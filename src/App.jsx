@@ -12,6 +12,10 @@ import OTPVerification from './pages/OTPVerification'
 import KYCVerification from './pages/KYCVerification'
 import AuctionDetails from './pages/AuctionDetails'
 import Dashboard from './pages/Dashboard'
+import SellerDashboard from './pages/SellerDashboard'
+import SellerAuctionListings from './pages/SellerAuctionListings'
+import CreateListing from './pages/CreateProduct'
+import SellerAnalytics from './pages/SellerAnalytics'
 import BuyerAuctions from './pages/BuyerAuctions'
 import BuyerAuctionDetails from './pages/BuyerAuctionDetails'
 import MyBids from './pages/MyBids'
@@ -20,6 +24,8 @@ import Invoices from './pages/Invoices'
 import Wallet from './pages/Wallet'
 import Profile from './pages/Profile'
 import './App.css'
+import SellerAuctions from './pages/SellerAuctions'
+import SellerListingDetails from './pages/SellerAuctionDetails'
 
 function App() {
   return (
@@ -31,6 +37,12 @@ function App() {
           <Route path="/otp-verification" element={<OTPVerification />} />
           <Route path="/kyc-verification" element={<KYCVerification />} />
           <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/seller-dashboard" element={<SellerDashboard />} />
+          <Route path='/seller/auction-listings' element={<SellerAuctionListings />}/>
+          <Route path='/seller/create-listing' element={<CreateListing/>}/>
+          <Route path='/seller/auctions' element={<SellerAuctions/>}/>
+          <Route path='/seller/listing/:id' element={<SellerListingDetails/>}/>
+          <Route path='/seller/analytics' element={<SellerAnalytics/>}/>
           <Route path="/buyer/auctions" element={<BuyerAuctions />} />
           <Route path="/buyer/auction/:id" element={<BuyerAuctionDetails />} />
           <Route path="/my-bids" element={<MyBids />} />
