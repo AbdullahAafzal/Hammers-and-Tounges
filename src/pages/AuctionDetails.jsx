@@ -1,20 +1,17 @@
 import React, { useState, useEffect } from 'react'
-import { useParams, useNavigate, Link } from 'react-router-dom'
+import { useParams, Link } from 'react-router-dom'
 import './AuctionDetails.css'
 
 const AuctionDetails = () => {
   const { id } = useParams()
-  const navigate = useNavigate()
   const [activeTab, setActiveTab] = useState('description')
   const [bidAmount, setBidAmount] = useState('')
   const [customBidAmount, setCustomBidAmount] = useState('')
   const [selectedImage, setSelectedImage] = useState(0)
   const [timeRemaining, setTimeRemaining] = useState({ hours: 0, minutes: 1, seconds: 25 })
 
-  // Determine status based on id - odd numbers are LIVE, even are UPCOMING
   const auctionStatus = parseInt(id) % 2 === 1 ? 'LIVE' : 'UPCOMING'
 
-  // Mock auction data - in real app, fetch based on id
   const auction = {
     id: id || '123',
     title: auctionStatus === 'LIVE' ? 'Lot 102: Vintage Rolex Submariner' : '1965 Shelby Cobra 427',
@@ -55,7 +52,6 @@ Fully restored to concours quality, this Cobra has been meticulously maintained 
     activeBidders: ['Bidder_789', 'Bidder_123', 'Bidder_456', 'Bidder_101']
   }
 
-  // Timer countdown for live auctions
   useEffect(() => {
     if (auction.status === 'LIVE') {
       const interval = setInterval(() => {

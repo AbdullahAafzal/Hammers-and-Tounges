@@ -1,7 +1,4 @@
 import React, { useState } from 'react'
-import { Link } from 'react-router-dom'
-import logo from '../assets/logo.png'
-import './SellerAuctionListings.css'
 import './SellerAnalytics.css'
 import SellerHeader from '../components/SellerHeader'
 

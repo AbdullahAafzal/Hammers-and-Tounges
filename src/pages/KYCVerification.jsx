@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { useNavigate, Link } from 'react-router-dom'
+import { useNavigate, Link, useLocation } from 'react-router-dom'
 import logo from '../assets/logo.png'
 import './KYCVerification.css'
 
@@ -73,6 +73,15 @@ const KYCVerification = () => {
   const handleSubmit = (e) => {
     e.preventDefault()
     console.log('Submitting KYC documents', documents)
+    
+    navigate( '/seller-dashboard', {
+      state: documents
+    } )
+
+  }
+
+  const handleSkip = () => {
+    navigate('/seller-dashboard')
   }
 
   const getStatusBadge = (status) => {
@@ -331,6 +340,16 @@ const KYCVerification = () => {
             </div>
 
             <div className="kyc-form-actions">
+              <button 
+                type="button" 
+                className="skip-button"
+                onClick={handleSkip}
+              >
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                  <path d="M13 17L18 12L13 7M6 17L11 12L6 7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+                Skip for Now
+              </button>
               <button type="submit" className="submit-verification-button">
                 Submit for Verification
               </button>
@@ -343,4 +362,3 @@ const KYCVerification = () => {
 }
 
 export default KYCVerification
-

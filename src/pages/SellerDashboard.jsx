@@ -170,31 +170,6 @@ const SellerDashboard = () => {
         }
     }
 
-    const getStatusBadge = (status) => {
-        const statusConfig = {
-            active: { text: 'Active', color: '#8CC63F', bg: 'rgba(140, 198, 63, 0.15)' },
-            paid: { text: 'Paid', color: '#3B82F6', bg: 'rgba(59, 130, 246, 0.15)' },
-            shipped: { text: 'Shipped', color: '#FFC107', bg: 'rgba(255, 193, 7, 0.15)' },
-            delivered: { text: 'Delivered', color: '#8B5CF6', bg: 'rgba(139, 92, 246, 0.15)' },
-            completed: { text: 'Completed', color: '#6B7280', bg: 'rgba(107, 114, 128, 0.15)' }
-        }
-
-        const config = statusConfig[status] || statusConfig.active
-
-        return (
-            <span
-                className="status-badge"
-                style={{
-                    backgroundColor: config.bg,
-                    color: config.color,
-                    border: `1px solid ${config.color}40`
-                }}
-            >
-                {config.text}
-            </span>
-        )
-    }
-
     return (
         <div className="dashboard-page">
             <SellerHeader />

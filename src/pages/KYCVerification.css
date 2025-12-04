@@ -360,10 +360,43 @@
   margin-top: 2rem;
   padding-top: 2rem;
   border-top: 1px solid rgba(255, 255, 255, 0.1);
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+}
+
+.skip-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.875rem 1.5rem;
+  background-color: transparent;
+  color: rgba(255, 255, 255, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 6px;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.skip-button:hover {
+  background-color: rgba(255, 255, 255, 0.05);
+  border-color: rgba(255, 255, 255, 0.3);
+  color: #ffffff;
+  transform: translateX(2px);
+}
+
+.skip-button svg {
+  transition: transform 0.2s;
+}
+
+.skip-button:hover svg {
+  transform: translateX(2px);
 }
 
 .submit-verification-button {
-  width: 100%;
+  flex: 1;
   padding: 0.875rem 2rem;
   background-color: #3B82F6;
   color: #ffffff;
@@ -407,5 +440,13 @@
   .document-upload-area {
     padding: 2rem 1rem;
   }
-}
 
+  .kyc-form-actions {
+    flex-direction: column-reverse;
+  }
+
+  .skip-button,
+  .submit-verification-button {
+    width: 100%;
+  }
+}

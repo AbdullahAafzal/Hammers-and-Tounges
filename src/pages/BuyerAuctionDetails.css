@@ -6,7 +6,6 @@
   flex-direction: column;
 }
 
-/* Buyer Auction Details Header */
 .buyer-auction-details-header {
   background-color: rgba(0, 0, 0, 0.95);
   border-bottom: 1px solid rgba(255, 255, 255, 0.08);

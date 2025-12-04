@@ -142,11 +142,11 @@ const SellerAuctionListings = () => {
         <div className="page-container">
           <div className="page-header">
             <div className="page-title-section">
-              <h1 className="page-title">My Listings</h1>
-              <p className="page-subtitle">Manage all your auction listings in one place</p>
+              <h1 className="page-title">My Products</h1>
+              <p className="page-subtitle">Manage all your auction products in one place</p>
             </div>
             <div className="page-actions">
-              <Link to="/seller/create-listing" className="primary-button">
+              <Link to="/seller/create-product" className="primary-button">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
                   <path d="M12 5V19M5 12H19" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
                 </svg>

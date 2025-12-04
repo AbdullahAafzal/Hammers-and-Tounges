@@ -1,9 +1,9 @@
 import React, { useState } from 'react'
 import { Link } from 'react-router-dom'
-import './SellerAuctionListings.css'
+import './CreateProduct.css'
 import SellerHeader from '../components/SellerHeader'
 
-const CreateListing = () => {
+const CreateProduct = () => {
   const [formData, setFormData] = useState({
     title: '',
     category: '',
@@ -338,4 +338,4 @@ const CreateListing = () => {
   )
 }
 
-export default CreateListing
+export default CreateProduct

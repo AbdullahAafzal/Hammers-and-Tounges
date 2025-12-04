@@ -12,10 +12,33 @@ function SellerHeader() {
         </Link>
 
         <nav className="dashboard-nav">
-          <Link to="/seller-dashboard" className="nav-link active">Dashboard</Link>
-          <Link to="/seller/auction-listings" className="nav-link">My Products</Link>
-          <Link to="/seller/auctions" className="nav-link">Auctions</Link>
-          <Link to="/seller/analytics" className="nav-link">Analytics</Link>
+           <Link
+              to="/seller-dashboard"
+              className={`nav-link ${location.pathname === '/seller-dashboard' ? 'active' : ''}`}
+            >
+              Dashboard
+            </Link>
+
+            <Link
+              to="/seller/auction-listings"
+              className={`nav-link ${location.pathname === '/seller/auction-listings' ? 'active' : ''}`}
+            >
+              My Products
+            </Link>
+
+            <Link
+              to="/seller/auctions"
+              className={`nav-link ${location.pathname === '/seller/auctions' ? 'active' : ''}`}
+            >
+              Auctions
+            </Link>
+
+            <Link
+              to="/seller/analytics"
+              className={`nav-link ${location.pathname === '/seller/analytics' ? 'active' : ''}`}
+            >
+              Analytics
+            </Link>
         </nav>
 
         <div className="dashboard-header-right">

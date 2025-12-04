@@ -14,7 +14,7 @@ import AuctionDetails from './pages/AuctionDetails'
 import Dashboard from './pages/Dashboard'
 import SellerDashboard from './pages/SellerDashboard'
 import SellerAuctionListings from './pages/SellerAuctionListings'
-import CreateListing from './pages/CreateProduct'
+import CreateProduct from './pages/CreateProduct'
 import SellerAnalytics from './pages/SellerAnalytics'
 import BuyerAuctions from './pages/BuyerAuctions'
 import BuyerAuctionDetails from './pages/BuyerAuctionDetails'
@@ -39,7 +39,7 @@ function App() {
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/seller-dashboard" element={<SellerDashboard />} />
           <Route path='/seller/auction-listings' element={<SellerAuctionListings />}/>
-          <Route path='/seller/create-listing' element={<CreateListing/>}/>
+          <Route path='/seller/create-product' element={<CreateProduct/>}/>
           <Route path='/seller/auctions' element={<SellerAuctions/>}/>
           <Route path='/seller/listing/:id' element={<SellerListingDetails/>}/>
           <Route path='/seller/analytics' element={<SellerAnalytics/>}/>
