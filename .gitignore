@@ -1,5 +1,4 @@
 # Dependencies
-node_modules/
 
 # Build outputs
 dist/
@@ -34,4 +33,4 @@ pnpm-debug.log*
 .vite/
 
 
-
+node_modules
