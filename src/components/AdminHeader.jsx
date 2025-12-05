@@ -27,7 +27,7 @@ function AdminHeader() {
          
         </div>
 
-        <div className="header-centerr">
+        <div className="header-center">
          <nav className="nav">
             <Link to="/admin-panel/" className={`nav-link ${location.pathname==="/"?"active":""}`}>Dashboard</Link>
             <Link to="/reports" className={`nav-link ${location.pathname.includes("reports")?"active":""}`}>Reports</Link>

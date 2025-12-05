@@ -19,10 +19,16 @@ const SignIn = () => {
   }
 
   const handleSubmit = (e) => {
-    e.preventDefault()
-    // Handle form submission
-    console.log('Sign In', formData)
+  e.preventDefault();
+
+  console.log('Sign In', formData);
+
+  if (formData.email === "admin@gmail.com" && formData.password === "admin") {
+    navigate("/admin-panel");
+  } else {
+    alert("Invalid Credentials ❌");
   }
+};
 
   return (
     <div className="signin-page">

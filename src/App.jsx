@@ -26,6 +26,11 @@ import Profile from './pages/Profile'
 import './App.css'
 import SellerAuctions from './pages/SellerAuctions'
 import SellerListingDetails from './pages/SellerAuctionDetails'
+import AdminPanel from './pages/AdminPanel'
+import AdminHeader from "./components/AdminHeader"
+import Reports from './pages/Reports'
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 function App() {
   return (
@@ -51,6 +56,21 @@ function App() {
           <Route path="/invoice/:invoiceNumber" element={<Invoices />} />
           <Route path="/wallet" element={<Wallet />} />
           <Route path="/profile" element={<Profile />} />
+                    <Route path="/reports" element={
+  <>
+  
+    <AdminHeader />
+    <Reports/>
+  </>
+  
+} />
+          <Route path="/admin-panel" element={
+  <>
+    <AdminHeader />
+    <AdminPanel />
+  </>
+  
+} />
           <Route path="/auction/:id" element={
             <>
               <Header />
@@ -87,8 +107,10 @@ function App() {
             </>
           } />
         </Routes>
+        <ToastContainer /> 
       </div>
     </Router>
+    
   )
 }
 
