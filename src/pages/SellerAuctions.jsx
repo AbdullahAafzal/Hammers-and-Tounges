@@ -355,14 +355,14 @@ const SellerAuctions = () => {
                                 <div className="auction-card-header">
                                     <div className="auction-image">
                                         <img src={auction.image} alt={auction.title} />
-                                        <div className="auction-time-badge">
-                                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+                                        {/* <div className="auction-time-badge">
+                                            <svg width="10" height="10" viewBox="0 0 24 24" fill="none">
                                                 <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2" />
                                                 <path d="M12 6V12L16 14" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
                                             </svg>
                                             {auction.timeRemaining}
-                                        </div>
-                                        {getStatusBadge(auction)}
+                                        </div> */}
+                                        {/* {getStatusBadge(auction)} */}
                                     </div>
                                     <div className="auction-category">
                                         {auction.category}

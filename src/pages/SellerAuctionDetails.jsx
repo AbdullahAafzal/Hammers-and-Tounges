@@ -458,7 +458,7 @@ const SellerListingDetails = () => {
                                 </button>
                             </div>
 
-                            <div className="questions-card">
+                            {/* <div className="questions-card">
                                 <div className="card-header">
                                     <h3 className="card-title">Questions & Answers</h3>
                                     <span className="card-subtitle">{listing.questions.length} questions</span>
@@ -474,7 +474,7 @@ const SellerListingDetails = () => {
                                     </svg>
                                     Ask a Question
                                 </button>
-                            </div>
+                            </div> */}
                         </div>
                     </div>
                 </div>
