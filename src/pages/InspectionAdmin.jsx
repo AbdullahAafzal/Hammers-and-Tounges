@@ -45,9 +45,24 @@ const InspectionAdmin = () => {
   };
 
   return (
+
+    
     <div className="inspection-container">
+      
       <div className="left-section">
         <h1 className="page-title">Inspection Reviews</h1>
+{/* Top Single Image Card - Above Accordion */}
+<div className="top-image-card">
+  <img src={images[0]} className="top-single-image" alt="vehicle" />
+
+  <div className="top-image-details">
+    <h4 className="car-title">2018 Toyota Hilux</h4>
+    <p className="car-meta">Item ID: GHI789</p>
+    <p className="car-meta">Category: Vehicles</p>
+  </div>
+</div>
+
+
         <div className="accordion-box">
 
           <div className="accordion-item">
