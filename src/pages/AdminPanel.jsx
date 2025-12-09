@@ -106,7 +106,7 @@ function AdminPanel() {
 
         <div className="table-container">
           <table className="inspection-table">
-            <thead className="table-light">
+            <thead className="table-dark">
               <tr>
                 <th>#</th> 
                 <th>Item ID</th>
