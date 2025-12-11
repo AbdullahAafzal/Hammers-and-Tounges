@@ -91,27 +91,22 @@ Fully restored to concours quality, this Cobra has been meticulously maintained 
   const handleBidSubmit = (e) => {
     e.preventDefault()
     console.log('Placing bid:', bidAmount)
-    // Handle bid submission
   }
 
   const handleCustomBidSubmit = (e) => {
     e.preventDefault()
     console.log('Placing custom bid:', customBidAmount)
-    // Handle custom bid submission
   }
 
   const handleQuickBid = () => {
     setBidAmount(auction.minimumBid.toString())
     console.log('Quick bid:', auction.minimumBid)
-    // Handle quick bid submission
   }
 
-  // Live Auction View
   if (auction.status === 'LIVE') {
     return (
       <div className="auction-details-page live-auction-page">
         <div className="auction-details-container">
-          {/* Breadcrumbs */}
           <nav className="breadcrumbs">
             <Link to="/">Home</Link>
             <span>/</span>
@@ -122,14 +117,12 @@ Fully restored to concours quality, this Cobra has been meticulously maintained 
             <span>{auction.lotNumber}</span>
           </nav>
 
-          {/* Title and Description */}
           <div className="live-auction-header">
             <h1 className="live-auction-title">{auction.title}</h1>
             <p className="live-auction-description">{auction.description}</p>
           </div>
 
           <div className="live-auction-content">
-            {/* Left Panel - Video/Image Player */}
             <div className="live-auction-player-section">
               <div className="video-player">
                 <img src={auction.images[selectedImage]} alt={auction.title} />
@@ -148,9 +141,7 @@ Fully restored to concours quality, this Cobra has been meticulously maintained 
               </div>
             </div>
 
-            {/* Right Panel - Bidding Info */}
             <div className="live-auction-bidding-panel">
-              {/* Timer */}
               <div className="live-timer-section">
                 <div className="timer-label">TIME REMAINING</div>
                 <div className="live-timer">
@@ -173,7 +164,6 @@ Fully restored to concours quality, this Cobra has been meticulously maintained 
                 </div>
               </div>
 
-              {/* Current Highest Bid */}
               <div className="current-bid-box">
                 <div className="current-bid-label">Current Highest Bid</div>
                 <div className="current-bid-amount">{formatCurrency(auction.currentBid)}</div>
@@ -183,12 +173,10 @@ Fully restored to concours quality, this Cobra has been meticulously maintained 
                 </div>
               </div>
 
-              {/* Quick Bid Button */}
               <button className="quick-bid-button" onClick={handleQuickBid}>
                 Bid {formatCurrency(auction.minimumBid)}
               </button>
 
-              {/* Custom Bid */}
               <form className="custom-bid-form" onSubmit={handleCustomBidSubmit}>
                 <input
                   type="text"
@@ -200,7 +188,6 @@ Fully restored to concours quality, this Cobra has been meticulously maintained 
                 <button type="submit" className="custom-bid-button">Place Bid</button>
               </form>
 
-              {/* Confirmation Message */}
               {auction.isHighestBidder && (
                 <div className="bidder-confirmation">
                   You are the highest bidder!
@@ -209,9 +196,7 @@ Fully restored to concours quality, this Cobra has been meticulously maintained 
             </div>
           </div>
 
-          {/* Bottom Panels */}
           <div className="live-auction-bottom-panels">
-            {/* Live Bidding Feed */}
             <div className="bidding-feed-panel">
               <h3 className="panel-title">Live Bidding Feed</h3>
               <div className="bidding-feed-list">
@@ -224,7 +209,6 @@ Fully restored to concours quality, this Cobra has been meticulously maintained 
               </div>
             </div>
 
-            {/* Active Bidders */}
             <div className="active-bidders-panel">
               <h3 className="panel-title">Active Bidders ({auction.activeBidders.length})</h3>
               <div className="active-bidders-list">
@@ -245,7 +229,6 @@ Fully restored to concours quality, this Cobra has been meticulously maintained 
     )
   }
 
-  // Upcoming Auction View (Details Only - No Bidding)
   return (
     <div className="auction-details-page">
       <div className="auction-details-container">

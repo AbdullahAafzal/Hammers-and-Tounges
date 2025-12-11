@@ -1,0 +1,210 @@
+.inspection-container {
+  display: flex;
+  padding: 25px;
+  background: #0c0c0c;
+  color: #fff;
+  min-height: 100vh;
+}
+
+.left-section {
+  width: 60%;
+  margin-right: 30px;
+}
+
+.page-title {
+  font-size: 40px;
+  font-weight: 600;
+}
+
+.accordion-item {
+  background: #151515;
+  border: 1px solid #333;
+  border-radius: 8px;
+  margin-bottom: 12px;
+  display: flex;
+  flex-direction: column;
+}
+
+.accordion-header {
+  padding: 14px 18px;
+  font-size: 17px;
+  display: flex;
+  justify-content: space-between;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.accordion-body {
+  padding: 10px;
+  border-top: 1px solid #333;
+  flex-grow: 1;
+}
+
+.label-text {
+  color: #bbb;
+  font-size: 14px;
+}
+
+.dark-input,
+.dark-select {
+  background: #000;
+  border: 1px solid #444;
+  color: #fff;
+}
+
+.dark-input:focus,
+.dark-select:focus {
+  border-color: #777;
+  box-shadow: none;
+}
+
+.right-section {
+  width: 50%;
+}
+
+.image-card {
+  background: #151515;
+  padding: 10px;
+  border-radius: 12px;
+  border: 1px solid #978a8a36;
+  margin-bottom: 20px;
+  width: 90%;
+  height: 600px;
+  margin-top: 20px;
+}
+
+.big-image {
+  width: 100%;
+  height: 400px;
+  border-radius: 12px;
+  margin-bottom: 12px;
+}
+
+.thumbnail-row {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 15px;
+}
+
+.thumb-img {
+  width: 60px;
+  height: 60px;
+  object-fit: cover;
+  border-radius: 2px;
+  cursor: pointer;
+  opacity: 0.5;
+  border: 1px solid #281515;
+}
+
+.thumb-img:hover {
+  opacity: 0.8;
+}
+
+.active-thumb {
+  opacity: 1;
+  border: 2px solid #0af;
+}
+
+.car-title {
+  font-size: 22px;
+  font-weight: bold;
+}
+
+.car-meta {
+  color: #fdfdfd;
+  font-size: 13px;
+}
+
+.approve-btn {
+  width: 20%;
+  padding: 12px;
+  font-size: 16px;
+  margin-right: 5px;
+  margin-left: 26%;
+}
+
+.reject-btn {
+  width: 20%;
+  padding: 12px;
+  font-size: 16px;
+}
+
+/* Top Image Card */
+.top-image-card {
+  width: 60%;
+  background: #0f0f0f;
+  border: 1px solid #222;
+  border-radius: 12px;
+  padding: 15px;
+  margin-bottom: 10px;
+  margin-left: 20%;
+}
+
+.top-single-image {
+  width: 100%;
+  height: auto;
+  max-height: 300px;
+  object-fit: contain;
+  background-color: #000;
+  border-radius: 10px;
+  border: 2px solid #333;
+}
+
+.top-image-details {
+  margin-top: 10px;
+}
+
+.car-title1 {
+  color: #fff;
+  font-size: 20px;
+  font-weight: bold;
+}
+
+.car-meta1 {
+  color: #aaa;
+  font-size: 14px;
+  margin: 2px 0;
+}
+
+/* ===== Accordion Grid Layout ===== */
+.custom-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.grid-row {
+  display: flex;
+  gap: 12px;
+  align-items: stretch;
+}
+
+.grid-row .accordion-item {
+  width: 50%;
+}
+
+.full-width-row .accordion-item {
+  width: 100%;
+}
+
+/* ===== Responsive ===== */
+@media (max-width: 992px) {
+  .grid-row {
+    flex-direction: column;
+  }
+
+  .grid-row .accordion-item {
+    width: 100%;
+  }
+}
+
+@media (max-width: 576px) {
+  .accordion-header {
+    font-size: 14px;
+    padding: 10px;
+  }
+
+  .accordion-body {
+    font-size: 14px;
+  }
+}

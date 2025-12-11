@@ -4,7 +4,6 @@ import logo from '../assets/logo.png'
 import './Dashboard.css'
 
 const Dashboard = () => {
-  // Mock user data - in real app, fetch from API
   const user = {
     name: 'John',
     walletBalance: 1250.00,

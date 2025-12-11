@@ -26,6 +26,18 @@ import Profile from './pages/Profile'
 import './App.css'
 import SellerAuctions from './pages/SellerAuctions'
 import SellerListingDetails from './pages/SellerAuctionDetails'
+import AdminPanel from './pages/AdminPanel'
+import AdminHeader from "./components/AdminHeader"
+import Reports from './pages/Reports'
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import InspectionAdmin from "./pages/InspectionAdmin";
+import AuctionAdminPanel from './pages/AuctionAdminPanel'
+import AdminPublishNew from './pages/AdminPublishNew'
+import AuctionControlPanel from './pages/AuctionControlPanel'
+import LiveAuctionsTab from './pages/LiveAuctionsTab'
+import AdminAuctionResults from './pages/AdminAuctionResults'
+import Finance from './pages/Finance'
 
 function App() {
   return (
@@ -51,6 +63,66 @@ function App() {
           <Route path="/invoice/:invoiceNumber" element={<Invoices />} />
           <Route path="/wallet" element={<Wallet />} />
           <Route path="/profile" element={<Profile />} />
+          
+          <Route path="/reports" element={
+            <>
+              <AdminHeader />
+              <Reports/>
+            </>
+          } />
+           <Route path="/livetab" element={
+            <>
+              <AdminHeader />
+              <LiveAuctionsTab/>
+            </>
+            
+          } />
+           <Route path="/finance" element={
+            <>
+              <AdminHeader />
+              <Finance/>
+            </>
+            
+          } />
+           <Route path="/AdminAuctionResults" element={
+            <>
+              <AdminHeader />
+              <AdminAuctionResults/>
+            </>
+            
+          } />
+           <Route path="/controlpanel" element={
+            <>
+              <AdminHeader />
+              <AuctionControlPanel/>
+            </>
+          } />
+           <Route path="/auctiontab" element={
+            <>
+              <AdminHeader />
+              <AuctionAdminPanel/>
+            </>
+          } />
+
+          <Route path="/admin-panel" element={
+            <>
+              <AdminHeader />
+              <AdminPanel />
+            </>
+          } />
+ <Route path="/publishnew" element={
+            <>
+              <AdminHeader />
+              <AdminPublishNew />
+            </>
+          } />
+          <Route path="/inspection" element={
+            <>
+            <AdminHeader/>
+              <InspectionAdmin />
+            </>
+          } />
+
           <Route path="/auction/:id" element={
             <>
               <Header />
@@ -87,10 +159,10 @@ function App() {
             </>
           } />
         </Routes>
+        <ToastContainer /> 
       </div>
     </Router>
   )
 }
 
 export default App
-

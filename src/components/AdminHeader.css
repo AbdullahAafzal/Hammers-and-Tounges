@@ -1,0 +1,102 @@
+.admin-header {
+  background: black;
+  color: white;
+  width: 100% !important;
+  padding: 10px 0;
+  border-bottom: 2px solid #222;
+}
+
+.admin-header .header-container {
+  width: 100%;      
+  max-width: 100%;  
+  margin: 0;        
+  padding: 0 20px; 
+  box-sizing: border-box;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.admin-header .nav {
+  display: flex;
+  gap: 15px;
+}
+
+.admin-header .nav-link {
+  color: #aaa;
+  font-weight: 500;
+  text-decoration: none;
+  padding: 5px 8px;
+  transition: 0.2s;
+}
+
+.admin-header .nav-link:hover {
+  color: white;
+}
+
+
+
+.admin-header .logo {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  text-decoration: none;
+  color: white;
+  font-size: 20px;
+  font-weight: bold;
+}
+
+.admin-header .logo-icon img {
+  width: 35px;
+  height: 35px;
+}
+
+.admin-header .search-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 350px;
+}
+
+.admin-header .search-input {
+  width: 100%;
+  padding: 8px 30px 8px 12px;
+  border-radius: 8px;
+  border: none;
+  font-size: 14px;
+  background: #111;
+  color: white;
+}
+
+.admin-header .search-input:focus {
+  outline: 2px solid #ffcc00;
+}
+
+.admin-header .search-clear {
+  position: absolute;
+  right: 8px;
+  background: none;
+  border: none;
+  color: #888;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+.admin-header .search-clear:hover {
+  color: #ff4444;
+}
+
+.admin-header .profile-button .setting-button .notification-button {
+  background: #111;
+  border: 1px solid #333;
+  padding: 7px 10px;
+  border-radius: 6px;
+  color: #aaa;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.admin-header .profile-button:hover .setting-button:hover .notification-button:hover {
+  color: white;
+  border-color: white;
+}

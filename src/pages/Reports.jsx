@@ -1,0 +1,171 @@
+import React, { useState, useMemo } from 'react';
+import "./AdminPanel.css";
+import { toast } from "react-toastify";
+
+const sampleData = [
+  { id: "AS-72384", asset: "2021 Toyota Hilux 2.8 GD-6", officer: "John Doe", status: "Approved", date: "2024-07-15 14:30", notes: "All checks passed. Minor scratches found on rear left door." },
+  { id: "AS-72381", asset: "CAT 320D Excavator", officer: "Jane Smith", status: "Rejected", date: "2024-07-18 07:28", notes: "Engine failure during startup test. Requires full mechanical inspection." },
+  { id: "AS-72375", asset: "Industrial Grade Compressor", officer: "John Doe", status: "Pending", date: "2024-07-20 09:14", notes: "Awaiting senior officer sign-off before approval." },
+  { id: "AS-72370", asset: "Office Furniture Lot 52", officer: "Mike Ross", status: "Approved", date: "2024-07-27 11:22", notes: "Condition as described. Photos match uploaded documentation." },
+  { id: "AS-72366", asset: "Set of 4 Alloy Rims", officer: "Jane Smith", status: "Approved", date: "2024-07-29 08:19", notes: "Passed visual inspection. No cracks or dents detected." },
+  { id: "AS-72385", asset: "Generator 5KVA", officer: "Mike Ross", status: "Pending", date: "2024-08-01 10:00", notes: "Fuel system check remaining." },
+  { id: "AS-72386", asset: "Forklift Heavy Duty", officer: "John Doe", status: "Approved", date: "2024-08-05 16:45", notes: "Hydraulic system stable." },
+  { id: "AS-72387", asset: "Security Cameras Pack", officer: "Jane Smith", status: "Approved", date: "2024-08-10 13:15", notes: "Installation verified." },
+  { id: "AS-72388", asset: "Dell Workstation PC", officer: "Mike Ross", status: "Rejected", date: "2024-08-15 09:50", notes: "Motherboard issue." },
+  { id: "AS-72389", asset: "Solar Panel Lot", officer: "John Doe", status: "Pending", date: "2024-08-22 12:40", notes: "Performance report awaited." }
+];
+
+function Report() {
+  const [search, setSearch] = useState("");
+  const [status, setStatus] = useState("All");
+  const [officer, setOfficer] = useState("All");
+  const [currentPage, setCurrentPage] = useState(1);
+  const [selectedRow, setSelectedRow] = useState(null);
+
+  const itemsPerPage = 10;
+
+  const sortedData = useMemo(() => {
+    return [...sampleData].sort((a, b) => new Date(b.date) - new Date(a.date));
+  }, []);
+
+  const filtered = useMemo(() => {
+    return sortedData.filter(item => {
+      const matchSearch =
+        item.id.toLowerCase().includes(search.toLowerCase()) ||
+        item.asset.toLowerCase().includes(search.toLowerCase());
+      const matchStatus = status === "All" || item.status === status;
+      const matchOfficer = officer === "All" || item.officer === officer;
+      return matchSearch && matchStatus && matchOfficer;
+    });
+  }, [search, status, officer, sortedData]);
+
+  const totalPages = Math.ceil(filtered.length / itemsPerPage);
+  const paginatedData = filtered.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  );
+
+  return (
+    <div className="admin-wrapper">
+      <h2 className="inspection-title">Inspection History Log</h2>
+
+      <div className="filter-bar-container">
+        <input
+          type="text"
+          className="search-input"
+          placeholder="Search inspections"
+          value={search}
+          onChange={e => { setSearch(e.target.value); setCurrentPage(1); }}
+        />
+
+        <select className="filter-select" value={status} onChange={e => { setStatus(e.target.value); setCurrentPage(1); }}>
+          <option value="All">All Status</option>
+          <option value="Approved">Approved</option>
+          <option value="Rejected">Rejected</option>
+          <option value="Pending">Pending</option>
+        </select>
+
+        <select className="filter-select" value={officer} onChange={e => { setOfficer(e.target.value); setCurrentPage(1); }}>
+          <option value="All">All Officers</option>
+          <option value="John Doe">John Doe</option>
+          <option value="Jane Smith">Jane Smith</option>
+          <option value="Mike Ross">Mike Ross</option>
+        </select>
+
+        <button onClick={() => setCurrentPage(1)} className="apply-btn">Apply</button>
+        <button onClick={() => { setSearch(""); setStatus("All"); setOfficer("All"); setCurrentPage(1); }} className="clear-btn">Clear</button>
+      </div>
+
+      <div className="table-container">
+        <table className="inspection-table">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Item ID</th>
+              <th>Item Category</th>
+              <th>Date & Time</th>
+              <th>Auction Officer</th>
+              <th>Status</th>
+              <th>Decision Comments</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+
+          <tbody>
+            {paginatedData.length > 0 ? (
+              paginatedData.map((item, index) => (
+                <tr
+                  key={item.id + index}
+                  className={selectedRow === item.id ? "row-selected" : ""}
+                  onClick={() => setSelectedRow(item.id)}
+                >
+                  <td className={selectedRow === item.id ? "bold-number" : ""}>
+                    {(currentPage - 1) * itemsPerPage + index + 1}
+                  </td>
+                  <td>{item.id}</td>
+                  <td>{item.asset}</td>
+                  <td>{item.date}</td>
+                  <td>{item.officer}</td>
+                <td className="text-center">
+  <span className={`badge rounded-pill px-2 py-1 ${
+    item.status === "Approved" ? "bg-success" :
+    item.status === "Rejected" ? "bg-danger" :
+    item.status === "In Progress" ? "bg-warning text-dark" :
+    "bg-primary" // Pending or others
+  }`}>
+    {item.status}
+  </span>
+</td>
+                  <td>{item.notes}</td>
+                  <td className="text-center">
+                    <button
+                      className="view-btn"
+                      onClick={() =>
+                        toast.info(item.notes, {
+                          position: "top-center",
+                          autoClose: 4000,
+                          closeButton: true,
+                          pauseOnHover: true,
+                          draggable: false,
+                          style: { fontSize: "16px", padding: "20px", textAlign: "center" }
+                        })
+                      }
+                    >
+                      View Details
+                    </button>
+                  </td>
+                </tr>
+              ))
+            ) : (
+              <tr>
+                <td colSpan="8" className="text-center p-3">No record found</td>
+              </tr>
+            )}
+          </tbody>
+        </table>
+      </div>
+
+      <div className="pagination-bar1">
+        <button disabled={currentPage === 1} onClick={() => setCurrentPage(p => p - 1)} className="btn border rounded px-3">Prev</button>
+
+        {[...Array(totalPages)].map((_, i) => (
+          i < 3 && (
+            <button
+              key={i}
+              onClick={() => setCurrentPage(i + 1)}
+              className={`btn border rounded px-3 ${currentPage === i + 1 ? "bg-blue-800 text-white border-0" : ""}`}
+            >
+              {i + 1}
+            </button>
+          )
+        ))}
+
+        {totalPages > 3 && <span className="px-2">...</span>}
+
+        <button disabled={currentPage === totalPages} onClick={() => setCurrentPage(p => p + 1)} className="btn border rounded px-3">Next</button>
+      </div>
+    </div>
+  );
+}
+
+export default Report;
