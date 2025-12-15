@@ -1,5 +1,5 @@
 import React, { useState, useCallback, useMemo, useEffect } from 'react'
-import { Link, useParams } from 'react-router-dom'
+import { useNavigate, Link, useParams } from 'react-router-dom'
 import './SellerAuctionDetails.css'
 import SellerHeader from '../components/SellerHeader'
 
@@ -91,6 +91,8 @@ const SellerListingDetails = () => {
     const [activeImage, setActiveImage] = useState(0)
     const [showFullDescription, setShowFullDescription] = useState(false)
     const [timeRemaining, setTimeRemaining] = useState('')
+
+    const navigate = useNavigate()
 
     const listing = useMemo(() => ({
         id: parseInt(id) || 1,
@@ -214,6 +216,11 @@ const SellerListingDetails = () => {
 
     const handleEditListing = () => {
         console.log('Edit listing clicked')
+        navigate('/seller/create-product', {
+            state: {
+                isEditing: true
+            }
+        })
     }
 
     const handleEndAuction = () => {

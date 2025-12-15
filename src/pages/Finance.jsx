@@ -1,11 +1,13 @@
 import React, { useState } from 'react'
 import './Finance.css'
+import { Link, useNavigate } from 'react-router-dom'
 
 const FinanceDashboard = () => {
   const [searchTerm, setSearchTerm] = useState('')
   const [actionFilter, setActionFilter] = useState('all')
   const [dateRange, setDateRange] = useState('today')
   const [currentPage, setCurrentPage] = useState(1)
+  const navigate = useNavigate()
   const itemsPerPage = 8
 
   const user = {
@@ -24,7 +26,8 @@ const FinanceDashboard = () => {
       amount: 145250.00,
       change: '+12.5%',
       trend: 'up',
-      icon: 'payments'
+      icon: 'payments',
+      navigation: ''
     },
     {
       id: 2,
@@ -32,7 +35,8 @@ const FinanceDashboard = () => {
       amount: 287500.00,
       change: '+8.3%',
       trend: 'up',
-      icon: 'revenue'
+      icon: 'revenue',
+      navigation: ''
     },
     {
       id: 3,
@@ -40,7 +44,8 @@ const FinanceDashboard = () => {
       amount: 12,
       change: '-2 new',
       trend: 'down',
-      icon: 'approvals'
+      icon: 'approvals',
+      navigation: ''
     },
     {
       id: 4,
@@ -48,7 +53,8 @@ const FinanceDashboard = () => {
       amount: 8,
       change: 'No change',
       trend: 'neutral',
-      icon: 'entries'
+      icon: 'entries',
+      navigation: '/finance/manual/payments-authorization'
     }
   ]
 
@@ -189,41 +195,41 @@ const FinanceDashboard = () => {
         color: '#8CC63F',
         bg: 'rgba(140, 198, 63, 0.15)',
         border: 'rgba(140, 198, 63, 0.4)',
-        icon: (
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
-            <path d="M12 2V22M17 5H9.5C8.57174 5 7.6815 5.36875 7.02513 6.02513C6.36875 6.6815 6 7.57174 6 8.5C6 9.42826 6.36875 10.3185 7.02513 10.9749C7.6815 11.6312 8.57174 12 9.5 12H14.5C15.4283 12 16.3185 12.3687 16.9749 13.0251C17.6312 13.6815 18 14.5717 18 15.5C18 16.4283 17.6312 17.3185 16.9749 17.9749C16.3185 18.6312 15.4283 19 14.5 19H6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-          </svg>
-        )
+        // icon: (
+        //   <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+        //     <path d="M12 2V22M17 5H9.5C8.57174 5 7.6815 5.36875 7.02513 6.02513C6.36875 6.6815 6 7.57174 6 8.5C6 9.42826 6.36875 10.3185 7.02513 10.9749C7.6815 11.6312 8.57174 12 9.5 12H14.5C15.4283 12 16.3185 12.3687 16.9749 13.0251C17.6312 13.6815 18 14.5717 18 15.5C18 16.4283 17.6312 17.3185 16.9749 17.9749C16.3185 18.6312 15.4283 19 14.5 19H6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+        //   </svg>
+        // )
       },
       'Refund Processed': {
         color: '#3B82F6',
         bg: 'rgba(59, 130, 246, 0.15)',
         border: 'rgba(59, 130, 246, 0.4)',
-        icon: (
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
-            <path d="M20 12H4M4 12L10 18M4 12L10 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-          </svg>
-        )
+        // icon: (
+        //   <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+        //     <path d="M20 12H4M4 12L10 18M4 12L10 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+        //   </svg>
+        // )
       },
       'Fee Adjusted': {
         color: '#8B5CF6',
         bg: 'rgba(139, 92, 246, 0.15)',
         border: 'rgba(139, 92, 246, 0.4)',
-        icon: (
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
-            <path d="M12 8V16M8 12H16" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
-          </svg>
-        )
+        // icon: (
+        //   <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+        //     <path d="M12 8V16M8 12H16" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+        //   </svg>
+        // )
       },
       'Payment Failed': {
         color: '#EF4444',
         bg: 'rgba(239, 68, 68, 0.15)',
         border: 'rgba(239, 68, 68, 0.4)',
-        icon: (
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
-            <path d="M18 6L6 18M6 6L18 18" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-          </svg>
-        )
+        // icon: (
+        //   <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+        //     <path d="M18 6L6 18M6 6L18 18" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+        //   </svg>
+        // )
       }
     }
 
@@ -327,15 +333,14 @@ const FinanceDashboard = () => {
 
   const handleNewManualEntry = () => {
     console.log('Open new manual entry form')
+    navigate('/finance/manual-payments')
   }
 
   return (
     <div className="dashboard-page">
 
-      {/* Main Dashboard Content */}
       <main className="dashboard-main">
         <div className="dashboard-container">
-          {/* Welcome Section */}
           <div className="dashboard-welcome">
             <div className="welcome-content">
               <h1 className="welcome-title">Finance Dashboard</h1>
@@ -348,11 +353,9 @@ const FinanceDashboard = () => {
                 </svg>
                 New Manual Entry
               </button>
-            
             </div>
           </div>
 
-          {/* Finance Summary Cards */}
           <div className="summary-cards">
             {financialSummary.map((stat) => (
               <div key={stat.id} className="summary-card">
@@ -403,7 +406,7 @@ const FinanceDashboard = () => {
                     </svg>
                   )}
                 </div>
-                <div className="card-content">
+                <Link className="card-content" to={stat.navigation}>
                   <span className="card-label">{stat.title}</span>
                   <span className="card-value">
                     {stat.title.includes('Total') ? formatCurrency(stat.amount) : stat.amount}
@@ -417,12 +420,11 @@ const FinanceDashboard = () => {
                   }}>
                     {stat.change}
                   </span>
-                </div>
+                </Link>
               </div>
             ))}
           </div>
 
-          {/* Filters Section */}
           <div className="finance-filters-section">
             <div className="filters-container">
               <div className="search-section">
@@ -490,7 +492,6 @@ const FinanceDashboard = () => {
             </div>
           </div>
 
-          {/* Finance Logs Table */}
           <div className="finance-table-section">
             <div className="section-header">
               <h2 className="section-title">Financial Activity Logs</h2>
@@ -506,10 +507,8 @@ const FinanceDashboard = () => {
                     <tr>
                       <th>Action</th>
                       <th>Details</th>
-                      {/* <th>Amount</th> */}
                       <th>Officer</th>
                       <th>Date & Time</th>
-                      {/* <th>Status</th> */}
                     </tr>
                   </thead>
                   <tbody>
@@ -526,18 +525,7 @@ const FinanceDashboard = () => {
                               <div className="details-text">{log.details}</div>
                             </div>
                           </td>
-                          {/* <td>
-                            <div className={`amount-cell ${log.amount > 0 ? 'positive' : log.amount < 0 ? 'negative' : 'zero'}`}>
-                              {log.amount !== 0 ? (
-                                <>
-                                  {log.amount > 0 ? '+' : ''}
-                                  {formatCurrency(log.amount)}
-                                </>
-                              ) : (
-                                formatCurrency(log.amount)
-                              )}
-                            </div>
-                          </td> */}
+                        
                           <td>
                             <div className="officer-cell">
                               <div className="officer-avatar">
@@ -560,9 +548,6 @@ const FinanceDashboard = () => {
                               <span className="date-text">{formatDateTime(log.dateTime)}</span>
                             </div>
                           </td>
-                          {/* <td>
-                            {getStatusBadge(log.status)}
-                          </td> */}
                         </tr>
                       ))
                     ) : (

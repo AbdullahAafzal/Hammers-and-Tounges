@@ -182,7 +182,7 @@ const SellerDashboard = () => {
                             <p className="welcome-subtitle">Your seller dashboard is updated in real-time</p>
                         </div>
                         <div className="welcome-actions">
-                            <Link to="/seller/create-listing" className="action-button primary-button primary">
+                            <Link to="/seller/create-product" className="action-button primary-button primary">
                                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
                                     <path d="M12 5V19M5 12H19" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
                                 </svg>

@@ -38,6 +38,8 @@ import AuctionControlPanel from './pages/AuctionControlPanel'
 import LiveAuctionsTab from './pages/LiveAuctionsTab'
 import AdminAuctionResults from './pages/AdminAuctionResults'
 import Finance from './pages/Finance'
+import ManualPaymentEntry from './components/ManualPayment'
+import ManualPaymentAuthorization from './pages/ManualPaymentAuthorization'
 
 function App() {
   return (
@@ -81,6 +83,20 @@ function App() {
             <>
               <AdminHeader />
               <Finance/>
+            </>
+            
+          } />
+           <Route path="/finance/manual-payments" element={
+            <>
+              <AdminHeader />
+              <ManualPaymentEntry/>
+            </>
+            
+          } />
+           <Route path="/finance/manual/payments-authorization" element={
+            <>
+              <AdminHeader />
+              <ManualPaymentAuthorization/>
             </>
             
           } />

@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useLocation } from 'react-router-dom'
 import './CreateProduct.css'
 import SellerHeader from '../components/SellerHeader'
 
@@ -19,6 +19,8 @@ const CreateProduct = () => {
     },
     images: []
   })
+
+  const location = useLocation()
 
   const categories = [
     'Furniture',
@@ -87,7 +89,7 @@ const CreateProduct = () => {
         <div className="page-container">
           <div className="page-header">
             <div className="page-title-section">
-              <h1 className="page-title">Create New Product</h1>
+              <h1 className="page-title"> { location?.state?.isEditing ? 'Edit Your Product' : 'Create New Product' } </h1>
               <p className="page-subtitle">Fill in the details to list your item for auction</p>
             </div>
             <div className="page-actions">
