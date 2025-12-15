@@ -43,6 +43,7 @@ import ManualPaymentAuthorization from './pages/ManualPaymentAuthorization'
 import PaymentVerification from './pages/paymentVerification/PaymentVerification'
 import CategoryManagement from './pages/categoryManagement/CategoryManagement'
 import UserManagement from './pages/userManagement/UserManagement'
+import KycVerification from './pages/userManagement/KycVerification'
 
 function App() {
   return (
@@ -69,6 +70,13 @@ function App() {
           <Route path="/wallet" element={<Wallet />} />
           <Route path="/profile" element={<Profile />} />
 
+
+<Route path="/kycverification" element={
+            <>
+              <AdminHeader />
+              <KycVerification />
+            </>
+          } />
           <Route path="/reports" element={
             <>
               <AdminHeader />
