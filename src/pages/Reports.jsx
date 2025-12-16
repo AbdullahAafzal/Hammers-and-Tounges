@@ -85,9 +85,9 @@ function Report() {
               <th>Item Category</th>
               <th>Date & Time</th>
               <th>Auction Officer</th>
-              <th>Status</th>
+              <th className="text-center">Status</th>
               <th>Decision Comments</th>
-              <th>Actions</th>
+              <th className="text-center">Actions</th>
             </tr>
           </thead>
 
@@ -115,7 +115,7 @@ function Report() {
     {item.status}
   </span>
 </td>
-                  <td>{item.notes}</td>
+                  <td style={{ maxWidth: '300px' }}>{item.notes}</td>
                   <td className="text-center">
                     <button
                       className="view-btn"
@@ -145,23 +145,33 @@ function Report() {
       </div>
 
       <div className="pagination-bar2">
-        <button disabled={currentPage === 1} onClick={() => setCurrentPage(p => p - 1)} className="btn border rounded px-3">Prev</button>
+        <button 
+          disabled={currentPage === 1} 
+          onClick={() => setCurrentPage(p => p - 1)}
+        >
+          Prev
+        </button>
 
         {[...Array(totalPages)].map((_, i) => (
           i < 3 && (
             <button
               key={i}
               onClick={() => setCurrentPage(i + 1)}
-              className={`btn border rounded px-3 ${currentPage === i + 1 ? "bg-black-800 text-white border-0" : ""}`}
+              className={currentPage === i + 1 ? "active-page" : ""}
             >
               {i + 1}
             </button>
           )
         ))}
 
-        {totalPages > 3 && <span className="px-2">...</span>}
+        {totalPages > 3 && <span style={{ padding: '0 0.5rem', color: 'rgba(255, 255, 255, 0.5)' }}>...</span>}
 
-        <button disabled={currentPage === totalPages} onClick={() => setCurrentPage(p => p + 1)} className="btn border rounded px-3">Next</button>
+        <button 
+          disabled={currentPage === totalPages} 
+          onClick={() => setCurrentPage(p => p + 1)}
+        >
+          Next
+        </button>
       </div>
     </div>
   );

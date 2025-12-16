@@ -123,36 +123,44 @@ export default function LiveAuctionsTab() {
             <tr>
               <th>Bid ID</th>
               <th>User</th>
-              <th>Bid Amount</th>
+              <th className="text-right">Bid Amount</th>
               <th>Time Stamp</th>
-              <th>Status</th>
+              <th className="text-center">Status</th>
             </tr>
           </thead>
 
           <tbody>
-            {paginatedData.map((item) => (
-               <tr
-      key={item.id}
-      style={{ cursor: "pointer" }}
-      onClick={() => navigate("/AdminAuctionResults")}
-    >
+            {paginatedData.length === 0 ? (
+              <tr>
+                <td colSpan="5" style={{ textAlign: 'center', padding: '2rem', color: 'rgba(255, 255, 255, 0.5)', fontStyle: 'italic' }}>
+                  No bid logs found
+                </td>
+              </tr>
+            ) : (
+              paginatedData.map((item) => (
+                <tr
+                  key={item.id}
+                  style={{ cursor: "pointer" }}
+                  onClick={() => navigate("/AdminAuctionResults")}
+                >
       <td>{item.id}</td>
       <td>{item.user}</td>
-      <td>${item.amount.toLocaleString()}</td>
+      <td className="text-right">${item.amount.toLocaleString()}</td>
       <td>{item.time}</td>
-    <td>
-                    <span className={`statusbadge
-                      ${item.status === "Winning" ? "bg-winning" :
-                      item.status === "Outbid" ? "bg-outbid" :
-                      item.status === "Ended" ? "bg-end" :
-                      "bg-draft"
-                      }`}>
-                      {item.status}
-                    </span>
-                  </td>
+      <td className="text-center">
+        <span className={`statusbadge
+          ${item.status === "Winning" ? "bg-winning" :
+          item.status === "Outbid" ? "bg-outbid" :
+          item.status === "Ended" ? "bg-end" :
+          "bg-draft"
+          }`}>
+          {item.status}
+        </span>
+      </td>
     </tr>
-  ))}
-</tbody>
+              ))
+            )}
+          </tbody>
         </table>
       </div>
 

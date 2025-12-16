@@ -96,8 +96,29 @@
   overflow-x: auto;
   border-radius: 12px;
   background: #0d0d0d;
-  padding: 2px;
-  box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+  padding: 1px;
+  border: 1px solid #222;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  -webkit-overflow-scrolling: touch;
+  position: relative;
+}
+
+.table-box::-webkit-scrollbar {
+  height: 8px;
+}
+
+.table-box::-webkit-scrollbar-track {
+  background: #0a0a0a;
+  border-radius: 4px;
+}
+
+.table-box::-webkit-scrollbar-thumb {
+  background: #333;
+  border-radius: 4px;
+}
+
+.table-box::-webkit-scrollbar-thumb:hover {
+  background: #444;
 }
 
 .auction-table {
@@ -107,6 +128,13 @@
   color: #fff;
   font-size: 15px;
   text-align: left;
+}
+
+.auction-table thead {
+  background: #161616;
+  position: sticky;
+  top: 0;
+  z-index: 10;
 }
 
 .auction-table thead tr {
@@ -122,15 +150,30 @@
   border-bottom: 1px solid #333;
   color: #fff;
   white-space: nowrap;
+  vertical-align: middle;
+}
+
+.auction-table th.text-right {
+  text-align: right;
+}
+
+.auction-table th.text-center {
+  text-align: center;
 }
 
 .auction-table tbody tr {
   background: #0f0f0f;
-  transition: background-color 0.2s;
+  transition: all 0.2s ease;
+  cursor: pointer;
 }
 
 .auction-table tbody tr:hover {
   background: #1a1a1a;
+  transform: scale(1.001);
+}
+
+.auction-table tbody tr:last-child td {
+  border-bottom: none;
 }
 
 .auction-table td {
@@ -146,13 +189,26 @@
   font-weight: 500;
 }
 
+.auction-table td.text-right {
+  text-align: right !important;
+  font-variant-numeric: tabular-nums;
+  color: #fff;
+  font-weight: 600;
+}
+
+.auction-table td.text-center {
+  text-align: center !important;
+}
+
 .pagination-row {
-display: flex;
+  display: flex;
   align-items: center;
   justify-content: center;
   gap: 1rem;
+  padding-top: 1.5rem;
   border-top: 1px solid rgba(255, 255, 255, 0.1);
   flex-wrap: wrap;
+  margin-top: 1rem;
 }
 
 
@@ -188,9 +244,11 @@ background-color: rgba(59, 130, 246, 0.15);
   cursor: not-allowed;
 }
 .pagination {
-  grid-column: 2; 
+  display: flex;
+  align-items: center;
   justify-content: center;
-  gap: 6px;
+  gap: 0.5rem;
+  flex-wrap: wrap;
 }
 .pagination-row > span {
   grid-column: 1; 
@@ -223,40 +281,42 @@ background-color: rgba(59, 130, 246, 0.15);
   
 }
 .statusbadge {
-   display: inline-block;
+  display: inline-block;
   font-size: 12px;
   font-weight: 700;
   text-align: center;
   border-radius: 20px;
-  padding: 6px 12px; 
+  padding: 6px 14px; 
   white-space: nowrap;
-  overflow: hidden;
-  width: 50%;
+  min-width: fit-content;
 }
 
-
 .bg-winning {
-  background-color: #00fd3b36;
-  color: #00fd3b;
-  border: 1px solid #00fd3b88; /* Correct syntax */
+  background-color: rgba(34, 197, 94, 0.2);
+  color: #4ade80;
+  border: 1px solid rgba(34, 197, 94, 0.5);
+  box-shadow: 0 0 8px rgba(34, 197, 94, 0.2);
 }
 
 .bg-outbid {
-  background-color: #d7fd0036;
-  color: #d7fd00;
-  border: 1px solid #d7fd006a;
+  background-color: rgba(251, 191, 36, 0.2);
+  color: #fbbf24;
+  border: 1px solid rgba(251, 191, 36, 0.5);
+  box-shadow: 0 0 8px rgba(251, 191, 36, 0.2);
 }
 
 .bg-end {
-  background-color: #fd000040;
-  color: #fd0000;
-  border: 1px solid #fd0000;
+  background-color: rgba(239, 68, 68, 0.2);
+  color: #f87171;
+  border: 1px solid rgba(239, 68, 68, 0.5);
+  box-shadow: 0 0 8px rgba(239, 68, 68, 0.2);
 }
 
 .bg-draft {
-  background-color: #6c757d25;
-  color: #6c757d;
-  border: 1px solid #6c757d;
+  background-color: rgba(107, 114, 128, 0.2);
+  color: #9ca3af;
+  border: 1px solid rgba(107, 114, 128, 0.5);
+  box-shadow: 0 0 8px rgba(107, 114, 128, 0.2);
 }
 
 
@@ -318,10 +378,22 @@ html, body {
 
   .table-box {
     overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
   }
 
   .auction-table {
-    min-width: 720px;
+    min-width: 800px;
+  }
+
+  .auction-table th,
+  .auction-table td {
+    padding: 12px 10px;
+    font-size: 13px;
+  }
+
+  .statusbadge {
+    font-size: 11px;
+    padding: 5px 10px;
   }
 
   .pagination-row {
@@ -354,5 +426,20 @@ html, body {
     min-width: 32px;
     height: 32px;
     font-size: 13px;
+    padding: 0.4rem 0.8rem;
+  }
+
+  .auction-table {
+    min-width: 900px;
+  }
+
+  .auction-table th {
+    font-size: 10px;
+    padding: 10px 8px;
+  }
+
+  .auction-table td {
+    font-size: 12px;
+    padding: 10px 8px;
   }
 }

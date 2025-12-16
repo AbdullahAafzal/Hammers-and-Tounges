@@ -141,7 +141,29 @@ body {
   overflow-x: auto;
   border-radius: 12px;
   background: #0d0d0d;
-  padding: 2px;
+  padding: 1px;
+  border: 1px solid #222;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  -webkit-overflow-scrolling: touch;
+  position: relative;
+}
+
+.table-container::-webkit-scrollbar {
+  height: 8px;
+}
+
+.table-container::-webkit-scrollbar-track {
+  background: #0a0a0a;
+  border-radius: 4px;
+}
+
+.table-container::-webkit-scrollbar-thumb {
+  background: #333;
+  border-radius: 4px;
+}
+
+.table-container::-webkit-scrollbar-thumb:hover {
+  background: #444;
 }
 
 .inspection-table {
@@ -155,28 +177,71 @@ body {
 
 .inspection-table thead {
   background: #161616;
+  position: sticky;
+  top: 0;
+  z-index: 10;
 }
+
 .inspection-table thead th {
-  padding: 14px 16px;
+  padding: 16px;
   font-size: 12px;
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.7px;
   border-bottom: 1px solid #333;
   white-space: nowrap;
+  vertical-align: middle;
+}
+
+.inspection-table thead th.text-center {
+  text-align: center;
 }
 
 .inspection-table tbody tr {
   background: #0f0f0f;
-  transition: 0.2s;
+  transition: all 0.2s ease;
+  cursor: pointer;
 }
+
 .inspection-table tbody tr:hover {
   background: #1a1a1a;
+  transform: scale(1.001);
 }
+
+.inspection-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
 .inspection-table tbody td {
-  padding: 14px 16px;
+  padding: 16px;
   border-bottom: 1px solid #222;
+  vertical-align: middle;
+}
+
+.inspection-table tbody td:not(:nth-child(7)) {
   white-space: nowrap;
+}
+
+.inspection-table tbody td:nth-child(7) {
+  white-space: normal;
+  max-width: 300px;
+  word-wrap: break-word;
+  line-height: 1.5;
+}
+
+.inspection-table .text-center {
+  text-align: center;
+}
+
+.inspection-table tbody td.text-center {
+  text-align: center;
+}
+
+.inspection-table tbody tr td[colspan] {
+  text-align: center;
+  padding: 2rem;
+  color: rgba(255, 255, 255, 0.5);
+  font-style: italic;
 }
 
 .badge-custom {
@@ -185,28 +250,32 @@ body {
   font-weight: 700;
   text-align: center;
   border-radius: 20px;
-  padding: 6px 12px; 
+  padding: 6px 14px; 
   white-space: nowrap;
-  overflow: hidden;
-  width: 100%;
+  min-width: fit-content;
 }
 
 
 
 .badge-rejected {
-  background-color: #ea060619; 
-  color: #dc3546fc;
-  border: 1px solid #dc354662; 
+  background-color: rgba(239, 68, 68, 0.2); 
+  color: #f87171;
+  border: 1px solid rgba(239, 68, 68, 0.5); 
+  box-shadow: 0 0 8px rgba(239, 68, 68, 0.2);
 }
-.badge-approved{
- background-color: #28a74615; 
-  color: #28a746;
-  border: 1px solid #28a74652; 
+
+.badge-approved {
+  background-color: rgba(34, 197, 94, 0.2); 
+  color: #4ade80;
+  border: 1px solid rgba(34, 197, 94, 0.5); 
+  box-shadow: 0 0 8px rgba(34, 197, 94, 0.2);
 }
-.badge-pending1{
- background-color: #cfd2160a; 
-  color: #cfd216ea;
-  border: 1px solid #cfd2163f; 
+
+.badge-pending1 {
+  background-color: rgba(251, 191, 36, 0.2); 
+  color: #fbbf24;
+  border: 1px solid rgba(251, 191, 36, 0.5); 
+  box-shadow: 0 0 8px rgba(251, 191, 36, 0.2);
 }
 
 .row-selected {
@@ -228,7 +297,7 @@ body {
 }
 
 .pagination-bar2 button {
-     padding: 0.6rem 1.25rem;
+  padding: 0.6rem 1.25rem;
   background-color: rgba(255, 255, 255, 0.03);
   border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 6px;
@@ -239,20 +308,22 @@ body {
   text-align: center;
 }
 
-.pagination-bar2 .active-page {
-   background-color: rgba(59, 130, 246, 0.15);
-  border-color: rgba(59, 130, 246, 0.4);
-  color: #3B82F6;
+.pagination-bar2 .active-page,
+.pagination-bar2 button.bg-black-800 {
+  background-color: rgba(59, 130, 246, 0.15) !important;
+  border-color: rgba(59, 130, 246, 0.4) !important;
+  color: #3B82F6 !important;
   font-weight: 600;
 }
 
-.pagination-bar1 button:hover:not([disabled]) {
- background-color: rgba(255, 255, 255, 0.06);
-  border-color: rgba(255, 255, 255, 0.25);
+.pagination-bar2 button:hover:not([disabled]) {
+  background-color: rgba(255, 255, 255, 0.06);
+  border-color: rgba(59, 130, 246, 0.4);
   color: #fff;
   transform: translateY(-1px);
 }
-.pagination-bar button[disabled] {
+
+.pagination-bar2 button[disabled] {
   opacity: 0.4;
   cursor: not-allowed;
 }
@@ -326,20 +397,25 @@ body {
   background-color: #8cc63f;
   color: #000;
   border: none;
-  padding: 0.625rem 1rem;
+  padding: 0.625rem 1.25rem;
   border-radius: 6px;
   font-size: 0.875rem;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s;
-  width: 140px;
+  min-width: 140px;
   text-align: center;
+  white-space: nowrap;
 }
 
 .view-btn:hover {
   background-color: #35b24a;
   transform: translateY(-1px);
   box-shadow: 0 4px 12px rgba(140, 198, 63, 0.3);
+}
+
+.view-btn:active {
+  transform: translateY(0);
 }
 
 html,
@@ -388,6 +464,12 @@ body {
   }
 }
 
+@media (max-width: 1024px) {
+  .inspection-table tbody td:nth-child(7) {
+    max-width: 250px;
+  }
+}
+
 @media (max-width: 768px) {
   .inspection-title {
     font-size: 22px;
@@ -400,26 +482,60 @@ body {
 
   .table-container {
     overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
   }
 
   .inspection-table {
-    min-width: 900px;
+    min-width: 1000px;
   }
 
-  .pagination-bar1 {
+  .inspection-table thead th,
+  .inspection-table tbody td {
+    padding: 12px 10px;
+    font-size: 13px;
+  }
+
+  .inspection-table tbody td:nth-child(7) {
+    max-width: 200px;
+    font-size: 12px;
+  }
+
+  .badge-custom {
+    font-size: 11px;
+    padding: 5px 10px;
+  }
+
+  .view-btn {
+    padding: 0.5rem 0.75rem;
+    font-size: 0.8rem;
+    min-width: 100px;
+  }
+
+  .pagination-bar2 {
     flex-wrap: wrap;
     justify-content: center;
     gap: 6px;
+  }
+
+  .pagination-bar2 button {
+    padding: 0.5rem 1rem;
+    font-size: 0.8rem;
   }
 }
 
 @media (max-width: 480px) {
   .inspection-title {
     font-size: 20px;
+    margin-left: 0;
+  }
+
+  .admin-wrapper {
+    padding: 12px;
   }
 
   .filter-bar-container {
     padding: 10px;
+    gap: 8px;
   }
 
   .search-input,
@@ -427,16 +543,45 @@ body {
   .apply-btn,
   .clear-btn {
     width: 100%;
+    font-size: 14px;
+  }
+
+  .inspection-table {
+    min-width: 1100px;
+  }
+
+  .inspection-table thead th {
+    font-size: 10px;
+    padding: 10px 8px;
+  }
+
+  .inspection-table tbody td {
+    padding: 10px 8px;
+    font-size: 12px;
+  }
+
+  .inspection-table tbody td:nth-child(7) {
+    max-width: 150px;
+    font-size: 11px;
   }
 
   .view-btn {
-    width: 120px;
-    font-size: 13px;
+    min-width: 90px;
+    padding: 0.4rem 0.6rem;
+    font-size: 0.75rem;
   }
 
-  .pagination-bar1 button {
-    height: 34px;
-    font-size: 13px;
-    padding: 0 10px;
+  .badge-custom {
+    font-size: 10px;
+    padding: 4px 8px;
+  }
+
+  .pagination-bar2 {
+    gap: 4px;
+  }
+
+  .pagination-bar2 button {
+    padding: 0.4rem 0.8rem;
+    font-size: 0.75rem;
   }
 }

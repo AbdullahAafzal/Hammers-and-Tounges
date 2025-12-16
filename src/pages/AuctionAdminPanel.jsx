@@ -21,6 +21,7 @@ export default function AuctionPage() {
   const navigate = useNavigate();
   const [search, setSearch] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
+  const [filterStatus, setFilterStatus] = useState("All");
   const itemsPerPage = 5;
 
   const tableData = [
@@ -37,9 +38,12 @@ export default function AuctionPage() {
   ];
 
   const filteredData = tableData.filter(
-    (item) =>
-      item.name.toLowerCase().includes(search.toLowerCase()) ||
-      item.id.toLowerCase().includes(search.toLowerCase())
+    (item) => {
+      const matchSearch = item.name.toLowerCase().includes(search.toLowerCase()) ||
+        item.id.toLowerCase().includes(search.toLowerCase());
+      const matchStatus = filterStatus === "All" || item.status === filterStatus;
+      return matchSearch && matchStatus;
+    }
   );
 
   const totalPages = Math.ceil(filteredData.length / itemsPerPage);
@@ -97,11 +101,36 @@ export default function AuctionPage() {
             />
 
             <div className="btn-group ms-2 filter-btn-group">
-              <button  className="btn custom-filter-btn active " >All</button>
-              <button className="btn custom-filter-btn">Live</button>
-              <button className="btn custom-filter-btn">Upcoming</button>
-              <button className="btn custom-filter-btn">Ended</button>
-              <button className="btn custom-filter-btn">Draft</button>
+              <button 
+                className={`btn custom-filter-btn ${filterStatus === "All" ? "active" : ""}`}
+                onClick={() => { setFilterStatus("All"); setCurrentPage(1); }}
+              >
+                All
+              </button>
+              <button 
+                className={`btn custom-filter-btn ${filterStatus === "Live" ? "active" : ""}`}
+                onClick={() => { setFilterStatus("Live"); setCurrentPage(1); }}
+              >
+                Live
+              </button>
+              <button 
+                className={`btn custom-filter-btn ${filterStatus === "Upcoming" ? "active" : ""}`}
+                onClick={() => { setFilterStatus("Upcoming"); setCurrentPage(1); }}
+              >
+                Upcoming
+              </button>
+              <button 
+                className={`btn custom-filter-btn ${filterStatus === "Ended" ? "active" : ""}`}
+                onClick={() => { setFilterStatus("Ended"); setCurrentPage(1); }}
+              >
+                Ended
+              </button>
+              <button 
+                className={`btn custom-filter-btn ${filterStatus === "Draft" ? "active" : ""}`}
+                onClick={() => { setFilterStatus("Draft"); setCurrentPage(1); }}
+              >
+                Draft
+              </button>
             </div>
           </div>
         </div>
@@ -111,16 +140,22 @@ export default function AuctionPage() {
             <thead>
               <tr>
                 <th>Auction Name / ID</th>
-                <th>Status</th>
+                <th className="text-center">Status</th>
                 <th>Start Date</th>
                 <th>End Date</th>
-                <th>Lots</th>
-                <th>Current Value</th>
-                <th>Actions</th>
+                <th className="text-right">Lots</th>
+                <th className="text-right">Current Value</th>
               </tr>
             </thead>
             <tbody>
-              {paginatedData.map((item, index) => (
+              {paginatedData.length === 0 ? (
+                <tr>
+                  <td colSpan="6" style={{ textAlign: 'center', padding: '2rem', color: 'rgba(255, 255, 255, 0.5)', fontStyle: 'italic' }}>
+                    No auctions found
+                  </td>
+                </tr>
+              ) : (
+                paginatedData.map((item, index) => (
                 <tr
                   key={index}
                   style={{ cursor: "pointer" }}
@@ -131,7 +166,7 @@ export default function AuctionPage() {
                     <small className="text-secondary">{item.id}</small>
                   </td>
 
-                  <td>
+                  <td className="text-center">
                     <span className={`badgecustomadmin 
                       ${item.status === "Live" ? "bg-live" :
                       item.status === "Upcoming" ? "bg-upcoming" :
@@ -142,30 +177,14 @@ export default function AuctionPage() {
                     </span>
                   </td>
 
-                  <td>{item.start}</td>
-                  <td>{item.end}</td>
-                  <td>{item.lots}</td>
-                  <td>{item.value}</td>
-
-                  <td>
-                    <span
-                      style={{ cursor: "pointer" }}
-                      onClick={(e) => { e.stopPropagation(); alert("View clicked"); }}
-                    >👁</span>{" "}
-
-                    <span
-                      style={{ cursor: "pointer" }}
-                      onClick={(e) => { e.stopPropagation(); alert("Edit clicked"); }}
-                    >✏️</span>{" "}
-
-                    <span
-                      style={{ cursor: "pointer" }}
-                      onClick={(e) => { e.stopPropagation(); alert("More clicked"); }}
-                    >⋮</span>
-                  </td>
+                  <td>{item.start === "-" ? <span style={{ color: 'rgba(255, 255, 255, 0.4)', fontStyle: 'italic' }}>N/A</span> : item.start}</td>
+                  <td>{item.end === "-" ? <span style={{ color: 'rgba(255, 255, 255, 0.4)', fontStyle: 'italic' }}>N/A</span> : item.end}</td>
+                  <td className="text-right">{item.lots}</td>
+                  <td className="text-right">{item.value === "-" ? <span style={{ color: 'rgba(255, 255, 255, 0.4)', fontStyle: 'italic' }}>N/A</span> : item.value}</td>
 
                 </tr>
-              ))}
+              ))
+              )}
             </tbody>
           </table>
         </div>

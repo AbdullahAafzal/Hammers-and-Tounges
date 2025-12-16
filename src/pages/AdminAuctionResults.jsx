@@ -58,13 +58,18 @@ export default function AdminAuctionResults() {
       </div>
 
       <div className="filter-row">
-        <input
-          type="text"
-          className="search-input"
-          placeholder="🔍 Search by Lot, Item Name, or Bidder..."
-          value={search}
-          onChange={(e) => { setSearch(e.target.value); setPage(1); }}
-        />
+        <div className="search-wrapper">
+          <svg className="search-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <path d="M21 21L15 15M17 10C17 13.866 13.866 17 10 17C6.13401 17 3 13.866 3 10C3 6.13401 6.13401 3 10 3C13.866 3 17 6.13401 17 10Z"/>
+          </svg>
+          <input
+            type="text"
+            className="search-input"
+            placeholder="Search by Lot, Item Name, or Bidder..."
+            value={search}
+            onChange={(e) => { setSearch(e.target.value); setPage(1); }}
+          />
+        </div>
 
         <button className="createBtn export-btn" onClick={exportResults}>
           Export Results
@@ -89,37 +94,57 @@ export default function AdminAuctionResults() {
             <tr>
               <th>LOT</th>
               <th>ITEM DESCRIPTION</th>
-              <th>WINNING BID</th>
+              <th className="text-right">WINNING BID</th>
               <th>WINNING BIDDER</th>
-              <th>RESERVE STATUS</th>
-              <th>FINANCIAL STATUS</th>
-              <th></th>
+              <th className="text-center">RESERVE STATUS</th>
+              <th className="text-center">FINANCIAL STATUS</th>
+              <th className="text-center">ACTIONS</th>
             </tr>
           </thead>
           <tbody>
-            {rows.map((row, i) => (
-              <tr key={i}>
-                <td>{row.lot}</td>
-                <td>{row.item}</td>
-                <td>{row.bid ? `$${row.bid.toLocaleString()}` : "—"}</td>
-                <td>{row.bidder}</td>
-                <td>
-                  <span className={`badgecustomadmin ${row.reserve === "Met" ? "bg-live" : "bg-draft"}`}>
-                    {row.reserve}
-                  </span>
+            {rows.length === 0 ? (
+              <tr>
+                <td colSpan="7" style={{ textAlign: 'center', padding: '2rem', color: 'rgba(255, 255, 255, 0.5)', fontStyle: 'italic' }}>
+                  No results found
                 </td>
-                <td>
-                  <span className={`badgecustomadmin
-                    ${row.status === "Payment Received" ? "bg-live" :
-                    row.status === "Invoice Sent" ? "bg-upcoming" :
-                    row.status === "Payment Pending" ? "bg-ended" :
-                    "bg-draft"}`}>
-                    {row.status}
-                  </span>
-                </td>
-                <td className="dots">⋮</td>
               </tr>
-            ))}
+            ) : (
+              rows.map((row, i) => (
+                <tr key={i}>
+                  <td>{row.lot}</td>
+                  <td><strong>{row.item}</strong></td>
+                  <td className="text-right">{row.bid ? `$${row.bid.toLocaleString()}` : <span style={{ color: 'rgba(255, 255, 255, 0.4)', fontStyle: 'italic' }}>—</span>}</td>
+                  <td>{row.bidder}</td>
+                  <td className="text-center">
+                    <span className={`badgecustomadmin ${row.reserve === "Met" ? "bg-live" : "bg-draft"}`}>
+                      {row.reserve}
+                    </span>
+                  </td>
+                  <td className="text-center">
+                    <span className={`badgecustomadmin
+                      ${row.status === "Payment Received" ? "bg-live" :
+                      row.status === "Invoice Sent" ? "bg-upcoming" :
+                      row.status === "Payment Pending" ? "bg-ended" :
+                      "bg-draft"}`}>
+                      {row.status}
+                    </span>
+                  </td>
+                  <td className="dots text-center">
+                    <button 
+                      className="action-menu-btn"
+                      onClick={(e) => { e.stopPropagation(); alert("Actions menu"); }}
+                      title="More actions"
+                    >
+                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                        <circle cx="12" cy="12" r="1"/>
+                        <circle cx="12" cy="5" r="1"/>
+                        <circle cx="12" cy="19" r="1"/>
+                      </svg>
+                    </button>
+                  </td>
+                </tr>
+              ))
+            )}
           </tbody>
         </table>
       </div>

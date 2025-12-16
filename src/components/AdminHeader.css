@@ -6,11 +6,6 @@
   border-bottom: 2px solid #222;
   height: 90px;
 }
-.admin-header .header-center {
-  position: absolute;
-  left: 50%;
-  transform: translateX(-50%);
-}
 
 .admin-header .header-container {
   width: 100%;
@@ -22,6 +17,20 @@
   justify-content: space-between;
   align-items: center;
   gap: 20px;
+}
+
+.admin-header .header-left {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  flex: 0 0 auto;
+}
+
+.admin-header .header-center {
+  flex: 1;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
 }
 .logo-text{
 
@@ -45,9 +54,9 @@
 
 .admin-header .nav {
   display: flex;
-  gap: 10px;
-  text-align: center;
-  
+  gap: 15px;
+  align-items: center;
+  flex-wrap: wrap;
 }
 
 .admin-header .nav-link {
@@ -63,13 +72,20 @@
   color: white;
 }
 
-.header-right {
+.admin-header .nav-link.active {
+  color: white;
+  font-weight: 600;
+}
+
+.admin-header .header-right {
   display: flex;
   align-items: center;
   gap: 12px;
+  flex: 0 0 auto;
+  margin-left: 20px;
 }
 
-.header-icon-button {
+.admin-header .header-icon-button {
   background: #111;
   border: 1px solid #333;
   padding: 7px 10px;
@@ -77,11 +93,25 @@
   color: #aaa;
   cursor: pointer;
   transition: 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-.header-icon-button:hover {
+.admin-header .header-icon-button:hover {
   color: white;
   border-color: white;
+}
+
+.admin-header .profile-button {
+  background: rgba(140, 198, 63, 0.1);
+  border: 1px solid rgba(140, 198, 63, 0.3);
+}
+
+.admin-header .profile-button:hover {
+  background: rgba(140, 198, 63, 0.2);
+  border-color: #8cc63f;
+  color: #8cc63f;
 }
 
 
@@ -99,7 +129,7 @@
     font-size: 18px;
   }
 
-  .header-icon-button {
+  .admin-header .header-icon-button {
     padding: 6px 8px;
   }
 }
@@ -159,7 +189,7 @@
     font-size: 20px;
   }
 
-  .header-icon-button {
+  .admin-header .header-icon-button {
     padding: 5px 7px;
   }
 
@@ -193,8 +223,8 @@
 }
 
 @media (max-width: 992px) {
-  .header-right {
-    display: none;
+  .admin-header .header-right {
+    display: flex;
   }
 }
 
@@ -209,8 +239,8 @@
     margin-left: auto;
   }
 
-  .header-right {
-    display: none;
+  .admin-header .header-right {
+    display: flex;
   }
 
   .admin-header .header-center {
@@ -233,8 +263,7 @@
 
 @media (min-width: 769px) {
   .admin-header .header-center {
-    position: absolute;
-    left: 50%;
-    transform: translateX(-50%);
+    position: static;
+    transform: none;
   }
 }
