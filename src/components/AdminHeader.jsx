@@ -25,10 +25,10 @@ function AdminHeader() {
   }, [mobileMenuOpen])
 
   return (
-    <header className="admin-header">
-      <div className="header-container" ref={menuRef}>
+    <header className="admin-header4">
+      <div className="header-container4" ref={menuRef}>
 
-        <div className="header-left">
+        <div className="header-left4">
           <Link to="/" className="logo">
             <div className="logo-icon">
               <img src={logo} alt="Logo" />
@@ -60,7 +60,7 @@ function AdminHeader() {
           </button>
         </div>
 
-        <div className={`header-center ${mobileMenuOpen ? "open" : ""}`}>
+        <div className={`header-center4 ${mobileMenuOpen ? "open" : ""}`}>
           <nav className="nav">
             <Link to="/admin-panel" onClick={() => setMobileMenuOpen(false)} className={`nav-link ${location.pathname === "/" ? "active" : ""}`}>Dashboard</Link>
             <Link to="/reports" onClick={() => setMobileMenuOpen(false)} className={`nav-link ${location.pathname.includes("reports") ? "active" : ""}`}>Reports</Link>
@@ -72,7 +72,7 @@ function AdminHeader() {
           </nav>
         </div>
 
-        <div className="header-right">
+        <div className="header-right4">
           <button className="header-icon-button notification-button" aria-label="Notifications">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
               <path d="M15.137 21C14.695 21.622 13.91 22 13 22H11C10.09 22 9.305 21.622 8.863 21M18 8C18 5.239 15.761 3 13 3H11C8.239 3 6 5.239 6 8V11C6 12.326 5.473 13.597 4.535 14.535L4 15.07V17H20V15.07L19.465 14.535C18.527 13.597 18 12.326 18 11V8Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />

@@ -14,9 +14,9 @@ const Header = () => {
   }
 
   return (
-    <header className="header">
-      <div className="header-container">
-        <div className="header-left">
+    <header className="header3">
+      <div className="header-container3">
+        <div className="header-left3">
           <Link to="/" className="logo">
             <div className="logo-icon">
               <img src={logo} alt="Hammers & Tongues Logo" />
@@ -30,7 +30,7 @@ const Header = () => {
           </nav>
         </div>
         
-        <div className="header-center">
+        <div className="header-center3">
           <form className="search-form" onSubmit={handleSearch}>
             <div className="search-wrapper">
               <svg className="search-icon" width="18" height="18" viewBox="0 0 24 24" fill="none">
@@ -59,7 +59,7 @@ const Header = () => {
           </form>
         </div>
 
-        <div className="header-right">
+        <div className="header-right3">
           <button className="header-icon-button profile-button" aria-label="Profile">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
               <path d="M20 21V19C20 17.9391 19.5786 16.9217 18.8284 16.1716C18.0783 15.4214 17.0609 15 16 15H8C6.93913 15 5.92172 15.4214 5.17157 16.1716C4.42143 16.9217 4 17.9391 4 19V21" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>

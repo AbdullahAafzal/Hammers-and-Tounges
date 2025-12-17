@@ -24,11 +24,12 @@
   margin-bottom: 35px;
 }
 .stat-card {
-  background: #0d0d0d;
-  padding: 30px 25px;
-  border-radius: 12px;
-  font-size: 28px;
-  font-weight: 700;
+  background: #b29898;
+  padding: 45px;
+  margin: 10px;
+  border-radius: 14px;
+  font-size: 20px;
+  font-weight: bold;
   text-align: center;
   border: 1px solid #222;
   transition: all 0.2s ease;
@@ -37,18 +38,7 @@
 
 .stat-card:hover {
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
-  border-color: rgba(140, 198, 63, 0.3);
-}
-
-.stat-card span {
-  display: block;
-  font-size: 14px;
-  font-weight: 500;
-  color: rgba(255, 255, 255, 0.6);
-  margin-top: 8px;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
+  box-shadow: 0 6px 12px rgba(206, 198, 198, 0.3);
 }
 
 .filter-row {
