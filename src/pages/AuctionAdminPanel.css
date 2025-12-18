@@ -376,28 +376,26 @@ body {
 }
 
 .auction-icon-emoji {
-  font-size: 1.25rem!important;
-  line-height: 1!important;
-  display: block !important ;
-
+  font-size: 1.25rem;
+  line-height: 1;
+  display: block;
 }
 
 .auction-details {
-  display: flex !important;
-  flex-direction: column!important;
-  gap: 0.25rem!important;
-  justify-content: center!important;
-  
-    
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  justify-content: center;
+  line-height: 1;
 }
 
 .auction-name {
-  font-size: 0.9375rem!important;
-  font-weight: 600!important;
+  font-size: 0.9375rem;
+  font-weight: 600;
   color: #ffffff;
-  
-  line-height: 1!important;
-  padding: 0!important;
+  margin: 0;
+  line-height: 1.4;
+  padding: 0;
 }
 
 .auction-id {

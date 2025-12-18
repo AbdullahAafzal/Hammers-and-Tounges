@@ -8,13 +8,8 @@ const DATA = [
   { lot: "004", item: "TAG Heuer Carrera", bid: 4800, bidder: "BIDDER-F2E5", reserve: "Met", status: "Payment Pending" },
   { lot: "005", item: "Vintage Rolex Submariner", bid: 16000, bidder: "BIDDER-K447", reserve: "Met", status: "Payment Received" },
   { lot: "006", item: "Cartier Tank", bid: 14000, bidder: "BIDDER-X882", reserve: "Met", status: "Invoice Sent" },
-];
-
-const CARD_IMAGES = [
-  "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTt3WpWd9ggi9EY-ZecKXm326Zwf_OQW4BHhw&s",
-  "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSqKtPikqGQLSttXbrMpROp-psrJgi_-cykwA&s",
-  "https://png.pngtree.com/png-vector/20220521/ourmid/pngtree-icon-live-streaming-vector-png-image_4643886.png",
-  "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTt3WpWd9ggi9EY-ZecKXm326Zwf_OQW4BHhw&s",
+  { lot: "007", item: "Breitling Navitimer", bid: 8500, bidder: "BIDDER-M123", reserve: "Met", status: "Payment Received" },
+  { lot: "008", item: "IWC Portuguese", bid: 12000, bidder: "BIDDER-P456", reserve: "Met", status: "Invoice Sent" },
 ];
 
 const ROWS_PER_PAGE = 5;
@@ -42,6 +37,40 @@ export default function AdminAuctionResults() {
     return filteredData.slice(startIndex, startIndex + ROWS_PER_PAGE);
   }, [filteredData, page]);
 
+  function generatePageNumbers() {
+    const pages = [];
+    const maxVisible = 5;
+
+    if (totalPages <= maxVisible) {
+      for (let i = 1; i <= totalPages; i++) {
+        pages.push(i);
+      }
+    } else {
+      if (page <= 3) {
+        for (let i = 1; i <= 4; i++) {
+          pages.push(i);
+        }
+        pages.push('...');
+        pages.push(totalPages);
+      } else if (page >= totalPages - 2) {
+        pages.push(1);
+        pages.push('...');
+        for (let i = totalPages - 3; i <= totalPages; i++) {
+          pages.push(i);
+        }
+      } else {
+        pages.push(1);
+        pages.push('...');
+        pages.push(page - 1);
+        pages.push(page);
+        pages.push(page + 1);
+        pages.push('...');
+        pages.push(totalPages);
+      }
+    }
+    return pages;
+  }
+
   const exportResults = () => {
     const headers = ["Lot", "Item", "Bid", "Bidder", "Reserve", "Status"];
     const csvRows = filteredData.map(d =>
@@ -54,188 +83,274 @@ export default function AdminAuctionResults() {
     link.click();
   };
 
-  const statsCards = [
-    { title: "Total Hammer Price", value: "$1,245,600", iconUrl: CARD_IMAGES[0] },
-    { title: "Sell-Through Rate", value: "92%", iconUrl: CARD_IMAGES[1] },
-    { title: "Total Lots Sold", value: "138", iconUrl: CARD_IMAGES[2] },
-    { title: "Lots Unsold", value: "12", iconUrl: CARD_IMAGES[3] },
+  const stats = [
+    { 
+      title: "Total Hammer Price", 
+      value: "$1,245,600",
+      icon: (
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+          <line x1="12" y1="1" x2="12" y2="23" stroke="#3B82F6" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+          <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" stroke="#3B82F6" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+        </svg>
+      ),
+      color: "#3B82F6"
+    },
+    { 
+      title: "Sell-Through Rate", 
+      value: "92%",
+      icon: (
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+          <polyline points="22 12 18 12 15 21 9 3 6 12 2 12" stroke="#8CC63F" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+        </svg>
+      ),
+      color: "#8CC63F"
+    },
+    { 
+      title: "Total Lots Sold", 
+      value: "138",
+      icon: (
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+          <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" stroke="#A855F7" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+          <polyline points="22 4 12 14.01 9 11.01" stroke="#A855F7" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+        </svg>
+      ),
+      color: "#A855F7"
+    },
+    { 
+      title: "Lots Unsold", 
+      value: "12",
+      icon: (
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+          <circle cx="12" cy="12" r="10" stroke="#EF4444" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+          <line x1="15" y1="9" x2="9" y2="15" stroke="#EF4444" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+          <line x1="9" y1="9" x2="15" y2="15" stroke="#EF4444" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+        </svg>
+      ),
+      color: "#EF4444"
+    },
   ];
 
   return (
     <div className="results-wrapper">
-      <h1 className="title">Auction Results: Vintage Watch Collection - 24 Oct 2024</h1>
-      <p className="subtitle">Review winning bids, financial status, and next steps for the auction.</p>
+      <div className="results-container">
 
-      <div className="stats-row">
-        {statsCards.map((card, index) => (
-          <div className="category-card-horizontal" key={index}>
-            <div className="category-card-icon-wrapper">
-              <img src={card.iconUrl} alt={card.title} className="category-card-icon-img" />
-            </div>
-            <div className="category-card-content">
-              <h4>{card.title}</h4>
-              <p>{card.value}</p>
-            </div>
+        <div className="results-section-header">
+          <div className="results-header-content">
+            <h1 className="results-page-title">Auction Results: Vintage Watch Collection</h1>
+            <p className="results-page-subtitle">24 Oct 2024 - Review winning bids, financial status, and next steps for the auction</p>
           </div>
-        ))}
-      </div>
-
-      {/* Updated filter row to match AuctionAdminPanel capsule design */}
-      <div className="d-flex flex-wrap justify-content-between align-items-center mb-3 mt-3 mobile-flex-column">
-        <div className="d-flex flex-wrap gap-2 align-items-center full-width-mobile">
-          <input
-            type="text"
-            className="form-control bg-dark text-white border-secondary search-input"
-            placeholder=" 🔍 Search by Lot, Item, or Bidder"
-            value={search}
-            onChange={(e) => {
-              setSearch(e.target.value);
-              setPage(1);
-            }}
-          />
-
-          <button className="createBtn full-width-mobile-btn" onClick={exportResults}>
-            Export Results
-          </button>
-
-          <div className="btn-group ms-2 filter-btn-group">
-            <button
-              className={`btn custom-filter-btn ${statusFilter === "All" ? "active" : ""}`}
-              onClick={() => { setStatusFilter("All"); setPage(1); }}
-            >
-              All
-            </button>
-            <button
-              className={`btn custom-filter-btn ${statusFilter === "Payment Received" ? "active" : ""}`}
-              onClick={() => { setStatusFilter("Payment Received"); setPage(1); }}
-            >
-              Payment Received
-            </button>
-            <button
-              className={`btn custom-filter-btn ${statusFilter === "Invoice Sent" ? "active" : ""}`}
-              onClick={() => { setStatusFilter("Invoice Sent"); setPage(1); }}
-            >
-              Invoice Sent
-            </button>
-            <button
-              className={`btn custom-filter-btn ${statusFilter === "Payment Pending" ? "active" : ""}`}
-              onClick={() => { setStatusFilter("Payment Pending"); setPage(1); }}
-            >
-              Payment Pending
-            </button>
-            <button
-              className={`btn custom-filter-btn ${statusFilter === "Unsold" ? "active" : ""}`}
-              onClick={() => { setStatusFilter("Unsold"); setPage(1); }}
-            >
-              Unsold
+          <div className="results-header-actions">
+            <button className="results-export-btn" onClick={exportResults}>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                <polyline points="7 10 12 15 17 10" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                <line x1="12" y1="15" x2="12" y2="3" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
+              Export Results
             </button>
           </div>
         </div>
-      </div>
 
-      <div className="table-box">
-        <table className="table-dark">
-          <thead>
-            <tr>
-              <th>LOT</th>
-              <th>ITEM DESCRIPTION</th>
-              <th className="text-right">WINNING BID</th>
-              <th>WINNING BIDDER</th>
-              <th className="text-center">RESERVE STATUS</th>
-              <th className="text-center">FINANCIAL STATUS</th>
-              <th className="text-center">ACTIONS</th>
-            </tr>
-          </thead>
+        {/* STATS CARDS */}
+        <div className="results-stats-grid">
+          {stats.map((stat, index) => (
+            <div className="results-stat-card" key={index}>
+              <div className="results-card-bg-gradient" style={{ background: `linear-gradient(135deg, ${stat.color}33 0%, ${stat.color}0D 100%)` }}></div>
+              <div className="results-card-icon-container">
+                <div className="results-card-icon" style={{ backgroundColor: `${stat.color}26` }}>
+                  {stat.icon}
+                </div>
+              </div>
+              <div className="results-card-content">
+                <span className="results-card-label">{stat.title}</span>
+                <h3 className="results-card-value">{stat.value}</h3>
+              </div>
+            </div>
+          ))}
+        </div>
 
-          <tbody>
-            {paginatedRows.length === 0 ? (
-              <tr>
-                <td colSpan="7" style={{ textAlign: 'center', padding: '2rem', color: 'rgba(255, 255, 255, 0.5)', fontStyle: 'italic' }}>
-                  No results found
-                </td>
-              </tr>
-
-            ) : (
-              paginatedRows.map((row, i) => (
-                <tr key={i}>
-                  <td>{row.lot}</td>
-                  <td><strong>{row.item}</strong></td>
-                  <td className="text-right">{row.bid ? `$${row.bid.toLocaleString()}` : <span style={{ color: 'rgba(255, 255, 255, 0.4)', fontStyle: 'italic' }}>—</span>}</td>
-                  <td>{row.bidder}</td>
-                  <td className="text-center">
-                    <span className={`badgecustomadmin ${row.reserve === "Met" ? "bg-live" : "bg-draft"}`}>
-                      {row.reserve}
-                    </span>
-                  </td>
-                  <td className="text-center">
-                    <span className={`badgecustomadmin
-                      ${row.status === "Payment Received" ? "bg-live" :
-                        row.status === "Invoice Sent" ? "bg-upcoming" :
-                          row.status === "Payment Pending" ? "bg-ended" :
-                            "bg-draft"}`}>
-                      {row.status}
-                    </span>
-                  </td>
-                  <td className="dots text-center">
-                    <button
-                      className="action-menu-btn"
-                      onClick={(e) => { e.stopPropagation(); alert("Actions menu"); }}
-                      title="More actions"
-                    >
-                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                        <circle cx="12" cy="12" r="1" />
-                        <circle cx="12" cy="5" r="1" />
-                        <circle cx="12" cy="19" r="1" />
-                      </svg>
-                    </button>
-                  </td>
-                </tr>
-              ))
-            )}
-          </tbody>
-
-        </table>
-      </div>
-
-      {filteredData.length > 0 && (
-        <div className="table-pagination">
-          <div className="pagination-info">
-            Page {page} of {totalPages}
+        {/* FILTER SECTION */}
+        <div className="results-filter-section">
+          <div className="results-search-container">
+            <div className="results-search-input-wrapper">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+                <circle cx="11" cy="11" r="8" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+                <path d="M21 21L16.65 16.65" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+              </svg>
+              <input
+                type="text"
+                placeholder="Search by Lot, Item, or Bidder..."
+                value={search}
+                onChange={(e) => { setSearch(e.target.value); setPage(1); }}
+                className="results-search-input"
+              />
+              {search && (
+                <button
+                  className="results-clear-search"
+                  onClick={() => { setSearch(''); setPage(1); }}
+                  aria-label="Clear search"
+                >
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+                    <path d="M18 6L6 18M6 6L18 18" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                  </svg>
+                </button>
+              )}
+            </div>
           </div>
 
-          <div className="pagination-controls">
-
-            <button
-              style={{ color: "black" }}
-              className="pagination-btn prev"
-              onClick={() => setPage(p => Math.max(p - 1, 1))}
-              disabled={page === 1}
-            >
-              Prev
-            </button>
-
-            {[...Array(totalPages)].map((_, i) => (
+          <div className="results-filter-buttons">
+            {['All', 'Payment Received', 'Invoice Sent', 'Payment Pending', 'Unsold'].map((filter) => (
               <button
-                key={i}
-                className={`page-number ${page === i + 1 ? "active" : ""}`}
-                onClick={() => setPage(i + 1)}
+                key={filter}
+                className={`results-filter-btn ${statusFilter === filter ? 'active' : ''}`}
+                onClick={() => { setStatusFilter(filter); setPage(1); }}
               >
-                {i + 1}
+                {filter}
               </button>
             ))}
-
-            <button
-              style={{ color: "black" }}
-              className="pagination-btn next"
-              onClick={() => setPage(p => Math.min(p + 1, totalPages))}
-              disabled={page === totalPages}
-            >
-              Next
-            </button>
-
           </div>
         </div>
-      )}
+
+        {/* TABLE */}
+        <div className="results-data-table-section">
+          <div className="results-table-wrapper">
+            <table className="results-data-table">
+              <thead>
+                <tr>
+                  <th>Lot</th>
+                  <th>Item Description</th>
+                  <th>Winning Bid</th>
+                  <th>Winning Bidder</th>
+                  <th>Reserve Status</th>
+                  <th>Financial Status</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+
+              <tbody>
+                {paginatedRows.length > 0 ? (
+                  paginatedRows.map((row, i) => (
+                    <tr key={i} className="results-table-row">
+                      <td>
+                        <span className="results-lot-number">{row.lot}</span>
+                      </td>
+
+                      <td>
+                        <span className="results-item-name">{row.item}</span>
+                      </td>
+
+                      <td>
+                        <span className="results-bid-amount">
+                          {row.bid ? `$${row.bid.toLocaleString()}` : '—'}
+                        </span>
+                      </td>
+
+                      <td>
+                        <span className="results-bidder-id">{row.bidder}</span>
+                      </td>
+
+                      <td>
+                        <div className="results-status-cell">
+                          <span className={`results-status-badge ${row.reserve === "Met" ? "badge-met" : "badge-not-met"}`}>
+                            {row.reserve}
+                          </span>
+                        </div>
+                      </td>
+
+                      <td>
+                        <div className="results-status-cell">
+                          <span className={`results-status-badge ${
+                            row.status === "Payment Received" ? "badge-received" :
+                            row.status === "Invoice Sent" ? "badge-sent" :
+                            row.status === "Payment Pending" ? "badge-pending" :
+                            "badge-unsold"
+                          }`}>
+                            {row.status}
+                          </span>
+                        </div>
+                      </td>
+
+                      <td>
+                        <div className="results-action-buttons">
+                          <button
+                            className="results-action-btn"
+                            onClick={(e) => { e.stopPropagation(); alert("Actions menu"); }}
+                            title="More actions"
+                          >
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+                              <circle cx="12" cy="12" r="1" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                              <circle cx="12" cy="5" r="1" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                              <circle cx="12" cy="19" r="1" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                            </svg>
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))
+                ) : (
+                  <tr>
+                    <td colSpan="7">
+                      <div className="results-empty-state">
+                        <div className="results-empty-icon">
+                          <svg width="48" height="48" viewBox="0 0 24 24" fill="none">
+                            <path d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                          </svg>
+                        </div>
+                        <h3>No results found</h3>
+                        <p>Try adjusting your search or filters</p>
+                      </div>
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
+
+          {/* PAGINATION */}
+          {filteredData.length > ROWS_PER_PAGE && (
+            <div className="results-pagination">
+              <button
+                className="results-pagination-btn results-prev-btn"
+                onClick={() => setPage(p => Math.max(p - 1, 1))}
+                disabled={page === 1}
+              >
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                  <path d="M15 18L9 12L15 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                </svg>
+                Previous
+              </button>
+
+              <div className="results-page-numbers">
+                {generatePageNumbers().map((p, index) => (
+                  p === '...' ? (
+                    <span key={`dots-${index}`} className="results-page-dots">...</span>
+                  ) : (
+                    <button
+                      key={p}
+                      className={`results-page-number ${page === p ? 'active' : ''}`}
+                      onClick={() => setPage(p)}
+                    >
+                      {p}
+                    </button>
+                  )
+                ))}
+              </div>
+
+              <button
+                className="results-pagination-btn results-next-btn"
+                onClick={() => setPage(p => Math.min(p + 1, totalPages))}
+                disabled={page === totalPages}
+              >
+                Next
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                  <path d="M9 18L15 12L9 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                </svg>
+              </button>
+            </div>
+          )}
+        </div>
+
+      </div>
     </div>
   );
 }

@@ -83,6 +83,23 @@ export default function AuctionPage() {
   return (
     <div className="auction-wrapper">
       <div className="auction-container">
+        {/* HEADER SECTION */}
+        <div className="auction-section-header">
+          <div className="auction-header-content">
+            <h1 className="auction-page-title">All Auctions</h1>
+            <p className="auction-page-subtitle">Manage and monitor all auction events</p>
+          </div>
+          <div className="auction-header-actions">
+            <Link to="/publishnew" className="auction-primary-action-btn-link">
+              <button className="auction-primary-action-btn">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                  <path d="M12 5V19M5 12H19" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+                </svg>
+                Create New Auction
+              </button>
+            </Link>
+          </div>
+        </div>
 
         {/* STATS CARDS */}
         <div className="auction-stats-grid">
@@ -140,24 +157,6 @@ export default function AuctionPage() {
           </div>
         </div>
 
-        {/* HEADER & FILTERS */}
-        <div className="auction-section-header">
-          <div className="auction-header-content">
-            <h1 className="auction-page-title">All Auctions</h1>
-            <p className="auction-page-subtitle">Manage and monitor all auction events</p>
-          </div>
-          <div className="auction-header-actions">
-            <Link to="/publishnew">
-              <button className="auction-primary-action-btn">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-                  <path d="M12 5V19M5 12H19" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-                </svg>
-                Create New Auction
-              </button>
-            </Link>
-          </div>
-        </div>
-
         {/* SEARCH & FILTER */}
         <div className="auction-filter-section">
           <div className="auction-search-container">
@@ -205,17 +204,24 @@ export default function AuctionPage() {
 
         {/* TABLE */}
         <div className="auction-data-table-section">
+          <div className="auction-table-info-bar">
+            <span className="auction-table-count">
+              Showing {startIndex + 1}-{Math.min(startIndex + itemsPerPage, filteredData.length)} of {filteredData.length} auctions
+            </span>
+          </div>
+          
           <div className="auction-table-wrapper">
             <table className="auction-data-table">
               <thead>
                 <tr>
-                  <th>Auction Name / ID</th>
-                  <th>Status</th>
-                  <th>Start Date</th>
-                  <th>End Date</th>
-                  <th>Lots</th>
-                  <th>Current Value</th>
-                  <th>Actions</th>
+                  <th className="auction-table-serial">#</th>
+                  <th className="auction-table-name">Auction Name / ID</th>
+                  <th className="auction-table-status">Status</th>
+                  <th className="auction-table-start">Start Date</th>
+                  <th className="auction-table-end">End Date</th>
+                  <th className="auction-table-lots">Lots</th>
+                  <th className="auction-table-value">Current Value</th>
+                  <th className="auction-table-actions">Actions</th>
                 </tr>
               </thead>
 
@@ -227,7 +233,11 @@ export default function AuctionPage() {
                       className="auction-table-row"
                       onClick={() => navigate("/controlpanel")}
                     >
-                      <td>
+                      <td className="auction-table-serial">
+                        <span className="auction-serial-number">{startIndex + index + 1}</span>
+                      </td>
+
+                      <td className="auction-table-name">
                         <div className="auction-name-info">
                           <div className="auction-icon-cell">
                             <span className="auction-icon-emoji">{getAuctionIcon(item.name)}</span>
@@ -239,7 +249,7 @@ export default function AuctionPage() {
                         </div>
                       </td>
 
-                      <td>
+                      <td className="auction-table-status">
                         <div className="auction-status-cell">
                           <span className={`auction-status-badge ${
                             item.status === "Live" ? "badge-live" :
@@ -252,23 +262,23 @@ export default function AuctionPage() {
                         </div>
                       </td>
 
-                      <td>
+                      <td className="auction-table-start">
                         <span className="auction-date">{item.start}</span>
                       </td>
 
-                      <td>
+                      <td className="auction-table-end">
                         <span className="auction-date">{item.end}</span>
                       </td>
 
-                      <td>
+                      <td className="auction-table-lots">
                         <span className="auction-lots">{item.lots}</span>
                       </td>
 
-                      <td>
+                      <td className="auction-table-value">
                         <span className="auction-value">{item.value}</span>
                       </td>
 
-                      <td>
+                      <td className="auction-table-actions">
                         <div className="auction-action-buttons">
                           <button
                             className="auction-action-btn auction-view-btn"
@@ -307,7 +317,7 @@ export default function AuctionPage() {
                   ))
                 ) : (
                   <tr>
-                    <td colSpan="7">
+                    <td colSpan="8">
                       <div className="auction-empty-state">
                         <div className="auction-empty-icon">
                           <svg width="48" height="48" viewBox="0 0 24 24" fill="none">
