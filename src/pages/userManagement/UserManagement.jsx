@@ -37,8 +37,8 @@ const UserManagement = () => {
   return (
     <div className="user-page">
       <header className="page-header1">
-        <h1>User Management</h1>
-        <p>Manage all users on the Hammers & Tongues platform.</p>
+        <h1 className="titlepage">User Management</h1>
+        <p className="desctitle">Manage all users on the Hammers & Tongues platform.</p>
       </header>
 
       <div className="filters-row2">
@@ -84,7 +84,6 @@ const UserManagement = () => {
           <tbody>
             {paginatedUsers.map((user, i) => (
               <tr key={i}>
-                {/* Clickable cells */}
                 <td
                   className="name-cell2"
                   style={{ cursor: "pointer" }}
@@ -119,37 +118,54 @@ const UserManagement = () => {
                   {user.lastLogin}
                 </td>
 
-                {/* Actions column NOT clickable */}
                 <td className="actions2">•••</td>
               </tr>
             ))}
           </tbody>
         </table>
 
-        <footer className="table-footer2">
-          <div className="pagination2">
-            <button disabled={page === 1} onClick={() => setPage(page - 1)}>
-              Previous
-            </button>
+        {/* Updated Pagination */}
+        {filteredUsers.length > 0 && (
+          <div className="table-pagination">
+            <div className="pagination-info">
+              Page {page} of {totalPages}
+            </div>
 
-            {[...Array(totalPages)].map((_, i) => (
+            <div className="pagination-controls">
               <button
-                key={i}
-                className={page === i + 1 ? "active" : ""}
-                onClick={() => setPage(i + 1)}
+                className="pagination-btn prev"
+                onClick={() => setPage(p => p - 1)}
+                disabled={page === 1}
               >
-                {i + 1}
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                  <path d="M15 18L9 12L15 6" stroke="currentColor" strokeWidth="2" />
+                </svg>
               </button>
-            ))}
 
-            <button
-              disabled={page === totalPages}
-              onClick={() => setPage(page + 1)}
-            >
-              Next
-            </button>
+              <div className="page-numbers">
+                {[...Array(totalPages)].map((_, i) => (
+                  <button
+                    key={i}
+                    className={`page-number ${page === i + 1 ? "active" : ""}`}
+                    onClick={() => setPage(i + 1)}
+                  >
+                    {i + 1}
+                  </button>
+                ))}
+              </div>
+
+              <button
+                className="pagination-btn next"
+                onClick={() => setPage(p => p + 1)}
+                disabled={page === totalPages}
+              >
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                  <path d="M9 18L15 12L9 6" stroke="currentColor" strokeWidth="2" />
+                </svg>
+              </button>
+            </div>
           </div>
-        </footer>
+        )}
       </div>
     </div>
   );

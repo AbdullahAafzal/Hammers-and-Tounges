@@ -18,8 +18,8 @@ const KYCVerification = () => {
       <div className={`kyc-page ${fullscreenImage ? "blurred" : ""}`}>
         <header className="kyc-header">
           <div>
-            <h1>KYC Verification</h1>
-            <p>Review user identity documents and approve or reject verification requests.</p>
+            <h1 className="titlePage">KYC Verification</h1>
+            <p className="descPage">Review user identity documents and approve or reject verification requests.</p>
           </div>
           <span className="kyc-status">Pending Review</span>
         </header>
