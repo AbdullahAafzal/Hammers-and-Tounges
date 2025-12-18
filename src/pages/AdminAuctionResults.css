@@ -151,12 +151,7 @@
 .status-buttons button.active {
   background-color: #8CC63F;
   color: #000;
-<<<<<<< HEAD
-  border-color: #8CC63F;
-  box-shadow: 0 2px 8px rgba(140, 198, 63, 0.3);
-=======
   border-color: #8CC63F !important;
->>>>>>> 07390773f89eb72b7a261b15d4a394ca8518ba05
 }
 
 
