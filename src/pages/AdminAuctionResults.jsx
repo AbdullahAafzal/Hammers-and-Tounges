@@ -54,7 +54,6 @@ export default function AdminAuctionResults() {
     link.click();
   };
 
-  // Stats cards data
   const statsCards = [
     { title: "Total Hammer Price", value: "$1,245,600", iconUrl: CARD_IMAGES[0] },
     { title: "Sell-Through Rate", value: "92%", iconUrl: CARD_IMAGES[1] },
@@ -67,7 +66,6 @@ export default function AdminAuctionResults() {
       <h1 className="title">Auction Results: Vintage Watch Collection - 24 Oct 2024</h1>
       <p className="subtitle">Review winning bids, financial status, and next steps for the auction.</p>
 
-      {/* Horizontal Cards */}
       <div className="stats-row">
         {statsCards.map((card, index) => (
           <div className="category-card-horizontal" key={index}>
@@ -82,39 +80,59 @@ export default function AdminAuctionResults() {
         ))}
       </div>
 
-      {/* Filter row */}
-      <div className="filter-row">
-        <div className="search-wrapper">
-          <svg className="search-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-            <path d="M21 21L15 15M17 10C17 13.866 13.866 17 10 17C6.13401 17 3 13.866 3 10C3 6.13401 6.13401 3 10 3C13.866 3 17 6.13401 17 10Z" />
-          </svg>
+      {/* Updated filter row to match AuctionAdminPanel capsule design */}
+      <div className="d-flex flex-wrap justify-content-between align-items-center mb-3 mt-3 mobile-flex-column">
+        <div className="d-flex flex-wrap gap-2 align-items-center full-width-mobile">
           <input
             type="text"
-            className="search-input"
-            placeholder="Search by Lot, Item Name, or Bidder..."
+            className="form-control bg-dark text-white border-secondary search-input"
+            placeholder=" 🔍 Search by Lot, Item, or Bidder"
             value={search}
-            onChange={(e) => { setSearch(e.target.value); setPage(1); }}
+            onChange={(e) => {
+              setSearch(e.target.value);
+              setPage(1);
+            }}
           />
-        </div>
 
-        <button className="createBtn export-btn" onClick={exportResults}>
-          Export Results
-        </button>
+          <button className="createBtn full-width-mobile-btn" onClick={exportResults}>
+            Export Results
+          </button>
 
-        <div className="btn-group filter-btn-group status-buttons">
-          {["All", "Payment Received", "Invoice Sent", "Payment Pending", "Unsold"].map((s) => (
+          <div className="btn-group ms-2 filter-btn-group">
             <button
-              key={s}
-              className={`custom-filter-btn ${statusFilter === s ? "active" : ""}`}
-              onClick={() => { setStatusFilter(s); setPage(1); }}
+              className={`btn custom-filter-btn ${statusFilter === "All" ? "active" : ""}`}
+              onClick={() => { setStatusFilter("All"); setPage(1); }}
             >
-              {s}
+              All
             </button>
-          ))}
+            <button
+              className={`btn custom-filter-btn ${statusFilter === "Payment Received" ? "active" : ""}`}
+              onClick={() => { setStatusFilter("Payment Received"); setPage(1); }}
+            >
+              Payment Received
+            </button>
+            <button
+              className={`btn custom-filter-btn ${statusFilter === "Invoice Sent" ? "active" : ""}`}
+              onClick={() => { setStatusFilter("Invoice Sent"); setPage(1); }}
+            >
+              Invoice Sent
+            </button>
+            <button
+              className={`btn custom-filter-btn ${statusFilter === "Payment Pending" ? "active" : ""}`}
+              onClick={() => { setStatusFilter("Payment Pending"); setPage(1); }}
+            >
+              Payment Pending
+            </button>
+            <button
+              className={`btn custom-filter-btn ${statusFilter === "Unsold" ? "active" : ""}`}
+              onClick={() => { setStatusFilter("Unsold"); setPage(1); }}
+            >
+              Unsold
+            </button>
+          </div>
         </div>
       </div>
 
-      {/* Table */}
       <div className="table-box">
         <table className="table-dark">
           <thead>
@@ -128,8 +146,9 @@ export default function AdminAuctionResults() {
               <th className="text-center">ACTIONS</th>
             </tr>
           </thead>
+
           <tbody>
-            {rows.length === 0 ? (
+            {paginatedRows.length === 0 ? (
               <tr>
                 <td colSpan="7" style={{ textAlign: 'center', padding: '2rem', color: 'rgba(255, 255, 255, 0.5)', fontStyle: 'italic' }}>
                   No results found
@@ -137,7 +156,7 @@ export default function AdminAuctionResults() {
               </tr>
 
             ) : (
-              rows.map((row, i) => (
+              paginatedRows.map((row, i) => (
                 <tr key={i}>
                   <td>{row.lot}</td>
                   <td><strong>{row.item}</strong></td>
@@ -174,6 +193,7 @@ export default function AdminAuctionResults() {
               ))
             )}
           </tbody>
+
         </table>
       </div>
 
@@ -184,12 +204,14 @@ export default function AdminAuctionResults() {
           </div>
 
           <div className="pagination-controls">
-            <button style={{ color: "black" }}
+
+            <button
+              style={{ color: "black" }}
               className="pagination-btn prev"
               onClick={() => setPage(p => Math.max(p - 1, 1))}
               disabled={page === 1}
             >
-              .
+              Prev
             </button>
 
             {[...Array(totalPages)].map((_, i) => (
@@ -202,17 +224,18 @@ export default function AdminAuctionResults() {
               </button>
             ))}
 
-            <button style={{ color: "black" }}
+            <button
+              style={{ color: "black" }}
               className="pagination-btn next"
               onClick={() => setPage(p => Math.min(p + 1, totalPages))}
               disabled={page === totalPages}
             >
-              .
+              Next
             </button>
+
           </div>
         </div>
       )}
     </div>
   );
 }
-

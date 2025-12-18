@@ -13,6 +13,7 @@
   margin-bottom: 0.5rem;
   letter-spacing: -0.5px;
 }
+
 .subtitle {
    font-size: 0.9375rem;
   color: rgba(255, 255, 255, 0.6);
@@ -21,7 +22,6 @@
   margin-bottom: 20px;
 }
 
-/* Horizontal Cards Only */
 .stats-row {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
@@ -38,12 +38,12 @@
   cursor: pointer;
   transition: all 0.3s ease;
 }
+
 .category-card-horizontal:hover {
   transform: translateY(-5px);
   box-shadow: 0 10px 20px rgba(0,0,0,0.5);
 }
 
-<<<<<<< HEAD
 .category-card-icon-wrapper {
   width: 60px;
   height: 60px;
@@ -54,12 +54,6 @@
   align-items: center;
   margin-right: 15px;
   flex-shrink: 0;
-=======
-.stat-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 12px rgba(206, 198, 198, 0.3);
-  border-color: rgba(249, 247, 247, 0.404) !important;
->>>>>>> baf32f9ef95c276c70f7e8b48a5b816d66957cbb
 }
 
 .category-card-icon-img {
@@ -74,119 +68,105 @@
   color: #fff;
   margin-bottom: 5px;
 }
+
 .category-card-content p {
   font-size: 1.2rem;
   font-weight: 700;
   color: #8CC63F;
 }
 
-
-.filter-row {
-  display: flex;
-  gap: 12px;
-  flex-wrap: wrap;
-  align-items: center;
-  margin-bottom: 25px;
-  background-color: #111;
-  padding: 15px;
-  border-radius: 12px;
-  border: 1px solid #222;
-}
-
-.search-wrapper {
-  position: relative;
-  flex: 1;
-  min-width: 250px;
-}
-
-.search-icon {
-  position: absolute;
-  left: 12px;
-  top: 50%;
-  transform: translateY(-50%);
-  color: rgba(255, 255, 255, 0.5);
-  pointer-events: none;
-  z-index: 1;
-}
-
-.search-input {
-  padding: 12px 15px;
-  padding-left: 40px;
-  border-radius: 8px;
-  background-color: #0a0a0a;
-  border: 1px solid #333;
-  color: #fff;
-  width: 100%;
-  font-size: 15px;
-  transition: border-color 0.2s;
-}
-
-.search-input:focus {
-  outline: none;
-  border-color: #8cc63f;
-}
-
-.search-input::placeholder {
-  color: rgba(255, 255, 255, 0.4);
-}
+/* Updated filter bar styles to match AuctionAdminPanel capsule design */
 .createBtn,
-.export-btn {
-  background-color: #8cc63f;
-  color: #000;
-  border: none;
-  padding: 12px 20px;
+.custom-filter-btn {
+  height: 38px;
+  min-width: 70px; 
   border-radius: 6px;
+  font-size: 14px;
   font-weight: 600;
-  font-size: 15px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-align: center;
+  white-space: nowrap;
+}
+
+.createBtn {
+  background-color: #8CC63F;
+  color: #000000;
+  border: none;
+  padding: 0.75rem 1.75rem;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  font-weight: 600;
   cursor: pointer;
   transition: all 0.2s;
-  white-space: nowrap;
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
+  text-align: center;
+  height: 50px;
 }
 
-.createBtn:hover,
-.export-btn:hover {
-  background-color: #35b24a;
+.filter-btn-group {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 3px;
+}
+
+.createBtn:hover {
+  background-color: #35B24A;
   transform: translateY(-1px);
   box-shadow: 0 4px 12px rgba(140, 198, 63, 0.3);
 }
 
-.status-buttons {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 6px;
-}
-
-.status-buttons button {
-  background-color: rgba(0, 0, 0, 0.5);
-  color: #fff;
-  border: 1px solid rgba(255, 255, 255, 0.1);
+.custom-filter-btn {
+  background-color: #0000007b;
+  color: #fefefe;
+  border: 1px solid rgb(57, 3, 3);
   border-radius: 6px;
-  font-size: 14px;
+  font-size: 1rem;
   font-weight: 600;
-  height: 40px;
-  padding: 0 16px;
   cursor: pointer;
-  transition: all 0.2s ease;
-  white-space: nowrap;
+  transition: all 0.2s;
+  text-align: center;
+  height: 40px;
+  border-color: #acb6ad6a;
+  border-radius: 1rem;
+  min-width: 1vmin;
+  border-right: #000;
 }
 
-.status-buttons button:hover {
-  background-color: rgba(140, 198, 63, 0.2);
-  border-color: rgba(140, 198, 63, 0.4);
-  color: #8cc63f;
+.custom-filter-btn:hover,
+.custom-filter-btn:focus {
+  background-color: #8CC63F;
   transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(130, 229, 0, 0.3);
+  color: rgb(0, 0, 0);
 }
 
-.status-buttons button.active {
+.custom-filter-btn.active {
   background-color: #8CC63F;
   color: #000;
-  border-color: #8CC63F !important;
+  border-color: #8CC63F;
 }
 
+.search-input {
+  background-color: #0a0a0a !important;
+  border: 1px solid #333 !important;
+  color: #fff !important;
+  border-radius: 8px;
+  font-size: 15px;
+  min-width: 350px;
+}
+
+.search-input:focus {
+  border-color: #8CC63F !important;
+  box-shadow: none !important;
+  outline: none;
+}
+
+.full-width-mobile {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  width: 100%;
+}
 
 .table-box {
   background: #0d0d0d;
@@ -337,6 +317,7 @@
   white-space: nowrap;
   min-width: fit-content;
 }
+
 .bg-live {
   background-color: rgba(34, 197, 94, 0.2);
   color: #4ade80;
@@ -399,8 +380,7 @@
 .pagination-btn:hover:not(:disabled),
 .page-number:hover {
   background-color: rgba(255, 255, 255, 0.1);
-  color: #ffffff47 !important;
-
+  color: #ffffff !important;
 }
 
 .page-number.active {
@@ -414,16 +394,6 @@
   opacity: 0.4;
   cursor: not-allowed;
 }
-
-<<<<<<< HEAD
-@media (max-width: 1024px) {
-  .stats-row {
-    grid-template-columns: repeat(2, 1fr);
-  }
-}
-=======
->>>>>>> 07390773f89eb72b7a261b15d4a394ca8518ba05
-
 @media (max-width: 768px) {
   .results-wrapper {
     padding: 20px;
@@ -442,35 +412,30 @@
     gap: 15px;
   }
 
-  .stat-card {
-    padding: 20px;
-    font-size: 24px;
+  .full-width-mobile-btn {
+    width: 371px;
   }
 
-  .filter-row {
-    flex-direction: column;
-    align-items: stretch;
+  .filter-btn-group {
+    display: flex;
+    flex-wrap: nowrap;
   }
 
-  .search-wrapper {
+  .custom-filter-btn {
+    flex: 1 1 auto;
+    text-align: center;
+  }
+
+  .full-width-mobile {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    width: 100%;
+  }
+
+  .search-input {
     width: 100%;
     min-width: unset;
-  }
-
-  .createBtn {
-    width: 100%;
-  }
-
-  .status-buttons {
-    width: 100%;
-    justify-content: flex-start;
-  }
-
-  .status-buttons button {
-    flex: 1 1 auto;
-    min-width: 0;
-    font-size: 12px;
-    padding: 0 12px;
   }
 
   .table-box {
@@ -503,15 +468,6 @@
     font-size: 20px;
   }
 
-  .stat-card {
-    padding: 18px;
-    font-size: 20px;
-  }
-
-  .stat-card span {
-    font-size: 12px;
-  }
-
   .table-dark {
     min-width: 1000px;
   }
@@ -526,7 +482,7 @@
     padding: 10px 8px;
   }
 
-  .status-buttons button {
+  .custom-filter-btn {
     font-size: 11px;
     padding: 0 8px;
     height: 36px;
