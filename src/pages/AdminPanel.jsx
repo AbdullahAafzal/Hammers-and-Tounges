@@ -48,7 +48,27 @@ function AdminPanel() {
   }, [search, category, status, sortedData]);
 
   const totalPages = Math.ceil(filtered.length / itemsPerPage);
-  const paginatedData = filtered.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
+
+  const paginatedData = filtered.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  );
+
+  function generatePageNumbers() {
+    const pages = [];
+    if (totalPages <= 5) {
+      for (let i = 1; i <= totalPages; i++) pages.push(i);
+    } else {
+      if (currentPage <= 3) {
+        pages.push(1, 2, 3, 4, "...", totalPages);
+      } else if (currentPage >= totalPages - 2) {
+        pages.push(1, "...", totalPages - 3, totalPages - 2, totalPages - 1, totalPages);
+      } else {
+        pages.push(1, "...", currentPage - 1, currentPage, currentPage + 1, "...", totalPages);
+      }
+    }
+    return pages;
+  }
 
   const ActionButton = ({ status }) => {
     if (status === "Pending Inspection")
@@ -68,10 +88,13 @@ function AdminPanel() {
   return (
     <>
       <div className="admin-wrapper">
+
         <h2 className="inspection-title">Inspection Queue</h2>
         <h5 className="inspection-para">Manage and track all items pending inspections.</h5>
 
+        {/* FILTER BAR SECTION */}
         <div className="filter-bar-container">
+
           <input
             type="text"
             className="search-input"
@@ -97,11 +120,14 @@ function AdminPanel() {
           </select>
 
           <button onClick={applyFilters} className="apply-btn">Apply</button>
+
           <button onClick={() => { setCategory("All"); setStatus("All"); applyFilters(); }} className="clear-btn">
             Clear
           </button>
+
         </div>
 
+        {/* TABLE */}
         <div className="table-container">
           <table className="inspection-table">
             <thead className="table-dark">
@@ -126,51 +152,88 @@ function AdminPanel() {
                   <td className={selectedRow === item.id ? "bold-number" : ""}>
                     {(currentPage - 1) * itemsPerPage + index + 1}
                   </td>
+
                   <td>{item.id}</td>
                   <td>{item.category}</td>
                   <td>{item.seller}</td>
+
                   <td className="text-center">
-                   <span className={`badge-custom1 ${
-  item.status === "Pending Inspection" ? "badge-pending" :
-  item.status === "In Progress" ? "badge-inprogress" :
-  item.status === "Completed" ? "badge-completed" : ""
-}`}>
-  {item.status}
-</span>
+                    <span className={`badge-custom1 ${
+                      item.status === "Pending Inspection" ? "badge-pending" :
+                      item.status === "In Progress" ? "badge-inprogress" :
+                      item.status === "Completed" ? "badge-completed" : ""
+                    }`}>
+                    {item.status}
+                    </span>
                   </td>
+
                   <td>{item.officer}</td>
+
                   <td className="text-center">
                     <ActionButton status={item.status} />
                   </td>
+
                 </tr>
               ))}
 
               {paginatedData.length === 0 && (
                 <tr><td colSpan="7" className="text-center p-3">No record found</td></tr>
               )}
+
             </tbody>
           </table>
         </div>
 
-        <div className="pagination-bar1">
-          <button disabled={currentPage === 1} onClick={() => setCurrentPage(p => p - 1)}>Prev</button>
+        {/* NEW PAGINATION SYSTEM */}
+        {filtered.length > 0 && (
+          <div className="table-pagination">
 
-          {[...Array(totalPages)].map((_, i) => (
-            i < 3 && (
-              <button
-                key={i}
-                onClick={() => setCurrentPage(i + 1)}
-                className={`btn ${currentPage === i + 1 ? "active-page" : ""}`}
+            <div className="pagination-info">
+              Page {currentPage} of {totalPages}
+            </div>
+
+            <div className="pagination-controls">
+
+              <button 
+                className="pagination-btn prev"
+                onClick={() => setCurrentPage(currentPage - 1)}
+                disabled={currentPage === 1}
               >
-                {i + 1}
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                  <path d="M15 18L9 12L15 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                </svg>
               </button>
-            )
-          ))}
 
-          {totalPages > 3 && <span className="px-2">...</span>}
+              <div className="page-numbers">
+                {generatePageNumbers().map((page, index) => (
+                  page === "..."
+                  ? <span key={index} className="page-dots">...</span>
+                  : (
+                      <button
+                        key={page}
+                        className={`page-number ${currentPage === page ? "active" : ""}`}
+                        onClick={() => setCurrentPage(page)}
+                      >
+                        {page}
+                      </button>
+                    )
+                ))}
+              </div>
 
-          <button disabled={currentPage === totalPages} onClick={() => setCurrentPage(p => p + 1)}>Next</button>
-        </div>
+              <button 
+                className="pagination-btn next"
+                onClick={() => setCurrentPage(currentPage + 1)}
+                disabled={currentPage === totalPages}
+              >
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                  <path d="M9 18L15 12L9 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                </svg>
+              </button>
+
+            </div>
+          </div>
+        )}
+
       </div>
     </>
   )

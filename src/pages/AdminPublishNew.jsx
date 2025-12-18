@@ -179,10 +179,13 @@ const AdminPublishNew = () => {
           <div className="admin-card">
             <h5 className="card-title-custom">Publishing</h5>
 
-            <p style={{ color: "#fff" }}>
-              Status:{" "}
-              <span className="badge bg-warning text-dark">Draft</span>
-            </p>
+         <div className="status-container">
+  <span className="status1">Status:</span>
+  <span className="status2">Draft</span>
+</div>
+
+
+
 
             <button className="btn-publish" onClick={handlePublish}>
               Publish Lot

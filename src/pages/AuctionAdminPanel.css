@@ -5,7 +5,14 @@
   margin: 0;
   padding: 0;
 }
+.mt-2{
 
+    font-size: 1.75rem;
+  font-weight: 700;
+  color: #FFFFFF;
+  margin-bottom: 0.5rem;
+  letter-spacing: -0.5px;
+}
 body {
   background-color: #000;
   font-family: 'Inter', sans-serif;
@@ -228,20 +235,9 @@ min-width: 1vmin;
   padding: 6px 14px; 
   border: 1px solid transparent; 
   white-space: nowrap;
-  min-width: fit-content;
-  margin: 0 auto;
-}
-
-.table-dark tbody td.text-center {
-  text-align: center !important;
-}
-
-.table-dark tbody td.text-center .badgecustomadmin {
-  display: inline-block;
-}
-
-.table-dark tbody td.text-right {
-  text-align: right !important;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  width: 50%;
 }
 
 .badge:hover {
@@ -320,45 +316,115 @@ min-width: 1vmin;
   box-shadow: 0 0 8px rgba(251, 191, 36, 0.2);
 }
 
-.pagination-bar3 {
+.table-pagination {
   display: flex;
+  justify-content: space-between; /* left info, right controls */
   align-items: center;
-  justify-content: center;
-  gap: 1rem;
-  padding-top: 1.5rem;
+  padding: 1rem 1.5rem;
+  background-color: rgba(255, 255, 255, 0.02);
   border-top: 1px solid rgba(255, 255, 255, 0.1);
   flex-wrap: wrap;
 }
-.mt-2{
-  font-size: 45px;
+
+.pagination-info {
+  font-size: 0.875rem;
+  color: rgba(255, 255, 255, 0.6);
 }
-.pagination-bar3 button {
-  padding: 0.6rem 1.25rem;
-  background-color: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+
+.pagination-controls {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.pagination-btn {
+  width: 36px;
+  height: 36px;
   border-radius: 6px;
-  color: rgba(255, 255, 255, 0.85);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.8);
   cursor: pointer;
   transition: all 0.2s;
+}
+
+.pagination-btn:hover:not(:disabled) {
+  background-color: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.2);
+  color: #ffffff;
+}
+
+.pagination-btn:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+.page-numbers {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.page-number {
+  min-width: 36px;
+  height: 36px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: transparent;
+  border: 1px solid transparent;
+  color: rgba(255, 255, 255, 0.8);
   font-size: 0.875rem;
-  text-align: center;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
 }
-.pagination-bar3 button:hover:not(:disabled) {
-  background-color: rgba(255, 255, 255, 0.06);
-  border-color: rgba(255, 255, 255, 0.25);
-  color: #fff;
-  transform: translateY(-1px);
+
+.page-number:hover {
+  background-color: rgba(255, 255, 255, 0.05);
+  border-color: rgba(255, 255, 255, 0.1);
 }
-.pagination-bar3 button.active {
-background-color: rgba(59, 130, 246, 0.15) !important;
-  border-color: rgba(59, 130, 246, 0.4)!important;
-  color: #3B82F6 !important;
+
+.page-number.active {
+  background-color: rgba(140, 198, 63, 0.15);
+  border-color: rgba(140, 198, 63, 0.3);
+  color: #8CC63F;
   font-weight: 600;
 }
 
-.pagination-bar3 button[disabled] {
-  opacity: 0.4;
-  cursor: not-allowed;
+.page-dots {
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 0.875rem;
+  padding: 0 0.5rem;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .table-pagination {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .pagination-info {
+    margin-bottom: 0.75rem;
+  }
+}
+
+
+@media (max-width: 768px) {
+  .table-pagination {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .pagination-info {
+    margin-bottom: 0.75rem;
+  }
 }
 
 html, body {
@@ -368,8 +434,7 @@ html, body {
 @media (max-width: 768px) {
 .mt-2{
   
-  margin-left: 30%;
-  
+    font-size: 1.5rem;  
 }
   .cards-row {
     display: flex;

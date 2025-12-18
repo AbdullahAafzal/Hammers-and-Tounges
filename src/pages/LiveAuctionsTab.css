@@ -8,18 +8,17 @@
 }
 
 .para {
-  color: #888;
-  font-size: 14px;
-  margin-bottom: 20px;
+   font-size: 0.9375rem;
+  color: rgba(255, 255, 255, 0.6);
+  margin: 0;
+  line-height: 1.5;
 }
 
 .para1 {
-  color: #dfe1dca1; 
-  font-size: 16px;
-  font-weight: 600;
-  margin-top: 10px;
-  margin-bottom: 45px;
-  letter-spacing: 0.5px;
+    font-size: 0.9375rem;
+  color: rgba(255, 255, 255, 0.6);
+  margin: 0;
+  line-height: 1.5;
 }
 
 .auction-header-row {
@@ -32,9 +31,12 @@
 }
 
 .auction-header-row h2 {
+  font-size: 2.5rem;
   font-weight: 700;
-  margin: 0;
-  color: #fff;
+  color: #FFFFFF;
+  margin-bottom: 0.5rem;
+  letter-spacing: -0.5px;
+  margin-top: 10px;
 }
 
 .right-tools {
@@ -189,6 +191,7 @@
   font-weight: 500;
 }
 
+<<<<<<< HEAD
 .auction-table td.text-right {
   text-align: right !important;
   font-variant-numeric: tabular-nums;
@@ -209,40 +212,96 @@
   border-top: 1px solid rgba(255, 255, 255, 0.1);
   flex-wrap: wrap;
   margin-top: 1rem;
+=======
+.table-pagination {
+  display: flex;
+  justify-content: space-between; /* page info left, controls right */
+  align-items: center;
+  padding: 1rem 1.5rem;
+  background-color: rgba(255, 255, 255, 0.02);
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  flex-wrap: wrap;
+  margin-top: 20px;
 }
 
+.pagination-info {
+  font-size: 0.875rem;
+  color: rgba(255, 255, 255, 0.6);
+}
 
+.pagination-controls {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+>>>>>>> 07390773f89eb72b7a261b15d4a394ca8518ba05
+}
 
-.pagination button {
-  padding: 0.6rem 1.25rem;
-  background-color: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+.pagination-btn {
+  width: 36px;
+  height: 36px;
   border-radius: 6px;
-  color: rgba(255, 255, 255, 0.85);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.8);
   cursor: pointer;
   transition: all 0.2s;
+}
+
+.pagination-btn:hover:not(:disabled) {
+  background-color: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.2);
+  color: #ffffff;
+}
+
+.pagination-btn:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+.page-numbers {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.page-number {
+  min-width: 36px;
+  height: 36px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: transparent;
+  border: 1px solid transparent;
+  color: rgba(255, 255, 255, 0.8);
   font-size: 0.875rem;
-  text-align: center;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
 }
 
-.pagination button:hover:not(:disabled) {
-  background-color: rgba(255, 255, 255, 0.06);
-  border-color: rgba(255, 255, 255, 0.25);
-  color: #fff;
-  transform: translateY(-1px);
+.page-number:hover {
+  background-color: rgba(255, 255, 255, 0.05);
+  border-color: rgba(255, 255, 255, 0.1);
 }
 
-.pagination button.active {
-background-color: rgba(59, 130, 246, 0.15);
-  border-color: rgba(59, 130, 246, 0.4);
-  color: #3B82F6;
+.page-number.active {
+  background-color: rgba(140, 198, 63, 0.15);
+  border-color: rgba(140, 198, 63, 0.3);
+  color: #8CC63F;
   font-weight: 600;
 }
 
-.pagination button:disabled {
-  opacity: 0.4;
-  cursor: not-allowed;
+.page-dots {
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 0.875rem;
+  padding: 0 0.5rem;
 }
+<<<<<<< HEAD
 .pagination {
   display: flex;
   align-items: center;
@@ -256,7 +315,21 @@ background-color: rgba(59, 130, 246, 0.15);
   color: #888;
   font-size: 14px;
   white-space: nowrap;
+=======
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .table-pagination {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .pagination-info {
+    margin-bottom: 0.75rem;
+  }
+>>>>>>> 07390773f89eb72b7a261b15d4a394ca8518ba05
 }
+
 /* Responsive  */
 @media (max-width: 768px) {
   .auction-header-row {
@@ -292,10 +365,16 @@ background-color: rgba(59, 130, 246, 0.15);
 }
 
 .bg-winning {
+<<<<<<< HEAD
   background-color: rgba(34, 197, 94, 0.2);
   color: #4ade80;
   border: 1px solid rgba(34, 197, 94, 0.5);
   box-shadow: 0 0 8px rgba(34, 197, 94, 0.2);
+=======
+  background-color: #00fd3b36;
+  color: #00fd3b;
+  border: 1px solid #00fd3b88; 
+>>>>>>> 07390773f89eb72b7a261b15d4a394ca8518ba05
 }
 
 .bg-outbid {

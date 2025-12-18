@@ -19,10 +19,11 @@ body {
 }
 
 .inspection-title {
-  margin-left: 20px;
-  font-size: 40px;
-  font-family: Arial, Helvetica, sans-serif;
-  margin-bottom: 05px;
+ font-size: 2.5rem;
+  font-weight: 700;
+  color: #FFFFFF;
+  margin-bottom: 0.5rem;
+  letter-spacing: -0.5px;
 }
 
 .inspection-para {
@@ -68,6 +69,7 @@ body {
   min-width: 150px;
   cursor: pointer;
   font-size: 14px;
+  
 }
 
 .apply-btn,
@@ -286,47 +288,93 @@ body {
   font-weight: bold;
 }
 
-.pagination-bar2 {
-   display: flex;
+/* Same existing styles above remain intact. Add/update this pagination CSS only */
+
+.table-pagination {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.25rem 1.5rem;
+  background-color: rgba(255, 255, 255, 0.02);
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.pagination-info {
+  font-size: 0.875rem;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.pagination-controls {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.pagination-btn {
+  width: 36px;
+  height: 36px;
+  border-radius: 6px;
+  display: flex;
   align-items: center;
   justify-content: center;
-  gap: 1rem;
-  padding-top: 1.5rem;
-  border-top: 1px solid rgba(255, 255, 255, 0.1);
-  flex-wrap: wrap;
-}
-
-.pagination-bar2 button {
-  padding: 0.6rem 1.25rem;
-  background-color: rgba(255, 255, 255, 0.03);
+  background-color: rgba(255, 255, 255, 0.05);
   border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 6px;
-  color: rgba(255, 255, 255, 0.85);
+  color: rgba(255, 255, 255, 0.8);
   cursor: pointer;
   transition: all 0.2s;
-  font-size: 0.875rem;
-  text-align: center;
 }
 
-.pagination-bar2 .active-page,
-.pagination-bar2 button.bg-black-800 {
-  background-color: rgba(59, 130, 246, 0.15) !important;
-  border-color: rgba(59, 130, 246, 0.4) !important;
-  color: #3B82F6 !important;
+.pagination-btn:hover:not(:disabled) {
+  background-color: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.2);
+  color: #ffffff;
+}
+
+.pagination-btn:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+.page-numbers {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.page-number {
+  min-width: 36px;
+  height: 36px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: transparent;
+  border: 1px solid transparent;
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.page-number:hover {
+  background-color: rgba(255, 255, 255, 0.05);
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+.page-number.active {
+  background-color: rgba(140, 198, 63, 0.15);
+  border-color: rgba(140, 198, 63, 0.3);
+  color: #8CC63F;
   font-weight: 600;
 }
 
-.pagination-bar2 button:hover:not([disabled]) {
-  background-color: rgba(255, 255, 255, 0.06);
-  border-color: rgba(59, 130, 246, 0.4);
-  color: #fff;
-  transform: translateY(-1px);
+.page-dots {
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 0.875rem;
+  padding: 0 0.5rem;
 }
 
-.pagination-bar2 button[disabled] {
-  opacity: 0.4;
-  cursor: not-allowed;
-}
 
 .custom-toast {
   position: fixed;

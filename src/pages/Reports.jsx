@@ -22,7 +22,7 @@ function Report() {
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedRow, setSelectedRow] = useState(null);
 
-  const itemsPerPage = 10;
+  const itemsPerPage = 5;
 
   const sortedData = useMemo(() => {
     return [...sampleData].sort((a, b) => new Date(b.date) - new Date(a.date));
@@ -44,6 +44,15 @@ function Report() {
     (currentPage - 1) * itemsPerPage,
     currentPage * itemsPerPage
   );
+
+  const generatePageNumbers = () => {
+    const pages = [];
+    for (let i = 1; i <= totalPages; i++) {
+      if (i <= 3 || i === totalPages) pages.push(i);
+      else if (i === 4 && totalPages > 4) pages.push("...");
+    }
+    return pages;
+  };
 
   return (
     <div className="admin-wrapper">
@@ -106,16 +115,16 @@ function Report() {
                   <td>{item.asset}</td>
                   <td>{item.date}</td>
                   <td>{item.officer}</td>
-               <td className="text-center">
-  <span className={`badge-custom ${
-    item.status === "Approved" ? "badge-approved" :
-    item.status === "Rejected" ? "badge-rejected" : 
-    item.status === "Pending" ? "badge-pending1" : ""
-  }`}>
-    {item.status}
-  </span>
-</td>
-                  <td style={{ maxWidth: '300px' }}>{item.notes}</td>
+                  <td className="text-center">
+                    <span className={`badge-custom ${
+                      item.status === "Approved" ? "badge-approved" :
+                      item.status === "Rejected" ? "badge-rejected" : 
+                      item.status === "Pending" ? "badge-pending1" : ""
+                    }`}>
+                      {item.status}
+                    </span>
+                  </td>
+                  <td>{item.notes}</td>
                   <td className="text-center">
                     <button
                       className="view-btn"
@@ -144,35 +153,51 @@ function Report() {
         </table>
       </div>
 
-      <div className="pagination-bar2">
-        <button 
-          disabled={currentPage === 1} 
-          onClick={() => setCurrentPage(p => p - 1)}
-        >
-          Prev
-        </button>
-
-        {[...Array(totalPages)].map((_, i) => (
-          i < 3 && (
+      {/* Updated Pagination */}
+      {filtered.length > 0 && (
+        <div className="table-pagination">
+          <div className="pagination-info">
+            Page {currentPage} of {totalPages}
+          </div>
+          <div className="pagination-controls">
             <button
-              key={i}
-              onClick={() => setCurrentPage(i + 1)}
-              className={currentPage === i + 1 ? "active-page" : ""}
+              className="pagination-btn prev"
+              onClick={() => setCurrentPage(p => p - 1)}
+              disabled={currentPage === 1}
             >
-              {i + 1}
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                <path d="M15 18L9 12L15 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
             </button>
-          )
-        ))}
 
-        {totalPages > 3 && <span style={{ padding: '0 0.5rem', color: 'rgba(255, 255, 255, 0.5)' }}>...</span>}
+            <div className="page-numbers">
+              {generatePageNumbers().map((page, index) =>
+                page === '...' ? (
+                  <span key={`dots-${index}`} className="page-dots">...</span>
+                ) : (
+                  <button
+                    key={page}
+                    className={`page-number ${currentPage === page ? 'active' : ''}`}
+                    onClick={() => setCurrentPage(page)}
+                  >
+                    {page}
+                  </button>
+                )
+              )}
+            </div>
 
-        <button 
-          disabled={currentPage === totalPages} 
-          onClick={() => setCurrentPage(p => p + 1)}
-        >
-          Next
-        </button>
-      </div>
+            <button
+              className="pagination-btn next"
+              onClick={() => setCurrentPage(p => p + 1)}
+              disabled={currentPage === totalPages}
+            >
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                <path d="M9 18L15 12L9 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

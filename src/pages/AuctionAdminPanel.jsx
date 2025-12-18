@@ -11,7 +11,6 @@ const PaymentsIcon = (
       strokeWidth="4"
       strokeLinecap="round"
       strokeLinejoin="round"
-      
     />
   </svg>
 )
@@ -50,10 +49,26 @@ export default function AuctionPage() {
   const startIndex = (currentPage - 1) * itemsPerPage;
   const paginatedData = filteredData.slice(startIndex, startIndex + itemsPerPage);
 
+  const generatePageNumbers = () => {
+    const pages = [];
+    if (totalPages <= 5) {
+      for (let i = 1; i <= totalPages; i++) pages.push(i);
+    } else {
+      if (currentPage <= 3) {
+        pages.push(1, 2, 3, 4, "...", totalPages);
+      } else if (currentPage >= totalPages - 2) {
+        pages.push(1, "...", totalPages - 3, totalPages - 2, totalPages - 1, totalPages);
+      } else {
+        pages.push(1, "...", currentPage - 1, currentPage, currentPage + 1, "...", totalPages);
+      }
+    }
+    return pages;
+  };
+
   return (
     <div className="container-fluid">
 
-      <div className="row g-3 mb-4 mt-4 cards-row" >
+      <div className="row g-3 mb-4 mt-4 cards-row">
         <div className="col-md-4">
           <div className="card p-3 shadow dark-card" style={{backgroundColor:"black"}}>
             <p className="text-Primary mb-1">Active Bidders</p>
@@ -189,35 +204,54 @@ export default function AuctionPage() {
           </table>
         </div>
 
-        <div className="d-flex justify-content-center mt-3 pagination-bar3">
-          <button
-            disabled={currentPage === 1}
-            onClick={() => setCurrentPage(p => p - 1)}
-            className="btn border rounded px-3"
-          >
-            Prev
-          </button>
+       {/* Updated Pagination */}
+{filteredData.length > 0 && (
+  <div className="table-pagination">
+    <div className="pagination-info">
+      Page {currentPage} of {totalPages}
+    </div>
+    <div className="pagination-controls">
+      <button
+        className="pagination-btn prev"
+        onClick={() => setCurrentPage(p => p - 1)}
+        disabled={currentPage === 1}
+      >
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+          <path d="M15 18L9 12L15 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+        </svg>
+      </button>
 
-          {[...Array(totalPages)].map((_, i) => (
+      <div className="page-numbers">
+        {generatePageNumbers().map((page, index) =>
+          page === '...' ? (
+            <span key={`dots-${index}`} className="page-dots">...</span>
+          ) : (
             <button
-              key={i}
-              onClick={() => setCurrentPage(i + 1)}
-              className={`btn border rounded px-3 ${currentPage === i + 1 ? "active" : ""}`}
+              key={page}
+              className={`page-number ${currentPage === page ? 'active' : ''}`}
+              onClick={() => setCurrentPage(page)}
             >
-              {i + 1}
+              {page}
             </button>
-          ))}
+          )
+        )}
+      </div>
 
-          <button
-            disabled={currentPage === totalPages}
-            onClick={() => setCurrentPage(p => p + 1)}
-            className="btn border rounded px-3"
-          >
-            Next
-          </button>
+      <button
+        className="pagination-btn next"
+        onClick={() => setCurrentPage(p => p + 1)}
+        disabled={currentPage === totalPages}
+      >
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+          <path d="M9 18L15 12L9 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+        </svg>
+      </button>
+    </div>
+  </div>
+)}
+
         </div>
 
       </div>
-    </div>
   );
 }

@@ -29,8 +29,11 @@ export default function AdminAuctionResults() {
   }, [search, statusFilter]);
 
   const totalPages = Math.ceil(filteredData.length / ROWS_PER_PAGE);
-  const startIndex = (page - 1) * ROWS_PER_PAGE;
-  const rows = filteredData.slice(startIndex, startIndex + ROWS_PER_PAGE);
+
+  const paginatedRows = useMemo(() => {
+    const startIndex = (page - 1) * ROWS_PER_PAGE;
+    return filteredData.slice(startIndex, startIndex + ROWS_PER_PAGE);
+  }, [filteredData, page]);
 
   const exportResults = () => {
     const headers = ["Lot", "Item", "Bid", "Bidder", "Reserve", "Status"];
@@ -46,7 +49,6 @@ export default function AdminAuctionResults() {
 
   return (
     <div className="results-wrapper">
-
       <h1 className="title">Auction Results: Vintage Watch Collection - 24 Oct 2024</h1>
       <p className="subtitle">Review winning bids, financial status, and next steps for the auction.</p>
 
@@ -60,7 +62,7 @@ export default function AdminAuctionResults() {
       <div className="filter-row">
         <div className="search-wrapper">
           <svg className="search-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-            <path d="M21 21L15 15M17 10C17 13.866 13.866 17 10 17C6.13401 17 3 13.866 3 10C3 6.13401 6.13401 3 10 3C13.866 3 17 6.13401 17 10Z"/>
+            <path d="M21 21L15 15M17 10C17 13.866 13.866 17 10 17C6.13401 17 3 13.866 3 10C3 6.13401 6.13401 3 10 3C13.866 3 17 6.13401 17 10Z" />
           </svg>
           <input
             type="text"
@@ -75,7 +77,7 @@ export default function AdminAuctionResults() {
           Export Results
         </button>
 
-<div className="btn-group filter-btn-group status-buttons">
+        <div className="btn-group filter-btn-group status-buttons">
           {["All", "Payment Received", "Invoice Sent", "Payment Pending", "Unsold"].map((s) => (
             <button
               key={s}
@@ -108,6 +110,7 @@ export default function AdminAuctionResults() {
                   No results found
                 </td>
               </tr>
+
             ) : (
               rows.map((row, i) => (
                 <tr key={i}>
@@ -123,22 +126,22 @@ export default function AdminAuctionResults() {
                   <td className="text-center">
                     <span className={`badgecustomadmin
                       ${row.status === "Payment Received" ? "bg-live" :
-                      row.status === "Invoice Sent" ? "bg-upcoming" :
-                      row.status === "Payment Pending" ? "bg-ended" :
-                      "bg-draft"}`}>
+                        row.status === "Invoice Sent" ? "bg-upcoming" :
+                          row.status === "Payment Pending" ? "bg-ended" :
+                            "bg-draft"}`}>
                       {row.status}
                     </span>
                   </td>
                   <td className="dots text-center">
-                    <button 
+                    <button
                       className="action-menu-btn"
                       onClick={(e) => { e.stopPropagation(); alert("Actions menu"); }}
                       title="More actions"
                     >
                       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                        <circle cx="12" cy="12" r="1"/>
-                        <circle cx="12" cy="5" r="1"/>
-                        <circle cx="12" cy="19" r="1"/>
+                        <circle cx="12" cy="12" r="1" />
+                        <circle cx="12" cy="5" r="1" />
+                        <circle cx="12" cy="19" r="1" />
                       </svg>
                     </button>
                   </td>
@@ -149,19 +152,64 @@ export default function AdminAuctionResults() {
         </table>
       </div>
 
-      <div className="pagination-bar3">
-        <button disabled={page === 1} onClick={() => setPage(p => p - 1)}>Prev</button>
-        {[...Array(totalPages)].map((_, i) => (
-          <button
-            key={i}
-            className={page === i + 1 ? "active" : ""}
-            onClick={() => setPage(i + 1)}
-          >
-            {i + 1}
-          </button>
-        ))}
-        <button disabled={page === totalPages} onClick={() => setPage(p => p + 1)}>Next</button>
-      </div>
+      {filteredData.length > 0 && (
+        <div className="table-pagination">
+          <div className="pagination-info">
+            Page {page} of {totalPages}
+          </div>
+
+          <div className="pagination-controls">
+            <button style={{ color: "black" }}
+              className="pagination-btn prev"
+              onClick={() => setPage(p => Math.max(p - 1, 1))}
+              disabled={page === 1}
+            >
+              .
+            </button>
+
+            {[...Array(totalPages)].map((_, i) => (
+              <button
+                key={i}
+                className={`page-number ${page === i + 1 ? "active" : ""}`}
+                onClick={() => setPage(i + 1)}
+              >
+                {i + 1}
+              </button>
+            ))}
+
+            <button style={{ color: "black" }}
+              className="pagination-btn next"
+              onClick={() => setPage(p => Math.min(p + 1, totalPages))}
+              disabled={page === totalPages}
+            >
+              .
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
+
+{/* {paginatedRows.map((row) => (
+              <tr key={row.lot}>
+                <td>{row.lot}</td>
+                <td>{row.item}</td>
+                <td>{row.bid ? `$${row.bid.toLocaleString()}` : "—"}</td>
+                <td>{row.bidder}</td>
+                <td>
+                  <span className={`badgecustomadmin ${row.reserve === "Met" ? "bg-live" : "bg-draft"}`}>
+                    {row.reserve}
+                  </span>
+                </td>
+                <td>
+                  <span className={`badgecustomadmin
+                    ${row.status === "Payment Received" ? "bg-live" :
+                      row.status === "Invoice Sent" ? "bg-upcoming" :
+                        row.status === "Payment Pending" ? "bg-ended" :
+                          "bg-draft"}`}>
+                    {row.status}
+                  </span>
+                </td>
+                <td className="dots">⋮</td>
+              </tr> */}

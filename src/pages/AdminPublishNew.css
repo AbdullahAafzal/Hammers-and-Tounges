@@ -25,10 +25,67 @@ body {
 }
 
 .header-title {
-  color: #fff;
-  margin: 0;
-  margin-left: 20px;
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: #FFFFFF;
+  margin-bottom: 0.5rem;
+  letter-spacing: -0.5px;
+  margin-left: 10px;
 }
+input:focus,
+textarea:focus,
+select:focus {
+  outline: none;
+  border-color: #8CC63F !important; 
+  box-shadow: 0 0 4px rgba(140, 198, 63, 0.5);
+}
+.status-container {
+  display: flex !important;
+  align-items: center !important; 
+  gap: 8px !important; 
+  margin-bottom: 20px;
+}
+
+.status-badge {
+  background-color: #8CC63F !important; 
+  color: #000;
+  min-width: auto;
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-size: 0.8rem;
+  text-align: center;
+  display: inline-block;
+}
+
+.form-check-input:checked {
+  background-color: #8CC63F;
+  border-color: #8CC63F;
+}
+
+.form-check-input:focus {
+  border-color: #8CC63F;
+  box-shadow: 0 0 4px rgba(140, 198, 63, 0.5);
+}
+.form-check-input{
+    border-color: #8CC63F !important;
+
+}
+
+
+.status2{
+ display: inline-block;
+  font-size: 12px;
+  font-weight: 700;
+  text-align: center;
+  border-radius: 20px;
+  padding: 6px 12px;
+  white-space: nowrap;
+  overflow: hidden;
+  width: 102px;
+ background-color: #cfd21649;
+  color: #d6d836e1;
+  border: 1px solid #cfd21671;}
+
 
 .btn-publish,
 .btn-preview {

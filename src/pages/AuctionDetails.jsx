@@ -262,7 +262,6 @@ Fully restored to concours quality, this Cobra has been meticulously maintained 
             </div>
           </div>
 
-          {/* Right Panel - Details */}
           <div className="auction-details-section">
             <div className="auction-header">
               <h1 className="auction-title">{auction.title}</h1>
