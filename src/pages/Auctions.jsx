@@ -12,10 +12,7 @@ const Auctions = () => {
   const [currentPage, setCurrentPage] = useState(1)
   const [showToast, setShowToast] = useState(false)
 
-  // Check if user is logged in (guest mode)
   const isGuest = () => {
-    // Check localStorage for auth token or user data
-    // For now, we'll check if user has visited dashboard/profile pages
     return !localStorage.getItem('isAuthenticated')
   }
 
@@ -128,12 +125,10 @@ const Auctions = () => {
   }
 
   const handleAuctionClick = (auction) => {
-    // Check if it's a LIVE auction and user is guest
     if (auction.status === 'LIVE' && isGuest()) {
       setShowToast(true)
       return
     }
-    // Navigate to auction details
     navigate(`/auction/${auction.id}`)
   }
 
@@ -247,7 +242,7 @@ const Auctions = () => {
                   </span>
                 </div>
                 <div className="auction-card-content">
-                  <p className="auction-category">{auction.category}</p>
+                  <p className="auction-category-1">{auction.category}</p>
                   <h3 className="auction-card-title">{auction.title}</h3>
                   <div className="auction-timer">
                     <span className="timer-label">

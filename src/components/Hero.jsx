@@ -1,7 +1,9 @@
 import React from 'react'
 import './Hero.css'
+import { useNavigate } from 'react-router-dom'
 
 const Hero = () => {
+  const navigate = useNavigate()
   return (
     <section className="hero">
       <div className="hero-overlay"></div>
@@ -10,7 +12,7 @@ const Hero = () => {
         <p className="hero-description">
           Discover exclusive deals on vehicles, real estate, art, and more. Your next prized possession awaits.
         </p>
-        <button className="hero-button">View All Auctions</button>
+        <button onClick={()=> navigate('/auctions')} className="hero-button">View All Auctions</button>
       </div>
     </section>
   )

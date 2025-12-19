@@ -42,13 +42,15 @@
 }
 
 .category-tab.active {
-  background-color: #8CC63F;
+   background-color: #8CC63F;
   color: #000000;
   border-color: #8CC63F;
 }
 
+
+
 .category-tab.active:hover {
-  background-color: #35B24A;
+  background-color: #7BB337;
 }
 
 @media (max-width: 768px) {

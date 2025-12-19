@@ -58,9 +58,7 @@
 }
 
 .onboarding-button.primary:hover {
-  background-color: #35B24A;
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(140, 198, 63, 0.3);
+  background-color: #7BB337;
 }
 
 .onboarding-button.secondary {
@@ -74,6 +72,28 @@
   border-color: #8CC63F;
   color: #8CC63F;
 }
+
+/* .hero-button {
+  padding: 0.75rem 1.5rem;
+  background-color: #8CC63F;
+  color: #000000;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  white-space: nowrap;
+  box-shadow: 0 4px 12px rgba(140, 198, 63, 0.2);
+}
+
+.hero-button:hover {
+  background-color: #7BB337;
+} */
+
 
 .onboarding-features {
   display: flex;

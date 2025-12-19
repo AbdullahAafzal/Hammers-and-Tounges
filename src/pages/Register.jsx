@@ -7,7 +7,6 @@ import './Register.css'
 // import { registerUser } from '../store/actions/authActions'
 
 const Register = () => {
-  // const [moveTo, setMoveTO] = useState(false)
   const navigate = useNavigate()
   // const dispatch = useDispatch()
 
@@ -35,19 +34,6 @@ const Register = () => {
   const [formErrors, setFormErrors] = useState({})
 
   // useEffect(() => {
-  //   if (moveTo) {
-  //     navigate('/otp-verification', {
-  //       state: {
-  //         email: formData.email,
-  //         userType: formData.role
-  //       }
-  //     })
-  //   }
-  // }, [moveTo])
-
-  // }, [registrationData, navigate, formData.email, formData.role])
-
-  // useEffect(() => {
   //   return () => {
   //     dispatch(clearRegistrationData())
   //     dispatch(clearError())
@@ -68,14 +54,11 @@ const Register = () => {
     }
   }
   const handlePhoneChange = (e) => {
-    let value = e.target.value.replace(/\D/g, '') // digits only
+    let value = e.target.value.replace(/\D/g, '') 
 
-    // limit to 9 digits (Zimbabwe mobile numbers)
     if (value.length > 9) {
       value = value.slice(0, 9)
     }
-
-    // format: XXX XXX XXX
     if (value.length > 3 && value.length <= 6) {
       value = value.replace(/(\d{3})(\d+)/, '$1 $2')
     } else if (value.length > 6) {
@@ -121,19 +104,9 @@ const Register = () => {
       errors.email = 'Please enter a valid email address'
     }
 
-    // // Zimbabwe phone validation
-    // const phoneRegex = /^\+263\s?(7[1-9]|77)\d{2}\s?\d{3}\s?\d{3}$/
-    // if (formData.phone && !phoneRegex.test(formData.phone.replace(/\s/g, ''))) {
-    //   errors.phone = 'Please enter a valid Zimbabwe phone number (e.g., +263 77X XXX XXX)'
-    // }
-
-    // Zimbabwe phone number validation
     if (formData.phone) {
       const phoneDigits = formData.phone.replace(/\s/g, '');
-
-      // Must be exactly 9 digits & start with 71–79
       const phoneRegex = /^7[1-9]\d{7}$/;
-
       if (!phoneRegex.test(phoneDigits)) {
         errors.phone = 'Please enter a valid Zimbabwe phone number (e.g., 77X XXX XXX)';
       }
@@ -168,9 +141,6 @@ const Register = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault()
-
-    // dispatch(clearError())
-
     if (!validateForm()) {
       return
     }
@@ -215,8 +185,8 @@ const Register = () => {
             </svg>
           </button>
           <Link to="/" className="register-logo">
-            <img src={logo} alt="Hammers & Tongues Logo" />
-            <span>Hammers & Tongues</span>
+            <img src={logo} alt="Hammer & Tongues Logo" />
+            <span>Hammer & Tongues</span>
           </Link>
         </div>
         <div className="register-header-link">
@@ -241,8 +211,6 @@ const Register = () => {
         <div className="register-right">
           <div className="register-form-wrapper">
             <h1 className="register-title">Create Your H&T Account</h1>
-
-            {/* User Type Tabs */}
             <div className="user-type-tabs">
               <button
                 type="button"
@@ -270,7 +238,6 @@ const Register = () => {
             </div>
 
             <form className="register-form" onSubmit={handleSubmit}>
-              {/* Display API errors */}
               {/* {registrationError && (
                 <div className="form-error-message">
                   {registrationError.message || 'Registration failed. Please try again.'}
@@ -279,7 +246,6 @@ const Register = () => {
                 </div>
               )} */}
 
-              {/* Personal Information Section */}
               <div className="form-section">
                 <h3 className="section-title">Personal Information</h3>
                 <div className="form-grid">
@@ -325,7 +291,6 @@ const Register = () => {
                 </div>
               </div>
 
-              {/* Contact Information Section */}
               <div className="form-section">
                 <h3 className="section-title">Contact Information</h3>
                 <div className="form-grid">
@@ -385,7 +350,6 @@ const Register = () => {
                 </div>
               </div>
 
-              {/* Seller Information Section */}
               {formData.role === 'seller' && (
                 <div className="form-section">
                   <h3 className="section-title">Business Information</h3>
@@ -433,7 +397,6 @@ const Register = () => {
                 </div>
               )}
 
-              {/* Security Section */}
               <div className="form-section">
                 <h3 className="section-title">Security</h3>
                 <div className="form-grid">
@@ -526,7 +489,6 @@ const Register = () => {
                 </div>
               </div>
 
-              {/* Terms and Submit */}
               <div className="form-section">
                 <div className="form-group">
                   <label className="checkbox-label terms">
@@ -540,8 +502,8 @@ const Register = () => {
                     </span>
                   </label>
                 </div>
-                {/* 
-                <button 
+                
+                {/* <button 
                   type="submit" 
                   className="submit-button"
                   // disabled={isRegistering}

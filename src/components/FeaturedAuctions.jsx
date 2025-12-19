@@ -80,7 +80,6 @@ const FeaturedAuctions = () => {
   const [currentIndex, setCurrentIndex] = useState(0)
   const [itemsPerRow, setItemsPerRow] = useState(5)
 
-  // Calculate items per row based on screen size
   useEffect(() => {
     const calculateItemsPerRow = () => {
       if (typeof window !== 'undefined') {
@@ -98,7 +97,6 @@ const FeaturedAuctions = () => {
     const handleResize = () => {
       const newItemsPerRow = calculateItemsPerRow()
       setItemsPerRow(newItemsPerRow)
-      // Reset to first page if current index would be out of bounds
       const maxIndex = Math.ceil(auctions.length / newItemsPerRow) - 1
       if (currentIndex > maxIndex) {
         setCurrentIndex(0)
@@ -128,22 +126,22 @@ const FeaturedAuctions = () => {
         <div className="featured-header">
           <h2 className="featured-title">Featured Auctions</h2>
           <div className="featured-nav">
-            <button 
-              className="nav-arrow left-arrow" 
+            <button
+              className="nav-arrow left-arrow"
               aria-label="Previous"
               onClick={handlePrevious}
             >
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-                <path d="M15 18L9 12L15 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                <path d="M15 18L9 12L15 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
               </svg>
             </button>
-            <button 
-              className="nav-arrow right-arrow" 
+            <button
+              className="nav-arrow right-arrow"
               aria-label="Next"
               onClick={handleNext}
             >
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-                <path d="M9 18L15 12L9 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                <path d="M9 18L15 12L9 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
               </svg>
             </button>
           </div>
@@ -166,12 +164,12 @@ const FeaturedAuctions = () => {
                     <span className="detail-value">{auction.timeRemaining}</span>
                   </div>
                 </div>
-                            <button 
-                              className="auction-button"
-                              onClick={() => navigate(`/auction/${auction.id}`)}
-                            >
-                              View Details
-                            </button>
+                <button
+                  className="auction-button"
+                  onClick={() => navigate(`/auction/${auction.id}`)}
+                >
+                  View Details
+                </button>
               </div>
             </div>
           ))}

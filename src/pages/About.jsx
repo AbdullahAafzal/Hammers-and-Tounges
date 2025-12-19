@@ -6,7 +6,7 @@ const About = () => {
     <div className="about-page">
       <div className="about-hero">
         <div className="about-hero-content">
-          <h1 className="about-hero-title">About Hammers & Tongues</h1>
+          <h1 className="about-hero-title">About Hammer & Tongues</h1>
           <p className="about-hero-subtitle">
             Your trusted partner in premium online auctions
           </p>

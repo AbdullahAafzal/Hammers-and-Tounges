@@ -16,7 +16,7 @@ const Header = () => {
   return (
     <header className="header3">
       <div className="header-container3">
-        <div className="header-left3">
+        {/* <div className="header-left3"> */}
           <Link to="/" className="logo">
             <div className="logo-icon">
               <img src={logo} alt="Hammers & Tongues Logo" />
@@ -28,8 +28,8 @@ const Header = () => {
             <Link to="/about" className={`nav-link ${location.pathname === '/about' ? 'active' : ''}`}>About Us</Link>
             <Link to="/contact" className={`nav-link ${location.pathname === '/contact' ? 'active' : ''}`}>Contact</Link>
           </nav>
-        </div>
-        
+        {/* </div> */}
+{/*         
         <div className="header-center3">
           <form className="search-form" onSubmit={handleSearch}>
             <div className="search-wrapper">
@@ -66,7 +66,7 @@ const Header = () => {
               <circle cx="12" cy="7" r="4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
             </svg>
           </button>
-        </div>
+        </div> */}
       </div>
     </header>
   )

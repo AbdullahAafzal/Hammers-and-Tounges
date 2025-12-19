@@ -251,7 +251,7 @@ const BuyerAuctions = () => {
                     </span>
                   </div>
                   <div className="auction-card-content">
-                    <p className="auction-category">{auction.category}</p>
+                    <p className="auction-category-1">{auction.category}</p>
                     <h3 className="auction-card-title">{auction.title}</h3>
                     <div className="auction-timer">
                       <span className="timer-label">
