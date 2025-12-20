@@ -108,7 +108,6 @@ const Register = () => {
       const phoneDigits = formData.phone.replace(/\s/g, '');
       const phoneRegex = /^7[1-9]\d{7}$/;
       if (!phoneRegex.test(phoneDigits)) {
-        errors.phone = 'Please enter a valid Zimbabwe phone number (e.g., 77X XXX XXX)';
       }
     }
 
