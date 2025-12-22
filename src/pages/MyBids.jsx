@@ -1,6 +1,5 @@
 import React, { useState } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
-import logo from '../assets/logo.png'
 import './MyBids.css'
 
 const MyBids = () => {
@@ -81,12 +80,8 @@ const MyBids = () => {
     }).format(amount)
   }
 
-  // Filter to only show live auctions (exclude upcoming)
   const filteredBids = activeBids.filter(bid => {
-    // Only show live auctions
     if (!bid.isLive) return false
-
-    // Apply search filter
     const matchesSearch = searchQuery === '' ||
       bid.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
       bid.lotId.toLowerCase().includes(searchQuery.toLowerCase())
@@ -111,7 +106,6 @@ const MyBids = () => {
             <span>Active</span>
           </nav>
 
-          {/* Page Header */}
           <div className="page-header">
             <div className="header-left">
               <h1 className="page-title">Active Bids</h1>
@@ -124,7 +118,6 @@ const MyBids = () => {
             </div>
           </div>
 
-          {/* Search */}
           <div className="search-bar">
             <div className="search-wrapper">
               <svg className="search-icon" width="18" height="18" viewBox="0 0 24 24" fill="none">
@@ -140,14 +133,12 @@ const MyBids = () => {
             </div>
           </div>
 
-          {/* Bids Grid */}
           <div className="bids-grid">
             {visibleBids.map(bid => (
               <div
                 key={bid.id}
                 className={`bid-card ${bid.status === 'outbid' ? 'outbid' : bid.status === 'leading' ? 'leading' : 'upcoming'}`}
               >
-                {/* Status Banner */}
                 {bid.status === 'outbid' && (
                   <div className="status-banner outbid-banner">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
@@ -165,7 +156,6 @@ const MyBids = () => {
                   </div>
                 )}
 
-                {/* Image */}
                 <div className="bid-image">
                   <img src={bid.image} alt={bid.title} />
                   <div className="live-badge">
@@ -174,13 +164,11 @@ const MyBids = () => {
                   </div>
                 </div>
 
-                {/* Details */}
                 <div className="bid-details">
                   <div className="bid-lot-id">{bid.lotId}</div>
                   <h3 className="bid-title">{bid.title}</h3>
                   <div className="bid-category">{bid.category}</div>
 
-                  {/* Bidding Info */}
                   <div className="bidding-info">
                     <div className="bid-row">
                       <span className="bid-label">Current Highest Bid</span>
@@ -194,23 +182,21 @@ const MyBids = () => {
                     </div>
                   </div>
 
-                  {/* Time Remaining */}
                   <div className="time-remaining">
                     <span className="time-label">Time Remaining</span>
                     <span className="time-value">{bid.timeRemaining}</span>
                   </div>
                 </div>
 
-                {/* Action Buttons */}
                 <div className="bid-actions">
                   <button
-                    className="action-btn secondary"
+                    className="bids-action-btn secondary"
                     onClick={() => navigate(`/buyer/auction/${bid.id}`)}
                   >
                     Enter Live Room
                   </button>
                   <button
-                    className="action-btn primary"
+                    className="bids-action-btn primary"
                     onClick={() => navigate(`/buyer/auction/${bid.id}`)}
                   >
                     Increase Bid
@@ -220,7 +206,6 @@ const MyBids = () => {
             ))}
           </div>
 
-          {/* Pagination */}
           {totalPages > 1 && (
             <div className="pagination">
               <button

@@ -264,13 +264,13 @@ const BuyerProfile = () => {
                   </div>
                   <form className="buyer-profile-form" onSubmit={handleSubmit}>
                     <div className="form-grid">
-                      <div className="form-group">
+                      <div className="profile-form-group">
                         <label className="form-label">First Name</label>
                         {isEditing ? (
                           <input
                             type="text"
                             name="firstName"
-                            className="form-input"
+                            className="profile-form-input"
                             value={formData.firstName}
                             onChange={handleChange}
                           />
@@ -278,13 +278,13 @@ const BuyerProfile = () => {
                           <div className="form-value">{formData.firstName}</div>
                         )}
                       </div>
-                      <div className="form-group">
+                      <div className="profile-form-group">
                         <label className="form-label">Last Name</label>
                         {isEditing ? (
                           <input
                             type="text"
                             name="lastName"
-                            className="form-input"
+                            className="profile-form-input"
                             value={formData.lastName}
                             onChange={handleChange}
                           />
@@ -292,13 +292,13 @@ const BuyerProfile = () => {
                           <div className="form-value">{formData.lastName}</div>
                         )}
                       </div>
-                      <div className="form-group">
+                      <div className="profile-form-group">
                         <label className="form-label">Display Name</label>
                         {isEditing ? (
                           <input
                             type="text"
                             name="displayName"
-                            className="form-input"
+                            className="profile-form-input"
                             value={formData.displayName}
                             onChange={handleChange}
                           />
@@ -307,7 +307,7 @@ const BuyerProfile = () => {
                         )}
                         <p className="form-hint">This is how your name appears to other users</p>
                       </div>
-                      <div className="form-group full-width">
+                      <div className="profile-form-group full-width">
                         <label className="form-label">Bio</label>
                         {isEditing ? (
                           <textarea
@@ -347,13 +347,13 @@ const BuyerProfile = () => {
                   </div>
                   <form className="buyer-profile-form" onSubmit={handleSubmit}>
                     <div className="form-grid">
-                      <div className="form-group full-width">
+                      <div className="profile-form-group full-width">
                         <label className="form-label">Email Address</label>
                         {isEditing ? (
                           <input
                             type="email"
                             name="email"
-                            className="form-input"
+                            className="profile-form-input"
                             value={formData.email}
                             onChange={handleChange}
                           />
@@ -361,13 +361,13 @@ const BuyerProfile = () => {
                           <div className="form-value">{formData.email}</div>
                         )}
                       </div>
-                      <div className="form-group">
+                      <div className="profile-form-group">
                         <label className="form-label">Phone Number</label>
                         {isEditing ? (
                           <input
                             type="tel"
                             name="phone"
-                            className="form-input"
+                            className="profile-form-input"
                             value={formData.phone}
                             onChange={handleChange}
                           />
@@ -375,13 +375,13 @@ const BuyerProfile = () => {
                           <div className="form-value">{formData.phone}</div>
                         )}
                       </div>
-                      <div className="form-group full-width">
+                      <div className="profile-form-group full-width">
                         <label className="form-label">Street Address</label>
                         {isEditing ? (
                           <input
                             type="text"
                             name="address"
-                            className="form-input"
+                            className="profile-form-input"
                             value={formData.address}
                             onChange={handleChange}
                           />
@@ -389,13 +389,13 @@ const BuyerProfile = () => {
                           <div className="form-value">{formData.address}</div>
                         )}
                       </div>
-                      <div className="form-group">
+                      <div className="profile-form-group">
                         <label className="form-label">City</label>
                         {isEditing ? (
                           <input
                             type="text"
                             name="city"
-                            className="form-input"
+                            className="profile-form-input"
                             value={formData.city}
                             onChange={handleChange}
                           />
@@ -403,13 +403,13 @@ const BuyerProfile = () => {
                           <div className="form-value">{formData.city}</div>
                         )}
                       </div>
-                      <div className="form-group">
+                      <div className="profile-form-group">
                         <label className="form-label">State</label>
                         {isEditing ? (
                           <input
                             type="text"
                             name="state"
-                            className="form-input"
+                            className="profile-form-input"
                             value={formData.state}
                             onChange={handleChange}
                           />
@@ -417,13 +417,13 @@ const BuyerProfile = () => {
                           <div className="form-value">{formData.state}</div>
                         )}
                       </div>
-                      <div className="form-group">
+                      <div className="profile-form-group">
                         <label className="form-label">Zip Code</label>
                         {isEditing ? (
                           <input
                             type="text"
                             name="zipCode"
-                            className="form-input"
+                            className="profile-form-input"
                             value={formData.zipCode}
                             onChange={handleChange}
                           />
@@ -431,7 +431,7 @@ const BuyerProfile = () => {
                           <div className="form-value">{formData.zipCode}</div>
                         )}
                       </div>
-                      <div className="form-group full-width">
+                      <div className="profile-form-group full-width">
                         <label className="form-label">Country</label>
                         {isEditing ? (
                           <select
@@ -476,32 +476,32 @@ const BuyerProfile = () => {
                   </div>
                   <form className="buyer-profile-form" onSubmit={handleSecuritySubmit}>
                     <div className="form-grid">
-                      <div className="form-group full-width">
+                      <div className="profile-form-group full-width">
                         <label className="form-label">Current Password</label>
                         <input
                           type="password"
                           name="currentPassword"
-                          className="form-input"
+                          className="profile-form-input"
                           value={securityData.currentPassword}
                           onChange={handleSecurityChange}
                         />
                       </div>
-                      <div className="form-group">
+                      <div className="profile-form-group">
                         <label className="form-label">New Password</label>
                         <input
                           type="password"
                           name="newPassword"
-                          className="form-input"
+                          className="profile-form-input"
                           value={securityData.newPassword}
                           onChange={handleSecurityChange}
                         />
                       </div>
-                      <div className="form-group">
+                      <div className="profile-form-group">
                         <label className="form-label">Confirm Password</label>
                         <input
                           type="password"
                           name="confirmPassword"
-                          className="form-input"
+                          className="profile-form-input"
                           value={securityData.confirmPassword}
                           onChange={handleSecurityChange}
                         />

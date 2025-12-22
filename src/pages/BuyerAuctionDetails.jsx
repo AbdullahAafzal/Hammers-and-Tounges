@@ -12,10 +12,8 @@ const BuyerAuctionDetails = () => {
   const [selectedImage, setSelectedImage] = useState(0)
   const [timeRemaining, setTimeRemaining] = useState({ hours: 0, minutes: 1, seconds: 25 })
 
-  // Determine status based on id - odd numbers are LIVE, even are UPCOMING
   const auctionStatus = parseInt(id) % 2 === 1 ? 'LIVE' : 'UPCOMING'
 
-  // Mock auction data - in real app, fetch based on id
   const auction = {
     id: id || '123',
     title: auctionStatus === 'LIVE' ? 'Lot 102: Vintage Rolex Submariner' : '1965 Shelby Cobra 427',
@@ -56,7 +54,6 @@ Fully restored to concours quality, this Cobra has been meticulously maintained 
     activeBidders: ['Bidder_789', 'Bidder_123', 'Bidder_456', 'Bidder_101']
   }
 
-  // Timer countdown for live auctions
   useEffect(() => {
     if (auction.status === 'LIVE') {
       const interval = setInterval(() => {
@@ -91,31 +88,28 @@ Fully restored to concours quality, this Cobra has been meticulously maintained 
   const handleBidSubmit = (e) => {
     e.preventDefault()
     console.log('Placing bid:', bidAmount)
-    // Handle bid submission
+
   }
 
   const handleCustomBidSubmit = (e) => {
     e.preventDefault()
     console.log('Placing custom bid:', customBidAmount)
-    // Handle custom bid submission
   }
 
   const handleQuickBid = () => {
     setBidAmount(auction.minimumBid.toString())
     console.log('Quick bid:', auction.minimumBid)
-    // Handle quick bid submission
   }
 
-  // Live Auction View
   if (auction.status === 'LIVE') {
     return (
       <div className="buyer-auction-details-page live-auction-page">
-        {/* Buyer Dashboard Header */}
+
         <header className="buyer-auction-details-header">
           <div className="buyer-auction-details-header-container">
             <Link to="/dashboard" className="buyer-auction-details-logo">
               <img src={logo} alt="Hammers & Tongues Logo" />
-              <span>Hammers & Tongues</span>
+              <span>Hammer & Tongues</span>
             </Link>
             
             <nav className="buyer-auction-details-nav">
@@ -126,13 +120,13 @@ Fully restored to concours quality, this Cobra has been meticulously maintained 
             </nav>
 
             <div className="buyer-auction-details-header-right">
-              <button className="notification-button" aria-label="Notifications">
+              {/* <button className="notification-button" aria-label="Notifications">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
                   <path d="M18 8A6 6 0 0 0 6 8C6 11.3137 3.31371 14 0 14M18 8C20.2091 8 22 9.79086 22 12C22 14.2091 20.2091 16 18 16M18 8C20.2091 8 22 5.79086 22 3C22 0.790861 20.2091 -1 18 -1C15.7909 -1 14 0.790861 14 3C14 5.79086 15.7909 8 18 8Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                   <path d="M6 8C6 11.3137 8.68629 14 12 14C15.3137 14 18 11.3137 18 8" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                 </svg>
                 <span className="notification-badge">3</span>
-              </button>
+              </button> */}
               <Link to="/profile" className="profile-button" aria-label="Profile">
                 <div className="profile-avatar">
                   <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
@@ -145,10 +139,8 @@ Fully restored to concours quality, this Cobra has been meticulously maintained 
           </div>
         </header>
 
-        {/* Auction Details Content */}
         <div className="buyer-auction-details-content">
           <div className="buyer-auction-details-container">
-            {/* Back Button and Breadcrumbs */}
             <div className="back-button-container">
               <button className="back-button" onClick={() => navigate('/buyer/auctions')}>
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
@@ -167,14 +159,12 @@ Fully restored to concours quality, this Cobra has been meticulously maintained 
               <span>{auction.lotNumber}</span>
             </nav>
 
-            {/* Title and Description */}
             <div className="live-auction-header">
               <h1 className="live-auction-title">{auction.title}</h1>
               <p className="live-auction-description">{auction.description}</p>
             </div>
 
             <div className="live-auction-content">
-              {/* Left Panel - Video/Image Player */}
               <div className="live-auction-player-section">
                 <div className="video-player">
                   <img src={auction.images[selectedImage]} alt={auction.title} />
@@ -193,9 +183,7 @@ Fully restored to concours quality, this Cobra has been meticulously maintained 
                 </div>
               </div>
 
-              {/* Right Panel - Bidding Info */}
               <div className="live-auction-bidding-panel">
-                {/* Timer */}
                 <div className="live-timer-section">
                   <div className="timer-label">TIME REMAINING</div>
                   <div className="live-timer">
@@ -218,7 +206,6 @@ Fully restored to concours quality, this Cobra has been meticulously maintained 
                   </div>
                 </div>
 
-                {/* Current Highest Bid */}
                 <div className="current-bid-box">
                   <div className="current-bid-label">Current Highest Bid</div>
                   <div className="current-bid-amount">{formatCurrency(auction.currentBid)}</div>
@@ -228,12 +215,10 @@ Fully restored to concours quality, this Cobra has been meticulously maintained 
                   </div>
                 </div>
 
-                {/* Quick Bid Button */}
                 <button className="quick-bid-button" onClick={handleQuickBid}>
                   Bid {formatCurrency(auction.minimumBid)}
                 </button>
 
-                {/* Custom Bid */}
                 <form className="custom-bid-form" onSubmit={handleCustomBidSubmit}>
                   <input
                     type="text"
@@ -245,7 +230,6 @@ Fully restored to concours quality, this Cobra has been meticulously maintained 
                   <button type="submit" className="custom-bid-button">Place Bid</button>
                 </form>
 
-                {/* Confirmation Message */}
                 {auction.isHighestBidder && (
                   <div className="bidder-confirmation">
                     You are the highest bidder!
@@ -254,9 +238,7 @@ Fully restored to concours quality, this Cobra has been meticulously maintained 
               </div>
             </div>
 
-            {/* Bottom Panels */}
             <div className="live-auction-bottom-panels">
-              {/* Live Bidding Feed */}
               <div className="bidding-feed-panel">
                 <h3 className="panel-title">Live Bidding Feed</h3>
                 <div className="bidding-feed-list">
@@ -269,7 +251,6 @@ Fully restored to concours quality, this Cobra has been meticulously maintained 
                 </div>
               </div>
 
-              {/* Active Bidders */}
               <div className="active-bidders-panel">
                 <h3 className="panel-title">Active Bidders ({auction.activeBidders.length})</h3>
                 <div className="active-bidders-list">
@@ -290,11 +271,9 @@ Fully restored to concours quality, this Cobra has been meticulously maintained 
       </div>
     )
   }
-
-  // Upcoming Auction View (Details Only - No Bidding)
   return (
     <div className="buyer-auction-details-page">
-      {/* Buyer Dashboard Header */}
+
       <header className="buyer-auction-details-header">
         <div className="buyer-auction-details-header-container">
           <Link to="/dashboard" className="buyer-auction-details-logo">
@@ -311,13 +290,13 @@ Fully restored to concours quality, this Cobra has been meticulously maintained 
           </nav>
 
           <div className="buyer-auction-details-header-right">
-            <button className="notification-button" aria-label="Notifications">
+            {/* <button className="notification-button" aria-label="Notifications">
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
                 <path d="M18 8A6 6 0 0 0 6 8C6 11.3137 3.31371 14 0 14M18 8C20.2091 8 22 9.79086 22 12C22 14.2091 20.2091 16 18 16M18 8C20.2091 8 22 5.79086 22 3C22 0.790861 20.2091 -1 18 -1C15.7909 -1 14 0.790861 14 3C14 5.79086 15.7909 8 18 8Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                 <path d="M6 8C6 11.3137 8.68629 14 12 14C15.3137 14 18 11.3137 18 8" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
               </svg>
               <span className="notification-badge">3</span>
-            </button>
+            </button> */}
             <Link to="/profile" className="profile-button" aria-label="Profile">
               <div className="profile-avatar">
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
@@ -329,11 +308,8 @@ Fully restored to concours quality, this Cobra has been meticulously maintained 
           </div>
         </div>
       </header>
-
-      {/* Auction Details Content */}
       <div className="buyer-auction-details-content">
         <div className="buyer-auction-details-container">
-          {/* Back Button and Breadcrumbs */}
           <div className="back-button-container">
             <button className="back-button" onClick={() => navigate('/buyer/auctions')}>
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
@@ -353,7 +329,6 @@ Fully restored to concours quality, this Cobra has been meticulously maintained 
           </nav>
 
           <div className="auction-details-content">
-            {/* Left Panel - Images */}
             <div className="auction-images-section">
               <div className="main-image">
                 <img src={auction.images[selectedImage]} alt={auction.title} />
@@ -371,14 +346,12 @@ Fully restored to concours quality, this Cobra has been meticulously maintained 
               </div>
             </div>
 
-            {/* Right Panel - Details */}
             <div className="auction-details-section">
               <div className="auction-header">
                 <h1 className="auction-title">{auction.title}</h1>
                 <span className="lot-number">{auction.lotNumber}</span>
               </div>
 
-              {/* Status Box */}
               <div className="bid-status-box">
                 <div className="bid-status-item">
                   <span className="status-label">Auction Starts In</span>
@@ -389,7 +362,6 @@ Fully restored to concours quality, this Cobra has been meticulously maintained 
                 </div>
               </div>
 
-              {/* Upcoming Notice */}
               <div className="upcoming-notice">
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
                   <path d="M12 8V12M12 16H12.01M21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3C16.9706 3 21 7.02944 21 12Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
@@ -400,7 +372,6 @@ Fully restored to concours quality, this Cobra has been meticulously maintained 
                 </div>
               </div>
 
-              {/* Information Tabs */}
               <div className="info-tabs">
                 <button
                   className={`tab ${activeTab === 'description' ? 'active' : ''}`}
@@ -422,7 +393,6 @@ Fully restored to concours quality, this Cobra has been meticulously maintained 
                 </button>
               </div>
 
-              {/* Tab Content */}
               <div className="tab-content">
                 {activeTab === 'description' && (
                   <div className="description-content">

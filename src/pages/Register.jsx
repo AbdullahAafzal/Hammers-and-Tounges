@@ -54,7 +54,7 @@ const Register = () => {
     }
   }
   const handlePhoneChange = (e) => {
-    let value = e.target.value.replace(/\D/g, '') 
+    let value = e.target.value.replace(/\D/g, '')
 
     if (value.length > 9) {
       value = value.slice(0, 9)
@@ -108,7 +108,6 @@ const Register = () => {
       const phoneDigits = formData.phone.replace(/\s/g, '');
       const phoneRegex = /^7[1-9]\d{7}$/;
       if (!phoneRegex.test(phoneDigits)) {
-        errors.phone = 'Please enter a valid Zimbabwe phone number (e.g., 77X XXX XXX)';
       }
     }
 
@@ -502,7 +501,7 @@ const Register = () => {
                     </span>
                   </label>
                 </div>
-                
+
                 {/* <button 
                   type="submit" 
                   className="submit-button"
@@ -518,15 +517,17 @@ const Register = () => {
                   )}
                 </button> */}
 
+                <div className='button-container'>
+                  <button
+                    type="submit"
+                    className="submit-button"
+                  // disabled={isRegistering}
+                  >
+                    Create Account
 
-                <button
-                  type="submit"
-                  className="submit-button"
-                // disabled={isRegistering}
-                >
-                  Create Account
+                  </button>
 
-                </button>
+                </div>
 
                 <div className="divider">
                   <span>or continue with</span>

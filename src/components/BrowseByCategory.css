@@ -4,7 +4,6 @@
 }
 
 .browse-container {
-  max-width: 1400px;
   margin: 0 auto;
 }
 
@@ -47,8 +46,6 @@
   border-color: #8CC63F;
 }
 
-
-
 .category-tab.active:hover {
   background-color: #7BB337;
 }
@@ -74,7 +71,6 @@
   }
 }
 
-
 @media (max-width: 576px) {
   .category-tabs {
     flex-wrap: nowrap;
@@ -98,7 +94,6 @@
     font-size: 0.7rem;
   }
 }
-
 
 @media (max-width: 400px) {
   .category-tab {

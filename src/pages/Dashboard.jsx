@@ -47,7 +47,7 @@ const Dashboard = () => {
       yourBid: 320.00,
       timeRemaining: '12h 45m',
       isLeading: true
-    }
+    },
   ]
 
   const recentActivities = [
@@ -140,7 +140,7 @@ const Dashboard = () => {
   const getActivityColor = (type) => {
     switch (type) {
       case 'bid_placed':
-        return '#3B82F6' // Blue
+        return '#2c7bfbff' // Blue
       case 'outbid':
         return '#FF4D4D' // Red
       case 'invoice':
@@ -149,6 +149,21 @@ const Dashboard = () => {
         return '#FFC107' // Gold
       default:
         return '#8CC63F'
+    }
+  }
+
+  const getActivityBgColor = (type) => {
+    switch (type) {
+      case 'bid_placed':
+        return '#2c7bfb3a' // Blue
+      case 'outbid':
+        return '#ff373733' // Red
+      case 'invoice':
+        return '#8bc63f35' // Green
+      case 'won':
+        return '#ffc1073c' // Gold
+      default:
+        return '#8bc63f35'
     }
   }
 
@@ -171,7 +186,7 @@ const Dashboard = () => {
 
           <div className="summary-cards">
             <div className="summary-card">
-              <div className="card-background-gradient" style={{ background: 'linear-gradient(135deg, rgba(59, 130, 246, 0.15) 0%, rgba(59, 130, 246, 0.05) 100%)' }}></div>
+              <div className="card-background-gradient" ></div>
               <div className="card-icon" style={{ backgroundColor: 'rgba(59, 130, 246, 0.2)', borderColor: 'rgba(59, 130, 246, 0.4)' }}>
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
                   <path d="M12 2L2 7L12 12L22 7L12 2Z" stroke="#3B82F6" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
@@ -202,15 +217,15 @@ const Dashboard = () => {
             </div>
 
             <Link to="/wallet" className="summary-card highlight" style={{ textDecoration: 'none', cursor: 'pointer' }}>
-              <div className="card-background-gradient" style={{ background: 'linear-gradient(135deg, rgba(255, 193, 7, 0.2) 0%, rgba(255, 193, 7, 0.1) 100%)' }}></div>
-              <div className="card-icon" style={{ backgroundColor: 'rgba(255, 193, 7, 0.25)', borderColor: 'rgba(255, 193, 7, 0.5)' }}>
+              <div className="card-background-gradient" ></div>
+              <div className="card-icon" style={{ backgroundColor: 'rgba(19, 3, 3, 0.33)', borderColor: 'rgba(150, 129, 67, 0.5)' }}>
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
                   <path d="M12 2V22M17 5H9.5C8.57174 5 7.6815 5.36875 7.02513 6.02513C6.36875 6.6815 6 7.57174 6 8.5C6 9.42826 6.36875 10.3185 7.02513 10.9749C7.6815 11.6312 8.57174 12 9.5 12H14.5C15.4283 12 16.3185 12.3687 16.9749 13.0251C17.6312 13.6815 18 14.5717 18 15.5C18 16.4283 17.6312 17.3185 16.9749 17.9749C16.3185 18.6312 15.4283 19 14.5 19H6" stroke="#FFC107" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                 </svg>
               </div>
               <div className="card-content">
                 <span className="card-label">Wallet Balance</span>
-                <span className="card-value currency">{formatCurrency(user.walletBalance)}</span>
+                <span className="card-value currency" style={{ color: 'white' }}> {formatCurrency(user.walletBalance)}</span>
                 <span className="card-sublabel">Available for bidding</span>
               </div>
             </Link>
@@ -222,8 +237,8 @@ const Dashboard = () => {
               <Link to="/my-bids" className="view-all-link">View All</Link>
             </div>
             <div className="active-bids-grid">
-              {activeBids.slice(0, 4).map((bid) => (
-                <Link key={bid.id} to={`/buyer/auction/${bid.id}`} className="bid-card">
+              {activeBids.map((bid) => (
+                <Link key={bid.id} to={`/buyer/auction/${bid.id}`} className="buyer-bid-card">
                   <div className="bid-card-image">
                     <img src={bid.image} alt={bid.title} />
                     {bid.isLeading && (
@@ -274,29 +289,32 @@ const Dashboard = () => {
             <h2 className="section-title">Recent Activity</h2>
             <div className="activity-list">
               {recentActivities.map((activity) => (
-                <div key={activity.id} className="activity-item">
+                <div key={activity.id} className="buyer-activity-item">
                   <div className="activity-image">
                     <img src={activity.image} alt={activity.title} />
                   </div>
 
-                  <div className="activity-content">
-                    <div className="activity-header">
+                  <div className="activity-content-1">
+                    <div className="activity-header-1">
+                      <p className="buyer-activity-title">{activity.title}</p>
+                    </div>
+                    <div className='buyer-icon-amount'>
                       <div
                         className="activity-icon-small"
                         style={{
-                          backgroundColor: `${getActivityColor(activity.type)}15`,
+                          backgroundColor: `${getActivityBgColor(activity.type)}`,
                           color: getActivityColor(activity.type)
                         }}
                       >
                         {getActivityIcon(activity.icon)}
                       </div>
-                      <p className="activity-title">{activity.title}</p>
-                    </div>
-                    <div className="activity-footer">
-                      <span className="activity-time">{activity.time}</span>
-                      <span className="activity-amount">
-                        {formatCurrency(activity.amount)}
-                      </span>
+
+                      <div className="activity-footer">
+                        <span className="activity-time">{activity.time}</span>
+                        <span className="activity-amount">
+                          {formatCurrency(activity.amount)}
+                        </span>
+                      </div>
                     </div>
                   </div>
                 </div>

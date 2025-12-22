@@ -156,7 +156,7 @@
   align-items: center;
   gap: 0.5rem;
   background-color: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
   color: rgba(255, 255, 255, 0.8);
   font-size: 0.875rem;
   font-weight: 500;
@@ -168,9 +168,8 @@
 
 .back-button:hover {
   background-color: rgba(140, 198, 63, 0.1);
-  border-color: rgba(140, 198, 63, 0.3);
+  border-color: rgba(140, 198, 63, 0.5);
   color: #8CC63F;
-  transform: translateX(-2px);
 }
 
 .back-button svg {
@@ -719,7 +718,7 @@
 .live-timer-section {
   padding: 1.5rem;
   background-color: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.2);
   border-radius: 8px;
   text-align: center;
 }
@@ -776,7 +775,7 @@
 .current-bid-box {
   padding: 1.5rem;
   background-color: rgba(140, 198, 63, 0.1);
-  border: 2px solid #8CC63F;
+  border: 1px solid #8CC63F;
   border-radius: 8px;
   text-align: center;
 }
@@ -794,7 +793,7 @@
 .current-bid-amount {
   font-size: 2.5rem;
   font-weight: 700;
-  color: #ffffff;
+  color: #8CC63F;
   margin-bottom: 1rem;
   line-height: 1;
 }
@@ -813,14 +812,14 @@
 .highest-bidder-name {
   font-size: 0.875rem;
   font-weight: 600;
-  color: #ffffff;
+  color: #8CC63F;
 }
 
 .quick-bid-button {
   width: 100%;
   padding: 1rem;
-  background-color: #3B82F6;
-  color: #ffffff;
+  background-color: #8CC63F;
+  color: #000000;
   border: none;
   border-radius: 8px;
   font-size: 1rem;
@@ -830,9 +829,8 @@
 }
 
 .quick-bid-button:hover {
-  background-color: #2563EB;
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+  background-color: #7BB337;
+  box-shadow: 0 6px 20px rgba(140, 198, 63, 0.3);
 }
 
 .custom-bid-form {
@@ -844,7 +842,7 @@
   flex: 1;
   padding: 0.75rem;
   background-color: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
   border-radius: 6px;
   font-size: 0.875rem;
   color: #ffffff;
@@ -864,7 +862,7 @@
   padding: 0.75rem 1.5rem;
   background-color: rgba(255, 255, 255, 0.05);
   color: #ffffff;
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
   border-radius: 6px;
   font-size: 0.875rem;
   font-weight: 600;
@@ -876,6 +874,7 @@
 .custom-bid-button:hover {
   background-color: rgba(255, 255, 255, 0.1);
   border-color: #8CC63F;
+  color: #8CC63F;
 }
 
 .bidder-confirmation {

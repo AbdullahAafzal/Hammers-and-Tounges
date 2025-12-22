@@ -3,7 +3,7 @@ import './Footer.css'
 
 const Footer = () => {
   return (
-    <footer className="footer">
+    <footer className="main-footer">
       <div className="footer-container">
         <div className="footer-column">
           <h3 className="footer-heading">H&T Auctions</h3>
@@ -46,13 +46,10 @@ const Footer = () => {
         </div>
       </div>
       <div className="footer-copyright">
-        <p>© 2024 Hammers & Tongues. All rights reserved.</p>
+        <p>© {new Date().getFullYear()} Hammer & Tongues. All rights reserved.</p>
       </div>
     </footer>
   )
 }
 
 export default Footer
-
-
-

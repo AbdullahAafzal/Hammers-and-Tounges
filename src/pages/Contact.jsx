@@ -116,7 +116,7 @@ const Contact = () => {
             </div>
           </div>
 
-          <div className="contact-form-wrapper">
+          <div className="contact-form-wrappers">
             <h2 className="contact-section-title">Send Us a Message</h2>
             <form className="contact-form" onSubmit={handleSubmit}>
               <div className="form-group">

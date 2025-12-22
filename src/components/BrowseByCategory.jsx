@@ -1,11 +1,9 @@
-import React, { useState } from 'react'
+import React from 'react'
 import './BrowseByCategory.css'
 
-const BrowseByCategory = () => {
-  const [selectedCategory, setSelectedCategory] = useState('All Categories')
-  
+const BrowseByCategory = ({ selectedCategory, setSelectedCategory }) => {
   const categories = ['All Categories', 'Vehicles', 'Real Estate', 'Art & Collectibles', 'Industrial Machinery']
-  
+
   return (
     <section className="browse-section">
       <div className="browse-container">
@@ -27,6 +25,3 @@ const BrowseByCategory = () => {
 }
 
 export default BrowseByCategory
-
-
-
