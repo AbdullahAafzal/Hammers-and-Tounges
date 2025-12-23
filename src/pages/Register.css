@@ -97,7 +97,7 @@
   gap: 2rem;
   align-items: center;
   flex: 1;
-  width: 100%;
+  width: 60%;
 }
 
 .register-left {
@@ -150,16 +150,11 @@
   line-height: 1.6;
 }
 
-.register-right {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+
+.register-form-wrapper-1 {
   width: 100%;
 }
 
-.register-form-wrapper {
-  width: 100%;
-}
 
 .register-title {
   font-size: 1.75rem;
@@ -175,6 +170,7 @@
   gap: 1rem;
   margin-bottom: 2rem;
   justify-content: center;
+  width: 100%;
 }
 
 .user-type-tab {
@@ -217,13 +213,13 @@
   cursor: not-allowed;
 }
 
-.form-section {
-  margin-bottom: 2rem;
+.register-form-section {
   background: rgba(255, 255, 255, 0.02);
-  border: 1px solid rgba(255, 255, 255, 0.05);
+  border: none !important;
   border-radius: 12px;
-  padding: 1.5rem;
+  padding: 1rem 0;
 }
+
 
 .section-title {
   font-size: 1.125rem;
@@ -252,6 +248,7 @@
   flex-direction: column;
   gap: 0.5rem;
 }
+
 
 .form-label {
   font-size: 0.8125rem;
@@ -432,25 +429,24 @@
   color: #35B24A;
   text-decoration: underline;
 }
+
 .button-container {
   height: auto;
   width: 100%;
   display: flex;
   justify-content: center;
-  margin-bottom: 1.5rem;
 }
 
 .submit-button {
   background-color: #8CC63F;
   color: #000000;
   border: none;
-  padding: 1rem 1.5rem;
+  padding: 0.7rem 1.5rem;
   border-radius: 8px;
   font-size: 1rem;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.3s ease;
-  width: 50%;
 }
 
 .submit-button:hover:not(:disabled) {
@@ -587,7 +583,6 @@
 }
 
 .login-link:hover {
-  color: #35B24A;
   text-decoration: underline;
 }
 
@@ -596,6 +591,7 @@
     opacity: 0;
     transform: translateY(-10px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -606,6 +602,7 @@
   from {
     opacity: 0;
   }
+
   to {
     opacity: 1;
   }
@@ -651,6 +648,7 @@
     grid-template-columns: 1fr;
     gap: 1.25rem;
   }
+
   .register-form-grid {
     grid-template-columns: 1fr;
     gap: 1.25rem;
@@ -685,7 +683,7 @@
   .country-code {
     font-size: 0.875rem;
   }
-  
+
   .submit-button {
     width: 100%;
   }
@@ -780,13 +778,14 @@
   .form-input.error {
     border-width: 2px;
   }
-  
+
   .field-error {
     font-weight: 600;
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
+
   .spinner,
   .form-error-message,
   .field-error,
@@ -797,12 +796,13 @@
     animation: none;
     transition: none;
   }
-  
+
   .submit-button:hover {
     transform: none;
   }
 }
 
-html, body {
+html,
+body {
   overflow-x: hidden;
 }

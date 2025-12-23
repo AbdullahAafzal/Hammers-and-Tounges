@@ -1,9 +1,11 @@
 import React, { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import './Profile.css'
+import { getLocalStorage } from '../utils/localStorage'
 
 const BuyerProfile = () => {
   const navigate = useNavigate()
+  const [role, setRole] = useState('buyer')
   const [activeSection, setActiveSection] = useState('profile')
   const [isEditing, setIsEditing] = useState(false)
   const [formData, setFormData] = useState({
@@ -23,6 +25,11 @@ const BuyerProfile = () => {
     wonAuctions: 38,
     successRate: '78%'
   })
+  const [user, setUser] = useState(()=> {
+    getLocalStorage('user')
+  })
+  console.log(user);
+  
 
   const [securityData, setSecurityData] = useState({
     currentPassword: '',
@@ -61,11 +68,12 @@ const BuyerProfile = () => {
   }
 
   const menuItems = [
-    { id: 'profile', label: 'Profile Information', icon: 'profile' },
-    { id: 'contact', label: 'Contact Details', icon: 'contact' },
-    { id: 'security', label: 'Security', icon: 'security' },
-    { id: 'activity', label: 'Bid Activity', icon: 'activity' },
-    { id: 'kyc', label: 'KYC Verification', icon: 'kyc' }
+    { id: 'profile', label: 'Profile Information', icon: 'profile', navigations: '/profile' },
+    { id: 'contact', label: 'Contact Details', icon: 'contact', navigations: '/profile' },
+    { id: 'security', label: 'Security', icon: 'security', navigations: '/profile' },
+    { id: 'activity', label: 'Bid Activity', icon: 'activity', navigations: '/profile' },
+    { id: 'kyc', label: 'KYC Verification', icon: 'kyc', navigations: '/profile' },
+    { id: 'dash', label: 'Dashboard', icon: 'dashboard', navigations: `${role == 'buyer' ? '/dashboard' : '/seller-dashboard'}` }
   ]
 
   const recentActivity = [
@@ -111,6 +119,15 @@ const BuyerProfile = () => {
             <path d="M9 12L11 14L15 10M21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3C16.9706 3 21 7.02944 21 12Z" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
           </svg>
         )
+      case 'dashboard':
+        return (
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+            <path d="M4 6H8C8.55228 6 9 5.55228 9 5V4C9 3.44772 8.55228 3 8 3H4C3.44772 3 3 3.44772 3 4V5C3 5.55228 3.44772 6 4 6Z" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+            <path d="M4 14H8C8.55228 14 9 13.5523 9 13V12C9 11.4477 8.55228 11 8 11H4C3.44772 11 3 11.4477 3 12V13C3 13.5523 3.44772 14 4 14Z" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+            <path d="M11 6H15C15.5523 6 16 5.55228 16 5V4C16 3.44772 15.5523 3 15 3H11C10.4477 3 10 3.44772 10 4V5C10 5.55228 10.4477 6 11 6Z" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+            <path d="M11 14H15C15.5523 14 16 13.5523 16 13V12C16 11.4477 15.5523 11 15 11H11C10.4477 11 10 11.4477 10 12V13C10 13.5523 10.4477 14 11 14Z" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+          </svg>
+        )
       default:
         return null
     }
@@ -118,11 +135,8 @@ const BuyerProfile = () => {
 
   return (
     <div className="buyer-profile-page">
-
-      {/* Main Content */}
       <main className="buyer-profile-main">
         <div className="buyer-profile-container">
-          {/* Sidebar */}
           <aside className="buyer-profile-sidebar">
             <div className="buyer-info-card">
               <div className="buyer-avatar-large">
@@ -144,7 +158,6 @@ const BuyerProfile = () => {
               </div>
             </div>
 
-            {/* Stats */}
             <div className="buyer-stats">
               <div className="stat-item">
                 <div className="stat-icon">
@@ -180,14 +193,16 @@ const BuyerProfile = () => {
                 </div>
               </div>
             </div>
-
-            {/* Navigation */}
             <nav className="buyer-profile-menu">
               {menuItems.map((item) => (
                 <button
                   key={item.id}
                   className={`buyer-menu-item ${activeSection === item.id ? 'active' : ''}`}
-                  onClick={() => setActiveSection(item.id)}
+                  onClick={() => {
+                    setActiveSection(item.id)
+                    navigate(`${item.navigations}`)
+                  }
+                  }
                 >
                   <span className="menu-item-icon">{getIcon(item.icon)}</span>
                   <span className="menu-item-label">{item.label}</span>
@@ -210,7 +225,6 @@ const BuyerProfile = () => {
             </nav>
           </aside>
 
-          {/* Main Content Area */}
           <div className="buyer-profile-content">
             <div className="content-header">
               <div className="header-info">
@@ -526,7 +540,6 @@ const BuyerProfile = () => {
                   </form>
                 </div>
 
-                {/* Two-Factor Authentication */}
                 <div className="security-settings-card">
                   <div className="form-card-header">
                     <h3 className="form-card-title">Two-Factor Authentication</h3>

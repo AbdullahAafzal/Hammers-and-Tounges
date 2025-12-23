@@ -1,14 +1,13 @@
 import React, { useState } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
-import logo from '../assets/logo.png'
 import './WonItems.css'
 
 const WonItems = () => {
   const navigate = useNavigate()
   const [searchQuery, setSearchQuery] = useState('')
   const [currentPage, setCurrentPage] = useState(1)
+  const itemsPerPage = 4
 
-  // Mock won items data
   const wonItems = [
     {
       id: 1,
@@ -75,6 +74,160 @@ const WonItems = () => {
       paymentStatus: 'paid',
       paymentDate: 'June 5, 2024',
       invoiceNumber: 'INV-2024-006'
+    },
+    {
+      id: 7,
+      lotId: '#4521',
+      title: 'Art Deco Mirror',
+      category: 'Home Decor',
+      image: 'https://images.unsplash.com/photo-1541961017774-22349e4a1262?w=800&q=80',
+      winningPrice: 720.00,
+      paymentStatus: 'pending',
+      paymentDeadline: '3d 10h 15m',
+      invoiceNumber: 'INV-2024-007'
+    },
+    {
+      id: 8,
+      lotId: '#8765',
+      title: 'Antique Pocket Watch',
+      category: 'Luxury Timepieces',
+      image: 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=800&q=80',
+      winningPrice: 2100.00,
+      paymentStatus: 'paid',
+      paymentDate: 'June 1, 2024',
+      invoiceNumber: 'INV-2024-008'
+    },
+    {
+      id: 9,
+      lotId: '#2109',
+      title: 'Vintage Leather Armchair',
+      category: 'Antique Furniture Fair',
+      image: 'https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=800&q=80',
+      winningPrice: 980.00,
+      paymentStatus: 'pending',
+      paymentDeadline: '5d 2h 45m',
+      invoiceNumber: 'INV-2024-009'
+    },
+    {
+      id: 10,
+      lotId: '#6543',
+      title: 'Crystal Chandelier',
+      category: 'Fine Art & Collectibles',
+      image: 'https://images.unsplash.com/photo-1541961017774-22349e4a1262?w=800&q=80',
+      winningPrice: 3500.00,
+      paymentStatus: 'paid',
+      paymentDate: 'May 20, 2024',
+      invoiceNumber: 'INV-2024-010'
+    },
+    {
+      id: 11,
+      lotId: '#7890',
+      title: 'Vintage Typewriter',
+      category: 'Office Collectibles',
+      image: 'https://images.unsplash.com/photo-1606983340126-99ab4feaa64a?w=800&q=80',
+      winningPrice: 340.00,
+      paymentStatus: 'pending',
+      paymentDeadline: '2d 18h 30m',
+      invoiceNumber: 'INV-2024-011'
+    },
+    {
+      id: 12,
+      lotId: '#3210',
+      title: 'Oil Painting Landscape',
+      category: 'Modern Art Collection',
+      image: 'https://images.unsplash.com/photo-1541961017774-22349e4a1262?w=800&q=80',
+      winningPrice: 1580.00,
+      paymentStatus: 'paid',
+      paymentDate: 'June 8, 2024',
+      invoiceNumber: 'INV-2024-012'
+    },
+    {
+      id: 13,
+      lotId: '#9876',
+      title: 'Bronze Sculpture',
+      category: 'Fine Art & Collectibles',
+      image: 'https://images.unsplash.com/photo-1541961017774-22349e4a1262?w=800&q=80',
+      winningPrice: 2800.00,
+      paymentStatus: 'pending',
+      paymentDeadline: '6d 12h 0m',
+      invoiceNumber: 'INV-2024-013'
+    },
+    {
+      id: 14,
+      lotId: '#5432',
+      title: 'Mahogany Writing Desk',
+      category: 'Antique Furniture Fair',
+      image: 'https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=800&q=80',
+      winningPrice: 1120.00,
+      paymentStatus: 'paid',
+      paymentDate: 'May 15, 2024',
+      invoiceNumber: 'INV-2024-014'
+    },
+    {
+      id: 15,
+      lotId: '#1357',
+      title: 'Vintage Vinyl Record Collection',
+      category: 'Music Memorabilia',
+      image: 'https://images.unsplash.com/photo-1606983340126-99ab4feaa64a?w=800&q=80',
+      winningPrice: 560.00,
+      paymentStatus: 'pending',
+      paymentDeadline: '1d 3h 50m',
+      invoiceNumber: 'INV-2024-015'
+    },
+    {
+      id: 16,
+      lotId: '#2468',
+      title: 'Porcelain Tea Set',
+      category: 'Fine China',
+      image: 'https://images.unsplash.com/photo-1541961017774-22349e4a1262?w=800&q=80',
+      winningPrice: 425.00,
+      paymentStatus: 'paid',
+      paymentDate: 'June 3, 2024',
+      invoiceNumber: 'INV-2024-016'
+    },
+    {
+      id: 17,
+      lotId: '#1122',
+      title: 'Art Nouveau Vase',
+      category: 'Fine Art & Collectibles',
+      image: 'https://images.unsplash.com/photo-1541961017774-22349e4a1262?w=800&q=80',
+      winningPrice: 780.00,
+      paymentStatus: 'pending',
+      paymentDeadline: '4d 22h 10m',
+      invoiceNumber: 'INV-2024-017'
+    },
+    {
+      id: 18,
+      lotId: '#3344',
+      title: 'Vintage Globe',
+      category: 'Cartography',
+      image: 'https://images.unsplash.com/photo-1606983340126-99ab4feaa64a?w=800&q=80',
+      winningPrice: 390.00,
+      paymentStatus: 'paid',
+      paymentDate: 'May 25, 2024',
+      invoiceNumber: 'INV-2024-018'
+    },
+    {
+      id: 19,
+      lotId: '#5566',
+      title: 'Stained Glass Window Panel',
+      category: 'Architectural Salvage',
+      image: 'https://images.unsplash.com/photo-1541961017774-22349e4a1262?w=800&q=80',
+      winningPrice: 1950.00,
+      paymentStatus: 'pending',
+      paymentDeadline: '3d 5h 25m',
+      invoiceNumber: 'INV-2024-019'
+    },
+    {
+      id: 20,
+      lotId: '#7788',
+      title: 'Antique Telescope',
+      category: 'Scientific Instruments',
+      image: 'https://images.unsplash.com/photo-1606983340126-99ab4feaa64a?w=800&q=80',
+      winningPrice: 2450.00,
+      paymentStatus: 'paid',
+      paymentDate: 'June 10, 2024',
+      invoiceNumber: 'INV-2024-020'
     }
   ]
 
@@ -91,70 +244,39 @@ const WonItems = () => {
     const matchesSearch = searchQuery === '' ||
       item.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
       item.lotId.toLowerCase().includes(searchQuery.toLowerCase())
-
     return matchesSearch
   })
 
-  const itemsPerPage = 12
-  const totalPages = Math.ceil(filteredItems.length / itemsPerPage)
+  const totalItems = filteredItems.length
+  const totalPages = Math.ceil(totalItems / itemsPerPage)
+  
   const startIndex = (currentPage - 1) * itemsPerPage
-  const visibleItems = filteredItems.slice(startIndex, startIndex + itemsPerPage)
+  const endIndex = startIndex + itemsPerPage
+  const currentItems = filteredItems.slice(startIndex, endIndex)
+
+  const handlePageChange = (pageNumber) => {
+    if (pageNumber >= 1 && pageNumber <= totalPages) {
+      setCurrentPage(pageNumber)
+    }
+  }
 
   return (
     <div className="won-items-page">
-      {/* Buyer Dashboard Header */}
-      {/* <header className="won-items-header">
-        <div className="won-items-header-container">
-          <Link to="/dashboard" className="won-items-logo">
-            <img src={logo} alt="Hammers & Tongues Logo" />
-            <span>Hammers & Tongues</span>
-          </Link>
-          
-          <nav className="won-items-nav">
-            <Link to="/dashboard" className="nav-link">Home</Link>
-            <Link to="/buyer/auctions" className="nav-link">Auctions</Link>
-            <Link to="/my-bids" className="nav-link">My Bids</Link>
-            <Link to="/won-items" className="nav-link active">Won Items</Link>
-          </nav>
-
-          <div className="won-items-header-right">
-            <button className="notification-button" aria-label="Notifications">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-                <path d="M18 8A6 6 0 0 0 6 8C6 11.3137 3.31371 14 0 14M18 8C20.2091 8 22 9.79086 22 12C22 14.2091 20.2091 16 18 16M18 8C20.2091 8 22 5.79086 22 3C22 0.790861 20.2091 -1 18 -1C15.7909 -1 14 0.790861 14 3C14 5.79086 15.7909 8 18 8Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                <path d="M6 8C6 11.3137 8.68629 14 12 14C15.3137 14 18 11.3137 18 8" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-              </svg>
-              <span className="notification-badge">3</span>
-            </button>
-            <Link to="/profile" className="profile-button" aria-label="Profile">
-              <div className="profile-avatar">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-                  <path d="M20 21V19C20 17.9391 19.5786 16.9217 18.8284 16.1716C18.0783 15.4214 17.0609 15 16 15H8C6.93913 15 5.92172 15.4214 5.17157 16.1716C4.42143 16.9217 4 17.9391 4 19V21" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                  <circle cx="12" cy="7" r="4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                </svg>
-              </div>
-            </Link>
-          </div>
-        </div>
-      </header> */}
-
-      {/* Won Items Content */}
       <div className="won-items-content">
         <div className="won-items-container">
-          {/* Breadcrumbs */}
+      
           <nav className="breadcrumbs">
             <Link to="/dashboard">Dashboard</Link>
             <span>/</span>
             <span>Won Items</span>
           </nav>
 
-          {/* Page Header */}
           <div className="page-header">
             <div className="header-left">
               <h1 className="page-title">Won Items</h1>
             </div>
           </div>
 
-          {/* Search */}
           <div className="search-bar">
             <div className="search-wrapper">
               <svg className="search-icon" width="18" height="18" viewBox="0 0 24 24" fill="none">
@@ -170,148 +292,140 @@ const WonItems = () => {
             </div>
           </div>
 
-          {/* Items Grid */}
-          <div className="items-grid">
-            {visibleItems.map(item => (
-              <div key={item.id} className="won-item-card">
-                {/* Image */}
-                <div className="item-image">
-                  <img src={item.image} alt={item.title} />
-                  <div className="won-badge">
-                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none">
-                      <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z" fill="currentColor" />
-                    </svg>
-                    <span>Won</span>
-                  </div>
-                </div>
-
-                {/* Details */}
-                <div className="item-details">
-                  <div className="item-category">{item.category.toUpperCase()}</div>
-                  <h3 className="item-title">{item.title}</h3>
-                  <div className="item-lot-id">Lot {item.lotId}</div>
-
-                  {/* Winning Price */}
-                  <div className="winning-price">
-                    {formatCurrency(item.winningPrice)}
-                  </div>
-
-                  {/* Congratulations Message */}
-                  <div className="congratulations-msg">
-                    Congratulations! You won this lot.
-                  </div>
-
-                  {/* Payment Status */}
-                  {item.paymentStatus === 'pending' ? (
-                    <div className="payment-status pending">
-                      <div className="status-header">
-                        <span className="status-label">PAYMENT DEADLINE</span>
-                        <span className="status-timer">{item.paymentDeadline}</span>
-                      </div>
-                      <div className="invoice-status">
-                        <span className="invoice-label">Invoice:</span>
-                        <span className="invoice-badge pending-badge">Pending Payment</span>
-                      </div>
-                    </div>
-                  ) : (
-                    <div className="payment-status paid">
-                      <div className="status-header">
-                        <span className="status-label">PAYMENT COMPLETE</span>
-                        <span className="status-date">{item.paymentDate}</span>
-                      </div>
-                      <div className="invoice-status">
-                        <span className="invoice-label">Invoice:</span>
-                        <span className="invoice-badge paid-badge">Paid</span>
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Action Buttons */}
-                  <div className="item-actions">
-                    {item.paymentStatus === 'pending' ? (
-                      <>
-                        <button
-                          className="action-btn primary"
-                          onClick={() => navigate(`/payment/${item.id}`)}
-                        >
-                          Proceed to Payment
-                        </button>
-                        <button
-                          className="action-btn secondary"
-                          onClick={() => navigate(`/invoices`)}
-                        >
-                          View Invoice
-                        </button>
-                      </>
-                    ) : (
-                      <>
-                        <button
-                          className="action-btn primary"
-                          onClick={() => navigate(`/invoice/${item.invoiceNumber}`)}
-                        >
-                          View Invoice
-                        </button>
-                        <button
-                          className="action-btn secondary"
-                          onClick={() => navigate(`/buyer/auction/${item.id}`)}
-                        >
-                          View Lot Details
-                        </button>
-                      </>
-                    )}
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-
-          {/* Pagination */}
-          {totalPages > 1 && (
-            <div className="pagination">
-              <button
-                className="pagination-btn"
-                onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
-                disabled={currentPage === 1}
-              >
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-                  <path d="M15 18L9 12L15 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                </svg>
-              </button>
-              <div className="pagination-numbers">
-                {Array.from({ length: Math.min(totalPages, 3) }).map((_, index) => {
-                  const pageNum = index + 1
-                  return (
-                    <button
-                      key={pageNum}
-                      className={`pagination-number ${currentPage === pageNum ? 'active' : ''}`}
-                      onClick={() => setCurrentPage(pageNum)}
-                    >
-                      {pageNum}
-                    </button>
-                  )
-                })}
-                {totalPages > 3 && (
-                  <>
-                    <span className="pagination-ellipsis">...</span>
-                    <button
-                      className={`pagination-number ${currentPage === totalPages ? 'active' : ''}`}
-                      onClick={() => setCurrentPage(totalPages)}
-                    >
-                      {totalPages}
-                    </button>
-                  </>
-                )}
-              </div>
-              <button
-                className="pagination-btn"
-                onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
-                disabled={currentPage === totalPages}
-              >
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-                  <path d="M9 18L15 12L9 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                </svg>
-              </button>
+          {totalItems === 0 ? (
+            <div className="no-results">
+              <p>No items found matching your search.</p>
             </div>
+          ) : (
+            <>
+              <div className="items-grid">
+                {currentItems.map(item => (
+                  <div key={item.id} className="won-item-card">
+                    <div className="item-image">
+                      <img src={item.image} alt={item.title} />
+                      <div className="won-badge">
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none">
+                          <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z" fill="currentColor" />
+                        </svg>
+                        <span>Won</span>
+                      </div>
+                    </div>
+
+                    <div className="item-details">
+                      <div className="item-category">{item.category.toUpperCase()}</div>
+                      <h3 className="item-title">{item.title}</h3>
+                      <div className="item-lot-id">Lot {item.lotId}</div>
+
+                      <div className="winning-price">
+                        {formatCurrency(item.winningPrice)}
+                      </div>
+
+                      <div className="congratulations-msg">
+                        Congratulations! You won this lot.
+                      </div>
+
+                      {item.paymentStatus === 'pending' ? (
+                        <div className="payment-status pending">
+                          <div className="status-header">
+                            <span className="status-label">PAYMENT DEADLINE</span>
+                            <span className="status-timer">{item.paymentDeadline}</span>
+                          </div>
+                          <div className="won-invoice-status">
+                            <span className="invoice-label">Invoice:</span>
+                            <span className="invoice-badge pending-badge">Pending Payment</span>
+                          </div>
+                        </div>
+                      ) : (
+                        <div className="payment-status paid">
+                          <div className="status-header">
+                            <span className="status-label">PAYMENT COMPLETE</span>
+                            <span className="status-date">{item.paymentDate}</span>
+                          </div>
+                          <div className="won-invoice-status">
+                            <span className="invoice-label">Invoice:</span>
+                            <span className="invoice-badge paid-badge">Paid</span>
+                          </div>
+                        </div>
+                      )}
+
+                      <div className="item-actions">
+                        {item.paymentStatus === 'pending' ? (
+                          <>
+                            <button
+                              className="wonItems-action-btn primary"
+                              onClick={() => navigate(`/payment/${item.id}`)}
+                            >
+                              Proceed to Payment
+                            </button>
+                            <button
+                              className="wonItems-action-btn secondary"
+                              onClick={() => navigate(`/invoices`)}
+                            >
+                              View Invoice
+                            </button>
+                          </>
+                        ) : (
+                          <>
+                            <button
+                              className="wonItems-action-btn primary"
+                              onClick={() => navigate(`/invoice/${item.invoiceNumber}`)}
+                            >
+                              View Invoice
+                            </button>
+                            <button
+                              className="wonItems-action-btn secondary"
+                              onClick={() => navigate(`/buyer/auction/${item.id}`)}
+                            >
+                              View Lot Details
+                            </button>
+                          </>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              {totalPages > 1 && (
+                <div className="wonItems-pagination">
+                  <button
+                    className="wonItems-pagination-btn wonItems-prev-btn"
+                    onClick={() => handlePageChange(currentPage - 1)}
+                    disabled={currentPage === 1}
+                    aria-label="Previous page"
+                  >
+                   <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                    <path d="M15 18L9 12L15 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                  </svg>
+                  Previous
+                  </button>
+
+                  <div className="wonItems-page-numbers">
+                    {Array.from({ length: totalPages }, (_, i) => i + 1).map(pageNumber => (
+                      <button
+                        key={pageNumber}
+                        className={`wonItems-page-number ${currentPage === pageNumber ? 'active' : ''}`}
+                        onClick={() => handlePageChange(pageNumber)}
+                      >
+                        {pageNumber}
+                      </button>
+                    ))}
+                  </div>
+
+                  <button
+                    className="wonItems-pagination-btn wonItems-next-btn"
+                    onClick={() => handlePageChange(currentPage + 1)}
+                    disabled={currentPage === totalPages}
+                    aria-label="Next page"
+                  >
+                    Next
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                      <path d="M9 18L15 12L9 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                    </svg>
+                  </button>
+                </div>
+              )}
+            </>
           )}
         </div>
       </div>
@@ -320,4 +434,3 @@ const WonItems = () => {
 }
 
 export default WonItems
-

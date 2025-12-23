@@ -1,72 +1,226 @@
-import React from 'react'
-import { Link } from 'react-router-dom'
+// import React from 'react'
+// import { Link } from 'react-router-dom'
+// import logo from '../assets/logo.png'
+
+// function SellerHeader() {
+//   return (
+//     <header className="dashboard-header">
+//       <div className="dashboard-header-container">
+//         <Link to="/seller-dashboard" className="dashboard-logo">
+//           <img src={logo} alt="Hammers & Tongues Logo" />
+//           <span className='logo-text'>Hammers & Tongues</span>
+//         </Link>
+
+//         <nav className="dashboard-nav">
+//            <Link
+//               to="/seller-dashboard"
+//               className={`nav-link ${location.pathname === '/seller-dashboard' ? 'active' : ''}`}
+//             >
+//               Dashboard
+//             </Link>
+
+//             <Link
+//               to="/seller/auction-listings"
+//               className={`nav-link ${location.pathname === '/seller/auction-listings' ? 'active' : ''}`}
+//             >
+//               My Products
+//             </Link>
+
+//             <Link
+//               to="/seller/auctions"
+//               className={`nav-link ${location.pathname === '/seller/auctions' ? 'active' : ''}`}
+//             >
+//               Auctions
+//             </Link>
+
+//             <Link
+//               to="/seller/analytics"
+//               className={`nav-link ${location.pathname === '/seller/analytics' ? 'active' : ''}`}
+//             >
+//               Analytics
+//             </Link>
+//         </nav>
+
+//         <div className="dashboard-header-right">
+//           <button className="notification-button" aria-label="Notifications">
+//             <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+//               <path d="M18 8A6 6 0 0 0 6 8C6 11.3137 3.31371 14 0 14M18 8C20.2091 8 22 9.79086 22 12C22 14.2091 20.2091 16 18 16M18 8C20.2091 8 22 5.79086 22 3C22 0.790861 20.2091 -1 18 -1C15.7909 -1 14 0.790861 14 3C14 5.79086 15.7909 8 18 8Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+//               <path d="M6 8C6 11.3137 8.68629 14 12 14C15.3137 14 18 11.3137 18 8" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+//             </svg>
+//             <span className="notification-badge">5</span>
+//           </button>
+//           <div className="seller-rating">
+//             <svg width="16" height="16" viewBox="0 0 24 24" fill="#FFC107">
+//               <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z" />
+//             </svg>
+//             <span>4.8</span>
+//           </div>
+//           <Link to="/seller/profile" className="profile-button" aria-label="Profile">
+//             <div className="profile-avatar">
+//               <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+//                 <path d="M20 21V19C20 17.9391 19.5786 16.9217 18.8284 16.1716C18.0783 15.4214 17.0609 15 16 15H8C6.93913 15 5.92172 15.4214 5.17157 16.1716C4.42143 16.9217 4 17.9391 4 19V21" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+//                 <circle cx="12" cy="7" r="4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+//               </svg>
+//             </div>
+//           </Link>
+//         </div>
+//       </div>
+//     </header>
+
+//   )
+// }
+
+// export default SellerHeader
+
+
+import React, { useState } from 'react'
+import { Link, useLocation } from 'react-router-dom'
 import logo from '../assets/logo.png'
+import './SellerHeader.css'
 
 function SellerHeader() {
+  const location = useLocation()
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+
+  const toggleMobileMenu = () => {
+    setMobileMenuOpen(!mobileMenuOpen)
+  }
+
+  const closeMobileMenu = () => {
+    setMobileMenuOpen(false)
+  }
+
   return (
-    <header className="dashboard-header">
-      <div className="dashboard-header-container">
-        <Link to="/seller-dashboard" className="dashboard-logo">
-          <img src={logo} alt="Hammers & Tongues Logo" />
-          <span className='logo-text'>Hammers & Tongues</span>
-        </Link>
+    <>
+      <header className="buyer-header">
+        <div className="buyer-header__container">
+          <Link to="/" className="buyer-header__logo">
+            <img src={logo} alt="Hammer & Tongues Logo" />
+            <span>Hammer & Tongues</span>
+          </Link>
 
-        <nav className="dashboard-nav">
-           <Link
+          <nav className="buyer-header__nav">
+            <Link
               to="/seller-dashboard"
-              className={`nav-link ${location.pathname === '/seller-dashboard' ? 'active' : ''}`}
+              className={`buyer-header__nav-link ${location.pathname === '/seller-dashboard' ? 'active' : ''
+                }`}
             >
-              Dashboard
+              Dashboard Overview
             </Link>
-
             <Link
               to="/seller/auction-listings"
-              className={`nav-link ${location.pathname === '/seller/auction-listings' ? 'active' : ''}`}
+              className={`buyer-header__nav-link ${location.pathname === '/seller/auction-listings' ? 'active' : ''
+                }`}
             >
               My Products
             </Link>
-
             <Link
               to="/seller/auctions"
-              className={`nav-link ${location.pathname === '/seller/auctions' ? 'active' : ''}`}
+              className={`buyer-header__nav-link ${location.pathname === '/seller/auctions' ? 'active' : ''
+                }`}
             >
               Auctions
             </Link>
-
             <Link
-              to="/seller/analytics"
-              className={`nav-link ${location.pathname === '/seller/analytics' ? 'active' : ''}`}
+               to="/seller/analytics"
+              className={`buyer-header__nav-link ${location.pathname === '/seller/analytics' ? 'active' : ''
+                }`}
             >
               Analytics
             </Link>
-        </nav>
+          </nav>
 
-        <div className="dashboard-header-right">
-          <button className="notification-button" aria-label="Notifications">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-              <path d="M18 8A6 6 0 0 0 6 8C6 11.3137 3.31371 14 0 14M18 8C20.2091 8 22 9.79086 22 12C22 14.2091 20.2091 16 18 16M18 8C20.2091 8 22 5.79086 22 3C22 0.790861 20.2091 -1 18 -1C15.7909 -1 14 0.790861 14 3C14 5.79086 15.7909 8 18 8Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-              <path d="M6 8C6 11.3137 8.68629 14 12 14C15.3137 14 18 11.3137 18 8" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-            </svg>
-            <span className="notification-badge">5</span>
-          </button>
-          <div className="seller-rating">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="#FFC107">
-              <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z" />
-            </svg>
-            <span>4.8</span>
-          </div>
-          <Link to="/seller/profile" className="profile-button" aria-label="Profile">
-            <div className="profile-avatar">
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-                <path d="M20 21V19C20 17.9391 19.5786 16.9217 18.8284 16.1716C18.0783 15.4214 17.0609 15 16 15H8C6.93913 15 5.92172 15.4214 5.17157 16.1716C4.42143 16.9217 4 17.9391 4 19V21" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                <circle cx="12" cy="7" r="4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+          <div className="buyer-header__right">
+            <button
+              className="buyer-header__mobile-toggle"
+              onClick={toggleMobileMenu}
+              aria-label="Toggle menu"
+            >
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16M4 18h16" />
               </svg>
-            </div>
-          </Link>
-        </div>
-      </div>
-    </header>
+            </button>
 
+            <Link to="/seller/profile" className="buyer-header__profile-btn" aria-label="Profile">
+              <div className="buyer-header__avatar">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                  <path
+                    d="M20 21V19C20 17.9391 19.5786 16.9217 18.8284 16.1716C18.0783 15.4214 17.0609 15 16 15H8C6.93913 15 5.92172 15.4214 5.17157 16.1716C4.42143 16.9217 4 17.9391 4 19V21"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                  <circle
+                    cx="12"
+                    cy="7"
+                    r="4"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                </svg>
+              </div>
+            </Link>
+          </div>
+        </div>
+
+        <div
+          className={`buyer-header__mobile-overlay ${mobileMenuOpen ? 'open' : ''}`}
+          onClick={closeMobileMenu}
+        />
+
+        <div className={`buyer-header__mobile-menu ${mobileMenuOpen ? 'open' : ''}`}>
+          <nav className="buyer-header__mobile-nav">
+            <Link
+             to="/seller-dashboard"
+              className={`buyer-header__mobile-nav-link ${location.pathname === '/seller-dashboard' ? 'active' : ''
+                }`}
+              onClick={closeMobileMenu}
+            >
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+              </svg>
+              Dashboard Overview
+            </Link>
+            <Link
+              to="/buyer/auctions"
+              className={`buyer-header__mobile-nav-link ${location.pathname === '/buyer/auctions' ? 'active' : ''
+                }`}
+              onClick={closeMobileMenu}
+            >
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+              </svg>
+              Auctions
+            </Link>
+            <Link
+              to="/my-bids"
+              className={`buyer-header__mobile-nav-link ${location.pathname === '/my-bids' ? 'active' : ''
+                }`}
+              onClick={closeMobileMenu}
+            >
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+              </svg>
+              My Bids
+            </Link>
+            <Link
+              to="/won-items"
+              className={`buyer-header__mobile-nav-link ${location.pathname === '/won-items' ? 'active' : ''
+                }`}
+              onClick={closeMobileMenu}
+            >
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
+              </svg>
+              Won Items
+            </Link>
+          </nav>
+        </div>
+      </header>
+    </>
   )
 }
 

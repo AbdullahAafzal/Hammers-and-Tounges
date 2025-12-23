@@ -18,7 +18,7 @@ const About = () => {
           <div className="about-content">
             <h2 className="section-title">Who We Are</h2>
             <p className="section-text">
-              Hammers & Tongues is a premier online auction platform dedicated to connecting buyers and sellers 
+              Hammer & Tongues is a premier online auction platform dedicated to connecting buyers and sellers 
               of exceptional items. With years of experience in the auction industry, we've built a reputation 
               for transparency, security, and excellence.
             </p>

@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import logo from '../assets/logo.png'
 import './BuyerHeader.css'
@@ -19,7 +19,7 @@ function BuyerHeader() {
     <>
       <header className="buyer-header">
         <div className="buyer-header__container">
-          <Link to="/dashboard" className="buyer-header__logo">
+          <Link to="/" className="buyer-header__logo">
             <img src={logo} alt="Hammer & Tongues Logo" />
             <span>Hammer & Tongues</span>
           </Link>
@@ -27,33 +27,29 @@ function BuyerHeader() {
           <nav className="buyer-header__nav">
             <Link
               to="/dashboard"
-              className={`buyer-header__nav-link ${
-                location.pathname === '/dashboard' ? 'active' : ''
-              }`}
+              className={`buyer-header__nav-link ${location.pathname === '/dashboard' ? 'active' : ''
+                }`}
             >
-              Home
+              Dashboard Overview
             </Link>
             <Link
               to="/buyer/auctions"
-              className={`buyer-header__nav-link ${
-                location.pathname === '/buyer/auctions' ? 'active' : ''
-              }`}
+              className={`buyer-header__nav-link ${location.pathname === '/buyer/auctions' ? 'active' : ''
+                }`}
             >
               Auctions
             </Link>
             <Link
               to="/my-bids"
-              className={`buyer-header__nav-link ${
-                location.pathname === '/my-bids' ? 'active' : ''
-              }`}
+              className={`buyer-header__nav-link ${location.pathname === '/my-bids' ? 'active' : ''
+                }`}
             >
               My Bids
             </Link>
             <Link
               to="/won-items"
-              className={`buyer-header__nav-link ${
-                location.pathname === '/won-items' ? 'active' : ''
-              }`}
+              className={`buyer-header__nav-link ${location.pathname === '/won-items' ? 'active' : ''
+                }`}
             >
               Won Items
             </Link>
@@ -95,32 +91,28 @@ function BuyerHeader() {
           </div>
         </div>
 
-        {/* Mobile overlay */}
         <div
           className={`buyer-header__mobile-overlay ${mobileMenuOpen ? 'open' : ''}`}
           onClick={closeMobileMenu}
         />
 
-        {/* Mobile menu */}
         <div className={`buyer-header__mobile-menu ${mobileMenuOpen ? 'open' : ''}`}>
           <nav className="buyer-header__mobile-nav">
             <Link
               to="/dashboard"
-              className={`buyer-header__mobile-nav-link ${
-                location.pathname === '/dashboard' ? 'active' : ''
-              }`}
+              className={`buyer-header__mobile-nav-link ${location.pathname === '/dashboard' ? 'active' : ''
+                }`}
               onClick={closeMobileMenu}
             >
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
               </svg>
-              Home
+              Dashboard Overview
             </Link>
             <Link
               to="/buyer/auctions"
-              className={`buyer-header__mobile-nav-link ${
-                location.pathname === '/buyer/auctions' ? 'active' : ''
-              }`}
+              className={`buyer-header__mobile-nav-link ${location.pathname === '/buyer/auctions' ? 'active' : ''
+                }`}
               onClick={closeMobileMenu}
             >
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
@@ -130,9 +122,8 @@ function BuyerHeader() {
             </Link>
             <Link
               to="/my-bids"
-              className={`buyer-header__mobile-nav-link ${
-                location.pathname === '/my-bids' ? 'active' : ''
-              }`}
+              className={`buyer-header__mobile-nav-link ${location.pathname === '/my-bids' ? 'active' : ''
+                }`}
               onClick={closeMobileMenu}
             >
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
@@ -142,9 +133,8 @@ function BuyerHeader() {
             </Link>
             <Link
               to="/won-items"
-              className={`buyer-header__mobile-nav-link ${
-                location.pathname === '/won-items' ? 'active' : ''
-              }`}
+              className={`buyer-header__mobile-nav-link ${location.pathname === '/won-items' ? 'active' : ''
+                }`}
               onClick={closeMobileMenu}
             >
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">

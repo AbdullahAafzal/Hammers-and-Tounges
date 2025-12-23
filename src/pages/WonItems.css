@@ -6,138 +6,6 @@
   flex-direction: column;
 }
 
-.won-items-header {
-  background-color: rgba(0, 0, 0, 0.95);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-  position: sticky;
-  top: 0;
-  z-index: 1000;
-  backdrop-filter: blur(10px);
-}
-
-.won-items-header-container {
-  margin: 0 auto;
-  padding: 0.75rem 1.5rem;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 1.5rem;
-}
-
-.won-items-logo {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  text-decoration: none;
-  color: #ffffff;
-  font-size: 0.9375rem;
-  font-weight: 600;
-  letter-spacing: -0.2px;
-}
-
-.won-items-logo img {
-  width: 32px;
-  height: 32px;
-  object-fit: contain;
-}
-
-.won-items-nav {
-  display: flex;
-  gap: 1.5rem;
-  align-items: center;
-  flex: 1;
-  justify-content: center;
-}
-
-.won-items-nav .nav-link {
-  color: rgba(255, 255, 255, 0.7);
-  text-decoration: none;
-  font-size: 0.8125rem;
-  font-weight: 500;
-  transition: all 0.2s;
-  position: relative;
-  padding: 0.25rem 0;
-}
-
-.won-items-nav .nav-link::after {
-  content: '';
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  width: 0;
-  height: 2px;
-  background-color: #8CC63F;
-  transition: width 0.3s;
-}
-
-.won-items-nav .nav-link:hover,
-.won-items-nav .nav-link.active {
-  color: #ffffff;
-}
-
-.won-items-nav .nav-link:hover::after,
-.won-items-nav .nav-link.active::after {
-  width: 100%;
-}
-
-.won-items-header-right {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-}
-
-.notification-button,
-.profile-button {
-  background: none;
-  border: none;
-  color: rgba(255, 255, 255, 0.7);
-  cursor: pointer;
-  padding: 0.375rem;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.2s;
-  position: relative;
-  text-decoration: none;
-}
-
-.notification-button:hover,
-.profile-button:hover {
-  background-color: rgba(255, 255, 255, 0.08);
-  color: #ffffff;
-}
-
-.notification-badge {
-  position: absolute;
-  top: 0;
-  right: 0;
-  background-color: #8CC63F;
-  color: #000000;
-  font-size: 0.625rem;
-  font-weight: 700;
-  border-radius: 50%;
-  width: 18px;
-  height: 18px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transform: translate(25%, -25%);
-}
-
-.profile-avatar {
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  background-color: rgba(140, 198, 63, 0.2);
-  border: 2px solid rgba(140, 198, 63, 0.3);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #8CC63F;
-}
-
-/* Won Items Content */
 .won-items-content {
   flex: 1;
   padding: 1.5rem 1.5rem;
@@ -170,7 +38,6 @@
   color: rgba(255, 255, 255, 0.4);
 }
 
-/* Page Header */
 .page-header {
   display: flex;
   justify-content: space-between;
@@ -191,7 +58,6 @@
   letter-spacing: -0.5px;
 }
 
-/* Search Bar */
 .search-bar {
   margin-bottom: 1.5rem;
 }
@@ -231,17 +97,15 @@
   background-color: rgba(255, 255, 255, 0.08);
 }
 
-/* Items Grid */
 .items-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
   gap: 1rem;
-  margin-bottom: 2rem;
 }
 
 .won-item-card {
   background-color: rgba(255, 255, 255, 0.02);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.2);
   border-radius: 8px;
   overflow: hidden;
   transition: all 0.3s;
@@ -251,11 +115,10 @@
 
 .won-item-card:hover {
   transform: translateY(-2px);
-  border-color: rgba(140, 198, 63, 0.3);
+  border-color: rgba(140, 198, 63);
   box-shadow: 0 4px 16px rgba(140, 198, 63, 0.1);
 }
 
-/* Item Image */
 .item-image {
   position: relative;
   width: 100%;
@@ -292,7 +155,6 @@
   height: 10px;
 }
 
-/* Item Details */
 .item-details {
   padding: 0.75rem;
   flex: 1;
@@ -303,7 +165,7 @@
 
 .item-category {
   font-size: 0.625rem;
-  color: #FFA500;
+  color: rgba(255, 255, 255, 0.5);
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.5px;
@@ -326,7 +188,7 @@
 .winning-price {
   font-size: 1rem;
   font-weight: 700;
-  color: #3B82F6;
+  color: #ffffff;
   margin-top: 0.25rem;
 }
 
@@ -336,9 +198,7 @@
   margin-top: 0.25rem;
 }
 
-/* Payment Status */
 .payment-status {
-  padding: 0.625rem;
   background-color: rgba(255, 255, 255, 0.03);
   border-radius: 4px;
   margin-top: 0.5rem;
@@ -374,10 +234,11 @@
   font-family: 'Courier New', monospace;
 }
 
-.invoice-status {
+.won-invoice-status {
   display: flex;
   align-items: center;
   gap: 0.5rem;
+  font-weight: 500;
 }
 
 .invoice-label {
@@ -405,7 +266,6 @@
   border: 1px solid rgba(140, 198, 63, 0.3);
 }
 
-/* Item Actions */
 .item-actions {
   display: flex;
   flex-direction: column;
@@ -413,7 +273,7 @@
   margin-top: 0.75rem;
 }
 
-.action-btn {
+.wonItems-action-btn {
   width: 100%;
   padding: 0.5rem 0.75rem;
   border-radius: 4px;
@@ -425,103 +285,106 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  background-color: transparent;
 }
 
-.action-btn.primary {
-  background-color: #3B82F6;
-  color: #ffffff;
-}
-
-.action-btn.primary:hover {
-  background-color: #2563EB;
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
-}
-
-.action-btn.secondary {
-  background-color: rgba(255, 255, 255, 0.05);
-  color: #ffffff;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-.action-btn.secondary:hover {
-  background-color: rgba(255, 255, 255, 0.08);
-  border-color: rgba(140, 198, 63, 0.3);
-}
-
-/* Pagination */
-.pagination {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 0.5rem;
-  margin-top: 2rem;
-  padding-top: 1.5rem;
-  border-top: 1px solid rgba(255, 255, 255, 0.05);
-}
-
-.pagination-btn {
-  background-color: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  color: #ffffff;
-  width: 32px;
-  height: 32px;
-  border-radius: 4px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  transition: all 0.2s;
-}
-
-.pagination-btn:hover:not(:disabled) {
+.wonItems-action-btn.primary {
   background-color: #8CC63F;
   color: #000000;
-  border-color: #8CC63F;
 }
 
-.pagination-btn:disabled {
-  opacity: 0.3;
+.wonItems-action-btn.primary:hover {
+  background-color: #7BB337;
+  box-shadow: 0 6px 20px rgba(140, 198, 63, 0.3);
+}
+
+.wonItems-action-btn.secondary {
+  color: #ffffff;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.wonItems-action-btn.secondary:hover {
+  border-color: #8CC63F;
+  color: #8CC63F;
+}
+
+.wonItems-pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 1rem;
+  padding: 1.5rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  background-color: rgba(255, 255, 255, 0.02);
+  flex-direction: row;
+}
+
+.wonItems-pagination-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.25rem;
+  background-color: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+
+.wonItems-pagination-btn:hover:not(:disabled) {
+  background-color: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.2);
+  color: #ffffff;
+  transform: translateY(-1px);
+}
+
+.wonItems-pagination-btn:disabled {
+  opacity: 0.4;
   cursor: not-allowed;
 }
 
-.pagination-numbers {
+.wonItems-pagination-btn svg {
+  width: 14px;
+  height: 14px;
+}
+
+.wonItems-page-numbers {
   display: flex;
   align-items: center;
   gap: 0.375rem;
 }
 
-.pagination-number {
-  background-color: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  color: #ffffff;
-  width: 32px;
-  height: 32px;
-  border-radius: 4px;
+.wonItems-page-number {
+  min-width: 40px;
+  height: 40px;
+  border-radius: 8px;
   display: flex;
   align-items: center;
   justify-content: center;
+  background-color: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 0.875rem;
+  font-weight: 500;
   cursor: pointer;
-  font-size: 0.8125rem;
-  font-weight: 600;
   transition: all 0.2s;
 }
 
-.pagination-number:hover {
+.wonItems-page-number:hover {
   background-color: rgba(255, 255, 255, 0.08);
-  border-color: rgba(140, 198, 63, 0.5);
+  border-color: rgba(255, 255, 255, 0.2);
+  color: #ffffff;
 }
 
-.pagination-number.active {
-  background-color: #8CC63F;
-  color: #000000;
-  border-color: #8CC63F;
-}
-
-.pagination-ellipsis {
-  color: rgba(255, 255, 255, 0.4);
-  padding: 0 0.25rem;
-  font-size: 0.8125rem;
+.wonItems-page-number.active {
+  background-color: rgba(140, 198, 63, 0.15);
+  border-color: rgba(140, 198, 63, 0.4);
+  color: #8CC63F;
+  font-weight: 700;
 }
 
 @media (max-width: 1024px) {
@@ -557,4 +420,3 @@
     grid-template-columns: 1fr;
   }
 }
-

@@ -338,7 +338,7 @@ const BuyerAuctions = () => {
               </div>
             </div>
 
-            <div className="auctions-grid">
+            <div className="buyer-auctions-grid">
               {paginatedAuctions.map(auction => (
                 <div key={auction.id} className="auctions-card">
                   <div className="auction-image-wrapper">
@@ -349,12 +349,12 @@ const BuyerAuctions = () => {
                   </div>
                   <div className="auctions-card-content">
                     <p className="auction-category-1">{auction.category}</p>
-                    <h3 className="auctions-card-title">{auction.title}</h3>
-                    <div className="auction-timer">
-                      <span className="timer-label">
+                    <h3 className="buyer-auctions-card-title">{auction.title}</h3>
+                    <div className="buyer-auction-timer">
+                      <span className="buyer-timer-label">
                         AUCTION {auction.timerType === 'ends' ? 'ENDS' : 'STARTS'} IN
                       </span>
-                      <span className="timer-value">{formatTimer(auction.timer)}</span>
+                      <span className="buyer-timer-value">{formatTimer(auction.timer)}</span>
                     </div>
                     <button
                       className="view-auctions-btn"

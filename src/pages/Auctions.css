@@ -246,9 +246,9 @@
   color: #000000;
 }
 
-.auctions-grid {
+.guest-auctions-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(260px, 3fr));
   gap: 1.25rem;
   margin-bottom: 2rem;
 }
@@ -329,7 +329,6 @@
   line-height: 1.4;
 }
 
-/* NEW - PRICE DISPLAY STYLES */
 .price-display {
   display: flex;
   flex-direction: column;
@@ -350,14 +349,11 @@
   color: #ffffff;
 }
 
-.auction-timer {
+.guest-auction-timer {
   display: flex;
   flex-direction: column;
-  gap: 0.375rem;
-  margin-bottom: 1rem;
-  padding: 0.75rem;
+  margin-bottom: 0.5rem;
   background-color: rgba(255, 255, 255, 0.03);
-  border-radius: 4px;
 }
 
 .timer-label {
@@ -367,8 +363,7 @@
   letter-spacing: 0.5px;
 }
 
-/* UPDATED - TIMER VALUE STYLES */
-.timer-value {
+.guest-timer-value {
   font-size: 0.875rem;
   font-weight: 700;
   color: #8CC63F;
@@ -396,7 +391,6 @@
   transform: translateY(-1px);
 }
 
-/* UPDATED PAGINATION STYLES - MATCHING CATEGORY PAGINATION */
 .category-pagination {
   display: flex;
   justify-content: center;

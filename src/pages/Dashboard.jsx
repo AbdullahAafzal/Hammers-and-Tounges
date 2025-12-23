@@ -1,7 +1,6 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
 import './Dashboard.css'
-import BuyerHeader from '../components/BuyerHeader'
 
 const Dashboard = () => {
   const user = {
@@ -140,13 +139,13 @@ const Dashboard = () => {
   const getActivityColor = (type) => {
     switch (type) {
       case 'bid_placed':
-        return '#2c7bfbff' // Blue
+        return '#2c7bfbff' 
       case 'outbid':
-        return '#FF4D4D' // Red
+        return '#FF4D4D' 
       case 'invoice':
-        return '#8CC63F' // Green
+        return '#8CC63F' 
       case 'won':
-        return '#FFC107' // Gold
+        return '#FFC107' 
       default:
         return '#8CC63F'
     }
@@ -155,13 +154,13 @@ const Dashboard = () => {
   const getActivityBgColor = (type) => {
     switch (type) {
       case 'bid_placed':
-        return '#2c7bfb3a' // Blue
+        return '#2c7bfb3a' 
       case 'outbid':
-        return '#ff373733' // Red
+        return '#ff373733' 
       case 'invoice':
-        return '#8bc63f35' // Green
+        return '#8bc63f35' 
       case 'won':
-        return '#ffc1073c' // Gold
+        return '#ffc1073c' 
       default:
         return '#8bc63f35'
     }
@@ -169,8 +168,6 @@ const Dashboard = () => {
 
   return (
     <div className="dashboard-page">
-      <BuyerHeader />
-
       <main className="dashboard-main">
         <div className="dashboard-container">
           <div className="dashboard-welcome">

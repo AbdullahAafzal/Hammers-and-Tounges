@@ -1,10 +1,5 @@
-/* ========================================
-   BUYER HEADER - BASE STYLES
-   ======================================== */
-
 .buyer-header {
   background-color: rgba(0, 0, 0, 0.95);
-  padding: 0.875rem 0;
   position: sticky;
   top: 0;
   z-index: 1000;
@@ -13,18 +8,14 @@
 }
 
 .buyer-header__container {
-  max-width: 1400px;
-  margin: 0 auto;
   padding: 0 1.5rem;
+  width: 100%;
+  margin: 0 auto;
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 1.25rem;
 }
-
-/* ========================================
-   LOGO STYLES
-   ======================================== */
 
 .buyer-header__logo {
   display: flex;
@@ -47,10 +38,6 @@
   height: 36px;
   object-fit: contain;
 }
-
-/* ========================================
-   DESKTOP NAVIGATION
-   ======================================== */
 
 .buyer-header__nav {
   display: flex;
@@ -93,10 +80,6 @@
   color: #8cc63f;
 }
 
-/* ========================================
-   RIGHT SIDE (PROFILE & MOBILE TOGGLE)
-   ======================================== */
-
 .buyer-header__right {
   display: flex;
   align-items: center;
@@ -133,10 +116,6 @@
   color: #8cc63f;
 }
 
-/* ========================================
-   MOBILE TOGGLE BUTTON
-   ======================================== */
-
 .buyer-header__mobile-toggle {
   display: none;
   background: none;
@@ -152,10 +131,6 @@
   background-color: rgba(140, 198, 63, 0.14);
   color: #8cc63f;
 }
-
-/* ========================================
-   MOBILE MENU & OVERLAY
-   ======================================== */
 
 .buyer-header__mobile-menu {
   position: fixed;
@@ -194,10 +169,6 @@
   visibility: visible;
 }
 
-/* ========================================
-   MOBILE NAVIGATION
-   ======================================== */
-
 .buyer-header__mobile-nav {
   display: flex;
   flex-direction: column;
@@ -227,18 +198,12 @@
   color: #8cc63f;
 }
 
-/* ========================================
-   RESPONSIVE BREAKPOINTS
-   ======================================== */
-
-/* Large Desktop */
 @media (max-width: 1200px) {
   .buyer-header__nav {
     gap: 1.75rem;
   }
 }
 
-/* Desktop to Tablet */
 @media (max-width: 1024px) {
   .buyer-header__nav {
     gap: 1.5rem;
@@ -249,7 +214,6 @@
   }
 }
 
-/* Tablet - Switch to Mobile Menu */
 @media (max-width: 900px) {
   .buyer-header__nav {
     display: none;
@@ -260,7 +224,6 @@
   }
 }
 
-/* Small Tablet */
 @media (max-width: 768px) {
   .buyer-header__container {
     padding: 0 1rem;
@@ -286,7 +249,6 @@
   }
 }
 
-/* Mobile */
 @media (max-width: 480px) {
   .buyer-header__container {
     padding: 0 0.75rem;
@@ -313,7 +275,6 @@
   }
 }
 
-/* Small Mobile */
 @media (max-width: 360px) {
   .buyer-header__logo span {
     font-size: 0.75rem;
@@ -324,7 +285,6 @@
   }
 }
 
-/* Extra Small Mobile */
 @media (max-width: 320px) {
   .buyer-header__container {
     padding: 0 0.5rem;

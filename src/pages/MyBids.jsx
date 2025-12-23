@@ -6,8 +6,8 @@ const MyBids = () => {
   const navigate = useNavigate()
   const [searchQuery, setSearchQuery] = useState('')
   const [currentPage, setCurrentPage] = useState(1)
+  const itemsPerPage = 4
 
-  // Mock active bids data
   const activeBids = [
     {
       id: 1,
@@ -68,6 +68,66 @@ const MyBids = () => {
       currentHighestBid: 4500.00,
       yourBid: 4200.00,
       timeRemaining: '12h 20m 10s'
+    },
+    {
+      id: 6,
+      lotId: '#567891',
+      title: 'Modern Abstract Painting',
+      category: 'Fine Art & Collectibles Auction',
+      image: 'https://images.unsplash.com/photo-1578301978018-3005759f48f7?w=800&q=80',
+      status: 'outbid',
+      isLive: true,
+      currentHighestBid: 4500.00,
+      yourBid: 4200.00,
+      timeRemaining: '12h 20m 10s'
+    },
+    {
+      id: 7,
+      lotId: '#345679',
+      title: 'Vintage Persian Rug',
+      category: 'Fine Art & Collectibles Auction',
+      image: 'https://images.unsplash.com/photo-1541961017774-22349e4a1262?w=800&q=80',
+      status: 'leading',
+      isLive: true,
+      currentHighestBid: 3200.00,
+      yourBid: 3200.00,
+      timeRemaining: '5h 45m 30s'
+    },
+    {
+      id: 8,
+      lotId: '#789123',
+      title: 'Rare Whiskey Collection',
+      category: 'Luxury Spirits Auction',
+      image: 'https://images.unsplash.com/photo-1550276300-237010ad7811?w=800&q=80',
+      status: 'leading',
+      isLive: true,
+      currentHighestBid: 12500.00,
+      yourBid: 12500.00,
+      timeRemaining: '8h 15m 20s'
+    },
+    {
+      id: 9,
+      lotId: '#891234',
+      title: 'Diamond Tennis Bracelet',
+      category: 'Jewelry Auction',
+      image: 'https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?w=800&q=80',
+      status: 'outbid',
+      isLive: true,
+      currentHighestBid: 8500.00,
+      yourBid: 8200.00,
+      timeRemaining: '1d 2h 45m 10s'
+    },
+    {
+      id: 10,
+      lotId: '#912345',
+      title: 'Signed First Edition Books',
+      category: 'Fine Art & Collectibles Auction',
+      image: 'https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?w=800&q=80',
+      status: 'leading',
+      isLive: true,
+      currentHighestBid: 3500.00,
+      yourBid: 3500.00,
+      timeRemaining: '6h 30m 0s'
     }
   ]
 
@@ -85,14 +145,21 @@ const MyBids = () => {
     const matchesSearch = searchQuery === '' ||
       bid.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
       bid.lotId.toLowerCase().includes(searchQuery.toLowerCase())
-
     return matchesSearch
   })
 
-  const itemsPerPage = 12
-  const totalPages = Math.ceil(filteredBids.length / itemsPerPage)
+  const totalItems = filteredBids.length
+  const totalPages = Math.ceil(totalItems / itemsPerPage)
+
   const startIndex = (currentPage - 1) * itemsPerPage
-  const visibleBids = filteredBids.slice(startIndex, startIndex + itemsPerPage)
+  const endIndex = startIndex + itemsPerPage
+  const currentItems = filteredBids.slice(startIndex, endIndex)
+
+  const handlePageChange = (pageNumber) => {
+    if (pageNumber >= 1 && pageNumber <= totalPages) {
+      setCurrentPage(pageNumber)
+    }
+  }
 
   return (
     <div className="my-bids-page">
@@ -134,12 +201,45 @@ const MyBids = () => {
           </div>
 
           <div className="bids-grid">
-            {visibleBids.map(bid => (
+            {currentItems.map(bid => (
               <div
                 key={bid.id}
                 className={`bid-card ${bid.status === 'outbid' ? 'outbid' : bid.status === 'leading' ? 'leading' : 'upcoming'}`}
               >
-                {bid.status === 'outbid' && (
+                
+
+                <div className="bid-image">
+                  <img src={bid.image} alt={bid.title} />
+                  <div className="live-badge">
+                    <span className="live-dot">•</span>
+                    <span>Live</span>
+                  </div>
+                </div>
+
+                <div className="mybid-details">
+                  <div className="bid-lot-id">{bid.lotId}</div>
+                  <h3 className="bid-title">{bid.title}</h3>
+                  <div className="bid-category">{bid.category}</div>
+
+                  <div className="mybidding-info">
+                    <div className="bid-row">
+                      <span className="bid-label">Current Highest Bid</span>
+                      <span className="bid-value">{formatCurrency(bid.currentHighestBid)}</span>
+                    </div>
+                    <div className={`bid-row ${bid.status === 'outbid' ? 'outbid-row' : 'leading-row'}`}>
+                      <span className="bid-label">Your Bid</span>
+                      <span className={`bid-value ${bid.status === 'outbid' ? 'outbid-value' : 'leading-value'}`}>
+                        {formatCurrency(bid.yourBid)}
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="buyer-time-remaining">
+                    <span className="time-label">Time Remaining</span>
+                    <span className="time-value">{bid.timeRemaining}</span>
+                  </div>
+
+                  {bid.status === 'outbid' && (
                   <div className="status-banner outbid-banner">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
                       <path d="M12 8V12M12 16H12.01M21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3C16.9706 3 21 7.02944 21 12Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
@@ -155,40 +255,10 @@ const MyBids = () => {
                     <span>You are the leading bidder!</span>
                   </div>
                 )}
-
-                <div className="bid-image">
-                  <img src={bid.image} alt={bid.title} />
-                  <div className="live-badge">
-                    <span className="live-dot">•</span>
-                    <span>Live</span>
-                  </div>
+                 
                 </div>
 
-                <div className="bid-details">
-                  <div className="bid-lot-id">{bid.lotId}</div>
-                  <h3 className="bid-title">{bid.title}</h3>
-                  <div className="bid-category">{bid.category}</div>
-
-                  <div className="bidding-info">
-                    <div className="bid-row">
-                      <span className="bid-label">Current Highest Bid</span>
-                      <span className="bid-value">{formatCurrency(bid.currentHighestBid)}</span>
-                    </div>
-                    <div className={`bid-row ${bid.status === 'outbid' ? 'outbid-row' : 'leading-row'}`}>
-                      <span className="bid-label">Your Bid</span>
-                      <span className={`bid-value ${bid.status === 'outbid' ? 'outbid-value' : 'leading-value'}`}>
-                        {formatCurrency(bid.yourBid)}
-                      </span>
-                    </div>
-                  </div>
-
-                  <div className="time-remaining">
-                    <span className="time-label">Time Remaining</span>
-                    <span className="time-value">{bid.timeRemaining}</span>
-                  </div>
-                </div>
-
-                <div className="bid-actions">
+                <div className="mybid-actions">
                   <button
                     className="bids-action-btn secondary"
                     onClick={() => navigate(`/buyer/auction/${bid.id}`)}
@@ -207,46 +277,38 @@ const MyBids = () => {
           </div>
 
           {totalPages > 1 && (
-            <div className="pagination">
+            <div className="mybids-pagination">
               <button
-                className="pagination-btn"
-                onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+                className="mybids-pagination-btn mybids-prev-btn"
+                onClick={() => handlePageChange(currentPage - 1)}
                 disabled={currentPage === 1}
+                aria-label="Previous page"
               >
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-                  <path d="M15 18L9 12L15 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                </svg>
+                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                    <path d="M15 18L9 12L15 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                  </svg>
+                  Previous
               </button>
-              <div className="pagination-numbers">
-                {Array.from({ length: Math.min(totalPages, 3) }).map((_, index) => {
-                  const pageNum = index + 1
-                  return (
-                    <button
-                      key={pageNum}
-                      className={`pagination-number ${currentPage === pageNum ? 'active' : ''}`}
-                      onClick={() => setCurrentPage(pageNum)}
-                    >
-                      {pageNum}
-                    </button>
-                  )
-                })}
-                {totalPages > 3 && (
-                  <>
-                    <span className="pagination-ellipsis">...</span>
-                    <button
-                      className={`pagination-number ${currentPage === totalPages ? 'active' : ''}`}
-                      onClick={() => setCurrentPage(totalPages)}
-                    >
-                      {totalPages}
-                    </button>
-                  </>
-                )}
+
+              <div className="mybids-page-numbers">
+                {Array.from({ length: totalPages }, (_, i) => i + 1).map(pageNumber => (
+                  <button
+                    key={pageNumber}
+                    className={`mybids-page-number ${currentPage === pageNumber ? 'active' : ''}`}
+                    onClick={() => handlePageChange(pageNumber)}
+                  >
+                    {pageNumber}
+                  </button>
+                ))}
               </div>
+
               <button
-                className="pagination-btn"
-                onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
+                className="mybids-pagination-btn mybids-next-btn"
+                onClick={() => handlePageChange(currentPage + 1)}
                 disabled={currentPage === totalPages}
+                aria-label="Next page"
               >
+                Next
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
                   <path d="M9 18L15 12L9 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                 </svg>
@@ -260,4 +322,3 @@ const MyBids = () => {
 }
 
 export default MyBids
-

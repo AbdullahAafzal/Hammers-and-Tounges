@@ -126,8 +126,8 @@ const SellerProfile = () => {
               <div className="avatar-wrapper">
                 <div className="avatar">
                   <img 
-                    src="https://images.unsplash.com/photo-1494790108755-2616b786d4d4?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80" 
-                    alt="Alexandra Chen"
+                    src="https://www.catholicsingles.com/wp-content/uploads/2020/06/blog-header-3.png" 
+                    alt=""
                   />
                   <div className="status-indicator"></div>
                 </div>

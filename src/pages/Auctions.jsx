@@ -375,7 +375,7 @@ const Auctions = () => {
             </div>
           </div>
 
-          <div className="auctions-grid">
+          <div className="guest-auctions-grid">
             {paginatedAuctions.map(auction => (
               <div key={auction.id} className="auctions-card">
 
@@ -397,12 +397,12 @@ const Auctions = () => {
                     <span className="price-value">{formatPrice(auction.price)}</span>
                   </div>
 
-                  <div className="auction-timer">
+                  <div className="guest-auction-timer">
                     <span className="timer-label">
                       AUCTION {auction.timerType === 'ends' ? 'ENDS' : 'STARTS'} IN
                     </span>
 
-                    <span className="timer-value">{formatTimer(auction.timer)}</span>
+                    <span className="guest-timer-value">{formatTimer(auction.timer)}</span>
                   </div>
 
                   <button className="view-auctions-btn"
