@@ -183,7 +183,7 @@ const BuyerAuctions = () => {
 
   const generatePageNumbers = () => {
     const pages = []
-    const maxVisiblePages = 5
+    const maxVisiblePages = 10
 
     if (totalPages <= maxVisiblePages) {
       for (let i = 1; i <= totalPages; i++) {
@@ -368,9 +368,9 @@ const BuyerAuctions = () => {
             </div>
 
             {filteredAuctions.length > itemsPerPage && (
-              <div className="category-pagination">
+              <div className="b-auctions-pagination">
                 <button
-                  className="category-pagination-btn category-prev-btn"
+                  className="b-auctions-pagination-btn b-auctions-prev-btn"
                   onClick={() => handlePageChange(currentPage - 1)}
                   disabled={currentPage === 1}
                 >
@@ -380,14 +380,14 @@ const BuyerAuctions = () => {
                   Previous
                 </button>
 
-                <div className="category-page-numbers">
+                <div className="b-auctions-page-numbers">
                   {generatePageNumbers().map((page, index) => (
                     page === '...' ? (
-                      <span key={`dots-${index}`} className="category-page-dots">...</span>
+                      <span key={`dots-${index}`} className="b-auctions-page-dots">...</span>
                     ) : (
                       <button
                         key={page}
-                        className={`category-page-number ${currentPage === page ? 'active' : ''}`}
+                        className={`b-auctions-page-number ${currentPage === page ? 'active' : ''}`}
                         onClick={() => handlePageChange(page)}
                       >
                         {page}
@@ -395,9 +395,9 @@ const BuyerAuctions = () => {
                     )
                   ))}
                 </div>
-
+                  
                 <button
-                  className="category-pagination-btn category-next-btn"
+                  className="b-auctions-pagination-btn b-auctions-next-btn"
                   onClick={() => handlePageChange(currentPage + 1)}
                   disabled={currentPage === totalPages}
                 >

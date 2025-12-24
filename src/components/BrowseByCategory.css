@@ -4,7 +4,6 @@
 }
 
 .browse-container {
-  max-width: 1400px;
   margin: 0 auto;
   width: 100%;
 }
@@ -56,7 +55,6 @@
   background-color: #7BB337;
 }
 
-/* Scroll indicator - hidden by default */
 .scroll-indicator {
   display: none;
   justify-content: center;
@@ -138,7 +136,7 @@
     flex-wrap: wrap;
     gap: 0.6rem;
     padding: 8px 4px 12px;
-   
+
   }
 
   .category-tab {
@@ -184,9 +182,11 @@
   0% {
     box-shadow: 0 0 0 0 rgba(140, 198, 63, 0.4);
   }
+
   70% {
     box-shadow: 0 0 0 6px rgba(140, 198, 63, 0);
   }
+
   100% {
     box-shadow: 0 0 0 0 rgba(140, 198, 63, 0);
   }

@@ -1,8 +1,28 @@
 import React, { useState } from 'react'
 import './SellerAnalytics.css'
-import SellerHeader from '../components/SellerHeader'
+import SummaryCard from './SummaryCard'
 
 const SellerAnalytics = () => {
+
+    
+    const seller = {
+        name: 'Sarah',
+        totalRevenue: 125000.00,
+        activeListings: 12,
+        itemsSold: 45,
+        pendingPayout: 3250.00,
+        rating: 4.8,
+        totalTransactions: 67,
+        activeLabel: 'Active Listings',
+        activeSubLabel: 'Items currently for auction',
+        soldLabel: 'Items Sold',
+        soldSubLabel: 'Total successful auctions',
+        revenueLabel: 'Total Revenue',
+        revenueSubLabel: 'Lifetime earnings',
+        pendingLabel: 'Pending Payout',
+        pendingSubLabel: 'Available for withdrawal',
+
+    }
     const [timeRange, setTimeRange] = useState('30d')
 
     const analyticsData = {
@@ -126,8 +146,6 @@ const SellerAnalytics = () => {
 
     return (
         <div className="seller-page">
-            <SellerHeader />
-
             <main className="seller-main">
                 <div className="page-container">
                     <div className="page-header">
@@ -155,7 +173,7 @@ const SellerAnalytics = () => {
                         </div>
                     </div>
 
-                    <div className="stats-cards">
+                    {/* <div className="stats-cards">
                         <div className="stat-card">
                             <div className="stat-icon" style={{ backgroundColor: 'rgba(59, 130, 246, 0.1)' }}>
                                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
@@ -226,7 +244,9 @@ const SellerAnalytics = () => {
                                 <span className="stat-sublabel">Views to Sales</span>
                             </div>
                         </div>
-                    </div>
+                    </div> */}
+
+                    <SummaryCard seller={seller}/>
 
                     <div className="charts-section">
                         <div className="chart-card">

@@ -1,9 +1,29 @@
 import React, { useState } from 'react'
 import { Link } from 'react-router-dom'
 import './SellerAuctions.css'
-import SellerHeader from '../components/SellerHeader'
+import SummaryCard from './SummaryCard'
 
 const SellerAuctions = () => {
+    
+    const seller = {
+        name: 'Sarah',
+        totalRevenue: 125000.00,
+        activeListings: 12,
+        itemsSold: 45,
+        pendingPayout: 3250.00,
+        rating: 4.8,
+        totalTransactions: 67,
+        activeLabel: 'Active Listings',
+        activeSubLabel: 'Items currently for auction',
+        soldLabel: 'Items Sold',
+        soldSubLabel: 'Total successful auctions',
+        revenueLabel: 'Total Revenue',
+        revenueSubLabel: 'Lifetime earnings',
+        pendingLabel: 'Pending Payout',
+        pendingSubLabel: 'Available for withdrawal',
+
+    }
+
     const [auctions, setAuctions] = useState([
         {
             id: 1,
@@ -188,7 +208,6 @@ const SellerAuctions = () => {
 
     const sortedAuctions = [...filteredAuctions].sort((a, b) => {
         if (sortBy === 'ending_soon') {
-            // Sort by time remaining (soonest first)
             const aTime = parseInt(a.timeRemaining)
             const bTime = parseInt(b.timeRemaining)
             return aTime - bTime
@@ -216,15 +235,13 @@ const SellerAuctions = () => {
         return totalMinutes
     }
 
-    const totalActiveAuctions = auctions.filter(a => a.status === 'active').length
-    const totalBids = auctions.reduce((sum, a) => sum + a.bids, 0)
-    const totalWatchers = auctions.reduce((sum, a) => sum + a.watchers, 0)
-    const totalCurrentValue = auctions.reduce((sum, a) => sum + a.currentBid, 0)
+    // const totalActiveAuctions = auctions.filter(a => a.status === 'active').length
+    // const totalBids = auctions.reduce((sum, a) => sum + a.bids, 0)
+    // const totalWatchers = auctions.reduce((sum, a) => sum + a.watchers, 0)
+    // const totalCurrentValue = auctions.reduce((sum, a) => sum + a.currentBid, 0)
 
     return (
         <div className="seller-page">
-            <SellerHeader />
-
             <main className="seller-main">
                 <div className="page-container">
                     <div className="page-header">
@@ -233,7 +250,7 @@ const SellerAuctions = () => {
                             <p className="page-subtitle">Monitor and manage your active auctions in real-time</p>
                         </div>
                         <div className="page-actions">
-                            <Link to="/seller/create-product" className="primary-button">
+                            <Link to="/seller/create-product" className="action-button primary">
                                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
                                     <path d="M12 5V19M5 12H19" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
                                 </svg>
@@ -242,63 +259,8 @@ const SellerAuctions = () => {
                         </div>
                     </div>
 
-                    <div className="stats-cards">
-                        <div className="stat-card">
-                            <div className="stat-icon" style={{ backgroundColor: 'rgba(59, 130, 246, 0.1)' }}>
-                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-                                    <path d="M12 2L2 7L12 12L22 7L12 2Z" stroke="#3B82F6" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                                    <path d="M2 17L12 22L22 17" stroke="#3B82F6" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                                </svg>
-                            </div>
-                            <div className="stat-content">
-                                <span className="stat-value">{totalActiveAuctions}</span>
-                                <span className="stat-label">Active Auctions</span>
-                                <span className="stat-sublabel">Live right now</span>
-                            </div>
-                        </div>
 
-                        <div className="stat-card">
-                            <div className="stat-icon" style={{ backgroundColor: 'rgba(140, 198, 63, 0.1)' }}>
-                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-                                    <path d="M12 2L2 7L12 12L22 7L12 2Z" stroke="#8CC63F" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                                    <path d="M2 17L12 22L22 17" stroke="#8CC63F" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                                    <path d="M2 12L12 17L22 12" stroke="#8CC63F" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                                </svg>
-                            </div>
-                            <div className="stat-content">
-                                <span className="stat-value">{totalBids}</span>
-                                <span className="stat-label">Total Bids</span>
-                                <span className="stat-sublabel">Across all auctions</span>
-                            </div>
-                        </div>
-
-                        <div className="stat-card">
-                            <div className="stat-icon" style={{ backgroundColor: 'rgba(255, 193, 7, 0.1)' }}>
-                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-                                    <path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" stroke="#FFC107" strokeWidth="2" />
-                                    <path d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" stroke="#FFC107" strokeWidth="2" />
-                                </svg>
-                            </div>
-                            <div className="stat-content">
-                                <span className="stat-value">{totalWatchers}</span>
-                                <span className="stat-label">Total Watchers</span>
-                                <span className="stat-sublabel">People watching</span>
-                            </div>
-                        </div>
-
-                        <div className="stat-card">
-                            <div className="stat-icon" style={{ backgroundColor: 'rgba(139, 92, 246, 0.1)' }}>
-                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-                                    <path d="M12 2V22M17 5H9.5C8.57174 5 7.6815 5.36875 7.02513 6.02513C6.36875 6.6815 6 7.57174 6 8.5C6 9.42826 6.36875 10.3185 7.02513 10.9749C7.6815 11.6312 8.57174 12 9.5 12H14.5C15.4283 12 16.3185 12.3687 16.9749 13.0251C17.6312 13.6815 18 14.5717 18 15.5C18 16.4283 17.6312 17.3185 16.9749 17.9749C16.3185 18.6312 15.4283 19 14.5 19H6" stroke="#8B5CF6" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                                </svg>
-                            </div>
-                            <div className="stat-content">
-                                <span className="stat-value">{formatCurrency(totalCurrentValue)}</span>
-                                <span className="stat-label">Current Value</span>
-                                <span className="stat-sublabel">Total bid amounts</span>
-                            </div>
-                        </div>
-                    </div>
+                    <SummaryCard seller={seller} />
 
                     <div className="filters-section">
                         <div className="filters-left">
@@ -349,20 +311,13 @@ const SellerAuctions = () => {
                         </div>
                     </div>
 
-                    <div className="auctions-grid">
+                    <div className="s-auctions-grid">
                         {sortedAuctions.map((auction) => (
                             <div key={auction.id} className="auction-card">
                                 <div className="auction-card-header">
                                     <div className="auction-image">
                                         <img src={auction.image} alt={auction.title} />
-                                        {/* <div className="auction-time-badge">
-                                            <svg width="10" height="10" viewBox="0 0 24 24" fill="none">
-                                                <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2" />
-                                                <path d="M12 6V12L16 14" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-                                            </svg>
-                                            {auction.timeRemaining}
-                                        </div> */}
-                                        {/* {getStatusBadge(auction)} */}
+                                     
                                     </div>
                                     <div className="auction-category">
                                         {auction.category}
@@ -436,7 +391,7 @@ const SellerAuctions = () => {
                                         </div>
                                     </div>
 
-                                    <div className="auction-bidder-info">
+                                    <div className="s-auction-bidder-info">
                                         <div className="bidder-label">Current Highest Bidder:</div>
                                         <div className="bidder-name">{auction.highestBidder}</div>
                                     </div>

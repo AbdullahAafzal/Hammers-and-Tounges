@@ -6,7 +6,7 @@ const MyBids = () => {
   const navigate = useNavigate()
   const [searchQuery, setSearchQuery] = useState('')
   const [currentPage, setCurrentPage] = useState(1)
-  const itemsPerPage = 4
+  const itemsPerPage = 8
 
   const activeBids = [
     {
@@ -128,7 +128,31 @@ const MyBids = () => {
       currentHighestBid: 3500.00,
       yourBid: 3500.00,
       timeRemaining: '6h 30m 0s'
-    }
+    },
+    {
+      id: 11,
+      lotId: '#912345',
+      title: 'Signed First Edition Books',
+      category: 'Fine Art & Collectibles Auction',
+      image: 'https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?w=800&q=80',
+      status: 'leading',
+      isLive: true,
+      currentHighestBid: 3500.00,
+      yourBid: 3500.00,
+      timeRemaining: '6h 30m 0s'
+    },
+    {
+      id: 12,
+      lotId: '#912345',
+      title: 'Signed First Edition Books',
+      category: 'Fine Art & Collectibles Auction',
+      image: 'https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?w=800&q=80',
+      status: 'leading',
+      isLive: true,
+      currentHighestBid: 3500.00,
+      yourBid: 3500.00,
+      timeRemaining: '6h 30m 0s'
+    },
   ]
 
   const formatCurrency = (amount) => {

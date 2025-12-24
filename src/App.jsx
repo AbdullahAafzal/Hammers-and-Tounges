@@ -70,13 +70,49 @@ function App() {
               <Dashboard />
             </>
           } />
-          <Route path="/seller-dashboard" element={<SellerDashboard />} />
-          <Route path='/seller/auction-listings' element={<SellerAuctionListings />} />
-          <Route path='/seller/create-product' element={<CreateProduct />} />
-          <Route path='/seller/auctions' element={<SellerAuctions />} />
-          <Route path='/seller/listing/:id' element={<SellerListingDetails />} />
-          <Route path='/seller/analytics' element={<SellerAnalytics />} />
-          <Route path="/buyer/auction/:id" element={<BuyerAuctionDetails />} />
+
+          <Route path="/seller-dashboard" element={
+            <>
+              <SellerHeader />
+              <SellerDashboard />
+            </>
+          } />
+
+          <Route path='/seller/auction-listings' element={
+            <>
+              <SellerHeader />
+              <SellerAuctionListings />
+            </>
+          } />
+          <Route path='/seller/create-product' element={
+            <>
+              <SellerHeader />
+              <CreateProduct />
+            </>
+          } />
+          <Route path='/seller/auctions' element={
+            <>
+              <SellerHeader />
+              <SellerAuctions />
+            </>
+          } />
+          <Route path='/seller/listing/:id' element={
+            <>
+              <SellerHeader />
+              <SellerListingDetails />
+            </>
+          }
+          />
+          <Route path='/seller/analytics' element={
+            <>
+              <SellerHeader />
+
+              <SellerAnalytics />
+            </>
+          } />
+          <Route path="/buyer/auction/:id" element={
+            <BuyerAuctionDetails />
+          } />
 
           <Route path="/buyer/auctions" element={
             <>

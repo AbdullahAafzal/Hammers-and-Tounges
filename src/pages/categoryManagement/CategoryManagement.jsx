@@ -31,7 +31,6 @@ export default function CategoryManagement() {
 
   const handleEdit = (id) => {
     console.log('Edit category:', id);
-    // Add edit logic here
   };
 
   const handleDelete = (id) => {

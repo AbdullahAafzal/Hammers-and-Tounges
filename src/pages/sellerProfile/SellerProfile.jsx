@@ -81,7 +81,7 @@ const SellerProfile = () => {
 
   return (
     <div className="seller-profile-container">
-      {/* Header */}
+  
       <div className="profile-header">
         <div className="header-content">
           <h1 className="profile-title">Seller Profile</h1>

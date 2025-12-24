@@ -1,7 +1,6 @@
 import React, { useState } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import './CreateProduct.css'
-import SellerHeader from '../components/SellerHeader'
 
 const CreateProduct = () => {
   const [formData, setFormData] = useState({
@@ -83,8 +82,6 @@ const CreateProduct = () => {
 
   return (
     <div className="seller-page">
-      <SellerHeader />
-
       <main className="seller-main">
         <div className="page-container">
           <div className="page-header">
@@ -323,11 +320,11 @@ const CreateProduct = () => {
               </div>
 
               <div className="form-actions">
-                <button type="button" className="secondary-button">
+                <button type="button" className="s-secondary-button">
                   Save as Draft
                 </button>
                 <div className="form-actions-right">
-                  <button type="submit" className="primary-button large">
+                  <button type="submit" className="s-primary-button">
                     Preview & List Item
                   </button>
                 </div>

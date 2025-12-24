@@ -484,3 +484,15 @@
   }
 }
 
+
+@media (max-width: 409px) {
+  .mybids-pagination-btn {
+    padding: 0.35rem 0.7rem;
+  }
+
+  .mybids-page-number {
+    min-width: 30px;
+    height: 30px;
+  }
+}
+

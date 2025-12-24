@@ -1,7 +1,6 @@
 import React, { useState, useCallback, useMemo, useEffect } from 'react'
 import { useNavigate, Link, useParams } from 'react-router-dom'
 import './SellerAuctionDetails.css'
-import SellerHeader from '../components/SellerHeader'
 
 const formatCurrency = (amount) => {
     return new Intl.NumberFormat('en-US', {
@@ -243,7 +242,6 @@ const SellerListingDetails = () => {
 
     return (
         <div className="seller-page">
-            <SellerHeader />
 
             <main className="seller-main">
                 <div className="page-container">

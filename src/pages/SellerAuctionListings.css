@@ -12,12 +12,10 @@
 }
 
 .page-container {
-  max-width: 1400px;
   margin: 0 auto;
   width: 100%;
 }
 
-/* Page Header */
 .page-header {
   display: flex;
   justify-content: space-between;
@@ -52,7 +50,6 @@
   align-items: center;
 }
 
-/* Stats Cards */
 .stats-cards {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
@@ -135,7 +132,6 @@
   margin-top: 0.25rem;
 }
 
-/* Filters Section */
 .filters-section {
   display: flex;
   justify-content: space-between;
@@ -192,9 +188,9 @@
 }
 
 .filter-button.active {
-  background-color: rgba(59, 130, 246, 0.15);
-  border-color: rgba(59, 130, 246, 0.4);
-  color: #3B82F6;
+  background-color: #000;
+  border-color: #8CC63F;
+  color: #8CC63F;
 }
 
 .sort-group {
@@ -212,10 +208,10 @@
 .sort-select,
 .filter-select {
   padding: 0.5rem 2rem 0.5rem 0.75rem;
-  background-color: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background-color: #000;
+  border: 1px solid rgba(255, 255, 255, 0.2);
   border-radius: 4px;
-  color: #ffffff;
+  color: #fff;
   font-size: 0.8125rem;
   cursor: pointer;
   appearance: none;
@@ -234,7 +230,7 @@
 .sort-select:focus,
 .filter-select:focus {
   outline: none;
-  border-color: #3B82F6;
+  border-color: #8CC63F;
 }
 
 .primary-button,
@@ -254,15 +250,33 @@
   text-decoration: none;
 }
 
-.primary-button {
-  background-color: #3B82F6;
-  color: #ffffff;
+.s-primary-button,
+.secondary-button {
+  padding: 0.625rem 1.25rem;
+  border-radius: 6px;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  border: none;
+  white-space: nowrap;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  text-decoration: none;
+  border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
-.primary-button:hover {
-  background-color: #2563EB;
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+.s-primary-button.small {
+  background-color: #000;
+  color: #fff ;
+   padding: 0.425rem 0.85rem;
+}
+
+.s-primary-button:hover {
+  background-color: #8CC63F;
+  color: #000;
 }
 
 .primary-button.large {
@@ -317,7 +331,7 @@
   color: #2563EB;
 }
 
-.status-badge {
+.s-status-badge {
   padding: 0.25rem 0.5rem;
   border-radius: 4px;
   font-size: 0.6875rem;
@@ -328,23 +342,17 @@
 
 .listings-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)) !important;
   gap: 1.5rem;
   margin-bottom: 1.5rem;
 }
 
-.listing-card {
-  background-color: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+.s-listing-card {
+  background-color: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.2);
   border-radius: 12px;
   overflow: hidden;
   transition: all 0.3s;
-}
-
-.listing-card:hover {
-  transform: translateY(-4px);
-  border-color: rgba(59, 130, 246, 0.4);
-  box-shadow: 0 8px 24px rgba(59, 130, 246, 0.15);
 }
 
 .listing-card-header {
@@ -379,7 +387,7 @@
   padding: 1rem;
 }
 
-.listing-title {
+.s-listing-title {
   font-size: 0.875rem;
   font-weight: 600;
   color: #ffffff;
@@ -387,9 +395,10 @@
   line-height: 1.4;
   -webkit-box-orient: vertical;
   overflow: hidden;
+  margin-bottom: 0.5rem;
 }
 
-.listing-category {
+.s-listing-category {
   font-size: 0.75rem;
   color: rgba(255, 255, 255, 0.6);
   margin: 0;

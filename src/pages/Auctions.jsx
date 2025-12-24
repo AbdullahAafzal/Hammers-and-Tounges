@@ -99,7 +99,47 @@ const Auctions = () => {
       title: 'Vintage Masterpieces',
       timer: '12:30:15:40',
       timerType: 'starts'
-    }
+    },
+    {
+      id: 9,
+      price: 450000,
+      image: 'https://images.unsplash.com/photo-1541961017774-22349e4a1262?w=800&q=80',
+      status: 'UPCOMING',
+      category: 'Fine Art',
+      title: 'Vintage Masterpieces',
+      timer: '12:30:15:40',
+      timerType: 'starts'
+    },
+    {
+      id: 10,
+      price: 450000,
+      image: 'https://images.unsplash.com/photo-1541961017774-22349e4a1262?w=800&q=80',
+      status: 'UPCOMING',
+      category: 'Fine Art',
+      title: 'Vintage Masterpieces',
+      timer: '12:30:15:40',
+      timerType: 'starts'
+    },
+    {
+      id: 11,
+      price: 450000,
+      image: 'https://images.unsplash.com/photo-1541961017774-22349e4a1262?w=800&q=80',
+      status: 'UPCOMING',
+      category: 'Fine Art',
+      title: 'Vintage Masterpieces',
+      timer: '12:30:15:40',
+      timerType: 'starts'
+    },
+    {
+      id: 12,
+      price: 450000,
+      image: 'https://images.unsplash.com/photo-1541961017774-22349e4a1262?w=800&q=80',
+      status: 'UPCOMING',
+      category: 'Fine Art',
+      title: 'Vintage Masterpieces',
+      timer: '12:30:15:40',
+      timerType: 'starts'
+    },
   ]
 
   const categories = ['Vehicles', 'Real Estate', 'Fine Art', 'Jewelry', 'Industrial Machinery', 'Collectibles']
@@ -132,7 +172,8 @@ const Auctions = () => {
 
   const filteredAuctions = useMemo(() => {
     let result = [...auctions]
-
+    console.log('result: ', result);
+    
     if (selectedCategories.length > 0) {
       result = result.filter(a => selectedCategories.includes(a.category))
     }
@@ -157,7 +198,7 @@ const Auctions = () => {
     return result
   }, [auctions, selectedCategories, selectedStatus, priceRange, sortBy])
 
-  const itemsPerPage = 6
+  const itemsPerPage = 9
   const totalPages = Math.ceil(filteredAuctions.length / itemsPerPage)
 
   const paginatedAuctions = filteredAuctions.slice(
@@ -416,9 +457,9 @@ const Auctions = () => {
           </div>
 
           {filteredAuctions.length > itemsPerPage && (
-            <div className="category-pagination">
+            <div className="g-auctions-pagination">
               <button
-                className="category-pagination-btn category-prev-btn"
+                className="g-auctions-pagination-btn g-auctions-prev-btn"
                 onClick={() => handlePageChange(currentPage - 1)}
                 disabled={currentPage === 1}
               >
@@ -428,14 +469,14 @@ const Auctions = () => {
                 Previous
               </button>
 
-              <div className="category-page-numbers">
+              <div className="g-auctions-page-numbers">
                 {generatePageNumbers().map((page, index) => (
                   page === '...' ? (
-                    <span key={`dots-${index}`} className="category-page-dots">...</span>
+                    <span key={`dots-${index}`} className="g-auctions-page-dots">...</span>
                   ) : (
                     <button
                       key={page}
-                      className={`category-page-number ${currentPage === page ? 'active' : ''}`}
+                      className={`g-auctions-page-number ${currentPage === page ? 'active' : ''}`}
                       onClick={() => handlePageChange(page)}
                     >
                       {page}
@@ -445,7 +486,7 @@ const Auctions = () => {
               </div>
 
               <button
-                className="category-pagination-btn category-next-btn"
+                className="g-auctions-pagination-btn g-auctions-next-btn"
                 onClick={() => handlePageChange(currentPage + 1)}
                 disabled={currentPage === totalPages}
               >

@@ -13,9 +13,10 @@ const FeaturedAuctions = ({ selectedCategory }) => {
     { id: 5, title: '1967 Ford Mustang GT', category: 'Vehicles', image: 'https://images.unsplash.com/photo-1552519507-da3b142c6e3d?w=800&q=80', currentBid: '$95,000', timeRemaining: '3d 6h 15m' },
     { id: 6, title: 'Luxury Penthouse in Manhattan', category: 'Real Estate', image: 'https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=800&q=80', currentBid: '$8,500,000', timeRemaining: '7d 12h 45m' },
     { id: 7, title: 'Vintage Rolex Submariner', category: 'Art & Collectibles', image: 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=800&q=80', currentBid: '$45,000', timeRemaining: '1d 8h 20m' },
-    { id: 8, title: 'Industrial CNC Machine', category: 'Industrial Machinery', image: 'https://images.unsplash.com/photo-1581092160562-40aa08e78837?w=800&q=80', currentBid: '$250,000', timeRemaining: '5d 3h 10m' },
     { id: 9, title: 'Classic Harley-Davidson', category: 'Vehicles', image: 'https://images.unsplash.com/photo-1558980664-1db506751c6a?w=800&q=80', currentBid: '$28,500', timeRemaining: '2d 18h 30m' },
-    { id: 10, title: 'Rare Picasso Lithograph', category: 'Art & Collectibles', image: 'https://images.unsplash.com/photo-1578301978018-3005759f48f7?w=800&q=80', currentBid: '$125,000', timeRemaining: '4d 10h 5m' }
+    { id: 10, title: 'Rare Picasso Lithograph', category: 'Art & Collectibles', image: 'https://images.unsplash.com/photo-1578301978018-3005759f48f7?w=800&q=80', currentBid: '$125,000', timeRemaining: '4d 10h 5m' },
+    { id: 11, title: 'Rare Picasso Lithograph', category: 'Art & Collectibles', image: 'https://images.unsplash.com/photo-1578301978018-3005759f48f7?w=800&q=80', currentBid: '$125,000', timeRemaining: '4d 10h 5m' },
+    { id: 12, title: 'Industrial CNC Machine', category: 'Industrial Machinery', image: 'https://images.unsplash.com/photo-1581092160562-40aa08e78837?w=800&q=80', currentBid: '$250,000', timeRemaining: '5d 3h 10m' },
   ]
 
   const [currentIndex, setCurrentIndex] = useState(0)
@@ -25,9 +26,9 @@ const FeaturedAuctions = ({ selectedCategory }) => {
     const calculateItemsPerRow = () => {
       if (typeof window !== 'undefined') {
         const width = window.innerWidth
-        if (width >= 1400) return 3
-        if (width >= 1024) return 3
-        if (width >= 768) return 2
+        if (width >= 1400) return 9
+        if (width >= 1024) return 9
+        if (width >= 768) return 6
         return 1
       }
       return 5
@@ -46,7 +47,6 @@ const FeaturedAuctions = ({ selectedCategory }) => {
     return () => window.removeEventListener('resize', handleResize)
   }, [currentIndex])
 
-  // Filter auctions based on selected category
   const filteredAuctions = selectedCategory === 'All Categories'
     ? auctions
     : auctions.filter(a => a.category === selectedCategory)

@@ -678,7 +678,6 @@
   .category-pagination {
     justify-content: center;
     flex-direction: row;
-    flex-wrap: wrap;
     gap: 0.75rem;
     padding: 1.25rem;
   }
