@@ -1,7 +1,6 @@
 import React, { useState } from 'react'
 import { Link } from 'react-router-dom'
 import './SellerAuctionListings.css'
-import SummaryCard from './SummaryCard'
 
 const SellerAuctionListings = () => {
 
@@ -208,13 +207,6 @@ const SellerAuctionListings = () => {
             </div>
           </div>
 
-
-          <SummaryCard
-            listings={listings}
-            seller={seller}
-            formatCurrency={formatCurrency}
-          />
-
           <div className="filters-section">
             <div className="filters-left">
               <div className="filter-group">
@@ -276,6 +268,8 @@ const SellerAuctionListings = () => {
                     {getStatusBadge(listing.status)}
                   </div>
                 </div>
+                <div className='parent-container'>
+
                 <div className="listing-card-body">
                   <h3 className="s-listing-title">{listing.title}</h3>
                   <p className="s-listing-category">{listing.category}</p>
@@ -307,7 +301,7 @@ const SellerAuctionListings = () => {
                   )}
                 </div>
                 <div className="listing-card-footer">
-                  <Link to={`/seller/listing/${listing.id}`} className="s-primary-button small ">
+                  <Link to={`/seller/listing/${listing.id}`} className="s-primary-button small">
                     View Details
                   </Link>
                   <div className="listing-actions">
@@ -325,6 +319,8 @@ const SellerAuctionListings = () => {
                     </button>
                   </div>
                 </div>
+                </div>
+
               </div>
             ))}
           </div>

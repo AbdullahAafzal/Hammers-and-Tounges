@@ -24,15 +24,17 @@ const SignIn = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    setLocalStorage('user', { ...formData, isAuth: true, role: 'buyer' })
-
+    
     if (formData.email === "admin@gmail.com" && formData.password === "admin") {
-      navigate("/admin-panel");
+      setLocalStorage('user', { ...formData, isAuth: true, role: 'admin' })
+      navigate("/admin-panel", { replace: true });
     } else if (formData.email === "testbuyer@gmail.com" && formData.password === "testBuyer@1") {
-      navigate("/dashboard")
+      setLocalStorage('user', { ...formData, isAuth: true, role: 'buyer' })
+      navigate("/dashboard", { replace: true })
     }
     else if (formData.email === "testseller@gmail.com" && formData.password === "testSeller@1") {
-      navigate("/seller-dashboard")
+      setLocalStorage('user', { ...formData, isAuth: true, role: 'seller' })
+      navigate("/seller-dashboard", { replace: true })
     }
     else {
       alert("Invalid Credentials ❌");
@@ -46,17 +48,14 @@ const SignIn = () => {
           <button
             type="button"
             className="back-button"
-            onClick={() => navigate(-1)}
+            onClick={() => navigate('/')}
             aria-label="Go back"
           >
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
               <path d="M19 12H5M12 19L5 12L12 5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
             </svg>
+            Back to Home
           </button>
-          <Link to="/" className="signin-logo">
-            <img src={logo} alt="Hammers & Tongues Logo" />
-            <span>Hammers & Tongues</span>
-          </Link>
         </div>
         <div className="signin-header-link">
           <span>Don't have an account?</span>
@@ -113,12 +112,12 @@ const SignIn = () => {
                       <>
                         <path d="M1 12S5 4 12 4S23 12 23 12S19 20 12 20S1 12 1 12Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                         <circle cx="12" cy="12" r="3" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                        <path d="M1 1L23 23" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                       </>
                     ) : (
                       <>
-                        <path d="M1 12S5 4 12 4S23 12 23 12S19 20 12 20S1 12 1 12Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                        <circle cx="12" cy="12" r="3" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                      <path d="M1 12S5 4 12 4S23 12 23 12S19 20 12 20S1 12 1 12Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                      <circle cx="12" cy="12" r="3" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                      <path d="M1 1L23 23" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                       </>
                     )}
                   </svg>

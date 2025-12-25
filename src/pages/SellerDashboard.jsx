@@ -195,7 +195,7 @@ const SellerDashboard = () => {
                                     <path d="M12 5V19M5 12H19" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
                                 </svg>
                                 Create New Product</Link>
-                            <Link to="/seller/payouts" className="action-button secondary">Request Payout</Link>
+                            <button to="/seller/payouts" className="action-button secondary">Request Payout</button>
                         </div>
                     </div>
 

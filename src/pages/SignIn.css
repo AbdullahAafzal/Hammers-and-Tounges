@@ -24,8 +24,7 @@
 }
 
 .back-button {
-  background: none;
-  border: none;
+  background: transparent;
   color: rgba(255, 255, 255, 0.7);
   cursor: pointer;
   padding: 0.5rem;
@@ -37,7 +36,7 @@
 }
 
 .back-button:hover {
-  background-color: rgba(255, 255, 255, 0.05);
+  background-color: #8CC63F;
   color: #8CC63F;
 }
 
@@ -155,6 +154,8 @@
   margin-bottom: 1.5rem;
   letter-spacing: -0.3px;
   text-align: center;
+  padding: 1rem 0;
+  margin-bottom: 2rem;
 }
 
 .signin-form {
@@ -280,13 +281,12 @@
   background-color: #8CC63F;
   color: #000000;
   border: none;
-  padding: 1rem 1.5rem;
+  padding: 0.5rem 1.5rem;
   border-radius: 8px;
   font-size: 1rem;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.3s ease;
-  width: 25%;
 }
 
 .submit-button:hover {
@@ -402,7 +402,6 @@
   }
 }
 
-/* Responsive adjustments */
 @media (max-width: 768px) {
   .signin-header {
     padding: 1rem 1.5rem;
@@ -413,6 +412,7 @@
 
   .signin-container {
     padding: 1.25rem;
+    width: 100%;
   }
   .form-group-container {
     flex-direction: column;
@@ -420,6 +420,7 @@
 
   .signin-image-section {
     height: 250px;
+    margin-top: 1rem;
   }
 
   .signin-image-title {
@@ -437,8 +438,13 @@
   .signin-title {
     font-size: 1.5rem;
   }
-  .submit-button {
-    width: 100%;
+  .signin-button-container {
+    width: 50%;
+    margin: auto;
+  }
+   .submit-button {
+    padding: 0.775rem 1rem !important;
+    font-size: 0.9375rem !important;
   }
 
   .social-buttons {
@@ -461,7 +467,7 @@
   }
 
   .signin-container {
-    padding: 1rem;
+    padding: 0.7rem;
   }
 
   .signin-image-section {
@@ -480,9 +486,11 @@
     padding: 0.625rem 0.875rem;
     font-size: 0.875rem;
   }
-
+  .signin-button-container {
+    width: 100%;
+  }
   .submit-button {
-    padding: 0.875rem 1.25rem;
+    padding: 0.775rem 1rem;
     font-size: 0.9375rem;
   }
 }

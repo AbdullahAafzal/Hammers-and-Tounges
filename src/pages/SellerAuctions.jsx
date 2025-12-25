@@ -1,29 +1,8 @@
 import React, { useState } from 'react'
 import { Link } from 'react-router-dom'
 import './SellerAuctions.css'
-import SummaryCard from './SummaryCard'
 
 const SellerAuctions = () => {
-    
-    const seller = {
-        name: 'Sarah',
-        totalRevenue: 125000.00,
-        activeListings: 12,
-        itemsSold: 45,
-        pendingPayout: 3250.00,
-        rating: 4.8,
-        totalTransactions: 67,
-        activeLabel: 'Active Listings',
-        activeSubLabel: 'Items currently for auction',
-        soldLabel: 'Items Sold',
-        soldSubLabel: 'Total successful auctions',
-        revenueLabel: 'Total Revenue',
-        revenueSubLabel: 'Lifetime earnings',
-        pendingLabel: 'Pending Payout',
-        pendingSubLabel: 'Available for withdrawal',
-
-    }
-
     const [auctions, setAuctions] = useState([
         {
             id: 1,
@@ -259,9 +238,6 @@ const SellerAuctions = () => {
                         </div>
                     </div>
 
-
-                    <SummaryCard seller={seller} />
-
                     <div className="filters-section">
                         <div className="filters-left">
                             <div className="filter-group">
@@ -317,7 +293,7 @@ const SellerAuctions = () => {
                                 <div className="auction-card-header">
                                     <div className="auction-image">
                                         <img src={auction.image} alt={auction.title} />
-                                     
+
                                     </div>
                                     <div className="auction-category">
                                         {auction.category}
@@ -397,7 +373,7 @@ const SellerAuctions = () => {
                                     </div>
                                 </div>
                                 <div className="auction-card-footer">
-                                    <Link to={`/seller/listing/${auction.id}`} className="primary-button small">
+                                    <Link to={`/seller/listing/${auction.id}`} className="primary-button smalll">
                                         View Details
                                     </Link>
                                     <div className="auction-actions">

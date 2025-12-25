@@ -86,7 +86,7 @@ const CreateProduct = () => {
         <div className="page-container">
           <div className="page-header">
             <div className="page-title-section">
-              <h1 className="page-title"> { location?.state?.isEditing ? 'Edit Your Product' : 'Create New Product' } </h1>
+              <h1 className="page-title"> {location?.state?.isEditing ? 'Edit Your Product' : 'Create New Product'} </h1>
               <p className="page-subtitle">Fill in the details to list your item for auction</p>
             </div>
             <div className="page-actions">
@@ -320,12 +320,12 @@ const CreateProduct = () => {
               </div>
 
               <div className="form-actions">
-                <button type="button" className="s-secondary-button">
-                  Save as Draft
+                <button type="submit" className="s-primary-button">
+                  Preview & List Item
                 </button>
                 <div className="form-actions-right">
-                  <button type="submit" className="s-primary-button">
-                    Preview & List Item
+                  <button type="button" className="sp-secondary-button">
+                    Save as Draft
                   </button>
                 </div>
               </div>

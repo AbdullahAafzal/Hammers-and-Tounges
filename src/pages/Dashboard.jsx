@@ -1,6 +1,7 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
 import './Dashboard.css'
+import SummaryCard from './SummaryCard'
 
 const Dashboard = () => {
   const user = {
@@ -9,6 +10,26 @@ const Dashboard = () => {
     activeBids: 8,
     itemsWon: 3
   }
+
+      const seller = {
+        name: 'Sarah',
+        totalRevenue: 125000.00,
+        activeListings: 12,
+        itemsSold: 45,
+        pendingPayout: 3250.00,
+        rating: 4.8,
+        totalTransactions: 67,
+        activeLabel: 'Active Listings',
+        activeSubLabel: 'Items currently for auction',
+        soldLabel: 'Items Sold',
+        soldSubLabel: 'Total successful auctions',
+        revenueLabel: 'Total Revenue',
+        revenueSubLabel: 'Lifetime earnings',
+        pendingLabel: 'Pending Payout',
+        pendingSubLabel: 'Available for withdrawal',
+
+    }
+
 
   const activeBids = [
     {
@@ -181,7 +202,7 @@ const Dashboard = () => {
             </div>
           </div>
 
-          <div className="summary-cards">
+          {/* <div className="summary-cards">
             <div className="summary-card">
               <div className="card-background-gradient" ></div>
               <div className="card-icon" style={{ backgroundColor: 'rgba(59, 130, 246, 0.2)', borderColor: 'rgba(59, 130, 246, 0.4)' }}>
@@ -226,7 +247,9 @@ const Dashboard = () => {
                 <span className="card-sublabel">Available for bidding</span>
               </div>
             </Link>
-          </div>
+          </div> */}
+
+            <SummaryCard seller={seller}/>
 
           <div className="active-bids-section">
             <div className="section-header">

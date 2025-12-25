@@ -250,7 +250,6 @@
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(260px, 3fr));
   gap: 1.25rem;
-  margin-bottom: 2rem;
 }
 
 .auctions-card {
@@ -520,7 +519,6 @@
   }
 
   .g-auctions-pagination {
-    flex-direction: column;
     flex-wrap: nowrap;
     gap: 0.75rem;
   }

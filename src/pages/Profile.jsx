@@ -1,13 +1,12 @@
-import React, { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
-import './Profile.css'
-import { getLocalStorage } from '../utils/localStorage'
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import './Profile.css';
+// import { getLocalStorage } from '../utils/localStorage';
 
 const BuyerProfile = () => {
-  const navigate = useNavigate()
-  const [role, setRole] = useState('buyer')
-  const [activeSection, setActiveSection] = useState('profile')
-  const [isEditing, setIsEditing] = useState(false)
+  const navigate = useNavigate();
+  const [activeTab, setActiveTab] = useState('overview');
+  const [isEditing, setIsEditing] = useState(false);
   const [formData, setFormData] = useState({
     firstName: 'John',
     lastName: 'Doe',
@@ -23,58 +22,15 @@ const BuyerProfile = () => {
     memberSince: '2022',
     totalBids: 142,
     wonAuctions: 38,
-    successRate: '78%'
-  })
-  const [user, setUser] = useState(()=> {
-    getLocalStorage('user')
-  })
-  console.log(user);
-  
+    successRate: '78%',
+    buyerId: 'BYR-5847'
+  });
 
   const [securityData, setSecurityData] = useState({
     currentPassword: '',
     newPassword: '',
     confirmPassword: ''
-  })
-
-  const handleChange = (e) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value
-    })
-  }
-
-  const handleSecurityChange = (e) => {
-    setSecurityData({
-      ...securityData,
-      [e.target.name]: e.target.value
-    })
-  }
-
-  const handleSubmit = (e) => {
-    e.preventDefault()
-    console.log('Saving profile:', formData)
-    setIsEditing(false)
-  }
-
-  const handleSecuritySubmit = (e) => {
-    e.preventDefault()
-    console.log('Updating security:', securityData)
-    setSecurityData({
-      currentPassword: '',
-      newPassword: '',
-      confirmPassword: ''
-    })
-  }
-
-  const menuItems = [
-    { id: 'profile', label: 'Profile Information', icon: 'profile', navigations: '/profile' },
-    { id: 'contact', label: 'Contact Details', icon: 'contact', navigations: '/profile' },
-    { id: 'security', label: 'Security', icon: 'security', navigations: '/profile' },
-    { id: 'activity', label: 'Bid Activity', icon: 'activity', navigations: '/profile' },
-    { id: 'kyc', label: 'KYC Verification', icon: 'kyc', navigations: '/profile' },
-    { id: 'dash', label: 'Dashboard', icon: 'dashboard', navigations: `${role == 'buyer' ? '/dashboard' : '/seller-dashboard'}` }
-  ]
+  });
 
   const recentActivity = [
     { id: 1, action: 'Placed bid on', item: 'Vintage Rolex Watch', amount: '$2,500', time: '2 hours ago', status: 'active' },
@@ -82,470 +38,472 @@ const BuyerProfile = () => {
     { id: 3, action: 'Outbid on', item: 'Industrial Lathe Machine', amount: '$1,800', time: '2 days ago', status: 'lost' },
     { id: 4, action: 'Saved auction', item: 'Modern Art Painting', time: '3 days ago', status: 'saved' },
     { id: 5, action: 'Joined auction', item: 'Classic Car Collection', time: '1 week ago', status: 'joined' }
-  ]
+  ];
 
-  const getIcon = (iconType) => {
-    switch (iconType) {
-      case 'profile':
-        return (
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-            <path d="M20 21V19C20 17.9391 19.5786 16.9217 18.8284 16.1716C18.0783 15.4214 17.0609 15 16 15H8C6.93913 15 5.92172 15.4214 5.17157 16.1716C4.42143 16.9217 4 17.9391 4 19V21" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-            <circle cx="12" cy="7" r="4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-          </svg>
-        )
-      case 'contact':
-        return (
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-            <path d="M21 10C21 17 12 23 12 23C12 23 3 17 3 10C3 7.61305 3.94821 5.32387 5.63604 3.63604C7.32387 1.94821 9.61305 1 12 1C14.3869 1 16.6761 1.94821 18.364 3.63604C20.0518 5.32387 21 7.61305 21 10Z" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-            <circle cx="12" cy="10" r="3" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-          </svg>
-        )
-      case 'security':
-        return (
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-            <path d="M12 22C12 22 20 18 20 12V5L12 2L4 5V12C4 18 12 22 12 22Z" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-            <path d="M9 12L11 14L15 10" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-          </svg>
-        )
-      case 'activity':
-        return (
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-            <path d="M12 8V12L15 15M21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3C16.9706 3 21 7.02944 21 12Z" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-          </svg>
-        )
-      case 'kyc':
-        return (
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-            <path d="M9 12L11 14L15 10M21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3C16.9706 3 21 7.02944 21 12Z" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-          </svg>
-        )
-      case 'dashboard':
-        return (
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-            <path d="M4 6H8C8.55228 6 9 5.55228 9 5V4C9 3.44772 8.55228 3 8 3H4C3.44772 3 3 3.44772 3 4V5C3 5.55228 3.44772 6 4 6Z" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-            <path d="M4 14H8C8.55228 14 9 13.5523 9 13V12C9 11.4477 8.55228 11 8 11H4C3.44772 11 3 11.4477 3 12V13C3 13.5523 3.44772 14 4 14Z" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-            <path d="M11 6H15C15.5523 6 16 5.55228 16 5V4C16 3.44772 15.5523 3 15 3H11C10.4477 3 10 3.44772 10 4V5C10 5.55228 10.4477 6 11 6Z" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-            <path d="M11 14H15C15.5523 14 16 13.5523 16 13V12C16 11.4477 15.5523 11 15 11H11C10.4477 11 10 11.4477 10 12V13C10 13.5523 10.4477 14 11 14Z" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-          </svg>
-        )
-      default:
-        return null
-    }
-  }
+  const handleChange = (e) => {
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value
+    });
+  };
+
+  const handleSecurityChange = (e) => {
+    setSecurityData({
+      ...securityData,
+      [e.target.name]: e.target.value
+    });
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    console.log('Saving profile:', formData);
+    setIsEditing(false);
+  };
+
+  const handleSecuritySubmit = (e) => {
+    e.preventDefault();
+    console.log('Updating security:', securityData);
+    setSecurityData({
+      currentPassword: '',
+      newPassword: '',
+      confirmPassword: ''
+    });
+  };
+
+  const handleInputChange = (field, value) => {
+    setFormData(prev => ({
+      ...prev,
+      [field]: value
+    }));
+  };
+
+  const handleSave = () => {
+    setIsEditing(false);
+  };
 
   return (
-    <div className="buyer-profile-page">
-      <main className="buyer-profile-main">
-        <div className="buyer-profile-container">
-          <aside className="buyer-profile-sidebar">
-            <div className="buyer-info-card">
-              <div className="buyer-avatar-large">
-                <div className="avatar-image">
-                  <svg width="60" height="60" viewBox="0 0 24 24" fill="none">
-                    <path d="M20 21V19C20 17.9391 19.5786 16.9217 18.8284 16.1716C18.0783 15.4214 17.0609 15 16 15H8C6.93913 15 5.92172 15.4214 5.17157 16.1716C4.42143 16.9217 4 17.9391 4 19V21" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-                    <circle cx="12" cy="7" r="4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-                  </svg>
+    <div className="buyer-profile-container">
+      <div className="profile-header">
+        <div className="header-content">
+          <h1 className="profile-title">Buyer Profile</h1>
+          <p className="profile-subtitle">Manage your account, track bids, and grow your collection</p>
+        </div>
+        <div className="header-actions">
+          <button 
+            className={`b-action-btn ${isEditing ? 'b-secondary' : 'b-primary'}`}
+            onClick={() => isEditing ? handleSave() : setIsEditing(true)}
+          >
+            {isEditing ? (
+              <>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                  <path d="M20 6L9 17L4 12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                </svg>
+                Save Changes
+              </>
+            ) : (
+              <>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                  <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" stroke="currentColor" strokeWidth="2"/>
+                  <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" stroke="currentColor" strokeWidth="2"/>
+                </svg>
+                Edit Profile
+              </>
+            )}
+          </button>
+          <button className="b-action-btn b-outline">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+              <path d="M3 16v5h5M21 16v5h-5M16 3v5h5M8 3v5H3" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+            </svg>
+            Export Data
+          </button>
+        </div>
+      </div>
+
+      <div className="profile-main">
+        <div className="profile-left">
+          <div className="profile-card">
+            <div className="profile-avatar-section">
+              <div className="avatar-wrapper">
+                <div className="avatar">
+                  <img 
+                    src="https://www.catholicsingles.com/wp-content/uploads/2020/06/blog-header-3.png" 
+                    alt=""
+                  />
+                  <div className="status-indicator"></div>
                 </div>
-                <div className="avatar-status"></div>
+                <button className="b-avatar-upload">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" stroke="currentColor" strokeWidth="2"/>
+                    <polyline points="17 8 12 3 7 8" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                    <line x1="12" y1="3" x2="12" y2="15" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+                  </svg>
+                </button>
               </div>
-              <div className="buyer-details">
-                <h3 className="buyer-name">{formData.firstName} {formData.lastName}</h3>
-                <p className="buyer-email">{formData.email}</p>
-                <div className="buyer-meta">
-                  <span className="member-since">Member since {formData.memberSince}</span>
-                  <span className="buyer-tier">Gold Buyer</span>
+              <div className="profile-info">
+                <h2 className="profile-name">{formData.firstName} {formData.lastName}</h2>
+                <p className="profile-email">{formData.email}</p>
+                <div className="verification-badge">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+                    <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2"/>
+                    <path d="M9 12l2 2 4-4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                  </svg>
+                  Gold Buyer
                 </div>
               </div>
             </div>
 
-            <div className="buyer-stats">
-              <div className="stat-item">
-                <div className="stat-icon">
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-                    <path d="M9 19H7C5.89543 19 5 18.1046 5 17V10C5 8.89543 5.89543 8 7 8H9M15 19H17C18.1046 19 19 18.1046 19 17V10C19 8.89543 18.1046 8 17 8H15M9 19V5C9 3.89543 9.89543 3 11 3H13C14.1046 3 15 3.89543 15 5V19M9 19H15" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+            <div className="profile-stats-grid">
+              <div className="stat-card">
+                <div className="stat-icon bids">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                    <path d="M9 19H7C5.89543 19 5 18.1046 5 17V10C5 8.89543 5.89543 8 7 8H9M15 19H17C18.1046 19 19 18.1046 19 17V10C19 8.89543 18.1046 8 17 8H15M9 19V5C9 3.89543 9.89543 3 11 3H13C14.1046 3 15 3.89543 15 5V19M9 19H15" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                   </svg>
                 </div>
-                <div className="stat-info">
-                  <span className="stat-value">{formData.totalBids}</span>
-                  <span className="stat-label">Total Bids</span>
+                <div className="stat-content">
+                  <div className="stat-value">{formData.totalBids}</div>
+                  <div className="stat-label">Total Bids</div>
                 </div>
               </div>
-              <div className="stat-item">
-                <div className="stat-icon">
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-                    <path d="M9 12L11 14L15 10M21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3C16.9706 3 21 7.02944 21 12Z" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+
+              <div className="stat-card">
+                <div className="stat-icon won">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                    <path d="M9 12L11 14L15 10M21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3C16.9706 3 21 7.02944 21 12Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                   </svg>
                 </div>
-                <div className="stat-info">
-                  <span className="stat-value">{formData.wonAuctions}</span>
-                  <span className="stat-label">Won Auctions</span>
+                <div className="stat-content">
+                  <div className="stat-value">{formData.wonAuctions}</div>
+                  <div className="stat-label">Won Auctions</div>
                 </div>
               </div>
-              <div className="stat-item">
-                <div className="stat-icon">
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-                    <path d="M12 8V12L15 15M21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3C16.9706 3 21 7.02944 21 12Z" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+
+              <div className="stat-card">
+                <div className="stat-icon success">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                    <path d="M12 8V12L15 15M21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3C16.9706 3 21 7.02944 21 12Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                   </svg>
                 </div>
-                <div className="stat-info">
-                  <span className="stat-value">{formData.successRate}</span>
-                  <span className="stat-label">Success Rate</span>
+                <div className="stat-content">
+                  <div className="stat-value">{formData.successRate}</div>
+                  <div className="stat-label">Success Rate</div>
+                </div>
+              </div>
+
+              <div className="stat-card">
+                <div className="stat-icon spent">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                    <path d="M12 1v22M17 5H9.5a3.5 3.5 0 1 0 0 7h5a3.5 3.5 0 1 1 0 7H6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                  </svg>
+                </div>
+                <div className="stat-content">
+                  <div className="stat-value">$24,580</div>
+                  <div className="stat-label">Total Spent</div>
                 </div>
               </div>
             </div>
-            <nav className="buyer-profile-menu">
-              {menuItems.map((item) => (
-                <button
-                  key={item.id}
-                  className={`buyer-menu-item ${activeSection === item.id ? 'active' : ''}`}
-                  onClick={() => {
-                    setActiveSection(item.id)
-                    navigate(`${item.navigations}`)
-                  }
-                  }
-                >
-                  <span className="menu-item-icon">{getIcon(item.icon)}</span>
-                  <span className="menu-item-label">{item.label}</span>
-                  <span className="menu-item-arrow">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
-                      <path d="M9 18L15 12L9 6" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+          </div>
+
+          <div className="quick-stats-card">
+            <h3 className="card-title">Activity Overview</h3>
+            <div className="stats-grid">
+              <div className="stat-item">
+                <span className="stat-label">Active Bids</span>
+                <span className="stat-value primary">12</span>
+              </div>
+              <div className="stat-item">
+                <span className="stat-label">Won This Month</span>
+                <span className="stat-value">8</span>
+              </div>
+              <div className="stat-item">
+                <span className="stat-label">Saved Items</span>
+                <span className="stat-value success">15</span>
+              </div>
+              <div className="stat-item">
+                <span className="stat-label">Member Since</span>
+                <span className="stat-value warning">{formData.memberSince}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div className="profile-right">
+          <div className="profile-tabs">
+            <button 
+              className={`tab-btn ${activeTab === 'overview' ? 'active' : ''}`}
+              onClick={() => setActiveTab('overview')}
+            >
+              Overview
+            </button>
+            <button 
+              className={`tab-btn ${activeTab === 'contact' ? 'active' : ''}`}
+              onClick={() => setActiveTab('contact')}
+            >
+              Contact Info
+            </button>
+            <button 
+              className={`tab-btn ${activeTab === 'security' ? 'active' : ''}`}
+              onClick={() => setActiveTab('security')}
+            >
+              Security
+            </button>
+            <button 
+              className={`tab-btn ${activeTab === 'activity' ? 'active' : ''}`}
+              onClick={() => setActiveTab('activity')}
+            >
+              Activity
+            </button>
+            <button 
+              className={`tab-btn ${activeTab === 'settings' ? 'active' : ''}`}
+              onClick={() => setActiveTab('settings')}
+            >
+              Settings
+            </button>
+          </div>
+
+          <div className="tab-content">
+            {activeTab === 'overview' && (
+              <div className="overview-content">
+                <div className="info-section">
+                  <h3 className="section-title">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+                      <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" stroke="currentColor" strokeWidth="2"/>
+                      <circle cx="12" cy="7" r="4" stroke="currentColor" strokeWidth="2"/>
                     </svg>
-                  </span>
-                </button>
-              ))}
-              <button className="buyer-menu-item logout" onClick={() => navigate('/signin')}>
-                <span className="menu-item-icon">
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-                    <path d="M9 21H5C4.46957 21 3.96086 20.7893 3.58579 20.4142C3.21071 20.0391 3 19.5304 3 19V5C3 4.46957 3.21071 3.96086 3.58579 3.58579C3.96086 3.21071 4.46957 3 5 3H9M16 17L21 12M21 12L16 7M21 12H9" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-                  </svg>
-                </span>
-                <span className="menu-item-label">Logout</span>
-                <span className="menu-item-arrow"></span>
-              </button>
-            </nav>
-          </aside>
-
-          <div className="buyer-profile-content">
-            <div className="content-header">
-              <div className="header-info">
-                <h1 className="content-title">
-                  {activeSection === 'profile' && 'Profile Information'}
-                  {activeSection === 'contact' && 'Contact Details'}
-                  {activeSection === 'security' && 'Security Settings'}
-                  {activeSection === 'activity' && 'Bid Activity'}
-                  {activeSection === 'kyc' && 'KYC Verification'}
-                </h1>
-                <p className="content-subtitle">
-                  {activeSection === 'profile' && 'Manage your personal information and preferences'}
-                  {activeSection === 'contact' && 'Update your contact information and addresses'}
-                  {activeSection === 'security' && 'Secure your account with password and 2FA'}
-                  {activeSection === 'activity' && 'View your bidding history and activity'}
-                  {activeSection === 'kyc' && 'Complete KYC verification for higher bidding limits'}
-                </p>
-              </div>
-              {activeSection !== 'activity' && activeSection !== 'kyc' && (
-                <button
-                  className={`edit-toggle-btn ${isEditing ? 'active' : ''}`}
-                  onClick={() => setIsEditing(!isEditing)}
-                >
-                  {isEditing ? (
-                    <>
-                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-                        <path d="M20 6L9 17L4 12" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-                      </svg>
-                      Done Editing
-                    </>
-                  ) : (
-                    <>
-                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-                        <path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7" stroke="currentColor" strokeWidth="1.5" />
-                        <path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-                      </svg>
-                      Edit Profile
-                    </>
-                  )}
-                </button>
-              )}
-            </div>
-
-            {/* Profile Section */}
-            {activeSection === 'profile' && (
-              <div className="profile-section">
-                <div className="profile-form-card">
-                  <div className="form-card-header">
-                    <h3 className="form-card-title">Personal Information</h3>
-                    <p className="form-card-subtitle">This information will be displayed publicly on your profile</p>
-                  </div>
-                  <form className="buyer-profile-form" onSubmit={handleSubmit}>
-                    <div className="form-grid">
-                      <div className="profile-form-group">
-                        <label className="form-label">First Name</label>
-                        {isEditing ? (
-                          <input
-                            type="text"
-                            name="firstName"
-                            className="profile-form-input"
-                            value={formData.firstName}
-                            onChange={handleChange}
-                          />
-                        ) : (
-                          <div className="form-value">{formData.firstName}</div>
-                        )}
-                      </div>
-                      <div className="profile-form-group">
-                        <label className="form-label">Last Name</label>
-                        {isEditing ? (
-                          <input
-                            type="text"
-                            name="lastName"
-                            className="profile-form-input"
-                            value={formData.lastName}
-                            onChange={handleChange}
-                          />
-                        ) : (
-                          <div className="form-value">{formData.lastName}</div>
-                        )}
-                      </div>
-                      <div className="profile-form-group">
-                        <label className="form-label">Display Name</label>
-                        {isEditing ? (
-                          <input
-                            type="text"
-                            name="displayName"
-                            className="profile-form-input"
-                            value={formData.displayName}
-                            onChange={handleChange}
-                          />
-                        ) : (
-                          <div className="form-value">{formData.displayName}</div>
-                        )}
-                        <p className="form-hint">This is how your name appears to other users</p>
-                      </div>
-                      <div className="profile-form-group full-width">
-                        <label className="form-label">Bio</label>
-                        {isEditing ? (
-                          <textarea
-                            name="bio"
-                            className="form-textarea"
-                            value={formData.bio}
-                            onChange={handleChange}
-                            rows="3"
-                          />
-                        ) : (
-                          <div className="form-value">{formData.bio}</div>
-                        )}
-                      </div>
+                    Personal Information
+                  </h3>
+                  <div className="info-grid">
+                    <div className="info-item">
+                      <label>First Name</label>
+                      {isEditing ? (
+                        <input 
+                          type="text" 
+                          className="edit-input"
+                          value={formData.firstName}
+                          onChange={(e) => handleInputChange('firstName', e.target.value)}
+                        />
+                      ) : (
+                        <div className="info-value">{formData.firstName}</div>
+                      )}
                     </div>
-                    {isEditing && (
-                      <div className="form-actions">
-                        <button type="button" className="btn-secondary" onClick={() => setIsEditing(false)}>
-                          Cancel
-                        </button>
-                        <button type="submit" className="btn-primary">
-                          Save Changes
-                        </button>
-                      </div>
-                    )}
-                  </form>
-                </div>
-              </div>
-            )}
-
-            {/* Contact Section */}
-            {activeSection === 'contact' && (
-              <div className="contact-section">
-                <div className="contact-form-card">
-                  <div className="form-card-header">
-                    <h3 className="form-card-title">Contact Information</h3>
-                    <p className="form-card-subtitle">Update your contact details for notifications and shipping</p>
-                  </div>
-                  <form className="buyer-profile-form" onSubmit={handleSubmit}>
-                    <div className="form-grid">
-                      <div className="profile-form-group full-width">
-                        <label className="form-label">Email Address</label>
-                        {isEditing ? (
-                          <input
-                            type="email"
-                            name="email"
-                            className="profile-form-input"
-                            value={formData.email}
-                            onChange={handleChange}
-                          />
-                        ) : (
-                          <div className="form-value">{formData.email}</div>
-                        )}
-                      </div>
-                      <div className="profile-form-group">
-                        <label className="form-label">Phone Number</label>
-                        {isEditing ? (
-                          <input
-                            type="tel"
-                            name="phone"
-                            className="profile-form-input"
-                            value={formData.phone}
-                            onChange={handleChange}
-                          />
-                        ) : (
-                          <div className="form-value">{formData.phone}</div>
-                        )}
-                      </div>
-                      <div className="profile-form-group full-width">
-                        <label className="form-label">Street Address</label>
-                        {isEditing ? (
-                          <input
-                            type="text"
-                            name="address"
-                            className="profile-form-input"
-                            value={formData.address}
-                            onChange={handleChange}
-                          />
-                        ) : (
-                          <div className="form-value">{formData.address}</div>
-                        )}
-                      </div>
-                      <div className="profile-form-group">
-                        <label className="form-label">City</label>
-                        {isEditing ? (
-                          <input
-                            type="text"
-                            name="city"
-                            className="profile-form-input"
-                            value={formData.city}
-                            onChange={handleChange}
-                          />
-                        ) : (
-                          <div className="form-value">{formData.city}</div>
-                        )}
-                      </div>
-                      <div className="profile-form-group">
-                        <label className="form-label">State</label>
-                        {isEditing ? (
-                          <input
-                            type="text"
-                            name="state"
-                            className="profile-form-input"
-                            value={formData.state}
-                            onChange={handleChange}
-                          />
-                        ) : (
-                          <div className="form-value">{formData.state}</div>
-                        )}
-                      </div>
-                      <div className="profile-form-group">
-                        <label className="form-label">Zip Code</label>
-                        {isEditing ? (
-                          <input
-                            type="text"
-                            name="zipCode"
-                            className="profile-form-input"
-                            value={formData.zipCode}
-                            onChange={handleChange}
-                          />
-                        ) : (
-                          <div className="form-value">{formData.zipCode}</div>
-                        )}
-                      </div>
-                      <div className="profile-form-group full-width">
-                        <label className="form-label">Country</label>
-                        {isEditing ? (
-                          <select
-                            name="country"
-                            className="form-select"
-                            value={formData.country}
-                            onChange={handleChange}
-                          >
-                            <option value="United States">United States</option>
-                            <option value="Canada">Canada</option>
-                            <option value="United Kingdom">United Kingdom</option>
-                            <option value="Australia">Australia</option>
-                            <option value="Germany">Germany</option>
-                          </select>
-                        ) : (
-                          <div className="form-value">{formData.country}</div>
-                        )}
-                      </div>
+                    <div className="info-item">
+                      <label>Last Name</label>
+                      {isEditing ? (
+                        <input 
+                          type="text" 
+                          className="edit-input"
+                          value={formData.lastName}
+                          onChange={(e) => handleInputChange('lastName', e.target.value)}
+                        />
+                      ) : (
+                        <div className="info-value">{formData.lastName}</div>
+                      )}
                     </div>
-                    {isEditing && (
-                      <div className="form-actions">
-                        <button type="button" className="btn-secondary" onClick={() => setIsEditing(false)}>
-                          Cancel
-                        </button>
-                        <button type="submit" className="btn-primary">
-                          Save Changes
-                        </button>
-                      </div>
-                    )}
-                  </form>
-                </div>
-              </div>
-            )}
-
-            {/* Security Section */}
-            {activeSection === 'security' && (
-              <div className="security-section">
-                <div className="security-form-card">
-                  <div className="form-card-header">
-                    <h3 className="form-card-title">Password & Security</h3>
-                    <p className="form-card-subtitle">Update your password and enhance account security</p>
+                    <div className="info-item">
+                      <label>Display Name</label>
+                      {isEditing ? (
+                        <input 
+                          type="text" 
+                          className="edit-input"
+                          value={formData.displayName}
+                          onChange={(e) => handleInputChange('displayName', e.target.value)}
+                        />
+                      ) : (
+                        <div className="info-value">{formData.displayName}</div>
+                      )}
+                    </div>
+                    <div className="info-item">
+                      <label>Buyer ID</label>
+                      <div className="info-value code">{formData.buyerId}</div>
+                    </div>
+                    <div className="info-item">
+                      <label>Email Address</label>
+                      {isEditing ? (
+                        <input 
+                          type="email" 
+                          className="edit-input"
+                          value={formData.email}
+                          onChange={(e) => handleInputChange('email', e.target.value)}
+                        />
+                      ) : (
+                        <div className="info-value">{formData.email}</div>
+                      )}
+                    </div>
+                    <div className="info-item">
+                      <label>Phone Number</label>
+                      {isEditing ? (
+                        <input 
+                          type="tel" 
+                          className="edit-input"
+                          value={formData.phone}
+                          onChange={(e) => handleInputChange('phone', e.target.value)}
+                        />
+                      ) : (
+                        <div className="info-value">{formData.phone}</div>
+                      )}
+                    </div>
                   </div>
-                  <form className="buyer-profile-form" onSubmit={handleSecuritySubmit}>
-                    <div className="form-grid">
-                      <div className="profile-form-group full-width">
-                        <label className="form-label">Current Password</label>
-                        <input
-                          type="password"
-                          name="currentPassword"
-                          className="profile-form-input"
-                          value={securityData.currentPassword}
-                          onChange={handleSecurityChange}
-                        />
-                      </div>
-                      <div className="profile-form-group">
-                        <label className="form-label">New Password</label>
-                        <input
-                          type="password"
-                          name="newPassword"
-                          className="profile-form-input"
-                          value={securityData.newPassword}
-                          onChange={handleSecurityChange}
-                        />
-                      </div>
-                      <div className="profile-form-group">
-                        <label className="form-label">Confirm Password</label>
-                        <input
-                          type="password"
-                          name="confirmPassword"
-                          className="profile-form-input"
-                          value={securityData.confirmPassword}
-                          onChange={handleSecurityChange}
-                        />
-                      </div>
-                      <div className="full-width">
-                        <div className="password-requirements">
-                          <h4>Password Requirements:</h4>
-                          <ul>
-                            <li>At least 8 characters long</li>
-                            <li>Contains uppercase and lowercase letters</li>
-                            <li>Includes at least one number</li>
-                            <li>Includes at least one special character</li>
-                          </ul>
+                </div>
+
+                <div className="info-section">
+                  <h3 className="section-title">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+                      <path d="M12 8v4l3 3m6-3a9 9 0 1 1-18 0 9 9 0 0 1 18 0z" stroke="currentColor" strokeWidth="2"/>
+                    </svg>
+                    Recent Activity
+                  </h3>
+                  <div className="activity-list">
+                    {recentActivity.map(activity => (
+                      <div key={activity.id} className="activity-item">
+                        <div className="activity-icon">
+                          <div className={`icon-circle ${activity.status}`}>
+                            {activity.status === 'active' && '🔄'}
+                            {activity.status === 'won' && '✓'}
+                            {activity.status === 'lost' && '✗'}
+                            {activity.status === 'saved' && '💾'}
+                            {activity.status === 'joined' && '👥'}
+                          </div>
+                        </div>
+                        <div className="activity-content">
+                          <div className="activity-title">{activity.action} {activity.item}</div>
+                          <div className="activity-meta">
+                            {activity.amount && <span>{activity.amount}</span>}
+                            <span className="activity-time">{activity.time}</span>
+                          </div>
                         </div>
                       </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {activeTab === 'contact' && (
+              <div className="contact-content">
+                <div className="info-section">
+                  <h3 className="section-title">Contact Details</h3>
+                  <div className="info-grid">
+                    <div className="info-item">
+                      <label>Street Address</label>
+                      {isEditing ? (
+                        <input 
+                          type="text" 
+                          className="edit-input"
+                          value={formData.address}
+                          onChange={(e) => handleInputChange('address', e.target.value)}
+                        />
+                      ) : (
+                        <div className="info-value">{formData.address}</div>
+                      )}
                     </div>
-                    <div className="form-actions">
-                      <button type="submit" className="btn-primary">
-                        Update Password
-                      </button>
+                    <div className="info-item">
+                      <label>City</label>
+                      {isEditing ? (
+                        <input 
+                          type="text" 
+                          className="edit-input"
+                          value={formData.city}
+                          onChange={(e) => handleInputChange('city', e.target.value)}
+                        />
+                      ) : (
+                        <div className="info-value">{formData.city}</div>
+                      )}
                     </div>
-                  </form>
+                    <div className="info-item">
+                      <label>State</label>
+                      {isEditing ? (
+                        <input 
+                          type="text" 
+                          className="edit-input"
+                          value={formData.state}
+                          onChange={(e) => handleInputChange('state', e.target.value)}
+                        />
+                      ) : (
+                        <div className="info-value">{formData.state}</div>
+                      )}
+                    </div>
+                    <div className="info-item">
+                      <label>Zip Code</label>
+                      {isEditing ? (
+                        <input 
+                          type="text" 
+                          className="edit-input"
+                          value={formData.zipCode}
+                          onChange={(e) => handleInputChange('zipCode', e.target.value)}
+                        />
+                      ) : (
+                        <div className="info-value">{formData.zipCode}</div>
+                      )}
+                    </div>
+                    <div className="info-item">
+                      <label>Country</label>
+                      {isEditing ? (
+                        <select 
+                          className="edit-input"
+                          value={formData.country}
+                          onChange={(e) => handleInputChange('country', e.target.value)}
+                        >
+                          <option value="United States">United States</option>
+                          <option value="Canada">Canada</option>
+                          <option value="United Kingdom">United Kingdom</option>
+                          <option value="Australia">Australia</option>
+                          <option value="Germany">Germany</option>
+                        </select>
+                      ) : (
+                        <div className="info-value">{formData.country}</div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {activeTab === 'security' && (
+              <div className="security-content">
+                <div className="info-section">
+                  <h3 className="section-title">Password & Security</h3>
+                  <div className="info-grid">
+                    <div className="info-item">
+                      <label>Current Password</label>
+                      <input
+                        type="password"
+                        className="edit-input"
+                        value={securityData.currentPassword}
+                        onChange={handleSecurityChange}
+                        name="currentPassword"
+                        placeholder="Enter current password"
+                      />
+                    </div>
+                    <div className="info-item">
+                      <label>New Password</label>
+                      <input
+                        type="password"
+                        className="edit-input"
+                        value={securityData.newPassword}
+                        onChange={handleSecurityChange}
+                        name="newPassword"
+                        placeholder="Enter new password"
+                      />
+                    </div>
+                    <div className="info-item">
+                      <label>Confirm Password</label>
+                      <input
+                        type="password"
+                        className="edit-input"
+                        value={securityData.confirmPassword}
+                        onChange={handleSecurityChange}
+                        name="confirmPassword"
+                        placeholder="Confirm new password"
+                      />
+                    </div>
+                  </div>
+                  <button className="action-btn primary" onClick={handleSecuritySubmit} style={{marginTop: '1rem'}}>
+                    Update Password
+                  </button>
                 </div>
 
-                <div className="security-settings-card">
-                  <div className="form-card-header">
-                    <h3 className="form-card-title">Two-Factor Authentication</h3>
-                    <p className="form-card-subtitle">Add an extra layer of security to your account</p>
-                  </div>
-                  <div className="security-settings">
+                <div className="info-section">
+                  <h3 className="section-title">Two-Factor Authentication</h3>
+                  <div className="settings-grid">
                     <div className="setting-item">
                       <div className="setting-info">
                         <h4>SMS Authentication</h4>
@@ -561,74 +519,35 @@ const BuyerProfile = () => {
                         <h4>Authenticator App</h4>
                         <p>Use Google Authenticator or similar app</p>
                       </div>
-                      <button className="btn-outline">Set Up</button>
+                      <button className="action-btn outline small">Set Up</button>
                     </div>
                   </div>
                 </div>
               </div>
             )}
 
-            {/* Activity Section */}
-            {activeSection === 'activity' && (
-              <div className="activity-section">
-                <div className="activity-stats">
-                  <div className="stat-card">
-                    <div className="stat-card-icon bids">
-                      <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-                        <path d="M9 19H7C5.89543 19 5 18.1046 5 17V10C5 8.89543 5.89543 8 7 8H9M15 19H17C18.1046 19 19 18.1046 19 17V10C19 8.89543 18.1046 8 17 8H15M9 19V5C9 3.89543 9.89543 3 11 3H13C14.1046 3 15 3.89543 15 5V19M9 19H15" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-                      </svg>
-                    </div>
-                    <div className="stat-card-content">
-                      <h4>Active Bids</h4>
-                      <p className="stat-number">12</p>
-                    </div>
-                  </div>
-                  <div className="stat-card">
-                    <div className="stat-card-icon won">
-                      <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-                        <path d="M9 12L11 14L15 10M21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3C16.9706 3 21 7.02944 21 12Z" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-                      </svg>
-                    </div>
-                    <div className="stat-card-content">
-                      <h4>Won This Month</h4>
-                      <p className="stat-number">8</p>
-                    </div>
-                  </div>
-                  <div className="stat-card">
-                    <div className="stat-card-icon spent">
-                      <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-                        <path d="M12 1v22M17 5H9.5a3.5 3.5 0 1 0 0 7h5a3.5 3.5 0 1 1 0 7H6" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-                      </svg>
-                    </div>
-                    <div className="stat-card-content">
-                      <h4>Total Spent</h4>
-                      <p className="stat-number">$24,580</p>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="activity-list">
-                  <div className="activity-header">
-                    <h3>Recent Activity</h3>
-                    <button className="btn-outline">View All</button>
-                  </div>
-                  <div className="activity-items">
-                    {recentActivity.map((activity) => (
+            {activeTab === 'activity' && (
+              <div className="activity-content">
+                <div className="info-section">
+                  <h3 className="section-title">Bidding History</h3>
+                  <div className="activity-list">
+                    {recentActivity.map(activity => (
                       <div key={activity.id} className="activity-item">
-                        <div className={`activity-icon ${activity.status}`}>
-                          {activity.status === 'active' && '🔄'}
-                          {activity.status === 'won' && '🏆'}
-                          {activity.status === 'lost' && '❌'}
-                          {activity.status === 'saved' && '💾'}
-                          {activity.status === 'joined' && '👥'}
+                        <div className="activity-icon">
+                          <div className={`icon-circle ${activity.status}`}>
+                            {activity.status === 'active' && '🔄'}
+                            {activity.status === 'won' && '✓'}
+                            {activity.status === 'lost' && '✗'}
+                            {activity.status === 'saved' && '💾'}
+                            {activity.status === 'joined' && '👥'}
+                          </div>
                         </div>
                         <div className="activity-content">
-                          <div className="activity-title">
-                            <span className="action">{activity.action}</span>
-                            <span className="item">{activity.item}</span>
-                            {activity.amount && <span className="amount">{activity.amount}</span>}
+                          <div className="activity-title">{activity.action} {activity.item}</div>
+                          <div className="activity-meta">
+                            {activity.amount && <span>{activity.amount}</span>}
+                            <span className="activity-time">{activity.time}</span>
                           </div>
-                          <div className="activity-time">{activity.time}</div>
                         </div>
                       </div>
                     ))}
@@ -637,57 +556,92 @@ const BuyerProfile = () => {
               </div>
             )}
 
-            {/* KYC Section */}
-            {activeSection === 'kyc' && (
-              <div className="kyc-section">
-                <div className="kyc-status-card">
-                  <div className="kyc-status-header">
-                    <div className="status-badge verified">
-                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-                        <path d="M20 6L9 17L4 12" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-                      </svg>
-                      <span>Verified Buyer</span>
+            {activeTab === 'settings' && (
+              <div className="settings-content">
+                <div className="info-section">
+                  <h3 className="section-title">Account Settings</h3>
+                  <div className="settings-grid">
+                    <div className="setting-item">
+                      <div className="setting-info">
+                        <h4>Email Notifications</h4>
+                        <p>Receive email updates about bids and auctions</p>
+                      </div>
+                      <label className="switch">
+                        <input type="checkbox" defaultChecked />
+                        <span className="slider"></span>
+                      </label>
                     </div>
-                    <p className="status-description">
-                      Your identity has been verified. You can participate in all auctions with higher bidding limits.
-                    </p>
-                  </div>
-                  <div className="kyc-details">
-                    <h4>Verification Details</h4>
-                    <div className="details-grid">
-                      <div className="detail-item">
-                        <span className="detail-label">Level</span>
-                        <span className="detail-value">Gold</span>
+                    <div className="setting-item">
+                      <div className="setting-info">
+                        <h4>SMS Notifications</h4>
+                        <p>Get SMS alerts for important updates</p>
                       </div>
-                      <div className="detail-item">
-                        <span className="detail-label">Verified On</span>
-                        <span className="detail-value">Jan 15, 2024</span>
+                      <label className="switch">
+                        <input type="checkbox" />
+                        <span className="slider"></span>
+                      </label>
+                    </div>
+                    <div className="setting-item">
+                      <div className="setting-info">
+                        <h4>Bid Reminders</h4>
+                        <p>Get notified before auctions end</p>
                       </div>
-                      <div className="detail-item">
-                        <span className="detail-label">Bidding Limit</span>
-                        <span className="detail-value">$100,000</span>
-                      </div>
-                      <div className="detail-item">
-                        <span className="detail-label">Documents</span>
-                        <span className="detail-value">3 Uploaded</span>
-                      </div>
+                      <label className="switch">
+                        <input type="checkbox" defaultChecked />
+                        <span className="slider"></span>
+                      </label>
                     </div>
                   </div>
-                  <div className="kyc-actions">
-                    <button className="btn-outline">
+                </div>
+
+                <div className="info-section">
+                  <h3 className="section-title">Preferences</h3>
+                  <div className="preferences-grid">
+                    <div className="preference-item">
+                      <label>Currency</label>
+                      <select className="preference-select">
+                        <option>USD ($)</option>
+                        <option>EUR (€)</option>
+                        <option>GBP (£)</option>
+                      </select>
+                    </div>
+                    <div className="preference-item">
+                      <label>Timezone</label>
+                      <select className="preference-select">
+                        <option>Eastern Time (ET)</option>
+                        <option>Central Time (CT)</option>
+                        <option>Pacific Time (PT)</option>
+                      </select>
+                    </div>
+                    <div className="preference-item">
+                      <label>Language</label>
+                      <select className="preference-select">
+                        <option>English</option>
+                        <option>Spanish</option>
+                        <option>French</option>
+                      </select>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="danger-zone">
+                  <h3 className="section-title">Logout Here</h3>
+                  <button className="danger-btn red" onClick={() => navigate('/signin', {replace: true})}>
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                      <path d="M9 21H5C4.46957 21 3.96086 20.7893 3.58579 20.4142C3.21071 20.0391 3 19.5304 3 19V5C3 4.46957 3.21071 3.96086 3.58579 3.58579C3.96086 3.21071 4.46957 3 5 3H9M16 17L21 12M21 12L16 7M21 12H9" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                    </svg>
+                    Logout
+                  </button>
+                </div>
+
+                <div className="danger-zone">
+                  <h3 className="section-title">Danger Zone</h3>
+                  <div className="danger-actions">
+                    <button className="danger-btn red">
                       <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-                        <path d="M21 15V19C21 19.5304 20.7893 20.0391 20.4142 20.4142C20.0391 20.7893 19.5304 21 19 21H5C4.46957 21 3.96086 20.7893 3.58579 20.4142C3.21071 20.0391 3 19.5304 3 19V15" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-                        <path d="M7 10L12 15L17 10" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-                        <path d="M12 15V3" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                        <path d="M10 11v6M14 11v6M5 7h14M6 7l1-4h10l1 4M8 7v-4h8v4" stroke="currentColor" strokeWidth="2"/>
                       </svg>
-                      Download Documents
-                    </button>
-                    <button className="btn-primary">
-                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-                        <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" stroke="currentColor" strokeWidth="1.5" />
-                        <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-                      </svg>
-                      Update Documents
+                      Delete Account
                     </button>
                   </div>
                 </div>
@@ -695,9 +649,9 @@ const BuyerProfile = () => {
             )}
           </div>
         </div>
-      </main>
+      </div>
     </div>
-  )
-}
+  );
+};
 
-export default BuyerProfile
+export default BuyerProfile;

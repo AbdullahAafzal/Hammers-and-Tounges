@@ -13,7 +13,7 @@
 
 .chart-card {
   background-color: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
   border-radius: 8px;
   padding: 1.5rem;
   display: flex;
@@ -47,6 +47,30 @@
   color: rgba(255, 255, 255, 0.6);
   font-weight: 400;
 }
+.s-secondary-button {
+  padding: 0.625rem 1.25rem;
+  border-radius: 6px;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  border: none;
+  white-space: nowrap;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  color: #000;
+  text-decoration: none;
+  background-color: #8cc63f;
+}
+
+.s-secondary-button:hover {
+  color: #000;
+  background-color: #7BB337;
+  box-shadow: 0 6px 20px rgba(140, 198, 63, 0.3);
+}
+
 
 .chart-container {
   position: relative;
@@ -148,7 +172,7 @@
   align-items: center;
   gap: 1rem;
   padding-top: 1rem;
-  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  border-top: 1px solid rgba(255, 255, 255, 0.2);
 }
 
 .chart-stat {
@@ -272,7 +296,7 @@
   width: 100%;
   border-collapse: collapse;
   background-color: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
   border-radius: 8px;
   overflow: hidden;
 }
@@ -284,7 +308,7 @@
   font-weight: 600;
   color: rgba(255, 255, 255, 0.6);
   background-color: rgba(255, 255, 255, 0.02);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
   text-transform: uppercase;
   letter-spacing: 0.5px;
   white-space: nowrap;
@@ -416,7 +440,7 @@
 
 .insight-card {
   background-color: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
   border-radius: 8px;
   padding: 1.5rem;
   transition: all 0.3s;
@@ -424,7 +448,7 @@
 
 .insight-card:hover {
   transform: translateY(-2px);
-  border-color: rgba(140, 198, 63, 0.3);
+  border-color: #8cc63f;
   box-shadow: 0 8px 24px rgba(140, 198, 63, 0.1);
 }
 

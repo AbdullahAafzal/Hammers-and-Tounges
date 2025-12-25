@@ -73,7 +73,7 @@
 }
 
 .mission-card:hover {
-  border-color: rgba(140, 198, 63, 0.3);
+  border-color: #8CC63F;
   transform: translateY(-2px);
   box-shadow: 0 4px 16px rgba(140, 198, 63, 0.1);
 }
@@ -145,23 +145,27 @@
   border-top: 1px solid rgba(255, 255, 255, 0.08);
 }
 
-.stats-grid {
+.about-stats-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
   gap: 1.5rem;
 }
 
-.stat-card {
+.about-stat-card {
   background-color: rgba(255, 255, 255, 0.02);
-  border: 1px solid rgba(255, 255, 255, 0.2) !important;
+  border: 1px solid rgba(255, 255, 255, 0.2);
   border-radius: 6px;
   padding: 1.5rem;
+  display: flex;
+  align-items: center;
   text-align: center;
   transition: all 0.3s ease-in-out;
+  gap: 1rem;
+  cursor: default;
 }
 
-.stat-card:hover {
-  border-color: rgba(140, 198, 63, 0.3);
+.about-stat-card:hover {
+  border-color: #8CC63F;
   transform: translateY(-2px);
 }
 
@@ -211,7 +215,7 @@
     grid-template-columns: 1fr;
   }
 
-  .stats-grid {
+  .about-stats-grid {
     grid-template-columns: repeat(2, 1fr);
   }
 
@@ -230,7 +234,7 @@
     gap: 0.75rem;
   }
 
-  .stats-grid {
+  .about-stats-grid {
     grid-template-columns: 1fr;
   }
 }

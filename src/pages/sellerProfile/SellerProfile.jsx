@@ -1,7 +1,9 @@
 import React, { useState } from "react";
 import "./SellerProfile.css";
+import { useNavigate } from "react-router-dom";
 
 const SellerProfile = () => {
+  const navigate = useNavigate()
   const [activeTab, setActiveTab] = useState("overview");
   const [isEditing, setIsEditing] = useState(false);
   const [profileData, setProfileData] = useState({
@@ -89,7 +91,7 @@ const SellerProfile = () => {
         </div>
         <div className="header-actions">
           <button 
-            className={`action-btn ${isEditing ? 'secondary' : 'primary'}`}
+            className={`s-action-btn ${isEditing ? 's-secondary' : 's-primary'}`}
             onClick={() => isEditing ? handleSave() : setIsEditing(true)}
           >
             {isEditing ? (
@@ -109,7 +111,7 @@ const SellerProfile = () => {
               </>
             )}
           </button>
-          <button className="action-btn outline">
+          <button className="s-action-btn s-outline">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
               <path d="M3 16v5h5M21 16v5h-5M16 3v5h5M8 3v5H3" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
               <path d="M16 8h5l-5-5v5zM8 8H3l5-5v5zM8 16H3l5 5v-5zM16 16h5l-5 5v-5z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
@@ -131,7 +133,7 @@ const SellerProfile = () => {
                   />
                   <div className="status-indicator"></div>
                 </div>
-                <button className="avatar-upload">
+                <button className="b-avatar-upload">
                   <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
                     <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" stroke="currentColor" strokeWidth="2"/>
                     <polyline points="17 8 12 3 7 8" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
@@ -343,7 +345,6 @@ const SellerProfile = () => {
                   </div>
                 </div>
 
-                {/* Recent Activity */}
                 <div className="info-section">
                   <h3 className="section-title">
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
@@ -713,6 +714,17 @@ const SellerProfile = () => {
                   </div>
                 </div>
 
+                <div className="danger-zone">
+                                    <h3 className="section-title">Logout Here</h3>
+
+                    <button className="danger-btn red" onClick={()=> navigate('/signin', {replace: true})}>
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                        <path d="M3 6h18M5 6l1 13a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2l1-13M10 11v6M14 11v6" stroke="currentColor" strokeWidth="2"/>
+                      </svg>
+                      Logout
+                    </button>
+                  {/* </div> */}
+                </div>
                 <div className="danger-zone">
                   <h3 className="section-title">Danger Zone</h3>
                   <div className="danger-actions">

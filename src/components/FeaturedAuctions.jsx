@@ -26,8 +26,8 @@ const FeaturedAuctions = ({ selectedCategory }) => {
     const calculateItemsPerRow = () => {
       if (typeof window !== 'undefined') {
         const width = window.innerWidth
-        if (width >= 1400) return 9
-        if (width >= 1024) return 9
+        if (width >= 1400) return 8
+        if (width >= 1024) return 8
         if (width >= 768) return 6
         return 1
       }

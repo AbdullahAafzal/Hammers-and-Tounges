@@ -144,8 +144,10 @@ const Register = () => {
       state: {
         email: formData.email,
         userType: formData.role
-      }
-    })
+      },
+    },
+      { replace: true }
+    )
   }
 
   return (
@@ -155,17 +157,15 @@ const Register = () => {
           <button
             type="button"
             className="back-button"
-            onClick={() => navigate(-1)}
+            onClick={() => navigate('/', { replace: true })}
             aria-label="Go back"
           >
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
               <path d="M19 12H5M12 19L5 12L12 5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
             </svg>
+            Back to Home
           </button>
-          <Link to="/" className="register-logo">
-            <img src={logo} alt="Hammer & Tongues Logo" />
-            <span>Hammer & Tongues</span>
-          </Link>
+
         </div>
         <div className="register-header-link">
           <span>Already have an account?</span>
@@ -380,12 +380,12 @@ const Register = () => {
                           <>
                             <path d="M1 12S5 4 12 4S23 12 23 12S19 20 12 20S1 12 1 12Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                             <circle cx="12" cy="12" r="3" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                            <path d="M1 1L23 23" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                           </>
                         ) : (
                           <>
                             <path d="M1 12S5 4 12 4S23 12 23 12S19 20 12 20S1 12 1 12Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                             <circle cx="12" cy="12" r="3" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                            <path d="M1 1L23 23" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                           </>
                         )}
                       </svg>
@@ -425,12 +425,12 @@ const Register = () => {
                           <>
                             <path d="M1 12S5 4 12 4S23 12 23 12S19 20 12 20S1 12 1 12Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                             <circle cx="12" cy="12" r="3" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                            <path d="M1 1L23 23" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                           </>
                         ) : (
                           <>
                             <path d="M1 12S5 4 12 4S23 12 23 12S19 20 12 20S1 12 1 12Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                             <circle cx="12" cy="12" r="3" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                            <path d="M1 1L23 23" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                           </>
                         )}
                       </svg>
@@ -444,14 +444,14 @@ const Register = () => {
             </div>
 
             <div className="register-form-section">
-              <div className="form-group">
+              <div className="form-group ">
                 <label className="checkbox-label terms">
                   <input type="checkbox" required />
                   <span>
                     I agree to the{' '}
-                    <Link to="/terms" className="terms-link">Terms of Service</Link>{' '}
+                    <Link className="terms-link">Terms of Service</Link>{' '}
                     and{' '}
-                    <Link to="/privacy" className="terms-link">Privacy Policy</Link>
+                    <Link className="terms-link">Privacy Policy</Link>
                   </span>
                 </label>
               </div>

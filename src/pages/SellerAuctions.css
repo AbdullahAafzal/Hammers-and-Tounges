@@ -73,12 +73,6 @@
   color: #ffffff;
 }
 
-.primary-button:hover {
-  background-color: #2563EB;
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
-}
-
 .primary-button.large {
   padding: 0.875rem 1.5rem;
   font-size: 0.875rem;
@@ -355,14 +349,16 @@
   gap: 0.75rem;
 }
 
-.primary-button.small {
-  padding: 0.5rem 1rem;
+.primary-button.smalll {
+  padding: 0.5rem 1.25rem;
   font-size: 0.75rem;
-  background-color: #8CC63F !important;
-  color: #000000;
+  background-color: #000;
+  color: white;
+  border: 1px solid rgba(255, 255, 255, 0.2);
 }
-.primary-button.small {
-  background-color: #7bb;
+.primary-button.smalll:hover {
+  background-color: #8CC63F !important;
+  color: #000;
 }
 
 .auction-actions {

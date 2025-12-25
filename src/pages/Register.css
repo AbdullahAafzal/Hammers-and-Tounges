@@ -24,8 +24,7 @@
 }
 
 .back-button {
-  background: none;
-  border: none;
+  background: transparent;
   color: rgba(255, 255, 255, 0.7);
   cursor: pointer;
   padding: 0.5rem;
@@ -37,7 +36,7 @@
 }
 
 .back-button:hover {
-  background-color: rgba(255, 255, 255, 0.05);
+  background-color: #8CC63F;
   color: #8CC63F;
 }
 
@@ -85,7 +84,7 @@
 }
 
 .header-link-button:hover {
-  color: #35B24A;
+  color: #7BB337;
   text-decoration: underline;
 }
 
@@ -160,7 +159,8 @@
   font-size: 1.75rem;
   font-weight: 700;
   color: #ffffff;
-  margin-bottom: 1.5rem;
+  padding: 1rem 0;
+  margin-bottom: 2rem ;
   letter-spacing: -0.3px;
   text-align: center;
 }
@@ -247,6 +247,9 @@
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
+}
+.r-form-group {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.02) !important;
 }
 
 
@@ -426,7 +429,7 @@
 }
 
 .terms-link:hover {
-  color: #35B24A;
+  color: #7BB337;
   text-decoration: underline;
 }
 
@@ -443,7 +446,7 @@
   border: none;
   padding: 0.7rem 1.5rem;
   border-radius: 8px;
-  font-size: 1rem;
+  font-size: 0.9rem;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.3s ease;
@@ -617,11 +620,13 @@
   }
 
   .register-container {
+    width: 100%;
     padding: 1.25rem;
   }
 
   .register-image-section {
     height: 250px;
+    margin-top: 1rem;
   }
 
   .register-image-title {
@@ -639,6 +644,7 @@
   .register-title {
     font-size: 1.5rem;
   }
+
 
   .user-type-tabs {
     flex-direction: column;
@@ -683,10 +689,11 @@
   .country-code {
     font-size: 0.875rem;
   }
-
-  .submit-button {
-    width: 100%;
+  .button-container {
+    width: 50%;
+    margin: auto;
   }
+
 
   .spinner {
     width: 16px;
@@ -709,7 +716,7 @@
   }
 
   .register-container {
-    padding: 1rem;
+    padding: 0.7rem;
   }
 
   .register-image-section {
@@ -740,6 +747,9 @@
   .form-input {
     padding: 0.625rem 0.875rem;
     font-size: 0.875rem;
+  }
+  .button-container {
+    width: 100%;
   }
 
   .submit-button {

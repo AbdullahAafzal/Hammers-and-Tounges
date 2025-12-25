@@ -23,7 +23,7 @@
   gap: 1.5rem;
   margin-bottom: 1.5rem;
   padding-bottom: 1.5rem;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
 }
 
 .page-title-section {
@@ -63,7 +63,7 @@
 
 .form-section {
   background-color: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
   border-radius: 8px;
   padding: 1.5rem;
 }
@@ -112,7 +112,7 @@
 .form-textarea {
   padding: 0.75rem;
   background-color: #000000 !important;
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
   border-radius: 4px;
   color: #ffffff;
   font-size: 0.8125rem;
@@ -185,7 +185,7 @@
   gap: 0.75rem;
   padding: 3rem 2rem;
   background-color: rgba(255, 255, 255, 0.02);
-  border: 2px dashed rgba(255, 255, 255, 0.1);
+  border: 2px dashed rgba(255, 255, 255, 0.2);
   border-radius: 8px;
   color: rgba(255, 255, 255, 0.6);
   cursor: pointer;
@@ -277,7 +277,7 @@
 .condition-button {
   padding: 0.5rem 1rem;
   background-color: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
   border-radius: 4px;
   color: rgba(255, 255, 255, 0.7);
   font-size: 0.8125rem;
@@ -322,7 +322,7 @@
   transition: all 0.2s;
 }
 
-.checkbox-input:checked + .checkbox-custom {
+.checkbox-input:checked+.checkbox-custom {
   background-color: #8CC63F;
   border-color: #7BB337;
 }
@@ -339,7 +339,7 @@
   align-items: center;
   gap: 1rem;
   padding-top: 1.5rem;
-  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  border-top: 1px solid rgba(255, 255, 255, 0.2);
 }
 
 .form-actions-right {
@@ -350,7 +350,7 @@
 
 
 .s-primary-button,
-.s-secondary-button {
+.sp-secondary-button {
   padding: 0.625rem 1.25rem;
   border-radius: 6px;
   font-size: 0.8125rem;
@@ -367,22 +367,22 @@
 }
 
 .s-primary-button {
-  background-color: #8CC63F ;
+  background-color: #8CC63F;
   color: #000;
 }
 
 .s-primary-button:hover {
-  background-color: #7BB337 ;
-  box-shadow: 0 6px 20px rgba(140, 198, 63, 0.3) ;
+  background-color: #7BB337;
+  box-shadow: 0 6px 20px rgba(140, 198, 63, 0.3);
 }
 
-.s-secondary-button {
+.sp-secondary-button {
   background-color: #000;
   color: #ffffff;
   border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
-.s-secondary-button:hover {
+.sp-secondary-button:hover {
   color: #8CC63F;
   border-color: #8CC63F;
 }

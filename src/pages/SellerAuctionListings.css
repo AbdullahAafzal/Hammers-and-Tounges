@@ -136,6 +136,7 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
+  flex-wrap: wrap;
   gap: 1rem;
   margin-bottom: 1.5rem;
   padding: 1rem;
@@ -166,6 +167,7 @@
 
 .filter-buttons {
   display: flex;
+  flex-wrap: wrap;
   gap: 0.5rem;
 }
 
@@ -265,7 +267,7 @@
   justify-content: center;
   gap: 0.5rem;
   text-decoration: none;
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.2) !important;
 }
 
 .s-primary-button.small {
@@ -318,7 +320,7 @@
 .link-button {
   background: none;
   border: none;
-  color: #3B82F6;
+  color: #8CC63F;
   font-size: 0.75rem;
   font-weight: 500;
   cursor: pointer;
@@ -327,9 +329,6 @@
   transition: color 0.2s;
 }
 
-.link-button:hover {
-  color: #2563EB;
-}
 
 .s-status-badge {
   padding: 0.25rem 0.5rem;
@@ -353,6 +352,8 @@
   border-radius: 12px;
   overflow: hidden;
   transition: all 0.3s;
+  display: flex;
+  justify-content: space-between;
 }
 
 .listing-card-header {
@@ -381,6 +382,13 @@
   position: absolute;
   top: 0.75rem;
   right: 0.75rem;
+}
+.parent-container {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  margin: 0;
 }
 
 .listing-card-body {
