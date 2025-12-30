@@ -165,7 +165,7 @@ export default function LiveAuctionsTab() {
                   <th>User</th>
                   <th>Bid Amount</th>
                   <th>Time Stamp</th>
-                  <th>Status</th>
+                  {/* <th>Status</th> */}
                 </tr>
               </thead>
 
@@ -175,7 +175,7 @@ export default function LiveAuctionsTab() {
                     <tr
                       key={item.id}
                       className="live-auction-table-row"
-                      onClick={() => navigate("/AdminAuctionResults")}
+                      onClick={() => navigate("/admin/auction-results")}
                     >
 
                       <td>
@@ -194,7 +194,7 @@ export default function LiveAuctionsTab() {
                         <span className="live-auction-time">{item.time}</span>
                       </td>
 
-                      <td>
+                      {/* <td>
                         <div className="live-auction-status-cell">
                           <span className={`live-auction-status-badge ${
                             item.status === "Winning" ? "badge-winning" :
@@ -204,7 +204,7 @@ export default function LiveAuctionsTab() {
                             {item.status}
                           </span>
                         </div>
-                      </td>
+                      </td> */}
                     </tr>
                   ))
                 ) : (

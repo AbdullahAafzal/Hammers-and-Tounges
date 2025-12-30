@@ -1,6 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import { useNavigate } from "react-router-dom";
-import "./AdminPanel.css";
+import "./SuperAdminDashboard.css";
 
 const sampleData = [
   { id: "VH-24351", category: "Vehicle", seller: "Johnathan Doe", status: "Pending Inspection", officer: "Walter White", date: "2025-12-01" },
@@ -12,12 +12,12 @@ const sampleData = [
   { id: "VH-55555", category: "Vehicle", seller: "Hank Schrader", status: "Rejected", officer: "Walter White", date: "2025-12-05" }
 ];
 
-function AdminPanel() {
+function SuperAdminDashboard() {
 
   const navigate = useNavigate();
 
   const handleAction = (status) => {
-    if (status === "Pending Inspection" || status === "In Progress") {
+    if (status === "Pending Inspection") {
       navigate("/admin/inspection",
         {
           state: {
@@ -95,10 +95,10 @@ function AdminPanel() {
 
   const ActionButton = ({ status }) => {
     if (status === "Pending Inspection")
-      return <button className="view-btn" onClick={() => handleAction(status)}>Start Inspection</button>;
+      return <button className="super-admin-view-btn" onClick={() => handleAction(status)}>Start Inspection</button>;
 
     if (status === "Rejected")
-      return <button className="view-btn view-danger-btn" onClick={() => handleAction(status)}>View Report</button>;
+      return <button className="super-admin-view-btn view-danger-btn" onClick={() => handleAction(status)}>View Report</button>;
 
     return <span className="text-gray-500">—</span>;
   }
@@ -118,20 +118,20 @@ function AdminPanel() {
 
   return (
     <>
-      <div className="admin-wrapper">
-        <div className="admin-container">
+      <div className="super-admin-wrapper">
+        <div className="super-admin-container">
 
-          <div className="admin-section-header">
-            <div className="admin-header-content">
-              <h1 className="admin-page-title">Inspection Queue</h1>
-              <p className="admin-page-subtitle">Manage and track all items pending inspections</p>
+          <div className="super-admin-section-header">
+            <div className="super-admin-header-content">
+              <h1 className="super-admin-page-title">Inspection Queue</h1>
+              <p className="super-admin-page-subtitle">Manage and track all items pending inspections</p>
             </div>
           </div>
 
-          <div className="admin-filter-section">
-            <div className="admin-search-container">
-              <div className="admin-search-input-wrapper">
-                <button className='admin-search-btn'>
+          <div className="super-admin-filter-section">
+            <div className="super-admin-search-container">
+              <div className="super-admin-search-input-wrapper">
+                <button className='super-admin-search-btn'>
                   <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
                     <circle cx="11" cy="11" r="8" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
                     <path d="M21 21L16.65 16.65" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
@@ -143,11 +143,11 @@ function AdminPanel() {
                   placeholder="Search by Item ID or Seller..."
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
-                  className="admin-search-input"
+                  className="super-admin-search-input"
                 />
                 {search && (
                   <button
-                    className="admin-clear-search"
+                    className="super-admin-clear-search"
                     onClick={() => setSearch('')}
                     aria-label="Clear search"
                   >
@@ -159,7 +159,7 @@ function AdminPanel() {
               </div>
             </div>
 
-            <select className="admin-filter-select" value={category} onChange={(e) => setCategory(e.target.value)}>
+            <select className="super-admin-filter-select" value={category} onChange={(e) => setCategory(e.target.value)}>
               <option value="All">All Categories</option>
               <option value="Vehicle">Vehicle</option>
               <option value="Electronics">Electronics</option>
@@ -168,25 +168,25 @@ function AdminPanel() {
               <option value="Home Goods">Home Goods</option>
             </select>
 
-            <select className="admin-filter-select" value={status} onChange={(e) => setStatus(e.target.value)}>
+            <select className="super-admin-filter-select" value={status} onChange={(e) => setStatus(e.target.value)}>
               <option value="All">All Status</option>
               <option value="Pending Inspection">Pending Inspection</option>
               <option value="In Progress">In Progress</option>
               <option value="Completed">Completed</option>
             </select>
 
-            <button onClick={applyFilters} className="admin-apply-btn">Apply</button>
+            <button onClick={applyFilters} className="super-admin-apply-btn">Apply</button>
 
-            <button onClick={() => { setSearch(''); setCategory("All"); setStatus("All"); applyFilters(); }} className="admin-clear-btn">
+            <button onClick={() => { setSearch(''); setCategory("All"); setStatus("All"); applyFilters(); }} className="super-admin-clear-btn">
               Clear
             </button>
           </div>
 
-          <div className="admin-data-table-section">
-            <div className="admin-table-wrapper">
-              <table className="admin-data-table">
+          <div className="super-admin-data-table-section">
+            <div className="super-admin-table-wrapper">
+              <table className="super-admin-data-table">
                 <thead>
-                  <tr className='admin-row-headings'>
+                  <tr className='super-admin-row-headings'>
                     <th>Item ID</th>
                     <th>Item Category</th>
                     <th>Seller</th>
@@ -201,33 +201,31 @@ function AdminPanel() {
                     paginatedData.map((item, index) => (
                       <tr
                         key={item.id}
-                        className={`admin-table-row ${selectedRow === item.id ? "row-selected" : ""}`}
+                        className={`super-admin-table-row ${selectedRow === item.id ? "row-selected" : ""}`}
                         onClick={() => {
                           setSelectedRow(item.id)
                         }
                         }
-
                       >
                         <td>
-                          <span className="admin-item-id">{item.id}</span>
+                          <span className="super-admin-item-id">{item.id}</span>
                         </td>
-
                         <td>
-                          <div className="admin-category-info">
-                            <div className="admin-category-icon-cell">
-                              <span className="admin-category-icon-emoji">{getCategoryIcon(item.category)}</span>
+                          <div className="super-admin-category-info">
+                            <div className="super-admin-category-icon-cell">
+                              <span className="super-admin-category-icon-emoji">{getCategoryIcon(item.category)}</span>
                             </div>
-                            <span className="admin-category-name">{item.category}</span>
+                            <span className="super-admin-category-name">{item.category}</span>
                           </div>
                         </td>
 
                         <td>
-                          <span className="admin-seller-name">{item.seller}</span>
+                          <span className="super-admin-seller-name">{item.seller}</span>
                         </td>
 
                         <td>
-                          <div className="admin-status-cell">
-                            <span className={`admin-status-badge ${item.status === "Pending Inspection" ? "badge-pending" :
+                          <div className="super-admin-status-cell">
+                            <span className={`super-admin-status-badge ${item.status === "Pending Inspection" ? "badge-pending" :
                                 item.status === "Rejected" ? "badge-inprogress" : ""
                               }`}>
                               {item.status}
@@ -236,11 +234,11 @@ function AdminPanel() {
                         </td>
 
                         <td>
-                          <span className="admin-officer-name">{item.officer}</span>
+                          <span className="super-admin-officer-name">{item.officer}</span>
                         </td>
 
                         <td>
-                          <div className="admin-action-buttons">
+                          <div className="super-admin-action-buttons">
                             <ActionButton status={item.status} />
                           </div>
                         </td>
@@ -249,8 +247,8 @@ function AdminPanel() {
                   ) : (
                     <tr>
                       <td colSpan="7">
-                        <div className="admin-empty-state">
-                          <div className="admin-empty-icon">
+                        <div className="super-admin-empty-state">
+                          <div className="super-admin-empty-icon">
                             <svg width="48" height="48" viewBox="0 0 24 24" fill="none">
                               <path d="M12 2L2 7L12 12L22 7L12 2Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                               <path d="M2 17L12 22L22 17" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
@@ -269,9 +267,9 @@ function AdminPanel() {
 
             {/* PAGINATION */}
             {filtered.length > itemsPerPage && (
-              <div className="admin-pagination">
+              <div className="super-admin-pagination">
                 <button
-                  className="admin-pagination-btn admin-prev-btn"
+                  className="super-admin-pagination-btn super-admin-prev-btn"
                   onClick={() => setCurrentPage(currentPage - 1)}
                   disabled={currentPage === 1}
                 >
@@ -281,14 +279,14 @@ function AdminPanel() {
                   Previous
                 </button>
 
-                <div className="admin-page-numbers">
+                <div className="super-admin-page-numbers">
                   {generatePageNumbers().map((page, index) => (
                     page === '...' ? (
-                      <span key={`dots-${index}`} className="admin-page-dots">...</span>
+                      <span key={`dots-${index}`} className="super-admin-page-dots">...</span>
                     ) : (
                       <button
                         key={page}
-                        className={`admin-page-number ${currentPage === page ? 'active' : ''}`}
+                        className={`super-admin-page-number ${currentPage === page ? 'active' : ''}`}
                         onClick={() => setCurrentPage(page)}
                       >
                         {page}
@@ -298,7 +296,7 @@ function AdminPanel() {
                 </div>
 
                 <button
-                  className="admin-pagination-btn admin-next-btn"
+                  className="super-admin-pagination-btn super-admin-next-btn"
                   onClick={() => setCurrentPage(currentPage + 1)}
                   disabled={currentPage === totalPages}
                 >
@@ -317,4 +315,4 @@ function AdminPanel() {
   )
 }
 
-export default AdminPanel;
+export default SuperAdminDashboard;

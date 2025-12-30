@@ -105,7 +105,6 @@ const ManualPaymentAuthorization = () => {
     }
   };
 
-  // Clear all filters
   const clearFilters = () => {
     setSearchQuery("");
     setStatusFilter("");
@@ -114,7 +113,6 @@ const ManualPaymentAuthorization = () => {
     setCurrentPage(1);
   };
 
-  // Get status badge class
   const getStatusClass = (status) => {
     switch (status.toLowerCase()) {
       case "approved":

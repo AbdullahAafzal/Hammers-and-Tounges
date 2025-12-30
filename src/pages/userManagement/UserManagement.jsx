@@ -3,12 +3,12 @@ import { useNavigate } from "react-router-dom";
 import "./UserManagement.css";
 
 const USERS = [
-  { name: "John Doe", email: "john.doe@example.com", role: "Administrator", status: "Active", lastLogin: "2024-05-20 10:30 AM" },
-  { name: "Jane Smith", email: "jane.smith@example.com", role: "Auctioneer", status: "Active", lastLogin: "2024-05-19 03:45 PM" },
+  { name: "John Doe", email: "john.doe@example.com", role: "Standard User", status: "Active", lastLogin: "2024-05-20 10:30 AM" },
+  { name: "Jane Smith", email: "jane.smith@example.com", role: "Standard User", status: "Active", lastLogin: "2024-05-19 03:45 PM" },
   { name: "Robert Brown", email: "robert.brown@example.com", role: "Standard User", status: "Suspended", lastLogin: "2024-04-30 11:00 AM" },
   { name: "Emily White", email: "emily.white@example.com", role: "Standard User", status: "Inactive", lastLogin: "2023-12-01 08:15 PM" },
-  { name: "Alex Green", email: "alex.green@example.com", role: "Auctioneer", status: "Active", lastLogin: "2024-05-21 01:10 PM" },
-  { name: "Sarah Lee", email: "sarah.lee@example.com", role: "Administrator", status: "Active", lastLogin: "2024-05-18 09:05 AM" },
+  { name: "Alex Green", email: "alex.green@example.com", role: "Standard User", status: "Active", lastLogin: "2024-05-21 01:10 PM" },
+  { name: "Sarah Lee", email: "sarah.lee@example.com", role: "Standard User", status: "Active", lastLogin: "2024-05-18 09:05 AM" },
 ];
 
 const ROWS_PER_PAGE = 5;
@@ -108,45 +108,40 @@ const UserManagement = () => {
               <tr key={i}>
                 <td
                   className="name-cell2"
-                  style={{ cursor: "pointer" }}
-                  onClick={() => navigate("/kycverification")}
+                  onClick={() => navigate("/manager/kycverification")}
                 >
                   {user.name}
                 </td>
                 <td
-                  style={{ cursor: "pointer" }}
-                  onClick={() => navigate("/kycverification")}
+                  onClick={() => navigate("/manager/kycverification")}
                 >
                   {user.email}
                 </td>
                 <td
-                  style={{ cursor: "pointer" }}
-                  onClick={() => navigate("/kycverification")}
+                  onClick={() => navigate("/manager/kycverification")}
                 >
                   {user.role}
                 </td>
                 <td
-                  style={{ cursor: "pointer" }}
-                  onClick={() => navigate("/kycverification")}
+                className="status-data"
+                  onClick={() => navigate("/manager/kycverification")}
                 >
-                  <span className={`status ${user.status.toLowerCase()}`}>
+                  <span className={`user-status ${user.status.toLowerCase()}`}>
                     {user.status}
                   </span>
                 </td>
                 <td
-                  style={{ cursor: "pointer" }}
-                  onClick={() => navigate("/kycverification")}
+                  onClick={() => navigate("/manager/kycverification")}
                 >
                   {user.lastLogin}
                 </td>
 
-                <td className="actions2">•••</td>
+                <td className="actions2" onClick={() => navigate("/manager/kycverification")}>•••</td>
               </tr>
             ))}
           </tbody>
         </table>
 
-        {/* Updated Pagination */}
         {filteredUsers.length > 0 && (
           <div className="table-pagination">
             <div className="pagination-info">

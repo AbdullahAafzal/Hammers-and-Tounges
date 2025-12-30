@@ -63,7 +63,6 @@ body {
   gap: 1rem;
   align-items: center;
   margin-bottom: 1.5rem;
-  padding: 0 1.5rem;
 }
 
 .reports-search-container {
@@ -206,7 +205,6 @@ body {
   border-color: rgba(255, 255, 255, 0.3);
 }
 
-/* TABLE SECTION */
 .reports-data-table-section {
   background-color: rgba(255, 255, 255, 0.03);
   border: 1px solid rgba(255, 255, 255, 0.1);
@@ -432,7 +430,6 @@ body {
   margin: 0;
 }
 
-/* PAGINATION */
 .reports-pagination {
   display: flex;
   justify-content: center;

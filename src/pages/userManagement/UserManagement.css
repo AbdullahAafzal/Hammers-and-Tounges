@@ -132,7 +132,7 @@ p {
   background: #000;
   border-radius: 12px;
   overflow-x: auto;
-  border: 1px solid #222;
+  border: 6px solid #222;
 }
 
 table {
@@ -140,22 +140,23 @@ table {
   border-collapse: collapse;
 }
 
-thead th {
-  text-align: left;
+.table-container2 thead th {
+  text-align: center;
   padding: 14px 16px;
-  font-size: 15px;
-  color: #fff;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.6) !important;
   background: #161616;
   text-transform: uppercase;
-  font-weight: 600;
   letter-spacing: 0.7px;
   border-bottom: 1px solid #222;
 }
 
 tbody td {
-  padding: 16px 14px;
   font-size: 14px;
   border-bottom: 1px solid #222;
+  text-align: center;
+  cursor: pointer;  
 }
 
 tbody tr:hover {
@@ -166,8 +167,10 @@ tbody tr:hover {
 .name-cell2 {
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: 12px;
 }
+
 
 .avatar2 {
   width: 32px;
@@ -181,31 +184,34 @@ tbody tr:hover {
   font-weight: 600;
 }
 
-.status {
-  display: inline-block;
+.user-status {
   font-size: 12px;
   font-weight: 700;
   text-align: center;
   border-radius: 20px;
-  padding: 6px 12px;
+  /* padding: 0.5rem 1.5rem; */
   border: 1px solid transparent;
-  width: 50%;
-  justify-content: center;
 }
 
-.status.active {
+.user-status.active {
   background-color: #1987541e;
-  color: #04ff8a;
-  border-color: #00ff885c;
+  color: #8CC63F !important;
+  border-color: #8CC63F !important;
 }
 
-.status.suspended {
+.user-status.suspended {
   background-color: #ffc1072b;
   color: #ffc107;
   border-color: #ffc10753;
 }
+.user-status.suspended {
+  margin: 0;
+  top: 0;
+  left: 0;
+  text-align: center;
+}
 
-.status.inactive {
+.user-status.inactive {
   background-color: #dc35462d;
   color: #f9011a;
   border-color: #dc354651;
@@ -310,7 +316,7 @@ tbody tr:hover {
   cursor: pointer;
 }
 
-.status {
+.user-status {
   display: inline-block;
   font-size: 12px;
   font-weight: 700;
@@ -321,19 +327,19 @@ tbody tr:hover {
   width: 50%;
 }
 
-.status.active {
+.user-status.active {
   background-color: #1987541e;
   color: #04ff8a;
   border-color: #00ff885c;
 }
 
-.status.suspended {
+.user-status.suspended {
   background-color: #ffc1072b;
   color: #ffc107;
   border-color: #ffc10753;
 }
 
-.status.inactive {
+.user-status.inactive {
   background-color: #dc35462d;
   color: #f9011a;
   border-color: #dc354651;

@@ -49,6 +49,7 @@ import ManageProductFields from './pages/manageProductFields/ManageProductFields
 import BuyerHeader from './components/BuyerHeader'
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import SuperAdminDashboard from './pages/adminDashboard/SuperAdminDashboard'
 // import { Provider } from 'react-redux'
 // import store from './store/store';
 
@@ -62,15 +63,95 @@ function App() {
         <Routes>
           <Route path="/signin" element={<SignIn />} />
           <Route path="/register" element={<Register />} />
-          <Route path="/otp-verification" element={<OTPVerification />} />
           <Route path="/kyc-verification" element={<KYCVerification />} />
+          <Route path="/otp-verification" element={<OTPVerification />} />
+
+
+          {/* Guest Flow */}
+          <Route path="/" element={
+            <>
+              <Header />
+              <Home />
+              <Footer />
+            </>
+          } />
+          <Route path="/auctions" element={
+            <>
+              <Header />
+              <Auctions />
+              <Footer />
+            </>
+          } />
+          <Route path="/auction/:id" element={
+            <>
+              <Header />
+              <AuctionDetails />
+              <Footer />
+            </>
+          } />
+          <Route path="/about" element={
+            <>
+              <Header />
+              <About />
+              <Footer />
+            </>
+          } />
+          <Route path="/contact" element={
+            <>
+              <Header />
+              <Contact />
+              <Footer />
+            </>
+          } />
+          {/* /////////// Guest Flow End  ////////// */}
+
+          {/* Buyer Dashboard Start */}
           <Route path="/dashboard" element={
             <>
               <BuyerHeader />
               <Dashboard />
             </>
           } />
+          <Route path="/buyer/auctions" element={
+            <>
+              <BuyerHeader />
+              <BuyerAuctions />
+            </>
+          } />
+          <Route path="/buyer/auction/:id" element={
+            <BuyerAuctionDetails />
+          } />
+          <Route path="/my-bids" element={
+            <>
+              <BuyerHeader />
+              <MyBids />
+            </>
+          } />
+          <Route path="/won-items" element={
+            <>
+              <BuyerHeader />
+              <WonItems />
+            </>
+          } />
 
+          <Route path="/invoices" element={<Invoices />} />
+          <Route path="/invoice/:invoiceNumber" element={<Invoices />} />
+          <Route path="/wallet" element={
+            <>
+              <BuyerHeader />
+              <Wallet />
+            </>
+          } />
+
+          <Route path="/profile" element={
+            <>
+              <BuyerHeader />
+              <Profile />
+            </>
+          } />
+          {/* ///// Buyer Dashboard End ////// */}
+
+          {/* ///// Seller Dashboard Start ////// */}
           <Route path="/seller-dashboard" element={
             <>
               <SellerHeader />
@@ -110,63 +191,41 @@ function App() {
               <SellerAnalytics />
             </>
           } />
-          <Route path="/buyer/auction/:id" element={
-            <BuyerAuctionDetails />
+          <Route path="/seller/profile" element={
+            <>
+              <SellerHeader />
+              <SellerProfile />
+            </>
           } />
+          {/* ////////////// Seller Dashboard End ///////////////// */}
 
-          <Route path="/buyer/auctions" element={
-            <>
-              <BuyerHeader />
-              <BuyerAuctions />
-            </>
-          } />
-          <Route path="/my-bids" element={
-            <>
-              <BuyerHeader />
-              <MyBids />
-            </>
-          } />
-          <Route path="/won-items" element={
-            <>
-              <BuyerHeader />
-              <WonItems />
-            </>
-          } />
 
-          <Route path="/invoices" element={<Invoices />} />
-          <Route path="/invoice/:invoiceNumber" element={<Invoices />} />
-          <Route path="/wallet" element={
+          {/* ////////////// Admin Dashboard Start ///////////////// */}
+          <Route path="/manager-panel" element={
             <>
-              <BuyerHeader />
-              <Wallet />
+              <AdminHeader />
+              <AdminPanel />
             </>
           } />
-
-          <Route path="/profile" element={
-            <>
-              <BuyerHeader />
-              <Profile />
-            </>
-          } />
-          <Route path="/kycverification" element={
+          <Route path="/manager/kycverification" element={
             <>
               <AdminHeader />
               <AdminKYC />
             </>
           } />
-          <Route path="/reports" element={
+          <Route path="/admin/reports" element={
             <>
               <AdminHeader />
               <Reports />
             </>
           } />
-          <Route path="/livetab" element={
+          <Route path="/admin/livetab" element={
             <>
               <AdminHeader />
               <LiveAuctionsTab />
             </>
           } />
-          <Route path="/finance" element={
+          <Route path="/admin/finance" element={
             <>
               <AdminHeader />
               <Finance />
@@ -178,55 +237,45 @@ function App() {
               <ManualPaymentEntry />
             </>
           } />
-          <Route path="/seller/profile" element={
-            <>
-              <SellerHeader />
-              <SellerProfile />
-            </>
-          } />
-          <Route path="/finance/manual/payments-authorization" element={
+
+          <Route path="/admin/finance/manual/payments-authorization" element={
             <>
               <AdminHeader />
               <ManualPaymentAuthorization />
             </>
           } />
-          <Route path="/finance/manual/payments-verification" element={
+          <Route path="/admin/finance/manual/payments-verification" element={
             <>
               <AdminHeader />
               <PaymentVerification />
             </>
           } />
-          <Route path="/AdminAuctionResults" element={
+          <Route path="/admin/auction-results" element={
             <>
               <AdminHeader />
               <AdminAuctionResults />
             </>
           } />
-          <Route path="/controlpanel" element={
+          <Route path="/admin/controlpanel" element={
             <>
               <AdminHeader />
               <AuctionControlPanel />
             </>
           } />
-          <Route path="/auctiontab" element={
+          <Route path="/admin/auctiontab" element={
             <>
               <AdminHeader />
               <AuctionAdminPanel />
             </>
           } />
-          <Route path="/admin-panel" element={
-            <>
-              <AdminHeader />
-              <AdminPanel />
-            </>
-          } />
-          <Route path="/publishnew" element={
+
+          <Route path="/admin/publishnew" element={
             <>
               <AdminHeader />
               <AdminPublishNew />
             </>
           } />
-          <Route path="/inspection" element={
+          <Route path="/admin/inspection" element={
             <>
               <AdminHeader />
               <InspectionAdmin />
@@ -255,43 +304,19 @@ function App() {
               <AdminHeader />
               <UserManagement />
             </>
+
+          } />
+          {/* // ///////////////////////// Admin Dashboard End  /////////////////////////////////////////////////// */}
+
+          {/* //////////////////////  Super Admin Working Start   ///////////////////////////// */}
+          <Route path='/super-admin' element={
+            <>
+              <AdminHeader />
+              <SuperAdminDashboard />
+            </>
           } />
 
-          <Route path="/auction/:id" element={
-            <>
-              <Header />
-              <AuctionDetails />
-              <Footer />
-            </>
-          } />
-          <Route path="/" element={
-            <>
-              <Header />
-              <Home />
-              <Footer />
-            </>
-          } />
-          <Route path="/auctions" element={
-            <>
-              <Header />
-              <Auctions />
-              <Footer />
-            </>
-          } />
-          <Route path="/about" element={
-            <>
-              <Header />
-              <About />
-              <Footer />
-            </>
-          } />
-          <Route path="/contact" element={
-            <>
-              <Header />
-              <Contact />
-              <Footer />
-            </>
-          } />
+
         </Routes>
         <ToastContainer
           position="top-right"

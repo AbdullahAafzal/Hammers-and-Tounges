@@ -1,105 +1,4 @@
-// import React, { useState, useEffect, useRef } from "react"
-// import { Link, useLocation } from "react-router-dom"
-// import logo from "../assets/logo.png"
-// import "./AdminHeader.css"
-
-// function AdminHeader() {
-//   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
-//   const location = useLocation()
-//   const menuRef = useRef(null)
-
-//   useEffect(() => {
-//     const handleClickOutside = (e) => {
-//       if (menuRef.current && !menuRef.current.contains(e.target)) {
-//         setMobileMenuOpen(false)
-//       }
-//     }
-
-//     if (mobileMenuOpen) {
-//       document.addEventListener("mousedown", handleClickOutside)
-//     }
-
-//     return () => {
-//       document.removeEventListener("mousedown", handleClickOutside)
-//     }
-//   }, [mobileMenuOpen])
-
-//   return (
-//     <header className="admin-header4">
-//       <div className="header-container4" ref={menuRef}>
-//         <div className="header-left4">
-//           <Link to="/" className="logo">
-//             <div className="logo-icon">
-//               <img src={logo} alt="Logo" />
-//             </div>
-//             <span className="logo-text">Hammers & Tongues</span>
-//           </Link>
-//           <button
-//             className="mobile-menu-btn"
-//             onClick={() => setMobileMenuOpen(prev => !prev)}
-//           >
-//             <svg
-//               xmlns="http://www.w3.org/2000/svg"
-//               viewBox="0 0 24 24"
-//               fill="none"
-//               stroke="#35B24A"
-//               strokeWidth="4"
-//               strokeLinecap="round"
-//               strokeLinejoin="round"
-//               width="30"
-//               height="30"
-
-//             >
-//               <line x1="3" y1="6" x2="21" y2="6" />
-//               <line x1="3" y1="12" x2="21" y2="12" />
-//               <line x1="3" y1="18" x2="21" y2="18" />
-//             </svg>
-//           </button>
-//         </div>
-
-//         <div className={`header-center4 ${mobileMenuOpen ? "open" : ""}`}>
-//           <nav className="nav">
-//             <Link to="/admin-panel" onClick={() => setMobileMenuOpen(false)} className={`nav-link ${location.pathname === "/" ? "active" : ""}`}>Dashboard</Link>
-//             <Link to="/reports" onClick={() => setMobileMenuOpen(false)} className={`nav-link ${location.pathname.includes("reports") ? "active" : ""}`}>Reports</Link>
-//             <Link to="/auctiontab" onClick={() => setMobileMenuOpen(false)} className={`nav-link ${location.pathname.includes("auctiontab") ? "active" : ""}`}>Auction</Link>
-//             <Link to="/livetab" onClick={() => setMobileMenuOpen(false)} className={`nav-link ${location.pathname.includes("livetab") ? "active" : ""}`}>Live Auctions</Link>
-//             <Link to="/finance" onClick={() => setMobileMenuOpen(false)} className={`nav-link ${location.pathname.includes("finance") ? "active" : ""}`}>Finance</Link>
-//             <Link to="/admin/category" onClick={() => setMobileMenuOpen(false)} className={`nav-link ${location.pathname.includes("admin/category") ? "active" : ""}`}>Category Management</Link>
-//             <Link to="/admin/user-management" onClick={() => setMobileMenuOpen(false)} className={`nav-link ${location.pathname.includes("admin/user-management") ? "active" : ""}`}>User Management</Link>
-//           </nav>
-//         </div>
-
-//         <div className="header-right4">
-//           <button className="header-icon-button notification-button" aria-label="Notifications">
-//             <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-//               <path d="M15.137 21C14.695 21.622 13.91 22 13 22H11C10.09 22 9.305 21.622 8.863 21M18 8C18 5.239 15.761 3 13 3H11C8.239 3 6 5.239 6 8V11C6 12.326 5.473 13.597 4.535 14.535L4 15.07V17H20V15.07L19.465 14.535C18.527 13.597 18 12.326 18 11V8Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-//             </svg>
-//           </button>
-
-//           <button className="header-icon-button settings-button" aria-label="Settings">
-//             <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-//               <path d="M12 15.5C13.933 15.5 15.5 13.933 15.5 12C15.5 10.067 13.933 8.5 12 8.5C10.067 8.5 8.5 10.067 8.5 12C8.5 13.933 10.067 15.5 12 15.5Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-//               <path d="M19.4 15A1.65 1.65 0 0 0 20 13.6V10.4A1.65 1.65 0 0 0 19.4 9L17.55 8.25A1.65 1.65 0 0 0 16.6 7L16.25 5.1A1.65 1.65 0 0 0 14.85 4.5H9.15A1.65 1.65 0 0 0 7.75 5.1L7.4 7A1.65 1.65 0 0 0 6.45 8.25L4.6 9A1.65 1.65 0 0 0 4 10.4V13.6A1.65 1.65 0 0 0 4.6 15L6.45 15.75A1.65 1.65 0 0 0 7.4 17L7.75 18.9A1.65 1.65 0 0 0 9.15 19.5H14.85A1.65 1.65 0 0 0 16.25 18.9L16.6 17A1.65 1.65 0 0 0 17.55 15.75L19.4 15Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-//             </svg>
-//           </button>
-
-//           <button className="header-icon-button profile-button" aria-label="Profile">
-//             <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-//               <path d="M20 21V19C20 17.9391 19.5786 16.9217 18.8284 16.1716C18.0783 15.4214 17.0609 15 16 15H8C6.93913 15 5.92172 15.4214 5.17157 16.1716C4.42143 16.9217 4 17.9391 4 19V21" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-//               <circle cx="12" cy="7" r="4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-//             </svg>
-//           </button>
-//         </div>
-
-//       </div>
-//     </header>
-//   )
-// }
-
-// export default AdminHeader
-
-
-import React, { useState } from 'react'
+import React, { useState, useRef, useEffect } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import logo from '../assets/logo.png'
 import './AdminHeader.css'
@@ -107,6 +6,36 @@ import './AdminHeader.css'
 function AdminHeader() {
   const location = useLocation()
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+  const menuRef = useRef(null)
+  const mobileMenuRef = useRef(null)
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (mobileMenuOpen &&
+        !mobileMenuRef.current?.contains(event.target) &&
+        !menuRef.current?.contains(event.target)) {
+        setMobileMenuOpen(false)
+      }
+    }
+
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside)
+    }
+  }, [mobileMenuOpen])
+
+  useEffect(() => {
+    const handleEscape = (event) => {
+      if (event.key === 'Escape') {
+        setMobileMenuOpen(false)
+      }
+    }
+
+    document.addEventListener('keydown', handleEscape)
+    return () => {
+      document.removeEventListener('keydown', handleEscape)
+    }
+  }, [])
 
   const toggleMobileMenu = () => {
     setMobileMenuOpen(!mobileMenuOpen)
@@ -116,82 +45,124 @@ function AdminHeader() {
     setMobileMenuOpen(false)
   }
 
+  const navItems = [
+    {
+      path: '/manager-panel',
+      label: 'Admin Dashboard',
+      desktopLabel: 'Admin Dashboard',
+      icon: (
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+        </svg>
+      )
+    },
+    {
+      path: '/super-admin',
+      label: 'Super Admin',
+      desktopLabel: 'Super Admin',
+      icon: (
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+        </svg>
+      )
+    },
+    {
+      path: '/admin/auctiontab',
+      label: 'Auctions',
+      desktopLabel: 'Auctions',
+      icon: (
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M14.121 14.121L19 19m-7-7l7-7m-7 7l-2.879 2.879M12 12L9.121 9.121m0 5.758a3 3 0 10-4.243 4.243 3 3 0 004.243-4.243zm0-5.758a3 3 0 10-4.243-4.243 3 3 0 004.243 4.243z" />
+        </svg>
+      )
+    },
+    {
+      path: '/admin/livetab',
+      label: 'Completed Auctions',
+      desktopLabel: 'Completed Auctions',
+      icon: (
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
+        </svg>
+      )
+    },
+    {
+      path: '/admin/finance',
+      label: 'Finance',
+      desktopLabel: 'Finance',
+      icon: (
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+      )
+    },
+    {
+      path: '/admin/category',
+      label: 'Category Management',
+      desktopLabel: 'Categories',
+      icon: (
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
+        </svg>
+      )
+    },
+    {
+      path: '/admin/user-management',
+      label: 'User Management',
+      desktopLabel: 'Users',
+      icon: (
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5 0a3.5 3.5 0 01-5.5 2.696" />
+        </svg>
+      )
+    }
+  ]
+
   return (
     <>
       <header className="admin-header">
-        <div className="admin-header__container">
+        <div className="admin-header__container" ref={menuRef}>
           <Link to="/" className="admin-header__logo">
             <img src={logo} alt="Hammer & Tongues Logo" />
             <span>Hammer & Tongues</span>
           </Link>
 
           <nav className="admin-header__nav">
-            <Link
-              to="/admin-panel"
-              className={`admin-header__nav-link ${location.pathname === '/admin-panel' ? 'active' : ''
-                }`}
-            >
-              Dashboard Overview
-            </Link>
-            <Link
-              to="/reports"
-              className={`admin-header__nav-link ${location.pathname === '/reports' ? 'active' : ''
-                }`}
-            >
-              Reports
-            </Link>
-            <Link
-              to="/auctiontab"
-              className={`admin-header__nav-link ${location.pathname === '/auctiontab' ? 'active' : ''
-                }`}
-            >
-              Auctions
-            </Link>
-            <Link
-              to="/livetab"
-              className={`admin-header__nav-link ${location.pathname === '/livetab' ? 'active' : ''
-                }`}
-            >
-              Live Auction
-            </Link>
-            <Link
-              to="/finance"
-              className={`admin-header__nav-link ${location.pathname === '/finance' ? 'active' : ''
-                }`}
-            >
-              Finance
-            </Link>
-            <Link
-              to="/admin/category"
-              className={`admin-header__nav-link ${location.pathname === '/admin/category' ? 'active' : ''
-                }`}
-            >
-              Category Management
-            </Link>
-            <Link
-              to="/admin/user-management"
-              className={`admin-header__nav-link ${location.pathname === '/admin/user-management' ? 'active' : ''
-                }`}
-            >
-              User Management
-            </Link>
-           
+            {navItems.map((item) => (
+              <Link
+                key={item.path}
+                to={item.path}
+                className={`admin-header__nav-link ${location.pathname === item.path ? 'active' : ''}`}
+              >
+                {item.desktopLabel}
+              </Link>
+            ))}
           </nav>
 
           <div className="admin-header__right">
+            <div className="admin-header__admin-badge">
+              <span className="admin-header__admin-text">Admin</span>
+            </div>
+
             <button
               className="admin-header__mobile-toggle"
               onClick={toggleMobileMenu}
-              aria-label="Toggle menu"
+              aria-label={mobileMenuOpen ? "Close menu" : "Open menu"}
             >
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16M4 18h16" />
-              </svg>
+              {mobileMenuOpen ? (
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              ) : (
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16M4 18h16" />
+                </svg>
+              )}
             </button>
 
-            <Link to="/seller/profile" className="admin-header__profile-btn" aria-label="Profile">
+            <Link to="/admin/profile" className="admin-header__profile-btn" aria-label="Profile">
               <div className="admin-header__avatar">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
                   <path
                     d="M20 21V19C20 17.9391 19.5786 16.9217 18.8284 16.1716C18.0783 15.4214 17.0609 15 16 15H8C6.93913 15 5.92172 15.4214 5.17157 16.1716C4.42143 16.9217 4 17.9391 4 19V21"
                     stroke="currentColor"
@@ -219,53 +190,33 @@ function AdminHeader() {
           onClick={closeMobileMenu}
         />
 
-        <div className={`admin-header__mobile-menu ${mobileMenuOpen ? 'open' : ''}`}>
+        <div className={`admin-header__mobile-menu ${mobileMenuOpen ? 'open' : ''}`} ref={mobileMenuRef}>
+          <div className="admin-header__mobile-header">
+            <div className="admin-header__mobile-logo">
+              <img src={logo} alt="Hammer & Tongues Logo" />
+              <span>Hammer & Tongues</span>
+            </div>
+            <div className="admin-header__mobile-badge">
+              <span>Admin Panel</span>
+            </div>
+          </div>
+
           <nav className="admin-header__mobile-nav">
-            <Link
-             to="/seller-dashboard"
-              className={`admin-header__mobile-nav-link ${location.pathname === '/seller-dashboard' ? 'active' : ''
-                }`}
-              onClick={closeMobileMenu}
-            >
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
-              </svg>
-              Dashboard Overview
-            </Link>
-            <Link
-              to="/admin/auctions"
-              className={`admin-header__mobile-nav-link ${location.pathname === '/admin/auctions' ? 'active' : ''
-                }`}
-              onClick={closeMobileMenu}
-            >
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
-              </svg>
-              Auctions
-            </Link>
-            <Link
-              to="/my-bids"
-              className={`admin-header__mobile-nav-link ${location.pathname === '/my-bids' ? 'active' : ''
-                }`}
-              onClick={closeMobileMenu}
-            >
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
-              </svg>
-              My Bids
-            </Link>
-            <Link
-              to="/won-items"
-              className={`admin-header__mobile-nav-link ${location.pathname === '/won-items' ? 'active' : ''
-                }`}
-              onClick={closeMobileMenu}
-            >
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
-              </svg>
-              Won Items
-            </Link>
+            {navItems.map((item) => (
+              <Link
+                key={item.path}
+                to={item.path}
+                className={`admin-header__mobile-nav-link ${location.pathname === item.path ? 'active' : ''}`}
+                onClick={closeMobileMenu}
+              >
+                <span className="admin-header__mobile-nav-icon">
+                  {item.icon}
+                </span>
+                <span className="admin-header__mobile-nav-text">{item.label}</span>
+              </Link>
+            ))}
           </nav>
+
         </div>
       </header>
     </>

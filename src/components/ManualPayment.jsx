@@ -22,7 +22,6 @@ export default function ManualPaymentEntry() {
       ...prev,
       [name]: value
     }));
-    // Clear error for this field
     if (errors[name]) {
       setErrors(prev => ({ ...prev, [name]: '' }));
     }
@@ -115,7 +114,6 @@ export default function ManualPaymentEntry() {
     
     console.log('Payment data submitted:', paymentData);
     
-    // Save to localStorage for demo
     const existingPayments = JSON.parse(localStorage.getItem('manualPayments') || '[]');
     existingPayments.push({ ...paymentData, id: Date.now() });
     localStorage.setItem('manualPayments', JSON.stringify(existingPayments));
@@ -126,7 +124,7 @@ export default function ManualPaymentEntry() {
 
   const handleCancel = () => {
     if (window.confirm('Are you sure you want to cancel? All unsaved changes will be lost.')) {
-      navigate('/finance');
+      navigate('/admin/finance');
     }
   };
 
@@ -159,17 +157,17 @@ export default function ManualPaymentEntry() {
   };
 
   return (
-    <div className="dashboard-page">
+    <div className="manual-dashboard-page">
 
-      <main className="dashboard-main">
-        <div className="dashboard-container">
+      <main className="manual-dashboard-main">
+        <div className="manual-dashboard-container">
           <div className="manual-payment-header">
             <div className="header-content">
-              <h1 className="page-title">Manual Payment Entry</h1>
-              <p className="page-subtitle">Record offline payments for invoices and accounts</p>
+              <h1 className="manual-page-title">Manual Payment Entry</h1>
+              <p className="manual-page-subtitle">Record offline payments for invoices and accounts</p>
             </div>
             <div className="header-actions">
-              <button className="secondary-btn" onClick={handleCancel}>
+              <button className="manual-secondary-btn" onClick={handleCancel}>
                 Cancel
               </button>
             </div>
@@ -248,8 +246,8 @@ export default function ManualPaymentEntry() {
                     )}
                   </div>
                 </div>
-                <div className="form-section">
-                  <div className="section-header">
+                <div className="manual-form-section">
+                  <div className="manual-section-header">
                     <h4 className="section-title">Proof of Payment</h4>
                     <span className="section-hint">Required • Max 5MB • PDF, JPG, PNG</span>
                   </div>
@@ -335,20 +333,20 @@ export default function ManualPaymentEntry() {
                     <span className="error-message">{errors.proofFile}</span>
                   )}
                 </div>
-                <div className="form-section">
-                  <div className="section-header">
+                <div className="manual-form-section">
+                  <div className="manual-section-header">
                     <h4 className="section-title">Additional Information</h4>
                     <span className="section-hint">Optional</span>
                   </div>
                   
-                  <div className="form-group">
+                  <div >
                     <label className="form-label">Remarks</label>
                     <textarea
                       name="remarks"
                       value={formData.remarks}
                       onChange={handleInputChange}
                       placeholder="Add any notes or details about this payment..."
-                      className="form-textarea"
+                      className="manual-form-textarea"
                       rows="4"
                     />
                     <div className="textarea-info">
@@ -360,7 +358,7 @@ export default function ManualPaymentEntry() {
                   <button 
                     type="button"
                     onClick={handleCancel}
-                    className="secondary-action-btn"
+                    className="manual-secondary-action-btn"
                   >
                     Cancel
                   </button>

@@ -151,7 +151,6 @@ export default function AdminAuctionResults() {
           </div>
         </div>
 
-        {/* STATS CARDS */}
         <div className="results-stats-grid">
           {stats.map((stat, index) => (
             <div className="results-stat-card" key={index}>

@@ -1,3 +1,16 @@
+.create-category-page {
+    min-height: 100vh;
+    color: #ffffff;
+}
+
+.create-category-main {
+    padding: 1.5rem;
+}
+
+.create-category-container {
+    margin: 0 auto;
+}
+
 .progress-steps {
     display: flex;
     align-items: center;
@@ -19,18 +32,18 @@
 }
 
 .add-category-page-title {
-  font-size: 1.75rem;
-  font-weight: 700;
-  color: #ffffff;
-  margin-bottom: 0.5rem;
-  letter-spacing: -0.5px;
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: #ffffff;
+    margin-bottom: 0.5rem;
+    letter-spacing: -0.5px;
 }
 
 .add-category-page-subtitle {
-  font-size: 0.9375rem;
-  color: rgba(255, 255, 255, 0.6);
-  margin: 0;
-  line-height: 1.5;
+    font-size: 0.9375rem;
+    color: rgba(255, 255, 255, 0.6);
+    margin: 0;
+    line-height: 1.5;
 }
 
 .category-form-section {

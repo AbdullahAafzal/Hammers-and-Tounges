@@ -89,7 +89,7 @@ export default function AuctionPage() {
             <p className="auction-page-subtitle">Manage and monitor all auction events</p>
           </div>
           <div className="auction-header-actions">
-            <Link to="/publishnew" className="auction-primary-action-btn-link">
+            <Link to="/admin/publishnew" className="auction-primary-action-btn-link">
               <button className="auction-primary-action-btn">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
                   <path d="M12 5V19M5 12H19" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
@@ -224,7 +224,7 @@ export default function AuctionPage() {
                     <tr
                       key={index}
                       className="auction-table-row"
-                      onClick={() => navigate("/controlpanel")}
+                      onClick={() => navigate("/admin/controlpanel")}
                     >
                       <td className="auction-table-name">
                         <div className="admin-auction-name-info">

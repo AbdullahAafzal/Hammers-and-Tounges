@@ -37,7 +37,7 @@ const CreateCategory = () => {
         const file = e.target.files[0];
         if (file) {
             const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
-            const maxSize = 2 * 1024 * 1024; 
+            const maxSize = 2 * 1024 * 1024;
 
             if (!validTypes.includes(file.type)) {
                 setErrors(prev => ({ ...prev, image: 'Please upload JPG, PNG, or WebP image' }));
@@ -76,9 +76,9 @@ const CreateCategory = () => {
     };
 
     return (
-        <div className="dashboard-page">
-            <main className="dashboard-main">
-                <div className="dashboard-container">
+        <div className="create-category-page">
+            <main className="create-category-main">
+                <div className="create-category-container">
                     <div className="add-category-header">
                         <div className="header-content">
                             <h1 className="add-category-page-title">Create New Category</h1>

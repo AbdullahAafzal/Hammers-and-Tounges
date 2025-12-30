@@ -1,9 +1,21 @@
+.category-dashboard-page {
+  min-height: 100vh;
+  color: #ffffff;
+}
+
+.category-dashboard-main {
+  padding: 1.5rem;
+}
+
+.category-dashboard-container {
+  margin: 0 auto;
+}
+
 .category-section-header {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
   margin-bottom: 1.5rem;
-  padding: 1.5rem;
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
   gap: 1rem;
 }
@@ -59,7 +71,6 @@
   grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
   gap: 1rem;
   margin-bottom: 1.5rem;
-  padding: 0 1.5rem;
 }
 
 .category-stat-card {
