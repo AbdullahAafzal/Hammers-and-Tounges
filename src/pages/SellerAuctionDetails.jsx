@@ -215,7 +215,7 @@ const SellerListingDetails = () => {
 
     const handleEditListing = () => {
         console.log('Edit listing clicked')
-        navigate('/seller/create-product', {
+        navigate('/seller/product', {
             state: {
                 isEditing: true
             }
@@ -251,7 +251,7 @@ const SellerListingDetails = () => {
                             <p className="page-subtitle">Manage and monitor your listing performance</p>
                         </div>
                         <div className="page-actions">
-                            <Link to="/seller/auction-listings" className="secondary-button">
+                            <Link to="/seller/auction-listings" className=" s-secondary-button">
                                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
                                     <path d="M19 12H5M12 19l-7-7 7-7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                                 </svg>
@@ -261,7 +261,7 @@ const SellerListingDetails = () => {
                     </div>
 
                     <div className="breadcrumb">
-                        <Link to="/seller-dashboard" className="breadcrumb-item">Dashboard</Link>
+                        <Link to="/seller/dashboard" className="breadcrumb-item">Dashboard</Link>
                         <span className="breadcrumb-separator">/</span>
                         <Link to="/seller/auction-listings" className="breadcrumb-item">My Listings</Link>
                         <span className="breadcrumb-separator">/</span>

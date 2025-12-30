@@ -1,3 +1,22 @@
+.seller-page {
+  min-height: 100vh;
+  background-color: #000000;
+  color: #ffffff;
+  display: flex;
+  flex-direction: column;
+}
+
+.seller-main {
+  flex: 1;
+  padding: 1.5rem;
+}
+
+.seller-container {
+  margin: 0 auto;
+  width: 100%;
+}
+
+
 .seller-rating {
   display: flex;
   align-items: center;

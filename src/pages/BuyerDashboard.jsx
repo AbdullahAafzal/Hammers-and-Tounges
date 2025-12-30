@@ -1,9 +1,9 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
-import './Dashboard.css'
+import './BuyerDashboard.css'
 import SummaryCard from './SummaryCard'
 
-const Dashboard = () => {
+const BuyerDashboard = () => {
   const user = {
     name: 'John',
     walletBalance: 1250.00,
@@ -188,9 +188,9 @@ const Dashboard = () => {
   }
 
   return (
-    <div className="dashboard-page">
-      <main className="dashboard-main">
-        <div className="dashboard-container">
+    <div className="buyer-dashboard-page">
+      <main className="buyer-dashboard-main">
+        <div className="buyer-dashboard-container">
           <div className="dashboard-welcome">
             <div className="welcome-content">
               <h1 className="welcome-title">Welcome, {user.name}!</h1>
@@ -347,4 +347,4 @@ const Dashboard = () => {
   )
 }
 
-export default Dashboard
+export default BuyerDashboard

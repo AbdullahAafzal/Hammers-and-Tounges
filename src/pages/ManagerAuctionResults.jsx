@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from "react";
-import "./AdminAuctionResults.css";
+import "./ManagerAuctionResults.css";
 
 const DATA = [
   { lot: "001", item: "Rolex Daytona Ref. 6263", bid: 75000, bidder: "BIDDER-A487", reserve: "Met", status: "Payment Received" },
@@ -14,7 +14,7 @@ const DATA = [
 
 const ROWS_PER_PAGE = 5;
 
-export default function AdminAuctionResults() {
+export default function ManagerAuctionResults() {
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("All");
   const [page, setPage] = useState(1);

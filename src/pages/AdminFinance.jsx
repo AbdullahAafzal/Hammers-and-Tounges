@@ -1,8 +1,8 @@
 import React, { useState } from 'react'
-import './Finance.css'
+import './AdminFinance.css'
 import { Link, useNavigate } from 'react-router-dom'
 
-const FinanceDashboard = () => {
+const AdminFinance = () => {
   const [searchTerm, setSearchTerm] = useState('')
   const [actionFilter, setActionFilter] = useState('all')
   const [dateRange, setDateRange] = useState('all')
@@ -45,7 +45,7 @@ const FinanceDashboard = () => {
       change: 'No change',
       trend: 'neutral',
       icon: 'entries',
-      navigation: '/finance/manual/payments-authorization'
+      navigation: '/admin/finance/manual/payments-authorization'
     }
   ]
 
@@ -311,7 +311,7 @@ const FinanceDashboard = () => {
   }
 
   const handleNewManualEntry = () => {
-    navigate('/finance/manual-payments')
+    navigate('/admin/finance/manual-payments')
   }
 
   const renderSummaryCardIcon = (icon) => {
@@ -634,4 +634,4 @@ const FinanceDashboard = () => {
   )
 }
 
-export default FinanceDashboard
+export default AdminFinance

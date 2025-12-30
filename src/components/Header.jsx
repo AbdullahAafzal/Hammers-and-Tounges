@@ -74,7 +74,7 @@ function Header() {
             </button>
             {
               user && user.isAuth ? (
-                <Link to="/profile" className="buyer-header__profile-btn" aria-label="Profile">
+                <Link to={`${user.role}/profile`} className="buyer-header__profile-btn" aria-label="Profile">
                   <div className="buyer-header__avatar">
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
                       <path

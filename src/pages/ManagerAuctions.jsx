@@ -1,8 +1,8 @@
 import React, { useState } from "react";
-import "./AuctionAdminPanel.css";
+import "./ManagerAuctions.css";
 import { Link, useNavigate } from "react-router-dom";
 
-export default function AuctionPage() {
+export default function ManagerAuctions() {
   const navigate = useNavigate();
   const [search, setSearch] = useState("");
   const [currentPage, setCurrentPage] = useState(1);

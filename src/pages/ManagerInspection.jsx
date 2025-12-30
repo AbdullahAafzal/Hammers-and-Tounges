@@ -1,8 +1,8 @@
 import React, { useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import "./InspectionAdmin.css";
+import "./ManagerInspection.css";
 
-const InspectionAdmin = () => {
+const ManagerInspection = () => {
   const location = useLocation();
   console.log('location: ', location);
   
@@ -61,11 +61,11 @@ const InspectionAdmin = () => {
 
     localStorage.setItem("inspectionData", JSON.stringify(dataToSave));
     alert("Inspection data saved!");
-    navigate("/admin-panel");
+    navigate("/manager-panel");
   };
 
   const handleReject = () => {
-    navigate("/admin-panel");
+    navigate("/manager-panel");
   };
 
   return (
@@ -457,4 +457,4 @@ const InspectionAdmin = () => {
   );
 };
 
-export default InspectionAdmin;
+export default ManagerInspection;

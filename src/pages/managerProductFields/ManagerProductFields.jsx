@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { Link, useParams, useNavigate } from 'react-router-dom';
-import './ManageProductFields.css';
+import './ManagerProductFields.css';
 
-const ManageProductFields = () => {
+const ManagerProductFields = () => {
   const { categoryId } = useParams();
   const navigate = useNavigate();
 
@@ -520,4 +520,4 @@ const ManageProductFields = () => {
   );
 };
 
-export default ManageProductFields;
+export default ManagerProductFields;

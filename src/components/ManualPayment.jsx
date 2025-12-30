@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import './ManualPayment.css';
 
 export default function ManualPaymentEntry() {
@@ -119,7 +119,7 @@ export default function ManualPaymentEntry() {
     localStorage.setItem('manualPayments', JSON.stringify(existingPayments));
     
     alert('Payment recorded successfully!');
-    navigate('/finance');
+    navigate('/admin/finance');
   };
 
   const handleCancel = () => {

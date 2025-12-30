@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from "react";
-import "./LiveAuctionsTab.css";
+import "./ManagerLiveAuctions.css";
 import { useNavigate } from "react-router-dom";
 
 const SAMPLE_DATA = [
@@ -19,7 +19,7 @@ const SAMPLE_DATA = [
 
 const ROWS_PER_PAGE = 5;
 
-export default function LiveAuctionsTab() {
+export default function ManagerLiveAuctions() {
   const [search, setSearch] = useState("");
   const [date, setDate] = useState("");
   const [page, setPage] = useState(1);

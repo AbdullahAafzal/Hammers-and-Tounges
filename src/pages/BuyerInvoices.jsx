@@ -1,17 +1,13 @@
 import React, { useState } from 'react'
-import { useNavigate, Link, useParams } from 'react-router-dom'
-import logo from '../assets/logo.png'
-import './Invoices.css'
+import { Link } from 'react-router-dom'
+import './BuyerInvoices.css'
 
-const Invoices = () => {
-  const navigate = useNavigate()
-  const { invoiceNumber } = useParams()
+const BuyerInvoices = () => {
   const [invoiceFilter, setInvoiceFilter] = useState('all')
   const [searchQuery, setSearchQuery] = useState('')
   const [selectedInvoices, setSelectedInvoices] = useState([])
   const [currentPage, setCurrentPage] = useState(1)
 
-  // Mock invoices data
   const invoices = [
     {
       id: 1,
@@ -60,7 +56,6 @@ const Invoices = () => {
     }
   ]
 
-  // Mock payment history data
   const paymentHistory = [
     {
       id: 1,
@@ -152,52 +147,16 @@ const Invoices = () => {
 
   return (
     <div className="invoices-page">
-      {/* Buyer Dashboard Header */}
-      <header className="invoices-header">
-        <div className="invoices-header-container">
-          <Link to="/dashboard" className="invoices-logo">
-            <img src={logo} alt="Hammers & Tongues Logo" />
-            <span>Hammers & Tongues</span>
-          </Link>
-          
-          <nav className="invoices-nav">
-            <Link to="/dashboard" className="nav-link">Home</Link>
-            <Link to="/buyer/auctions" className="nav-link">Auctions</Link>
-            <Link to="/my-bids" className="nav-link">My Bids</Link>
-            <Link to="/won-items" className="nav-link">Won Items</Link>
-          </nav>
 
-          <div className="invoices-header-right">
-            <button className="notification-button" aria-label="Notifications">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-                <path d="M18 8A6 6 0 0 0 6 8C6 11.3137 3.31371 14 0 14M18 8C20.2091 8 22 9.79086 22 12C22 14.2091 20.2091 16 18 16M18 8C20.2091 8 22 5.79086 22 3C22 0.790861 20.2091 -1 18 -1C15.7909 -1 14 0.790861 14 3C14 5.79086 15.7909 8 18 8Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                <path d="M6 8C6 11.3137 8.68629 14 12 14C15.3137 14 18 11.3137 18 8" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-              </svg>
-              <span className="notification-badge">3</span>
-            </button>
-            <Link to="/profile" className="profile-button" aria-label="Profile">
-              <div className="profile-avatar">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-                  <path d="M20 21V19C20 17.9391 19.5786 16.9217 18.8284 16.1716C18.0783 15.4214 17.0609 15 16 15H8C6.93913 15 5.92172 15.4214 5.17157 16.1716C4.42143 16.9217 4 17.9391 4 19V21" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                  <circle cx="12" cy="7" r="4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                </svg>
-              </div>
-            </Link>
-          </div>
-        </div>
-      </header>
-
-      {/* Invoices Content */}
       <div className="invoices-content">
         <div className="invoices-container">
-          {/* Breadcrumbs */}
+      
           <nav className="breadcrumbs">
-            <Link to="/dashboard">Dashboard</Link>
+            <Link to="/buyer/dashboard">Dashboard</Link>
             <span>/</span>
             <span>Invoices & Payment History</span>
           </nav>
 
-          {/* Page Header */}
           <div className="page-header">
             <h1 className="page-title">Invoices & Payment History</h1>
             <button className="export-button">
@@ -208,11 +167,9 @@ const Invoices = () => {
             </button>
           </div>
 
-          {/* My Invoices Section */}
           <section className="invoices-section">
             <h2 className="section-title">My Invoices</h2>
             
-            {/* Filter Tabs and Search */}
             <div className="invoices-controls">
               <div className="filter-tabs">
                 <button
@@ -255,7 +212,6 @@ const Invoices = () => {
               </div>
             </div>
 
-            {/* Invoice List */}
             <div className="invoice-list">
               {filteredInvoices.map(invoice => (
                 <div 
@@ -298,14 +254,14 @@ const Invoices = () => {
                     {invoice.status !== 'paid' && (
                       <button 
                         className="action-btn primary"
-                        onClick={() => navigate(`/payment/${invoice.id}`)}
+                        // onClick={() => navigate(`/payment/${invoice.id}`)}
                       >
                         Pay Now
                       </button>
                     )}
                     <button 
                       className="action-btn secondary"
-                      onClick={() => window.open(`/invoice/${invoice.invoiceNumber}/pdf`, '_blank')}
+                      // onClick={() => window.open(`/invoice/${invoice.invoiceNumber}/pdf`, '_blank')}
                     >
                       <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
                         <path d="M14 2H6C5.46957 2 4.96086 2.21071 4.58579 2.58579C4.21071 2.96086 4 3.46957 4 4V20C4 20.5304 4.21071 21.0391 4.58579 21.4142C4.96086 21.7893 5.46957 22 6 22H18C18.5304 22 19.0391 21.7893 19.4142 21.4142C19.7893 21.0391 20 20.5304 20 20V8L14 2Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
@@ -319,7 +275,6 @@ const Invoices = () => {
             </div>
           </section>
 
-          {/* Payment History Section */}
           <section className="payment-history-section">
             <h2 className="section-title">Payment History</h2>
             
@@ -354,7 +309,6 @@ const Invoices = () => {
               </table>
             </div>
 
-            {/* Pagination */}
             <div className="table-pagination">
               <div className="pagination-info">
                 Showing {startIndex + 1} to {Math.min(startIndex + itemsPerPage, paymentHistory.length)} of {paymentHistory.length} results
@@ -383,7 +337,7 @@ const Invoices = () => {
   )
 }
 
-export default Invoices
+export default BuyerInvoices
 
 
 

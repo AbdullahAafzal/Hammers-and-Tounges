@@ -1,8 +1,8 @@
 import React, { useState } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
-import './MyBids.css'
+import './BuyerBids.css'
 
-const MyBids = () => {
+const BuyerBids = () => {
   const navigate = useNavigate()
   const [searchQuery, setSearchQuery] = useState('')
   const [currentPage, setCurrentPage] = useState(1)
@@ -347,4 +347,4 @@ const MyBids = () => {
   )
 }
 
-export default MyBids
+export default BuyerBids

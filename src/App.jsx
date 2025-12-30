@@ -4,52 +4,58 @@ import Header from './components/Header'
 import Footer from './components/Footer'
 import Home from './pages/Home'
 import Auctions from './pages/Auctions'
+import AuctionDetails from './pages/AuctionDetails'
 import About from './pages/About'
 import Contact from './pages/Contact'
-import SignIn from './pages/SignIn'
+
 import Register from './pages/Register'
 import OTPVerification from './pages/OTPVerification'
+import SignIn from './pages/SignIn'
 import KYCVerification from './pages/KYCVerification'
-import AuctionDetails from './pages/AuctionDetails'
-import Dashboard from './pages/Dashboard'
-import SellerDashboard from './pages/SellerDashboard'
-import SellerAuctionListings from './pages/SellerAuctionListings'
-import CreateProduct from './pages/CreateProduct'
-import SellerAnalytics from './pages/SellerAnalytics'
+
+import BuyerHeader from './components/BuyerHeader'
+import BuyerDashboard from './pages/BuyerDashboard'
 import BuyerAuctions from './pages/BuyerAuctions'
 import BuyerAuctionDetails from './pages/BuyerAuctionDetails'
-import MyBids from './pages/MyBids'
-import WonItems from './pages/WonItems'
-import Invoices from './pages/Invoices'
-import Wallet from './pages/Wallet'
-import Profile from './pages/Profile'
-import './App.css'
-import SellerAuctions from './pages/SellerAuctions'
+import BuyerBids from './pages/BuyerBids'
+import BuyerWonItems from './pages/BuyerWonItems'
+import BuyerInvoices from './pages/BuyerInvoices'
+import BuyerWallet from './pages/BuyerWallet'
+import BuyerProfile from './pages/BuyerProfile'
+
+import SellerHeader from './components/SellerHeader'
+import SellerDashboard from './pages/SellerDashboard'
+import SellerAuctionListings from './pages/SellerAuctionListings'
 import SellerListingDetails from './pages/SellerAuctionDetails'
-import AdminPanel from './pages/AdminPanel'
-import AdminHeader from "./components/AdminHeader"
+import SellerAuctions from './pages/SellerAuctions'
+import SellerCreateProduct from './pages/SellerCreateProduct'
+import SellerAnalytics from './pages/SellerAnalytics'
+import SellerProfile from './pages/sellerProfile/SellerProfile'
+import './App.css'
 import Reports from './pages/Reports'
-import InspectionAdmin from "./pages/InspectionAdmin";
-import AuctionAdminPanel from './pages/AuctionAdminPanel'
-import AdminPublishNew from './pages/AdminPublishNew'
-import AuctionControlPanel from './pages/AuctionControlPanel'
-import LiveAuctionsTab from './pages/LiveAuctionsTab'
-import AdminAuctionResults from './pages/AdminAuctionResults'
-import Finance from './pages/Finance'
+
+import ManagerHeader from './components/ManagerHeader'
+import ManagerDashboard from './pages/ManagerDashboard'
+import ManagerInspection from "./pages/ManagerInspection";
+import ManagerAuctions from './pages/ManagerAuctions'
+import ManagerPublishNew from './pages/ManagerPublishNew'
+import ManagerLiveAuctions from './pages/ManagerLiveAuctions'
+import ManagerAuctionControlPanel from './pages/ManagerAuctionControlPanel'
+import ManagerAuctionResults from './pages/ManagerAuctionResults'
+import CategoryManagement from './pages/categoryManagement/CategoryManagement'
+import ManagerCreateCategory from './pages/managerCreateCategory/ManagerCreateCategory'
+import ManagerProductFields from './pages/managerProductFields/ManagerProductFields'
+
+import AdminHeader from './components/AdminHeader'
+import AdminDashboard from './pages/adminDashboard/AdminDashboard'
+import AdminFinance from './pages/AdminFinance'
 import ManualPaymentEntry from './components/ManualPayment'
 import ManualPaymentAuthorization from './pages/ManualPaymentAuthorization'
 import PaymentVerification from './pages/paymentVerification/PaymentVerification'
-import CategoryManagement from './pages/categoryManagement/CategoryManagement'
 import UserManagement from './pages/userManagement/UserManagement'
-import AdminKYC from './pages/userManagement/AdminKYC'
-import SellerProfile from './pages/sellerProfile/SellerProfile'
-import SellerHeader from './components/SellerHeader'
-import CreateCategory from './pages/createCategory/CreateCategory'
-import ManageProductFields from './pages/manageProductFields/ManageProductFields'
-import BuyerHeader from './components/BuyerHeader'
+import AdminManagerKYC from './pages/userManagement/AdminManagerKYC'
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import SuperAdminDashboard from './pages/adminDashboard/SuperAdminDashboard'
 // import { Provider } from 'react-redux'
 // import store from './store/store';
 
@@ -65,7 +71,6 @@ function App() {
           <Route path="/register" element={<Register />} />
           <Route path="/kyc-verification" element={<KYCVerification />} />
           <Route path="/otp-verification" element={<OTPVerification />} />
-
 
           {/* Guest Flow */}
           <Route path="/" element={
@@ -103,13 +108,12 @@ function App() {
               <Footer />
             </>
           } />
-          {/* /////////// Guest Flow End  ////////// */}
 
-          {/* Buyer Dashboard Start */}
-          <Route path="/dashboard" element={
+          {/* ////// Buyer Dashboard Start ////// */}
+          <Route path="/buyer/dashboard" element={
             <>
               <BuyerHeader />
-              <Dashboard />
+              <BuyerDashboard />
             </>
           } />
           <Route path="/buyer/auctions" element={
@@ -119,62 +123,56 @@ function App() {
             </>
           } />
           <Route path="/buyer/auction/:id" element={
+            <>
+              {/* <BuyerHeader/> */}
             <BuyerAuctionDetails />
-          } />
-          <Route path="/my-bids" element={
-            <>
-              <BuyerHeader />
-              <MyBids />
             </>
           } />
-          <Route path="/won-items" element={
+          <Route path="/buyer/bids" element={
             <>
               <BuyerHeader />
-              <WonItems />
+              <BuyerBids />
             </>
           } />
-
-          <Route path="/invoices" element={<Invoices />} />
-          <Route path="/invoice/:invoiceNumber" element={<Invoices />} />
-          <Route path="/wallet" element={
+          <Route path="/buyer/won-items" element={
             <>
               <BuyerHeader />
-              <Wallet />
+              <BuyerWonItems />
             </>
           } />
 
-          <Route path="/profile" element={
+          <Route path="/buyer/invoices" element={
             <>
               <BuyerHeader />
-              <Profile />
+              <BuyerInvoices />
             </>
           } />
-          {/* ///// Buyer Dashboard End ////// */}
+          {/* <Route path="/buyer/invoice/:invoiceNumber" element={<BuyerInvoices />} /> */}
+          <Route path="/buyer/wallet" element={
+            <>
+              <BuyerHeader />
+              <BuyerWallet />
+            </>
+          } />
+
+          <Route path="/buyer/profile" element={
+            <>
+              <BuyerHeader />
+              <BuyerProfile />
+            </>
+          } />
 
           {/* ///// Seller Dashboard Start ////// */}
-          <Route path="/seller-dashboard" element={
+          <Route path="/seller/dashboard" element={
             <>
               <SellerHeader />
               <SellerDashboard />
             </>
           } />
-
           <Route path='/seller/auction-listings' element={
             <>
               <SellerHeader />
               <SellerAuctionListings />
-            </>
-          } />
-          <Route path='/seller/create-product' element={
-            <>
-              <SellerHeader />
-              <CreateProduct />
-            </>
-          } />
-          <Route path='/seller/auctions' element={
-            <>
-              <SellerHeader />
-              <SellerAuctions />
             </>
           } />
           <Route path='/seller/listing/:id' element={
@@ -184,10 +182,21 @@ function App() {
             </>
           }
           />
+          <Route path='/seller/auctions' element={
+            <>
+              <SellerHeader />
+              <SellerAuctions />
+            </>
+          } />
+          <Route path='/seller/product' element={
+            <>
+              <SellerHeader />
+              <SellerCreateProduct />
+            </>
+          } />
           <Route path='/seller/analytics' element={
             <>
               <SellerHeader />
-
               <SellerAnalytics />
             </>
           } />
@@ -197,41 +206,104 @@ function App() {
               <SellerProfile />
             </>
           } />
-          {/* ////////////// Seller Dashboard End ///////////////// */}
 
-
-          {/* ////////////// Admin Dashboard Start ///////////////// */}
+          {/* /////// Manager Dashboard /////// */}
           <Route path="/manager-panel" element={
             <>
-              <AdminHeader />
-              <AdminPanel />
+              <ManagerHeader />
+              <ManagerDashboard />
+            </>
+          } />
+
+          <Route path="/manager/inspection" element={
+            <>
+              <ManagerHeader />
+              <ManagerInspection />
+            </>
+          } />
+          <Route path="/manager/reports" element={
+            <>
+              <ManagerHeader />
+              <Reports />
+            </>
+          } />
+          <Route path="/manager/auctions" element={
+            <>
+              <ManagerHeader />
+              <ManagerAuctions />
+            </>
+          } />
+
+          <Route path="/manager/publishnew" element={
+            <>
+              <ManagerHeader />
+              <ManagerPublishNew />
+            </>
+          } />
+          <Route path="/manager/live-auctions" element={
+            <>
+              <ManagerHeader />
+              <ManagerLiveAuctions />
+            </>
+          } />
+          <Route path="/manager/auction-results" element={
+            <>
+              <ManagerHeader />
+              <ManagerAuctionResults />
+            </>
+          } />
+          <Route path="/manager/controlpanel" element={
+            <>
+              <ManagerHeader />
+              <ManagerAuctionControlPanel />
+            </>
+          } />
+
+          <Route path="/manager/category" element={
+            <>
+              <ManagerHeader />
+              <CategoryManagement />
+            </>
+          } />
+          <Route path="/manager/add-category" element={
+            <>
+              <ManagerHeader />
+              <ManagerCreateCategory />
+            </>
+          } />
+          <Route path="/manager/product-fields" element={
+            <>
+              <ManagerHeader />
+              <ManagerProductFields />
+            </>
+          } />
+          <Route path="/manager/user-management" element={
+            <>
+              <ManagerHeader />
+              <UserManagement />
             </>
           } />
           <Route path="/manager/kycverification" element={
             <>
-              <AdminHeader />
-              <AdminKYC />
+              <ManagerHeader />
+              <AdminManagerKYC />
             </>
           } />
-          <Route path="/admin/reports" element={
+
+          {/* /////// Admin Working /////// */}
+          <Route path='/admin-panel' element={
             <>
               <AdminHeader />
-              <Reports />
-            </>
-          } />
-          <Route path="/admin/livetab" element={
-            <>
-              <AdminHeader />
-              <LiveAuctionsTab />
+              <AdminDashboard />
             </>
           } />
           <Route path="/admin/finance" element={
             <>
               <AdminHeader />
-              <Finance />
+              <AdminFinance />
             </>
           } />
-          <Route path="/finance/manual-payments" element={
+          <Route path="/admin/finance/manual-payments" element={
             <>
               <AdminHeader />
               <ManualPaymentEntry />
@@ -248,71 +320,6 @@ function App() {
             <>
               <AdminHeader />
               <PaymentVerification />
-            </>
-          } />
-          <Route path="/admin/auction-results" element={
-            <>
-              <AdminHeader />
-              <AdminAuctionResults />
-            </>
-          } />
-          <Route path="/admin/controlpanel" element={
-            <>
-              <AdminHeader />
-              <AuctionControlPanel />
-            </>
-          } />
-          <Route path="/admin/auctiontab" element={
-            <>
-              <AdminHeader />
-              <AuctionAdminPanel />
-            </>
-          } />
-
-          <Route path="/admin/publishnew" element={
-            <>
-              <AdminHeader />
-              <AdminPublishNew />
-            </>
-          } />
-          <Route path="/admin/inspection" element={
-            <>
-              <AdminHeader />
-              <InspectionAdmin />
-            </>
-          } />
-          <Route path="/admin/category" element={
-            <>
-              <AdminHeader />
-              <CategoryManagement />
-            </>
-          } />
-          <Route path="/admin/add-category" element={
-            <>
-              <AdminHeader />
-              <CreateCategory />
-            </>
-          } />
-          <Route path="/admin/product-fields" element={
-            <>
-              <AdminHeader />
-              <ManageProductFields />
-            </>
-          } />
-          <Route path="/admin/user-management" element={
-            <>
-              <AdminHeader />
-              <UserManagement />
-            </>
-
-          } />
-          {/* // ///////////////////////// Admin Dashboard End  /////////////////////////////////////////////////// */}
-
-          {/* //////////////////////  Super Admin Working Start   ///////////////////////////// */}
-          <Route path='/super-admin' element={
-            <>
-              <AdminHeader />
-              <SuperAdminDashboard />
             </>
           } />
 

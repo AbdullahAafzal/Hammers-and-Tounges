@@ -144,7 +144,7 @@ const SellerAnalytics = () => {
                                 <option value="1y">Last year</option>
                                 <option value="all">All time</option>
                             </select>
-                            <button className="action-button primary-button primary">Request Payout</button>
+                            {/* <button className="action-button primary-button primary">Request Payout</button> */}
                         </div>
                     </div>
 

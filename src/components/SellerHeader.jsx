@@ -26,11 +26,11 @@ function SellerHeader() {
 
           <nav className="seller-header__nav">
             <Link
-              to="/seller-dashboard"
-              className={`seller-header__nav-link ${location.pathname === '/seller-dashboard' ? 'active' : ''
+              to="/seller/dashboard"
+              className={`seller-header__nav-link ${location.pathname === '/seller/dashboard' ? 'active' : ''
                 }`}
             >
-              Dashboard Overview
+              Dashboard
             </Link>
             <Link
               to="/seller/auction-listings"
@@ -47,7 +47,7 @@ function SellerHeader() {
               Auctions
             </Link>
             <Link
-               to="/seller/analytics"
+              to="/seller/analytics"
               className={`seller-header__nav-link ${location.pathname === '/seller/analytics' ? 'active' : ''
                 }`}
             >
@@ -99,15 +99,26 @@ function SellerHeader() {
         <div className={`seller-header__mobile-menu ${mobileMenuOpen ? 'open' : ''}`}>
           <nav className="seller-header__mobile-nav">
             <Link
-             to="/seller-dashboard"
-              className={`seller-header__mobile-nav-link ${location.pathname === '/seller-dashboard' ? 'active' : ''
+              to="/seller/dashboard"
+              className={`seller-header__mobile-nav-link ${location.pathname === '/seller/dashboard' ? 'active' : ''
                 }`}
               onClick={closeMobileMenu}
             >
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
               </svg>
-              Dashboard Overview
+              Dashboard
+            </Link>
+            <Link
+              to="/seller/auction-listings"
+              className={`seller-header__mobile-nav-link ${location.pathname === '/seller/auction-listings' ? 'active' : ''
+                }`}
+              onClick={closeMobileMenu}
+            >
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+              </svg>
+              My Products
             </Link>
             <Link
               to="/seller/auctions"
@@ -120,27 +131,17 @@ function SellerHeader() {
               </svg>
               Auctions
             </Link>
+
             <Link
-              to="/my-bids"
-              className={`seller-header__mobile-nav-link ${location.pathname === '/my-bids' ? 'active' : ''
-                }`}
-              onClick={closeMobileMenu}
-            >
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
-              </svg>
-              My Bids
-            </Link>
-            <Link
-              to="/won-items"
-              className={`seller-header__mobile-nav-link ${location.pathname === '/won-items' ? 'active' : ''
+              to="/seller/analytics"
+              className={`seller-header__mobile-nav-link ${location.pathname === '/seller/analytics' ? 'active' : ''
                 }`}
               onClick={closeMobileMenu}
             >
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
               </svg>
-              Won Items
+              Analytics
             </Link>
           </nav>
         </div>

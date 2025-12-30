@@ -1,8 +1,8 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import "./AdminPublishNew.css"; 
+import "./ManagerPublishNew.css"; 
 
-const AdminPublishNew = () => {
+const ManagerPublishNew = () => {
   const navigate = useNavigate();
 
   const [formData, setFormData] = useState({
@@ -199,4 +199,4 @@ const AdminPublishNew = () => {
   );
 };
 
-export default AdminPublishNew;
+export default ManagerPublishNew;

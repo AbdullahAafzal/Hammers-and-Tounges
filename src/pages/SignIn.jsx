@@ -28,6 +28,10 @@ const SignIn = () => {
     if (formData.email === "admin@gmail.com" && formData.password === "admin") {
       setLocalStorage('user', { ...formData, isAuth: true, role: 'admin' })
       navigate("/admin-panel", { replace: true });
+    }
+    else if (formData.email === "manager@gmail.com" && formData.password === "manager") {
+      setLocalStorage('user', { ...formData, isAuth: true, role: 'manager' })
+      navigate("/manager-panel", { replace: true });
     } else if (formData.email === "testbuyer@gmail.com" && formData.password === "testBuyer@1") {
       setLocalStorage('user', { ...formData, isAuth: true, role: 'buyer' })
       navigate("/dashboard", { replace: true })

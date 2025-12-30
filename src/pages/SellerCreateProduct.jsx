@@ -1,8 +1,8 @@
 import React, { useState } from 'react'
 import { Link, useLocation } from 'react-router-dom'
-import './CreateProduct.css'
+import './SellerCreateProduct.css'
 
-const CreateProduct = () => {
+const SellerCreateProduct = () => {
   const [formData, setFormData] = useState({
     title: '',
     category: '',
@@ -337,4 +337,4 @@ const CreateProduct = () => {
   )
 }
 
-export default CreateProduct
+export default SellerCreateProduct

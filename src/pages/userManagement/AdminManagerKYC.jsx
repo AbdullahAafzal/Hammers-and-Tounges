@@ -1,7 +1,7 @@
 import React, { useState } from "react";
-import "./AdminKYC.css";
+import "./AdminManagerKYC.css";
 
-const AdminKYC = () => {
+const AdminManagerKYC = () => {
   const [comparison, setComparison] = useState(false);
   const [fullscreenImage, setFullscreenImage] = useState(null);
 
@@ -157,4 +157,4 @@ const AdminKYC = () => {
   );
 };
 
-export default AdminKYC;
+export default AdminManagerKYC;

@@ -1,6 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import { useNavigate } from "react-router-dom";
-import "./AdminPanel.css";
+import "./ManagerDashboard.css";
 
 const sampleData = [
   { id: "VH-24351", category: "Vehicle", seller: "Johnathan Doe", status: "Pending Inspection", officer: "Walter White", date: "2025-12-01" },
@@ -12,20 +12,20 @@ const sampleData = [
   { id: "VH-55555", category: "Vehicle", seller: "Hank Schrader", status: "Rejected", officer: "Walter White", date: "2025-12-05" }
 ];
 
-function AdminPanel() {
+function ManagerDashboard() {
 
   const navigate = useNavigate();
 
   const handleAction = (status) => {
     if (status === "Pending Inspection" || status === "In Progress") {
-      navigate("/admin/inspection",
+      navigate("/manager/inspection",
         {
           state: {
             startInspection: true
           }
         });
     } else if (status === "Rejected", { state: { startInspection: false } }) {
-      navigate("/admin/inspection");
+      navigate("/manager/inspection");
     }
   };
 
@@ -317,4 +317,4 @@ function AdminPanel() {
   )
 }
 
-export default AdminPanel;
+export default ManagerDashboard;

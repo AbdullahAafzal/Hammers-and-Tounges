@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
-import "./AuctionControlPanel.css";
+import "./ManagerAuctionControlPanel.css";
 
-export default function AuctionControlPanel() {
+export default function ManagerAuctionControlPanel() {
   const [time, setTime] = useState(85);
   const [isRunning, setIsRunning] = useState(false);
   const [activeTab, setActiveTab] = useState("disputes");

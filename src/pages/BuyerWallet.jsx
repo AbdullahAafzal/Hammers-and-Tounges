@@ -1,8 +1,8 @@
 import React from 'react'
 import { useNavigate, Link } from 'react-router-dom'
-import './Wallet.css'
+import './BuyerWallet.css'
 
-const Wallet = () => {
+const BuyerWallet = () => {
   const navigate = useNavigate()
 
   const walletData = {
@@ -68,9 +68,8 @@ const Wallet = () => {
     <div className="wallet-page">
       <div className="wallet-content">
         <div className="wallet-container">
-          {/* Breadcrumbs */}
           <nav className="breadcrumbs">
-            <Link to="/dashboard">Dashboard</Link>
+            <Link to="/buyer/dashboard">Dashboard</Link>
             <span>/</span>
             <span>My Wallet</span>
           </nav>
@@ -154,4 +153,4 @@ const Wallet = () => {
   )
 }
 
-export default Wallet
+export default BuyerWallet

@@ -1,4 +1,4 @@
-.dashboard-page {
+.buyer-dashboard-page {
   min-height: 100vh;
   background-color: #000000;
   color: #ffffff;
@@ -6,7 +6,7 @@
   flex-direction: column;
 }
 
-.dashboard-header {
+.buyer-dashboard-header {
   background-color: rgba(0, 0, 0, 0.95);
   border-bottom: 1px solid rgba(255, 255, 255, 0.08);
   position: sticky;
@@ -15,7 +15,7 @@
   backdrop-filter: blur(10px);
 }
 
-.dashboard-main {
+.buyer-dashboard-main {
   flex: 1;
   padding: 1.5rem;
 }

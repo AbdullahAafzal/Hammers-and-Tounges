@@ -26,11 +26,11 @@ function BuyerHeader() {
 
           <nav className="buyer-header__nav">
             <Link
-              to="/dashboard"
-              className={`buyer-header__nav-link ${location.pathname === '/dashboard' ? 'active' : ''
+              to="/buyer/dashboard"
+              className={`buyer-header__nav-link ${location.pathname === '/buyer/dashboard' ? 'active' : ''
                 }`}
             >
-              Dashboard Overview
+              Dashboard
             </Link>
             <Link
               to="/buyer/auctions"
@@ -40,15 +40,15 @@ function BuyerHeader() {
               Auctions
             </Link>
             <Link
-              to="/my-bids"
-              className={`buyer-header__nav-link ${location.pathname === '/my-bids' ? 'active' : ''
+              to="/buyer/bids"
+              className={`buyer-header__nav-link ${location.pathname === '/buyer/bids' ? 'active' : ''
                 }`}
             >
               My Bids
             </Link>
             <Link
-              to="/won-items"
-              className={`buyer-header__nav-link ${location.pathname === '/won-items' ? 'active' : ''
+              to="/buyer/won-items"
+              className={`buyer-header__nav-link ${location.pathname === '/buyer/won-items' ? 'active' : ''
                 }`}
             >
               Won Items
@@ -66,7 +66,7 @@ function BuyerHeader() {
               </svg>
             </button>
 
-            <Link to="/profile" className="buyer-header__profile-btn" aria-label="Profile">
+            <Link to="/buyer/profile" className="buyer-header__profile-btn" aria-label="Profile">
               <div className="buyer-header__avatar">
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
                   <path
@@ -99,15 +99,15 @@ function BuyerHeader() {
         <div className={`buyer-header__mobile-menu ${mobileMenuOpen ? 'open' : ''}`}>
           <nav className="buyer-header__mobile-nav">
             <Link
-              to="/dashboard"
-              className={`buyer-header__mobile-nav-link ${location.pathname === '/dashboard' ? 'active' : ''
+              to="/buyer/dashboard"
+              className={`buyer-header__mobile-nav-link ${location.pathname === '/buyer/dashboard' ? 'active' : ''
                 }`}
               onClick={closeMobileMenu}
             >
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
               </svg>
-              Dashboard Overview
+              Dashboard
             </Link>
             <Link
               to="/buyer/auctions"
@@ -121,8 +121,8 @@ function BuyerHeader() {
               Auctions
             </Link>
             <Link
-              to="/my-bids"
-              className={`buyer-header__mobile-nav-link ${location.pathname === '/my-bids' ? 'active' : ''
+              to="/buyer/bids"
+              className={`buyer-header__mobile-nav-link ${location.pathname === '/buyer/bids' ? 'active' : ''
                 }`}
               onClick={closeMobileMenu}
             >
@@ -132,8 +132,8 @@ function BuyerHeader() {
               My Bids
             </Link>
             <Link
-              to="/won-items"
-              className={`buyer-header__mobile-nav-link ${location.pathname === '/won-items' ? 'active' : ''
+              to="/buyer/won-items"
+              className={`buyer-header__mobile-nav-link ${location.pathname === '/buyer/won-items' ? 'active' : ''
                 }`}
               onClick={closeMobileMenu}
             >

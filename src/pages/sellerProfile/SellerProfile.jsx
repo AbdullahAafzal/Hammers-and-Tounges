@@ -580,7 +580,7 @@ const SellerProfile = () => {
               <div className="products-content">
                 <div className="products-header">
                   <h3 className="section-title">Top Performing Products</h3>
-                  <button className="action-btn outline small">
+                  <button className="s-action-btn s-outline small" onClick={()=> navigate('/seller/product')}>
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
                       <path d="M12 5v14M5 12h14" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
                     </svg>

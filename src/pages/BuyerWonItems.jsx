@@ -1,8 +1,8 @@
 import React, { useState } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
-import './WonItems.css'
+import './BuyerWonItems.css'
 
-const WonItems = () => {
+const BuyerWonItems = () => {
   const navigate = useNavigate()
   const [searchQuery, setSearchQuery] = useState('')
   const [currentPage, setCurrentPage] = useState(1)
@@ -266,7 +266,7 @@ const WonItems = () => {
         <div className="won-items-container">
       
           <nav className="breadcrumbs">
-            <Link to="/dashboard">Dashboard</Link>
+            <Link to="/buyer/dashboard">Dashboard</Link>
             <span>/</span>
             <span>Won Items</span>
           </nav>
@@ -301,7 +301,7 @@ const WonItems = () => {
               <div className="items-grid">
                 {currentItems.map(item => (
                   <div key={item.id} className="won-item-card">
-                    <div className="item-image">
+                    <div className="won-item-image">
                       <img src={item.image} alt={item.title} />
                       <div className="won-badge">
                         <svg width="12" height="12" viewBox="0 0 24 24" fill="none">
@@ -353,13 +353,13 @@ const WonItems = () => {
                           <>
                             <button
                               className="wonItems-action-btn primary"
-                              onClick={() => navigate(`/payment/${item.id}`)}
+                              // onClick={() => navigate(`/payment/${item.id}`)}
                             >
                               Proceed to Payment
                             </button>
                             <button
                               className="wonItems-action-btn secondary"
-                              onClick={() => navigate(`/invoices`)}
+                              // onClick={() => navigate(`/buyer/invoices`)}
                             >
                               View Invoice
                             </button>
@@ -368,7 +368,7 @@ const WonItems = () => {
                           <>
                             <button
                               className="wonItems-action-btn primary"
-                              onClick={() => navigate(`/invoice/${item.invoiceNumber}`)}
+                              // onClick={() => navigate(`/invoice/${item.invoiceNumber}`)}
                             >
                               View Invoice
                             </button>
@@ -433,4 +433,4 @@ const WonItems = () => {
   )
 }
 
-export default WonItems
+export default BuyerWonItems

@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import './CreateCategory.css';
+import './ManagerCreateCategory.css';
 
-const CreateCategory = () => {
+const ManagerCreateCategory = () => {
     const [categoryData, setCategoryData] = useState({
         name: '',
         description: '',
@@ -203,4 +203,4 @@ const CreateCategory = () => {
     );
 };
 
-export default CreateCategory;
+export default ManagerCreateCategory;

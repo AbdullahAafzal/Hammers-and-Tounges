@@ -180,28 +180,27 @@ const SellerDashboard = () => {
     }
 
     return (
-        <div className="dashboard-page">
+        <div className="seller-page">
 
-            <main className="dashboard-main">
-                <div className="dashboard-container">
+            <main className="seller-main">
+                <div className="seller-container">
                     <div className="dashboard-welcome">
                         <div className="welcome-content">
                             <h1 className="welcome-title">Welcome back, {seller.name}!</h1>
                             <p className="welcome-subtitle">Your seller dashboard is updated in real-time</p>
                         </div>
                         <div className="welcome-actions">
-                            <Link to="/seller/create-product" className="action-button primary-button primary">
+                            <Link to="/seller/product" className="action-button primary-button primary">
                                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
                                     <path d="M12 5V19M5 12H19" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
                                 </svg>
                                 Create New Product</Link>
-                            <button to="/seller/payouts" className="action-button secondary">Request Payout</button>
+                            {/* <button className="action-button secondary">Request Payout</button> */}
                         </div>
                     </div>
 
                     <SummaryCard 
                         seller={seller} 
-                        // formatCurrency={formatCurrency}
                     />
 
                     <div className="dashboard-two-column">
