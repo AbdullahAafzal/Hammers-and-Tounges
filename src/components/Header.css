@@ -30,10 +30,6 @@
   z-index: 1001;
 }
 
-.buyer-header__logo:hover {
-  opacity: 0.9;
-}
-
 .buyer-header__logo img {
   width: 36px;
   height: 36px;

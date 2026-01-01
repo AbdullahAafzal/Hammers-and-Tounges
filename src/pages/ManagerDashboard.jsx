@@ -118,20 +118,20 @@ function ManagerDashboard() {
 
   return (
     <>
-      <div className="admin-wrapper">
-        <div className="admin-container">
+      <div className="manager-wrapper">
+        <div className="manager-container">
 
-          <div className="admin-section-header">
-            <div className="admin-header-content">
-              <h1 className="admin-page-title">Inspection Queue</h1>
-              <p className="admin-page-subtitle">Manage and track all items pending inspections</p>
+          <div className="manager-section-header">
+            <div className="manager-header-content">
+              <h1 className="manager-page-title">Inspection Queue</h1>
+              <p className="manager-page-subtitle">Manage and track all items pending inspections</p>
             </div>
           </div>
 
-          <div className="admin-filter-section">
-            <div className="admin-search-container">
-              <div className="admin-search-input-wrapper">
-                <button className='admin-search-btn'>
+          <div className="manager-filter-section">
+            <div className="manager-search-container">
+              <div className="manager-search-input-wrapper">
+                <button className='manager-search-btn'>
                   <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
                     <circle cx="11" cy="11" r="8" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
                     <path d="M21 21L16.65 16.65" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
@@ -143,11 +143,11 @@ function ManagerDashboard() {
                   placeholder="Search by Item ID or Seller..."
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
-                  className="admin-search-input"
+                  className="manager-search-input"
                 />
                 {search && (
                   <button
-                    className="admin-clear-search"
+                    className="manager-clear-search"
                     onClick={() => setSearch('')}
                     aria-label="Clear search"
                   >
@@ -159,7 +159,7 @@ function ManagerDashboard() {
               </div>
             </div>
 
-            <select className="admin-filter-select" value={category} onChange={(e) => setCategory(e.target.value)}>
+            <select className="manager-filter-select" value={category} onChange={(e) => setCategory(e.target.value)}>
               <option value="All">All Categories</option>
               <option value="Vehicle">Vehicle</option>
               <option value="Electronics">Electronics</option>
@@ -168,25 +168,25 @@ function ManagerDashboard() {
               <option value="Home Goods">Home Goods</option>
             </select>
 
-            <select className="admin-filter-select" value={status} onChange={(e) => setStatus(e.target.value)}>
+            <select className="manager-filter-select" value={status} onChange={(e) => setStatus(e.target.value)}>
               <option value="All">All Status</option>
               <option value="Pending Inspection">Pending Inspection</option>
               <option value="In Progress">In Progress</option>
               <option value="Completed">Completed</option>
             </select>
 
-            <button onClick={applyFilters} className="admin-apply-btn">Apply</button>
+            <button onClick={applyFilters} className="manager-apply-btn">Apply</button>
 
-            <button onClick={() => { setSearch(''); setCategory("All"); setStatus("All"); applyFilters(); }} className="admin-clear-btn">
+            <button onClick={() => { setSearch(''); setCategory("All"); setStatus("All"); applyFilters(); }} className="manager-clear-btn">
               Clear
             </button>
           </div>
 
-          <div className="admin-data-table-section">
-            <div className="admin-table-wrapper">
-              <table className="admin-data-table">
+          <div className="manager-data-table-section">
+            <div className="manager-table-wrapper">
+              <table className="manager-data-table">
                 <thead>
-                  <tr className='admin-row-headings'>
+                  <tr className='manager-row-headings'>
                     <th>Item ID</th>
                     <th>Item Category</th>
                     <th>Seller</th>
@@ -201,7 +201,7 @@ function ManagerDashboard() {
                     paginatedData.map((item, index) => (
                       <tr
                         key={item.id}
-                        className={`admin-table-row ${selectedRow === item.id ? "row-selected" : ""}`}
+                        className={`manager-table-row ${selectedRow === item.id ? "row-selected" : ""}`}
                         onClick={() => {
                           setSelectedRow(item.id)
                         }
@@ -209,26 +209,26 @@ function ManagerDashboard() {
 
                       >
                         <td>
-                          <span className="admin-item-id">{item.id}</span>
+                          <span className="manager-item-id">{item.id}</span>
                         </td>
 
                         <td>
-                          <div className="admin-category-info">
-                            <div className="admin-category-icon-cell">
-                              <span className="admin-category-icon-emoji">{getCategoryIcon(item.category)}</span>
+                          <div className="manager-category-info">
+                            <div className="manager-category-icon-cell">
+                              <span className="manager-category-icon-emoji">{getCategoryIcon(item.category)}</span>
                             </div>
-                            <span className="admin-category-name">{item.category}</span>
+                            <span className="manager-category-name">{item.category}</span>
                           </div>
                         </td>
 
                         <td>
-                          <span className="admin-seller-name">{item.seller}</span>
+                          <span className="manager-seller-name">{item.seller}</span>
                         </td>
 
                         <td>
-                          <div className="admin-status-cell">
-                            <span className={`admin-status-badge ${item.status === "Pending Inspection" ? "badge-pending" :
-                                item.status === "Rejected" ? "badge-inprogress" : ""
+                          <div className="manager-status-cell">
+                            <span className={`manager-status-badge ${item.status === "Pending Inspection" ? "badge-pending" :
+                              item.status === "Rejected" ? "badge-inprogress" : ""
                               }`}>
                               {item.status}
                             </span>
@@ -236,11 +236,11 @@ function ManagerDashboard() {
                         </td>
 
                         <td>
-                          <span className="admin-officer-name">{item.officer}</span>
+                          <span className="manager-officer-name">{item.officer}</span>
                         </td>
 
                         <td>
-                          <div className="admin-action-buttons">
+                          <div className="manager-action-buttons">
                             <ActionButton status={item.status} />
                           </div>
                         </td>
@@ -249,8 +249,8 @@ function ManagerDashboard() {
                   ) : (
                     <tr>
                       <td colSpan="7">
-                        <div className="admin-empty-state">
-                          <div className="admin-empty-icon">
+                        <div className="manager-empty-state">
+                          <div className="manager-empty-icon">
                             <svg width="48" height="48" viewBox="0 0 24 24" fill="none">
                               <path d="M12 2L2 7L12 12L22 7L12 2Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                               <path d="M2 17L12 22L22 17" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
@@ -269,9 +269,9 @@ function ManagerDashboard() {
 
             {/* PAGINATION */}
             {filtered.length > itemsPerPage && (
-              <div className="admin-pagination">
+              <div className="manager-pagination">
                 <button
-                  className="admin-pagination-btn admin-prev-btn"
+                  className="manager-pagination-btn manager-prev-btn"
                   onClick={() => setCurrentPage(currentPage - 1)}
                   disabled={currentPage === 1}
                 >
@@ -281,14 +281,14 @@ function ManagerDashboard() {
                   Previous
                 </button>
 
-                <div className="admin-page-numbers">
+                <div className="manager-page-numbers">
                   {generatePageNumbers().map((page, index) => (
                     page === '...' ? (
-                      <span key={`dots-${index}`} className="admin-page-dots">...</span>
+                      <span key={`dots-${index}`} className="manager-page-dots">...</span>
                     ) : (
                       <button
                         key={page}
-                        className={`admin-page-number ${currentPage === page ? 'active' : ''}`}
+                        className={`manager-page-number ${currentPage === page ? 'active' : ''}`}
                         onClick={() => setCurrentPage(page)}
                       >
                         {page}
@@ -298,7 +298,7 @@ function ManagerDashboard() {
                 </div>
 
                 <button
-                  className="admin-pagination-btn admin-next-btn"
+                  className="manager-pagination-btn manager-next-btn"
                   onClick={() => setCurrentPage(currentPage + 1)}
                   disabled={currentPage === totalPages}
                 >

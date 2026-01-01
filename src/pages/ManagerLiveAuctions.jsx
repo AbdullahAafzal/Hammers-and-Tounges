@@ -25,7 +25,6 @@ export default function ManagerLiveAuctions() {
   const [page, setPage] = useState(1);
   const navigate = useNavigate();
 
-  // Filtered data
   const filteredData = useMemo(() => {
     return SAMPLE_DATA.filter((item) => {
       const matchSearch = item.user.toLowerCase().includes(search.toLowerCase()) ||
@@ -175,7 +174,7 @@ export default function ManagerLiveAuctions() {
                     <tr
                       key={item.id}
                       className="live-auction-table-row"
-                      onClick={() => navigate("/admin/auction-results")}
+                      onClick={() => navigate("/manager/auction-results")}
                     >
 
                       <td>

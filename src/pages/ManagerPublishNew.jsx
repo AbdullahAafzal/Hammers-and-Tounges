@@ -1,9 +1,10 @@
-import React, { useState } from "react";
+import React, { useState, useCallback, useRef } from "react";
 import { useNavigate } from "react-router-dom";
-import "./ManagerPublishNew.css"; 
+import "./ManagerPublishNew.css";
 
 const ManagerPublishNew = () => {
   const navigate = useNavigate();
+  const fileInputRef = useRef(null);
 
   const [formData, setFormData] = useState({
     title: "",
@@ -15,183 +16,344 @@ const ManagerPublishNew = () => {
     images: [],
   });
 
-  const handleChange = (e) => {
+  const handleChange = useCallback((e) => {
     const { name, value, type, checked } = e.target;
-    setFormData({
-      ...formData,
+    setFormData(prev => ({
+      ...prev,
       [name]: type === "checkbox" ? checked : value,
-    });
-  };
+    }));
+  }, []);
 
-  const handleImageUpload = (files) => {
-    const fileArray = Array.from(files).map((file) => ({
+  const handleImageUpload = useCallback((files) => {
+    const validImages = Array.from(files).filter(file => 
+      file.type.startsWith('image/')
+    );
+    
+    const fileArray = validImages.slice(0, 8).map((file) => ({
+      id: Date.now() + Math.random(),
       name: file.name,
       url: URL.createObjectURL(file),
+      size: (file.size / 1024 / 1024).toFixed(2), // MB
     }));
 
-    setFormData((prev) => ({
+    setFormData(prev => ({
       ...prev,
       images: [...prev.images, ...fileArray],
     }));
-  };
+  }, []);
 
-  const handleDrop = (e) => {
+  const removeImage = useCallback((id) => {
+    setFormData(prev => ({
+      ...prev,
+      images: prev.images.filter(img => img.id !== id),
+    }));
+  }, []);
+
+  const handleDrop = useCallback((e) => {
     e.preventDefault();
     handleImageUpload(e.dataTransfer.files);
-  };
+  }, [handleImageUpload]);
 
-  const handleSaveDraft = () => {
+  const handleDragOver = useCallback((e) => {
+    e.preventDefault();
+    e.currentTarget.classList.add('mpn-drag-active');
+  }, []);
+
+  const handleDragLeave = useCallback((e) => {
+    e.preventDefault();
+    e.currentTarget.classList.remove('mpn-drag-active');
+  }, []);
+
+  const handleSaveDraft = useCallback(() => {
     localStorage.setItem("draftLot", JSON.stringify(formData));
-    navigate("/auctiontab");
-  };
+    navigate("/manager/auctions");
+  }, [formData, navigate]);
 
-  const handlePublish = () => {
+  const handlePublish = useCallback(() => {
     localStorage.setItem("publishedLot", JSON.stringify(formData));
-    navigate("/auctiontab");
-  };
+    navigate("/manager/auctions");
+  }, [formData, navigate]);
+
+  const handlePreview = useCallback(() => {
+    // Preview logic here
+    console.log("Previewing lot:", formData);
+  }, [formData]);
 
   return (
-    <div className="admin-page">
-      <div className="admin-header">
-        <h2 className="header-title">Publish New Lot</h2>
-        <button className="btn-draft" onClick={handleSaveDraft}>
-          Save Draft
-        </button>
-      </div>
+    <div className="mpn-container">
+      {/* Header */}
+      <header className="mpn-header">
+        <div className="mpn-header-content">
+          <div>
+            <h1 className="mpn-title">Publish New Lot</h1>
+            <p className="mpn-subtitle">Create and publish a new auction lot with detailed information</p>
+          </div>
+          <button className="mpn-btn mpn-btn-outline" onClick={handleSaveDraft}>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z" stroke="currentColor" strokeWidth="2"/>
+              <path d="M17 21v-8H7v8M7 3v5h8" stroke="currentColor" strokeWidth="2"/>
+            </svg>
+            Save Draft
+          </button>
+        </div>
+      </header>
 
-      <div className="row g-4">
-        <div className="col-md-7">
-          <div className="admin-card">
-            <h5 className="card-title-custom">Lot Details</h5>
-
-            <div className="mb-3">
-              <label className="form-label-custom">Lot Title</label>
+      {/* Main Content Grid */}
+      <div className="mpn-main-grid">
+        {/* Left Column - Lot Details */}
+        <div className="mpn-left-column">
+          <div className="mpn-card">
+            <div className="mpn-card-header">
+              <h2 className="mpn-card-title">Lot Details</h2>
+            </div>
+            
+            <div className="mpn-form-group">
+              <label className="mpn-form-label">
+                Lot Title
+                <span className="mpn-required">*</span>
+              </label>
               <input
                 type="text"
-                className="form-control bg-dark text-white border-secondary"
-                placeholder="Enter title"
+                className="mpn-input"
+                placeholder="Enter a descriptive title for your lot"
                 name="title"
                 value={formData.title}
                 onChange={handleChange}
+                required
               />
+              <div className="mpn-input-hint">Be specific and descriptive</div>
             </div>
 
-            <div className="row mb-3">
-              <div className="col">
-                <label className="form-label-custom">Lot Number</label>
+            <div className="mpn-form-row">
+              <div className="mpn-form-group">
+                <label className="mpn-form-label">
+                  Lot Number
+                  <span className="mpn-required">*</span>
+                </label>
                 <input
                   type="text"
-                  className="form-control bg-dark text-white border-secondary"
-                  placeholder="e.g. L-1024"
+                  className="mpn-input"
+                  placeholder="e.g., L-1024"
                   name="lotNumber"
                   value={formData.lotNumber}
                   onChange={handleChange}
+                  required
                 />
+                <div className="mpn-input-hint">Unique identifier for this lot</div>
               </div>
-              <div className="col">
-                <label className="form-label-custom">Starting Bid ($)</label>
-                <input
-                  type="number"
-                  className="form-control bg-dark text-white border-secondary"
-                  placeholder="500.00"
-                  name="startingBid"
-                  value={formData.startingBid}
-                  onChange={handleChange}
-                />
+              
+              <div className="mpn-form-group">
+                <label className="mpn-form-label">
+                  Starting Bid ($)
+                  <span className="mpn-required">*</span>
+                </label>
+                <div className="mpn-input-with-prefix">
+                  <span className="mpn-input-prefix">$</span>
+                  <input
+                    type="number"
+                    className="mpn-input"
+                    placeholder="0.00"
+                    name="startingBid"
+                    value={formData.startingBid}
+                    onChange={handleChange}
+                    min="0"
+                    step="0.01"
+                    required
+                  />
+                </div>
+                <div className="mpn-input-hint">Minimum starting bid amount</div>
               </div>
             </div>
 
-            <div className="mb-3">
-              <label className="form-label-custom">Lot Description</label>
+            <div className="mpn-form-group">
+              <label className="mpn-form-label">
+                Lot Description
+                <span className="mpn-required">*</span>
+              </label>
               <textarea
-                rows={4}
-                className="form-control bg-dark text-white border-secondary"
-                placeholder="Description..."
+                className="mpn-textarea"
+                placeholder="Describe the lot in detail. Include condition, specifications, history, and any important notes..."
                 name="description"
                 value={formData.description}
                 onChange={handleChange}
+                rows={4}
+                required
               />
+              <div className="mpn-textarea-counter">
+                {formData.description.length}/2000 characters
+              </div>
             </div>
 
-            <div className="mb-3">
-              <label className="form-label-custom">Assign Auction</label>
+            <div className="mpn-form-group">
+              <label className="mpn-form-label">
+                Assign to Auction
+                <span className="mpn-required">*</span>
+              </label>
               <select
-                className="form-select bg-dark text-white border-secondary"
+                className="mpn-select"
                 name="auction"
                 value={formData.auction}
                 onChange={handleChange}
+                required
               >
-                <option value="">Select Auction</option>
-                <option value="Auction 1">Vehicle</option>
-                <option value="Auction 2">Building</option>
+                <option value="">Select an auction</option>
+                <option value="vehicle-auction">Vehicle Auction</option>
+                <option value="property-auction">Property Auction</option>
+                <option value="art-auction">Art & Collectibles</option>
+                <option value="electronics-auction">Electronics Auction</option>
               </select>
+              <div className="mpn-input-hint">Choose the auction category for this lot</div>
             </div>
 
-            <div className="d-flex justify-content-between align-items-center">
-              <span className="form-label-custom">Set Reserve Price</span>
-              <div className="form-check form-switch">
-                <input
-                  type="checkbox"
-                  className="form-check-input"
-                  name="reservePrice"
-                  checked={formData.reservePrice}
-                  onChange={handleChange}
-                />
+            <div className="mpn-toggle-group">
+              <div className="mpn-toggle-content">
+                <div className="mpn-toggle-label">
+                  <span className="mpn-toggle-title">Set Reserve Price</span>
+                  <span className="mpn-toggle-description">
+                    Enable to set a minimum price that must be met for the lot to sell
+                  </span>
+                </div>
+                <label className="mpn-switch">
+                  <input
+                    type="checkbox"
+                    name="reservePrice"
+                    checked={formData.reservePrice}
+                    onChange={handleChange}
+                  />
+                  <span className="mpn-slider"></span>
+                </label>
               </div>
+              {formData.reservePrice && (
+                <div className="mpn-reserve-input">
+                  <label className="mpn-form-label">Reserve Price ($)</label>
+                  <div className="mpn-input-with-prefix">
+                    <span className="mpn-input-prefix">$</span>
+                    <input
+                      type="number"
+                      className="mpn-input"
+                      placeholder="0.00"
+                      min="0"
+                      step="0.01"
+                    />
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         </div>
 
-        <div className="col-md-5">
-          <div className="admin-card">
-            <h5 className="card-title-custom">Images</h5>
+        {/* Right Column - Images & Publishing */}
+        <div className="mpn-right-column">
+          {/* Image Upload Card */}
+          <div className="mpn-card">
+            <div className="mpn-card-header">
+              <h2 className="mpn-card-title">Images & Media</h2>
+              {formData.images.length > 0 && (
+                <span className="mpn-image-count">{formData.images.length}/8 images</span>
+              )}
+            </div>
 
             <div
-              className="drop-area"
-              onDragOver={(e) => e.preventDefault()}
+              className={`mpn-drop-area ${formData.images.length > 0 ? 'mpn-has-images' : ''}`}
+              onDragOver={handleDragOver}
+              onDragLeave={handleDragLeave}
               onDrop={handleDrop}
-              onClick={() => document.getElementById("fileInput").click()}
+              onClick={() => fileInputRef.current?.click()}
             >
-              <p className="drop-area-text">
-                Drag & Drop Images Here or Click to Upload
-              </p>
+              <div className="mpn-drop-area-content">
+                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+                  <polyline points="17 8 12 3 7 8" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                  <line x1="12" y1="3" x2="12" y2="15" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+                </svg>
+                <div className="mpn-drop-area-text">
+                  <p className="mpn-drop-area-title">Drop images here or click to upload</p>
+                  <p className="mpn-drop-area-subtitle">JPG, JPEG, PNG, GIF up to 5MB each</p>
+                </div>
+              </div>
               <input
+                ref={fileInputRef}
                 type="file"
-                id="fileInput"
                 multiple
-                hidden
+                accept="image/*"
                 onChange={(e) => handleImageUpload(e.target.files)}
+                className="mpn-file-input"
               />
             </div>
 
-            <div className="d-flex flex-wrap gap-2 mt-3">
-              {formData.images.map((img, index) => (
-                <img
-                  key={index}
-                  src={img.url}
-                  alt=""
-                  className="preview-img"
-                />
-              ))}
-            </div>
+            {/* Image Preview Grid */}
+            {formData.images.length > 0 && (
+              <div className="mpn-image-grid">
+                {formData.images.map((img) => (
+                  <div key={img.id} className="mpn-image-preview">
+                    <img
+                      src={img.url}
+                      alt={img.name}
+                      className="mpn-preview-img"
+                      loading="lazy"
+                    />
+                    <button
+                      className="mpn-remove-image"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        removeImage(img.id);
+                      }}
+                      aria-label={`Remove ${img.name}`}
+                    >
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+                        <path d="M18 6L6 18" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+                        <path d="M6 6L18 18" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+                      </svg>
+                    </button>
+                    <div className="mpn-image-info">
+                      <span className="mpn-image-name">{img.name}</span>
+                      <span className="mpn-image-size">{img.size} MB</span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
 
-          <div className="admin-card">
-            <h5 className="card-title-custom">Publishing</h5>
+          {/* Publishing Card */}
+          <div className="mpn-card">
+            <div className="mpn-card-header">
+              <h2 className="mpn-card-title">Publishing</h2>
+            </div>
 
-         <div className="status-container">
-  <span className="status1">Status:</span>
-  <span className="status2">Draft</span>
-</div>
+            <div className="mpn-status-section">
+              <div className="mpn-status-row">
+                <span className="mpn-status-label">Current Status</span>
+                <span className="mpn-status-value mpn-status-draft">Draft</span>
+              </div>
+              <div className="mpn-status-row">
+                <span className="mpn-status-label">Last Updated</span>
+                <span className="mpn-status-value">Just now</span>
+              </div>
+            </div>
 
+            <div className="mpn-publish-actions">
+              <button className="mpn-btn mpn-btn-primary mpn-btn-publish" onClick={handlePublish}>
+                Publish Lot
+              </button>
+              
+              <button className="mpn-btn mpn-btn-outline mpn-btn-preview" onClick={handlePreview}>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                  <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" stroke="currentColor" strokeWidth="2"/>
+                  <circle cx="12" cy="12" r="3" stroke="currentColor" strokeWidth="2"/>
+                </svg>
+                Preview Lot
+              </button>
+            </div>
 
-
-
-            <button className="btn-publish" onClick={handlePublish}>
-              Publish Lot
-            </button>
-
-            <button className="btn-preview">Preview Lot</button>
+            <div className="mpn-publishing-note">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2"/>
+                <line x1="12" y1="8" x2="12" y2="12" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+                <circle cx="12" cy="16" r="1" fill="currentColor"/>
+              </svg>
+              <p>Once published, the lot will be visible to all bidders and can't be edited</p>
+            </div>
           </div>
         </div>
       </div>

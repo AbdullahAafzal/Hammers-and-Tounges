@@ -59,14 +59,14 @@ const AdminManagerKYC = () => {
             </div>
           </div>
 
-          <div className="card admin-panel">
+          <div className="kyc-card-form admin-panel">
             <h3>Admin Review Panel</h3>
             <div className="action-buttons">
               <button className="approve">Approve</button>
               <button className="reject">Reject</button>
             </div>
             <label className="reason-label">Reason for Rejection</label>
-            <textarea placeholder="Provide a clear reason for rejecting this user's KYC documents..." />
+            <textarea className="textarea-form" placeholder="Provide a clear reason for rejecting this user's KYC documents..." />
             <div className="checkbox-row">
               <input type="checkbox" />
               <span>Flag for additional verification</span>

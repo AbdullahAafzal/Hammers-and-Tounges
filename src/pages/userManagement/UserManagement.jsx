@@ -108,35 +108,35 @@ const UserManagement = () => {
               <tr key={i}>
                 <td
                   className="name-cell2"
-                  onClick={() => navigate("/manager/kycverification")}
+                  onClick={() => navigate("/admin/kycverification")}
                 >
                   {user.name}
                 </td>
                 <td
-                  onClick={() => navigate("/manager/kycverification")}
+                  onClick={() => navigate("/admin/kycverification")}
                 >
                   {user.email}
                 </td>
                 <td
-                  onClick={() => navigate("/manager/kycverification")}
+                  onClick={() => navigate("/admin/kycverification")}
                 >
                   {user.role}
                 </td>
                 <td
                 className="status-data"
-                  onClick={() => navigate("/manager/kycverification")}
+                  onClick={() => navigate("/admin/kycverification")}
                 >
                   <span className={`user-status ${user.status.toLowerCase()}`}>
                     {user.status}
                   </span>
                 </td>
                 <td
-                  onClick={() => navigate("/manager/kycverification")}
+                  onClick={() => navigate("/admin/kycverification")}
                 >
                   {user.lastLogin}
                 </td>
 
-                <td className="actions2" onClick={() => navigate("/manager/kycverification")}>•••</td>
+                <td className="actions2" onClick={() => navigate("/admin/kycverification")}>•••</td>
               </tr>
             ))}
           </tbody>

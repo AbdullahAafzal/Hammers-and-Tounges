@@ -74,14 +74,14 @@ const KYCVerification = () => {
     e.preventDefault()
     console.log('Submitting KYC documents', documents)
     
-    navigate( '/seller-dashboard', {
+    navigate( '/seller/dashboard', {
       state: documents
     } )
 
   }
 
   const handleSkip = () => {
-    navigate('/seller-dashboard')
+    navigate('/seller/dashboard')
   }
 
   const getStatusBadge = (status) => {
@@ -135,7 +135,7 @@ const KYCVerification = () => {
           </button>
           <Link to="/" className="kyc-logo">
             <img src={logo} alt="Hammers & Tongues Logo" />
-            <span>Hammers & Tongues</span>
+            <span>Hammer & Tongues</span>
           </Link>
         </div>
       </div>

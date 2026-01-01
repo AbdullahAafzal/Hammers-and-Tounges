@@ -56,6 +56,11 @@ function SellerHeader() {
           </nav>
 
           <div className="seller-header__right">
+
+            <div className="seller-header__seller-badge">
+              <span className="seller-header__seller-text">Seller</span>
+            </div>
+
             <button
               className="seller-header__mobile-toggle"
               onClick={toggleMobileMenu}

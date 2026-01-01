@@ -1,41 +1,38 @@
-import React from 'react'
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
-import Header from './components/Header'
-import Footer from './components/Footer'
-import Home from './pages/Home'
-import Auctions from './pages/Auctions'
-import AuctionDetails from './pages/AuctionDetails'
-import About from './pages/About'
-import Contact from './pages/Contact'
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import Header from "./components/Header";
+import Footer from "./components/Footer";
 
-import Register from './pages/Register'
-import OTPVerification from './pages/OTPVerification'
-import SignIn from './pages/SignIn'
-import KYCVerification from './pages/KYCVerification'
+import Home from "./pages/Home";
+import Auctions from "./pages/Auctions";
+import AuctionDetails from "./pages/AuctionDetails";
+import About from "./pages/About";
+import Contact from "./pages/Contact";
 
-import BuyerHeader from './components/BuyerHeader'
-import BuyerDashboard from './pages/BuyerDashboard'
-import BuyerAuctions from './pages/BuyerAuctions'
-import BuyerAuctionDetails from './pages/BuyerAuctionDetails'
-import BuyerBids from './pages/BuyerBids'
-import BuyerWonItems from './pages/BuyerWonItems'
-import BuyerInvoices from './pages/BuyerInvoices'
-import BuyerWallet from './pages/BuyerWallet'
-import BuyerProfile from './pages/BuyerProfile'
+import SignIn from "./pages/SignIn";
+import Register from "./pages/Register";
+import OTPVerification from "./pages/OTPVerification";
+import KYCVerification from "./pages/KYCVerification";
 
-import SellerHeader from './components/SellerHeader'
-import SellerDashboard from './pages/SellerDashboard'
-import SellerAuctionListings from './pages/SellerAuctionListings'
-import SellerListingDetails from './pages/SellerAuctionDetails'
-import SellerAuctions from './pages/SellerAuctions'
-import SellerCreateProduct from './pages/SellerCreateProduct'
-import SellerAnalytics from './pages/SellerAnalytics'
-import SellerProfile from './pages/sellerProfile/SellerProfile'
-import './App.css'
-import Reports from './pages/Reports'
+import BuyerDashboard from "./pages/BuyerDashboard";
+import BuyerAuctions from "./pages/BuyerAuctions";
+import BuyerAuctionDetails from "./pages/BuyerAuctionDetails";
+import BuyerBids from "./pages/BuyerBids";
+import BuyerWonItems from "./pages/BuyerWonItems";
+import BuyerInvoices from "./pages/BuyerInvoices";
+import BuyerWallet from "./pages/BuyerWallet";
+import BuyerProfile from "./pages/BuyerProfile";
 
-import ManagerHeader from './components/ManagerHeader'
-import ManagerDashboard from './pages/ManagerDashboard'
+import SellerDashboard from "./pages/SellerDashboard";
+import SellerAuctionListings from "./pages/SellerAuctionListings";
+import SellerListingDetails from "./pages/SellerAuctionDetails";
+import SellerAuctions from "./pages/SellerAuctions";
+import SellerCreateProduct from "./pages/SellerCreateProduct";
+import SellerAnalytics from "./pages/SellerAnalytics";
+import SellerProfile from "./pages/sellerProfile/SellerProfile";
+
+// Manager
+import ManagerDashboard from "./pages/ManagerDashboard";
+import ManagerProfile from "./pages/ManagerProfile";
 import ManagerInspection from "./pages/ManagerInspection";
 import ManagerAuctions from './pages/ManagerAuctions'
 import ManagerPublishNew from './pages/ManagerPublishNew'
@@ -46,301 +43,171 @@ import CategoryManagement from './pages/categoryManagement/CategoryManagement'
 import ManagerCreateCategory from './pages/managerCreateCategory/ManagerCreateCategory'
 import ManagerProductFields from './pages/managerProductFields/ManagerProductFields'
 
-import AdminHeader from './components/AdminHeader'
-import AdminDashboard from './pages/adminDashboard/AdminDashboard'
+// Admin
+import AdminDashboard from "./pages/adminDashboard/AdminDashboard";
+import AdminProfile from "./pages/adminProfile/AdminProfile";
 import AdminFinance from './pages/AdminFinance'
 import ManualPaymentEntry from './components/ManualPayment'
 import ManualPaymentAuthorization from './pages/ManualPaymentAuthorization'
 import PaymentVerification from './pages/paymentVerification/PaymentVerification'
 import UserManagement from './pages/userManagement/UserManagement'
 import AdminManagerKYC from './pages/userManagement/AdminManagerKYC'
-import { ToastContainer } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
-// import { Provider } from 'react-redux'
-// import store from './store/store';
 
+// Route Guards
+import BuyerGuard from "./guards/BuyerGuard";
+import SellerGuard from "./guards/SellerGuard";
+import ManagerGuard from "./guards/ManagerGuard";
+import AdminGuard from "./guards/AdminGuard";
+
+// All Role's Layouts
+import BuyerLayout from "./layouts/BuyerLayout";
+import SellerLayout from "./layouts/SellerLayout";
+import ManagerLayout from "./layouts/ManagerLayout";
+import AdminLayout from "./layouts/AdminLayout";
 
 function App() {
-
   return (
-    // <Provider store={store}>
     <Router>
-      <div className="app">
-        <Routes>
-          <Route path="/signin" element={<SignIn />} />
-          <Route path="/register" element={<Register />} />
-          <Route path="/kyc-verification" element={<KYCVerification />} />
-          <Route path="/otp-verification" element={<OTPVerification />} />
+      <Routes>
 
-          {/* Guest Flow */}
-          <Route path="/" element={
-            <>
-              <Header />
-              <Home />
-              <Footer />
-            </>
-          } />
-          <Route path="/auctions" element={
-            <>
-              <Header />
-              <Auctions />
-              <Footer />
-            </>
-          } />
-          <Route path="/auction/:id" element={
-            <>
-              <Header />
-              <AuctionDetails />
-              <Footer />
-            </>
-          } />
-          <Route path="/about" element={
-            <>
-              <Header />
-              <About />
-              <Footer />
-            </>
-          } />
-          <Route path="/contact" element={
-            <>
-              <Header />
-              <Contact />
-              <Footer />
-            </>
-          } />
+        {/* Public Routes */}
+        <Route path="/" element={<><Header /><Home /><Footer /></>} />
+        <Route path="/auctions" element={<><Header /><Auctions /><Footer /></>} />
+        <Route path="/auction/:id" element={<><Header /><AuctionDetails /><Footer /></>} />
+        <Route path="/about" element={<><Header /><About /><Footer /></>} />
+        <Route path="/contact" element={<><Header /><Contact /><Footer /></>} />
 
-          {/* ////// Buyer Dashboard Start ////// */}
-          <Route path="/buyer/dashboard" element={
-            <>
-              <BuyerHeader />
-              <BuyerDashboard />
-            </>
-          } />
-          <Route path="/buyer/auctions" element={
-            <>
-              <BuyerHeader />
-              <BuyerAuctions />
-            </>
-          } />
-          <Route path="/buyer/auction/:id" element={
-            <>
-              {/* <BuyerHeader/> */}
-            <BuyerAuctionDetails />
-            </>
-          } />
-          <Route path="/buyer/bids" element={
-            <>
-              <BuyerHeader />
-              <BuyerBids />
-            </>
-          } />
-          <Route path="/buyer/won-items" element={
-            <>
-              <BuyerHeader />
-              <BuyerWonItems />
-            </>
-          } />
+        <Route path="/signin" element={<SignIn />} />
+        <Route path="/register" element={<Register />} />
+        <Route path="/otp-verification" element={<OTPVerification />} />
+        <Route path="/kyc-verification" element={<KYCVerification />} />
 
-          <Route path="/buyer/invoices" element={
-            <>
-              <BuyerHeader />
-              <BuyerInvoices />
-            </>
-          } />
-          {/* <Route path="/buyer/invoice/:invoiceNumber" element={<BuyerInvoices />} /> */}
-          <Route path="/buyer/wallet" element={
-            <>
-              <BuyerHeader />
-              <BuyerWallet />
-            </>
-          } />
+        {/* Buyer Routes */}
+        <Route element={<BuyerGuard />}>
+          <Route element={<BuyerLayout />}>
+            <Route path="/buyer/dashboard" element={<BuyerDashboard />} />
+            <Route path="/buyer/auctions" element={<BuyerAuctions />} />
+            <Route path="/buyer/auction/:id" element={<BuyerAuctionDetails />} />
+            <Route path="/buyer/bids" element={<BuyerBids />} />
+            <Route path="/buyer/won-items" element={<BuyerWonItems />} />
+            <Route path="/buyer/invoices" element={<BuyerInvoices />} />
+            <Route path="/buyer/wallet" element={<BuyerWallet />} />
+            <Route path="/buyer/profile" element={<BuyerProfile />} />
+          </Route>
+        </Route>
 
-          <Route path="/buyer/profile" element={
-            <>
-              <BuyerHeader />
-              <BuyerProfile />
-            </>
-          } />
+        {/* Seller Routes */}
+        <Route element={<SellerGuard />}>
+          <Route element={<SellerLayout />}>
+            <Route path="/seller/dashboard" element={<SellerDashboard />} />
+            <Route path="/seller/auction-listings" element={<SellerAuctionListings />} />
+            <Route path="/seller/listing/:id" element={<SellerListingDetails />} />
+            <Route path="/seller/auctions" element={<SellerAuctions />} />
+            <Route path="/seller/product" element={<SellerCreateProduct />} />
+            <Route path="/seller/analytics" element={<SellerAnalytics />} />
+            <Route path="/seller/profile" element={<SellerProfile />} />
+          </Route>
+        </Route>
 
-          {/* ///// Seller Dashboard Start ////// */}
-          <Route path="/seller/dashboard" element={
-            <>
-              <SellerHeader />
-              <SellerDashboard />
-            </>
-          } />
-          <Route path='/seller/auction-listings' element={
-            <>
-              <SellerHeader />
-              <SellerAuctionListings />
-            </>
-          } />
-          <Route path='/seller/listing/:id' element={
-            <>
-              <SellerHeader />
-              <SellerListingDetails />
-            </>
-          }
-          />
-          <Route path='/seller/auctions' element={
-            <>
-              <SellerHeader />
-              <SellerAuctions />
-            </>
-          } />
-          <Route path='/seller/product' element={
-            <>
-              <SellerHeader />
-              <SellerCreateProduct />
-            </>
-          } />
-          <Route path='/seller/analytics' element={
-            <>
-              <SellerHeader />
-              <SellerAnalytics />
-            </>
-          } />
-          <Route path="/seller/profile" element={
-            <>
-              <SellerHeader />
-              <SellerProfile />
-            </>
-          } />
+        {/* Manager Routes */}
+        <Route element={<ManagerGuard />}>
+          <Route element={<ManagerLayout />}>
+            <Route path="/manager/dashboard" element={<ManagerDashboard />} />
+            <Route path="/manager/profile" element={<ManagerProfile />} />
 
-          {/* /////// Manager Dashboard /////// */}
-          <Route path="/manager-panel" element={
+            
+           <Route path="/manager/inspection" element={
             <>
-              <ManagerHeader />
-              <ManagerDashboard />
-            </>
-          } />
-
-          <Route path="/manager/inspection" element={
-            <>
-              <ManagerHeader />
               <ManagerInspection />
             </>
           } />
-          <Route path="/manager/reports" element={
-            <>
-              <ManagerHeader />
-              <Reports />
-            </>
-          } />
+  
           <Route path="/manager/auctions" element={
             <>
-              <ManagerHeader />
               <ManagerAuctions />
             </>
           } />
 
           <Route path="/manager/publishnew" element={
             <>
-              <ManagerHeader />
               <ManagerPublishNew />
             </>
           } />
           <Route path="/manager/live-auctions" element={
             <>
-              <ManagerHeader />
               <ManagerLiveAuctions />
             </>
           } />
           <Route path="/manager/auction-results" element={
             <>
-              <ManagerHeader />
               <ManagerAuctionResults />
             </>
           } />
           <Route path="/manager/controlpanel" element={
             <>
-              <ManagerHeader />
               <ManagerAuctionControlPanel />
             </>
           } />
 
           <Route path="/manager/category" element={
             <>
-              <ManagerHeader />
               <CategoryManagement />
             </>
           } />
           <Route path="/manager/add-category" element={
             <>
-              <ManagerHeader />
               <ManagerCreateCategory />
             </>
           } />
           <Route path="/manager/product-fields" element={
             <>
-              <ManagerHeader />
               <ManagerProductFields />
             </>
           } />
-          <Route path="/manager/user-management" element={
-            <>
-              <ManagerHeader />
-              <UserManagement />
-            </>
-          } />
-          <Route path="/manager/kycverification" element={
-            <>
-              <ManagerHeader />
-              <AdminManagerKYC />
-            </>
-          } />
 
-          {/* /////// Admin Working /////// */}
-          <Route path='/admin-panel' element={
-            <>
-              <AdminHeader />
-              <AdminDashboard />
-            </>
-          } />
-          <Route path="/admin/finance" element={
-            <>
-              <AdminHeader />
-              <AdminFinance />
-            </>
-          } />
-          <Route path="/admin/finance/manual-payments" element={
-            <>
-              <AdminHeader />
-              <ManualPaymentEntry />
-            </>
-          } />
+          </Route>
+        </Route>
 
-          <Route path="/admin/finance/manual/payments-authorization" element={
-            <>
-              <AdminHeader />
-              <ManualPaymentAuthorization />
-            </>
-          } />
-          <Route path="/admin/finance/manual/payments-verification" element={
-            <>
-              <AdminHeader />
-              <PaymentVerification />
-            </>
-          } />
+        {/* Admin Routes */}
+        <Route element={<AdminGuard />}>
+          <Route element={<AdminLayout />}>
+            <Route path="/admin/dashboard" element={<AdminDashboard />} />
+            <Route path="/admin/profile" element={<AdminProfile />} />
 
+            <Route path="/admin/finance" element={<AdminFinance />} />
+            <Route path="/admin/finance/manual-payments" element={
+              <>
+                <ManualPaymentEntry />
+              </>
+            } />
 
-        </Routes>
-        <ToastContainer
-          position="top-right"
-          autoClose={3000}
-          hideProgressBar={false}
-          newestOnTop={true}
-          closeOnClick
-          rtl={false}
-          pauseOnFocusLoss
-          draggable
-          pauseOnHover
-          theme="light"
-        />
-      </div>
+            <Route path="/admin/finance/manual/payments-authorization" element={
+              <>
+                <ManualPaymentAuthorization />
+              </>
+            } />
+            <Route path="/admin/finance/manual/payments-verification" element={
+              <>
+                <PaymentVerification />
+              </>
+            } />
+            <Route path="/admin/users" element={
+              <>
+                <UserManagement />
+              </>
+            } />
+            <Route path="/admin/kycverification" element={
+              <>
+                <AdminManagerKYC />
+              </>
+            } />
+
+          </Route>
+        </Route>
+
+      </Routes>
     </Router>
-    // </Provider>
-  )
+  );
 }
 
-export default App
+export default App;

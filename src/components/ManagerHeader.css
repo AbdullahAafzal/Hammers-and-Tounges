@@ -32,11 +32,6 @@
   flex-shrink: 0;
 }
 
-.manager-header__logo:hover {
-  opacity: 0.9;
-  transform: translateY(-1px);
-}
-
 .manager-header__logo img {
   width: 36px;
   height: 36px;

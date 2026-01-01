@@ -26,17 +26,21 @@ const SignIn = () => {
     
     if (formData.email === "admin@gmail.com" && formData.password === "admin") {
       setLocalStorage('user', { ...formData, isAuth: true, role: 'admin' })
-      navigate("/admin-panel", { replace: true });
+      setLocalStorage('adminToken', 'admin')
+      navigate("/admin/dashboard", { replace: true });
     }
     else if (formData.email === "manager@gmail.com" && formData.password === "manager") {
       setLocalStorage('user', { ...formData, isAuth: true, role: 'manager' })
-      navigate("/manager-panel", { replace: true });
+      setLocalStorage('managerToken', 'manager')
+      navigate("/manager/dashboard", { replace: true });
     } else if (formData.email === "testbuyer@gmail.com" && formData.password === "testBuyer@1") {
       setLocalStorage('user', { ...formData, isAuth: true, role: 'buyer' })
+      setLocalStorage('buyerToken', 'buyer')
       navigate("/buyer/dashboard", { replace: true })
     }
     else if (formData.email === "testseller@gmail.com" && formData.password === "testSeller@1") {
       setLocalStorage('user', { ...formData, isAuth: true, role: 'seller' })
+      setLocalStorage('sellerToken', 'seller')
       navigate("/seller/dashboard", { replace: true })
     }
     else {

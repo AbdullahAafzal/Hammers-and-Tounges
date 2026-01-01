@@ -11,15 +11,15 @@ export default function ManagerAuctions() {
 
   const tableData = [
     { name: "Vintage Watch Collection", id: "#VW-10234", status: "Live", start: "Oct 25, 2023", end: "Nov 01, 2023", lots: 45, value: "$15,420" },
-    { name: "Modern Art & Sculptures", id: "#MA-98765", status: "Upcoming", start: "Nov 05, 2023", end: "Nov 12, 2023", lots: 82, value: "$0.00" },
-    { name: "Estate Jewelry Clearance", id: "#EJ-45678", status: "Ended", start: "Oct 10, 2023", end: "Oct 17, 2023", lots: 120, value: "$48,950" },
+    { name: "Modern Art & Sculptures", id: "#MA-98765", status: "Live", start: "Nov 05, 2023", end: "Nov 12, 2023", lots: 82, value: "$0.00" },
+    { name: "Estate Jewelry Clearance", id: "#EJ-45678", status: "Draft", start: "Oct 10, 2023", end: "Oct 17, 2023", lots: 120, value: "$48,950" },
     { name: "Antique Furniture Finds", id: "#AF-33211", status: "Draft", start: "-", end: "-", lots: 35, value: "-" },
     { name: "Luxury Cars Auction", id: "#LC-11223", status: "Live", start: "Oct 12, 2023", end: "Oct 20, 2023", lots: 60, value: "$22,300" },
-    { name: "Rare Books Lot", id: "#RB-65432", status: "Upcoming", start: "Dec 01, 2023", end: "Dec 10, 2023", lots: 90, value: "$0.00" },
-    { name: "Vintage Cameras", id: "#VC-90876", status: "Ended", start: "Sep 15, 2023", end: "Sep 20, 2023", lots: 25, value: "$9,500" },
+    { name: "Rare Books Lot", id: "#RB-65432", status: "Live", start: "Dec 01, 2023", end: "Dec 10, 2023", lots: 90, value: "$0.00" },
+    { name: "Vintage Cameras", id: "#VC-90876", status: "Draft", start: "Sep 15, 2023", end: "Sep 20, 2023", lots: 25, value: "$9,500" },
     { name: "Art Statues", id: "#AS-77889", status: "Draft", start: "-", end: "-", lots: 14, value: "-" },
     { name: "Old Coins", id: "#OC-55511", status: "Live", start: "Oct 19, 2023", end: "Oct 22, 2023", lots: 80, value: "$12,100" },
-    { name: "Antique Watches", id: "#AW-22445", status: "Upcoming", start: "Nov 15, 2023", end: "Nov 25, 2023", lots: 35, value: "$0.00" },
+    { name: "Antique Watches", id: "#AW-22445", status: "Live", start: "Nov 15, 2023", end: "Nov 25, 2023", lots: 35, value: "$0.00" },
   ];
 
   const filteredData = tableData.filter((item) => {
@@ -80,6 +80,14 @@ export default function ManagerAuctions() {
     return '🏷️';
   };
 
+  const handleRowClick = (item) => {
+  if (item.status === "Draft") {
+    navigate("/manager/publishnew");
+  } else {
+    navigate("/manager/controlpanel");
+  }
+};
+
   return (
     <div className="auction-wrapper">
       <div className="auction-container">
@@ -88,8 +96,8 @@ export default function ManagerAuctions() {
             <h1 className="auction-page-title">All Auctions</h1>
             <p className="auction-page-subtitle">Manage and monitor all auction events</p>
           </div>
-          <div className="auction-header-actions">
-            <Link to="/admin/publishnew" className="auction-primary-action-btn-link">
+          {/* <div className="auction-header-actions">
+            <Link to="/manager/publishnew" className="auction-primary-action-btn-link">
               <button className="auction-primary-action-btn">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
                   <path d="M12 5V19M5 12H19" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
@@ -97,10 +105,10 @@ export default function ManagerAuctions() {
                 Create New Auction
               </button>
             </Link>
-          </div>
+          </div> */}
         </div>
 
-        {/* STATS CARDS */}
+   
         <div className="auction-stats-grid">
           <div className="auction-stat-card">
             <div className="auction-card-bg-gradient" style={{ background: 'linear-gradient(135deg, rgba(59, 130, 246, 0.2) 0%, rgba(59, 130, 246, 0.05) 100%)' }}></div>
@@ -114,7 +122,7 @@ export default function ManagerAuctions() {
               </div>
             </div>
             <div className="auction-card-content">
-              <span className="auction-card-label">Active Bidders</span>
+              <span className="m-auction-card-label">Active Bidders</span>
               <h3 className="auction-card-value">1,204</h3>
               <span className="auction-card-change positive">+5.2% vs last period</span>
             </div>
@@ -132,7 +140,7 @@ export default function ManagerAuctions() {
               </div>
             </div>
             <div className="auction-card-content">
-              <span className="auction-card-label">Total Lots</span>
+              <span className="m-auction-card-label">Total Lots</span>
               <h3 className="auction-card-value">850</h3>
               <span className="auction-card-change positive">+1.8% vs last period</span>
             </div>
@@ -149,7 +157,7 @@ export default function ManagerAuctions() {
               </div>
             </div>
             <div className="auction-card-content">
-              <span className="auction-card-label">Live Rooms</span>
+              <span className="m-auction-card-label">Live Rooms</span>
               <h3 className="auction-card-value">15</h3>
               <span className="auction-card-change positive">+2 since yesterday</span>
             </div>
@@ -190,7 +198,7 @@ export default function ManagerAuctions() {
           </div>
 
           <div className="auction-filter-buttons">
-            {['All', 'Live', 'Upcoming', 'Ended', 'Draft'].map((filter) => (
+            {['All','Live', 'Draft'].map((filter) => (
               <button
                 key={filter}
                 className={`auction-filter-btn ${activeFilter === filter ? 'active' : ''}`}
@@ -224,7 +232,7 @@ export default function ManagerAuctions() {
                     <tr
                       key={index}
                       className="auction-table-row"
-                      onClick={() => navigate("/admin/controlpanel")}
+                      onClick={() =>  handleRowClick(item)}
                     >
                       <td className="auction-table-name">
                         <div className="admin-auction-name-info">
@@ -241,8 +249,8 @@ export default function ManagerAuctions() {
                       <td className="auction-table-status">
                         <div className="auction-status-cell">
                           <span className={`auction-status-badge ${item.status === "Live" ? "badge-live" :
-                              item.status === "Upcoming" ? "badge-upcoming" :
-                                item.status === "Ended" ? "badge-ended" :
+                              item.status === "Live" ? "badge-upcoming" :
+                                item.status === "Draft" ? "badge-draft" :
                                   "badge-draft"
                             }`}>
                             {item.status}

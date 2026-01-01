@@ -5,10 +5,10 @@ import "./ManagerInspection.css";
 const ManagerInspection = () => {
   const location = useLocation();
   console.log('location: ', location);
-  
+
   const isStart = location?.state?.startInspection;
   console.log('Is Start: ', isStart);
-  
+
   const [open, setOpen] = useState(null);
   const [mainImage, setMainImage] = useState(0);
   const [imagePreview, setImagePreview] = useState(null);
@@ -61,18 +61,18 @@ const ManagerInspection = () => {
 
     localStorage.setItem("inspectionData", JSON.stringify(dataToSave));
     alert("Inspection data saved!");
-    navigate("/manager-panel");
+    navigate("/manager/dashboard");
   };
 
   const handleReject = () => {
-    navigate("/manager-panel");
+    navigate("/manager/dashboard");
   };
 
   return (
-    <div className="dashboard-page">
+    <div className="inspection-dashboard">
 
-      <main className="dashboard-main">
-        <div className="dashboard-container">
+      <main className="inspection-main">
+        <div className="inspection-container">
           <div className="inspection-page">
             <div className="inspection-header">
               <div className="welcome-content">
@@ -81,28 +81,28 @@ const ManagerInspection = () => {
               </div>
               {
                 isStart ? (
-              <div className="inspection-actions">
-                <button className="action-button secondary" onClick={handleReject}>
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-                    <path d="M18 6L6 18M6 6L18 18" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                  </svg>
-                  Reject
-                </button>
-                <button className="action-button primary" onClick={handleApprove}>
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-                    <path d="M20 6L9 17L4 12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                  </svg>
-                  Approve Inspection
-                </button>
-              </div>
+                  <div className="inspection-actions">
+                    <button className="action-button secondary" onClick={handleReject}>
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                        <path d="M18 6L6 18M6 6L18 18" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                      </svg>
+                      Reject
+                    </button>
+                    <button className="action-button primary" onClick={handleApprove}>
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                        <path d="M20 6L9 17L4 12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                      </svg>
+                      Approve Inspection
+                    </button>
+                  </div>
 
                 ) : (
-              <div className="inspection-actions"> 
-                 <button className="action-button primary" onClick={()=> navigate('/manager-panel')}>
-                  
-                  Go Back
-                </button>
-              </div>
+                  <div className="inspection-actions">
+                    <button className="action-button primary" onClick={() => navigate('/manager/dashboard')}>
+
+                      Go Back
+                    </button>
+                  </div>
 
                 )
               }
@@ -431,6 +431,45 @@ const ManagerInspection = () => {
                       </div>
                       <div className="inspection-accordions">
                         {/* Here you print the message of rejection by manager of any product which was came for inspection to the manager. */}
+                        <div className="rejection-report">
+                          <div className="rejection-section row-status">
+                            <h4 className="rejection-title">Inspection Status</h4>
+                            <p className="rejection-status">❌ Rejected</p>
+                          </div>
+
+                          <div className="rejection-section">
+                            <h4 className="rejection-title">Reason for Rejection</h4>
+                            <p className="rejection-text">
+                              The vehicle did not meet the minimum inspection requirements set by the management.
+                            </p>
+                          </div>
+
+                          <div className="rejection-section">
+                            <h4 className="rejection-title">Key Observations</h4>
+                            <ul className="rejection-list">
+                              <li>Visible exterior scratches and paint damage on multiple panels.</li>
+                              <li>Interior condition was below acceptable standards.</li>
+                              <li>Engine noise and mechanical concerns were identified.</li>
+                              <li>Uploaded inspection images were insufficient for approval.</li>
+                            </ul>
+                          </div>
+
+                          <div className="rejection-section">
+                            <h4 className="rejection-title">Manager Remarks</h4>
+                            <p className="rejection-text">
+                              Please resolve the highlighted issues and resubmit the vehicle for inspection.
+                              Approval will only be considered after necessary repairs and complete documentation.
+                            </p>
+                          </div>
+
+                          <div className="rejection-section">
+                            <h4 className="rejection-title">Reviewed By</h4>
+                            <p className="rejection-text">
+                              Inspection Manager<br />
+                              Date: 12 Jan 2026
+                            </p>
+                          </div>
+                        </div>
                       </div>
                     </div>
                   )

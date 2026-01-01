@@ -47,7 +47,7 @@ function ManagerHeader() {
 
   const navItems = [
     {
-      path: '/manager-panel',
+      path: '/manager/dashboard',
       label: 'Dashboard',
       desktopLabel: 'Dashboard',
       icon: (
@@ -87,16 +87,7 @@ function ManagerHeader() {
         </svg>
       )
     },
-    {
-      path: '/manager/user-management',
-      label: 'User Management',
-      desktopLabel: 'Users',
-      icon: (
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5 0a3.5 3.5 0 01-5.5 2.696" />
-        </svg>
-      )
-    }
+   
   ]
 
   return (

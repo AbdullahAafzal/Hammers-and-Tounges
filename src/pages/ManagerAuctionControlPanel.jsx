@@ -14,10 +14,10 @@ export default function ManagerAuctionControlPanel() {
   ]);
 
   const [bidders] = useState([
-    { name: "User_7891", bids: 14, status: "Active" },
-    { name: "BidMasterFlex", bids: 11, status: "Active" },
-    { name: "CollectorJane", bids: 8, status: "Watching" },
-    { name: "WatchFan_22", bids: 5, status: "Watching" }
+    { name: "User_7891", bids: 14, status: "Live" },
+    { name: "BidMasterFlex", bids: 11, status: "Live" },
+    { name: "CollectorJane", bids: 8, status: "Live" },
+    { name: "WatchFan_22", bids: 5, status: "Live" }
   ]);
 
   const [userMessages, setUserMessages] = useState([
@@ -149,7 +149,6 @@ export default function ManagerAuctionControlPanel() {
             {/* LIVE BID FEED CARD */}
             <div className="control-card">
               <h3 className="control-card-title">Live Bid Feed</h3>
-              
               <div className="control-bids-list">
                 {bids.map((bid, i) => (
                   <div key={i} className="control-bid-row">
@@ -170,7 +169,7 @@ export default function ManagerAuctionControlPanel() {
             </div>
 
             {/* DISPUTES & ISSUES CARD */}
-            <div className="control-card">
+            {/* <div className="control-card">
               <div className="control-tabs">
                 <button 
                   className={`control-tab ${activeTab === "disputes" ? "active" : ""}`}
@@ -192,7 +191,6 @@ export default function ManagerAuctionControlPanel() {
                 </button>
               </div>
 
-              {/* DISPUTED BIDS TAB */}
               {activeTab === "disputes" && (
                 <div className="control-disputes-list">
                   <div className="control-dispute-box">
@@ -241,7 +239,6 @@ export default function ManagerAuctionControlPanel() {
                 </div>
               )}
 
-              {/* TECHNICAL ISSUES TAB */}
               {activeTab === "technical" && (
                 <div className="control-empty-state">
                   <div className="control-empty-icon">
@@ -254,8 +251,6 @@ export default function ManagerAuctionControlPanel() {
                   <p>All systems are running smoothly</p>
                 </div>
               )}
-
-              {/* USER MESSAGES TAB */}
               {activeTab === "messages" && (
                 <div className="control-messages-list">
                   {userMessages.map((msg, i) => (
@@ -284,7 +279,7 @@ export default function ManagerAuctionControlPanel() {
                   ))}
                 </div>
               )}
-            </div>
+            </div> */}
           </div>
         </div>
 
