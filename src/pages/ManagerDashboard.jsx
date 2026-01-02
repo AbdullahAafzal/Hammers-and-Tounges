@@ -3,13 +3,13 @@ import { useNavigate } from "react-router-dom";
 import "./ManagerDashboard.css";
 
 const sampleData = [
-  { id: "VH-24351", category: "Vehicle", seller: "Johnathan Doe", status: "Pending Inspection", officer: "Walter White", date: "2025-12-01" },
-  { id: "EL-98765", category: "Electronics", seller: "James Smith", status: "Pending Inspection", officer: "Walter White", date: "2025-12-02" },
-  { id: "FN-54321", category: "Furniture", seller: "Mike Ehrmantraut", status: "Rejected", officer: "Walter White", date: "2025-12-03" },
-  { id: "AR-88776", category: "Artwork", seller: "Lydia Rodarte", status: "Pending Inspection", officer: "Walter White", date: "2025-12-04" },
-  { id: "HG-11223", category: "Home Goods", seller: "Kim Wexler", status: "Pending Inspection", officer: "Walter White", date: "2025-12-05" },
-  { id: "EL-33333", category: "Electronics", seller: "Gus Fring", status: "Rejected", officer: "Walter White", date: "2025-12-05" },
-  { id: "VH-55555", category: "Vehicle", seller: "Hank Schrader", status: "Rejected", officer: "Walter White", date: "2025-12-05" }
+  // { id: "VH-24351", category: "Vehicle", seller: "Johnathan Doe", status: "Pending Inspection", officer: "Walter White", date: "2025-12-01" },
+  // { id: "EL-98765", category: "Electronics", seller: "James Smith", status: "Pending Inspection", officer: "Walter White", date: "2025-12-02" },
+  // { id: "FN-54321", category: "Furniture", seller: "Mike Ehrmantraut", status: "Rejected", officer: "Walter White", date: "2025-12-03" },
+  // { id: "AR-88776", category: "Artwork", seller: "Lydia Rodarte", status: "Pending Inspection", officer: "Walter White", date: "2025-12-04" },
+  // { id: "HG-11223", category: "Home Goods", seller: "Kim Wexler", status: "Pending Inspection", officer: "Walter White", date: "2025-12-05" },
+  // { id: "EL-33333", category: "Electronics", seller: "Gus Fring", status: "Rejected", officer: "Walter White", date: "2025-12-05" },
+  // { id: "VH-55555", category: "Vehicle", seller: "Hank Schrader", status: "Rejected", officer: "Walter White", date: "2025-12-05" }
 ];
 
 function ManagerDashboard() {

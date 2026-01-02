@@ -94,7 +94,7 @@ function ManagerHeader() {
     <>
       <header className="manager-header">
         <div className="manager-header__container" ref={menuRef}>
-          <Link to="/" className="manager-header__logo">
+          <Link to="/manager/dashboard" className="manager-header__logo">
             <img src={logo} alt="Hammer & Tongues Logo" />
             <span>Hammer & Tongues</span>
           </Link>

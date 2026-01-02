@@ -45,13 +45,32 @@
     margin: 0;
     line-height: 1.5;
 }
+    
+.add-category-secondary-btn {
+  background-color: #000;
+  color: #fff;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  padding: 0.5rem 1.5rem;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.add-category-secondary-btn:hover {
+  border-color: #8CC63F;
+    color: #8CC63F;
+  box-shadow: 0 6px 20px rgba(140, 198, 63, 0.3);
+}
+
 
 .category-form-section {
     margin-bottom: 2rem;
 }
 
 .form-group {
-    margin-top: 20px;
+    margin-top: 20px !important;
 }
 
 .image-upload-section {

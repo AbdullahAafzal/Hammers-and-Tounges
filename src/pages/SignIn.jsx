@@ -23,7 +23,6 @@ const SignIn = () => {
   })
   const [formErrors, setFormErrors] = useState({})
 
-  // Redirect based on user role after successful login
   useEffect(() => {
     if (isAuthenticated && user) {
       const role = user.role

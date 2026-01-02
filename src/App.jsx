@@ -118,8 +118,6 @@ function App() {
               <Route element={<ManagerLayout />}>
                 <Route path="/manager/dashboard" element={<ManagerDashboard />} />
                 <Route path="/manager/profile" element={<ManagerProfile />} />
-
-
                 <Route path="/manager/inspection" element={
                   <>
                     <ManagerInspection />
@@ -177,7 +175,6 @@ function App() {
               <Route element={<AdminLayout />}>
                 <Route path="/admin/dashboard" element={<AdminDashboard />} />
                 <Route path="/admin/profile" element={<AdminProfile />} />
-
                 <Route path="/admin/finance" element={<AdminFinance />} />
                 <Route path="/admin/finance/manual-payments" element={
                   <>
@@ -200,7 +197,7 @@ function App() {
                     <UserManagement />
                   </>
                 } />
-                <Route path="/admin/kycverification" element={
+                <Route path="/admin/kycverification/:id" element={
                   <>
                     <AdminManagerKYC />
                   </>

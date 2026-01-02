@@ -3,18 +3,18 @@ import "./ManagerLiveAuctions.css";
 import { useNavigate } from "react-router-dom";
 
 const SAMPLE_DATA = [
-  { id: "BID-1001", user: "Ali Khan", amount: 1200, time: "2023-10-25 10:45 AM", status: "Winning" },
-  { id: "BID-1002", user: "Sara Ahmed", amount: 1350, time: "2023-10-25 10:50 AM", status: "Outbid" },
-  { id: "BID-1003", user: "Usman Tariq", amount: 1500, time: "2023-10-25 10:55 AM", status: "Winning" },
-  { id: "BID-1004", user: "Hassan Raza", amount: 1100, time: "2023-10-25 11:00 AM", status: "Outbid" },
-  { id: "BID-1005", user: "Ayesha Noor", amount: 1600, time: "2023-10-25 11:05 AM", status: "Winning" },
-  { id: "BID-1006", user: "Bilal Khan", amount: 1250, time: "2023-10-25 11:10 AM", status: "Winning" },
-  { id: "BID-1007", user: "Nida Ali", amount: 1400, time: "2023-10-25 11:15 AM", status: "Outbid" },
-  { id: "BID-1008", user: "Omar Farooq", amount: 1550, time: "2023-10-25 11:20 AM", status: "Winning" },
-  { id: "BID-1009", user: "Sara Khan", amount: 1150, time: "2023-10-25 11:25 AM", status: "Outbid" },
-  { id: "BID-1010", user: "Ayesha Farooq", amount: 1650, time: "2023-10-25 11:30 AM", status: "Winning" },
-  { id: "BID-1011", user: "Ahmed Ali", amount: 1750, time: "2023-10-25 11:35 AM", status: "Winning" },
-  { id: "BID-1012", user: "Fatima Khan", amount: 1200, time: "2023-10-25 11:40 AM", status: "Outbid" },
+  // { id: "BID-1001", user: "Ali Khan", amount: 1200, time: "2023-10-25 10:45 AM", status: "Winning" },
+  // { id: "BID-1002", user: "Sara Ahmed", amount: 1350, time: "2023-10-25 10:50 AM", status: "Outbid" },
+  // { id: "BID-1003", user: "Usman Tariq", amount: 1500, time: "2023-10-25 10:55 AM", status: "Winning" },
+  // { id: "BID-1004", user: "Hassan Raza", amount: 1100, time: "2023-10-25 11:00 AM", status: "Outbid" },
+  // { id: "BID-1005", user: "Ayesha Noor", amount: 1600, time: "2023-10-25 11:05 AM", status: "Winning" },
+  // { id: "BID-1006", user: "Bilal Khan", amount: 1250, time: "2023-10-25 11:10 AM", status: "Winning" },
+  // { id: "BID-1007", user: "Nida Ali", amount: 1400, time: "2023-10-25 11:15 AM", status: "Outbid" },
+  // { id: "BID-1008", user: "Omar Farooq", amount: 1550, time: "2023-10-25 11:20 AM", status: "Winning" },
+  // { id: "BID-1009", user: "Sara Khan", amount: 1150, time: "2023-10-25 11:25 AM", status: "Outbid" },
+  // { id: "BID-1010", user: "Ayesha Farooq", amount: 1650, time: "2023-10-25 11:30 AM", status: "Winning" },
+  // { id: "BID-1011", user: "Ahmed Ali", amount: 1750, time: "2023-10-25 11:35 AM", status: "Winning" },
+  // { id: "BID-1012", user: "Fatima Khan", amount: 1200, time: "2023-10-25 11:40 AM", status: "Outbid" },
 ];
 
 const ROWS_PER_PAGE = 5;

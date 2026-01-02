@@ -10,16 +10,16 @@ export default function ManagerAuctions() {
   const itemsPerPage = 5;
 
   const tableData = [
-    { name: "Vintage Watch Collection", id: "#VW-10234", status: "Live", start: "Oct 25, 2023", end: "Nov 01, 2023", lots: 45, value: "$15,420" },
-    { name: "Modern Art & Sculptures", id: "#MA-98765", status: "Live", start: "Nov 05, 2023", end: "Nov 12, 2023", lots: 82, value: "$0.00" },
-    { name: "Estate Jewelry Clearance", id: "#EJ-45678", status: "Draft", start: "Oct 10, 2023", end: "Oct 17, 2023", lots: 120, value: "$48,950" },
-    { name: "Antique Furniture Finds", id: "#AF-33211", status: "Draft", start: "-", end: "-", lots: 35, value: "-" },
-    { name: "Luxury Cars Auction", id: "#LC-11223", status: "Live", start: "Oct 12, 2023", end: "Oct 20, 2023", lots: 60, value: "$22,300" },
-    { name: "Rare Books Lot", id: "#RB-65432", status: "Live", start: "Dec 01, 2023", end: "Dec 10, 2023", lots: 90, value: "$0.00" },
-    { name: "Vintage Cameras", id: "#VC-90876", status: "Draft", start: "Sep 15, 2023", end: "Sep 20, 2023", lots: 25, value: "$9,500" },
-    { name: "Art Statues", id: "#AS-77889", status: "Draft", start: "-", end: "-", lots: 14, value: "-" },
-    { name: "Old Coins", id: "#OC-55511", status: "Live", start: "Oct 19, 2023", end: "Oct 22, 2023", lots: 80, value: "$12,100" },
-    { name: "Antique Watches", id: "#AW-22445", status: "Live", start: "Nov 15, 2023", end: "Nov 25, 2023", lots: 35, value: "$0.00" },
+    // { name: "Vintage Watch Collection", id: "#VW-10234", status: "Live", start: "Oct 25, 2023", end: "Nov 01, 2023", lots: 45, value: "$15,420" },
+    // { name: "Modern Art & Sculptures", id: "#MA-98765", status: "Live", start: "Nov 05, 2023", end: "Nov 12, 2023", lots: 82, value: "$0.00" },
+    // { name: "Estate Jewelry Clearance", id: "#EJ-45678", status: "Draft", start: "Oct 10, 2023", end: "Oct 17, 2023", lots: 120, value: "$48,950" },
+    // { name: "Antique Furniture Finds", id: "#AF-33211", status: "Draft", start: "-", end: "-", lots: 35, value: "-" },
+    // { name: "Luxury Cars Auction", id: "#LC-11223", status: "Live", start: "Oct 12, 2023", end: "Oct 20, 2023", lots: 60, value: "$22,300" },
+    // { name: "Rare Books Lot", id: "#RB-65432", status: "Live", start: "Dec 01, 2023", end: "Dec 10, 2023", lots: 90, value: "$0.00" },
+    // { name: "Vintage Cameras", id: "#VC-90876", status: "Draft", start: "Sep 15, 2023", end: "Sep 20, 2023", lots: 25, value: "$9,500" },
+    // { name: "Art Statues", id: "#AS-77889", status: "Draft", start: "-", end: "-", lots: 14, value: "-" },
+    // { name: "Old Coins", id: "#OC-55511", status: "Live", start: "Oct 19, 2023", end: "Oct 22, 2023", lots: 80, value: "$12,100" },
+    // { name: "Antique Watches", id: "#AW-22445", status: "Live", start: "Nov 15, 2023", end: "Nov 25, 2023", lots: 35, value: "$0.00" },
   ];
 
   const filteredData = tableData.filter((item) => {
@@ -123,8 +123,8 @@ export default function ManagerAuctions() {
             </div>
             <div className="auction-card-content">
               <span className="m-auction-card-label">Active Bidders</span>
-              <h3 className="auction-card-value">1,204</h3>
-              <span className="auction-card-change positive">+5.2% vs last period</span>
+              <h3 className="auction-card-value">0</h3>
+              <span className="auction-card-change positive">0</span>
             </div>
           </div>
 
@@ -141,8 +141,8 @@ export default function ManagerAuctions() {
             </div>
             <div className="auction-card-content">
               <span className="m-auction-card-label">Total Lots</span>
-              <h3 className="auction-card-value">850</h3>
-              <span className="auction-card-change positive">+1.8% vs last period</span>
+              <h3 className="auction-card-value">0</h3>
+              <span className="auction-card-change positive">0</span>
             </div>
           </div>
 
@@ -157,9 +157,9 @@ export default function ManagerAuctions() {
               </div>
             </div>
             <div className="auction-card-content">
-              <span className="m-auction-card-label">Live Rooms</span>
-              <h3 className="auction-card-value">15</h3>
-              <span className="auction-card-change positive">+2 since yesterday</span>
+              <span className="m-auction-card-label">Live Auctions</span>
+              <h3 className="auction-card-value">0</h3>
+              <span className="auction-card-change positive">0</span>
             </div>
           </div>
         </div>

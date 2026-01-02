@@ -188,7 +188,7 @@ const ManagerProductFields = () => {
   const handleSaveFields = () => {
     console.log('Saving fields:', fields);
     alert('Product fields saved successfully!');
-    navigate('/admin/categories');
+    navigate('/manager/categories');
   };
 
   const getFieldTypeIcon = (type) => {
@@ -214,13 +214,13 @@ const ManagerProductFields = () => {
             </div>
             <div className="header-actions">
               <button
-                className="secondary-btn"
-                onClick={() => navigate('/admin/category')}
+                className="field-secondary-btn"
+                onClick={() => navigate('/manager/category')}
               >
                 Back to Categories
               </button>
               <button
-                className="primary-action-btn"
+                className="primary-action-btn field-primary"
                 onClick={handleSaveFields}
               >
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
@@ -421,7 +421,7 @@ const ManagerProductFields = () => {
                     <div className="form-actions">
                       <button
                         type="button"
-                        className="secondary-action-btn"
+                        className="field-secondary-btn"
                         onClick={() => {
                           setShowFieldForm(false);
                           setEditingField(null);
@@ -439,12 +439,9 @@ const ManagerProductFields = () => {
                       </button>
                       <button
                         type="button"
-                        className="primary-action-btn"
+                        className="field-primary-btn"
                         onClick={editingField ? handleUpdateField : handleAddField}
                       >
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-                          <path d="M20 6L9 17L4 12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                        </svg>
                         {editingField ? 'Update Field' : 'Add Field'}
                       </button>
                     </div>

@@ -2,7 +2,7 @@ import Cookies from 'js-cookie';
 
 const COOKIE_OPTIONS = {
   expires: 7, // 7 days
-  secure: process.env.NODE_ENV === 'production',
+  secure: import.meta.env.PROD,
   sameSite: 'strict',
   path: '/',
 };

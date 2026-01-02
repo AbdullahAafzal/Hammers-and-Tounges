@@ -254,7 +254,7 @@ const BuyerDashboard = () => {
           <div className="active-bids-section">
             <div className="section-header">
               <h2 className="section-title">My Active Bids</h2>
-              <Link to="/my-bids" className="view-all-link">View All</Link>
+              <Link to="/buyer/bids" className="view-all-link">View All</Link>
             </div>
             <div className="active-bids-grid">
               {activeBids.map((bid) => (

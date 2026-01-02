@@ -72,7 +72,7 @@ const ManagerCreateCategory = () => {
 
 
     const handleNext = () => {
-        navigate('/admin/product-fields')
+        navigate('/manager/product-fields')
     };
 
     return (
@@ -85,7 +85,7 @@ const ManagerCreateCategory = () => {
                             <p className="add-category-page-subtitle">Add a new auction category with custom settings and product fields</p>
                         </div>
                         <div className="header-actions">
-                            <button className="secondary-btn" onClick={() => navigate('/admin/category')}>
+                            <button className="add-category-secondary-btn" onClick={() => navigate('/manager/category')}>
                                 Cancel
                             </button>
                         </div>

@@ -5,18 +5,18 @@ import './CategoryManagement.css';
 export default function CategoryManagement() {
   const [searchQuery, setSearchQuery] = useState('');
   const [categories, setCategories] = useState([
-    { id: 1, name: 'Industrial Machinery', items: 142, status: true, description: 'Heavy machinery and industrial equipment', icon: '🏭' },
-    { id: 2, name: 'Vehicles & Fleet', items: 88, status: true, description: 'Cars, trucks, and commercial vehicles', icon: '🚗' },
-    { id: 3, name: 'Office Furniture', items: 231, status: false, description: 'Office desks, chairs, and furnishings', icon: '🪑' },
-    { id: 4, name: 'Electronics & IT', items: 175, status: true, description: 'Computers, servers, and IT equipment', icon: '💻' },
-    { id: 5, name: 'Real Estate', items: 12, status: false, description: 'Commercial and residential properties', icon: '🏠' },
-    { id: 6, name: 'Construction Equipment', items: 98, status: true, description: 'Construction tools and machinery', icon: '🚧' },
-    { id: 7, name: 'Medical Equipment', items: 45, status: true, description: 'Medical devices and hospital equipment', icon: '🏥' },
-    { id: 8, name: 'Agriculture Tools', items: 67, status: false, description: 'Farming equipment and agricultural tools', icon: '🚜' },
-    { id: 9, name: 'Sports Equipment', items: 34, status: true, description: 'Sports gear and fitness equipment', icon: '⚽' },
-    { id: 10, name: 'Art & Collectibles', items: 156, status: true, description: 'Artwork and collectible items', icon: '🎨' },
-    { id: 11, name: 'Restaurant Equipment', items: 89, status: false, description: 'Kitchen and restaurant equipment', icon: '🍽️' },
-    { id: 12, name: 'Lab Equipment', items: 43, status: true, description: 'Laboratory instruments and equipment', icon: '🔬' },
+    // { id: 1, name: 'Industrial Machinery', items: 142, status: true, description: 'Heavy machinery and industrial equipment', icon: '🏭' },
+    // { id: 2, name: 'Vehicles & Fleet', items: 88, status: true, description: 'Cars, trucks, and commercial vehicles', icon: '🚗' },
+    // { id: 3, name: 'Office Furniture', items: 231, status: false, description: 'Office desks, chairs, and furnishings', icon: '🪑' },
+    // { id: 4, name: 'Electronics & IT', items: 175, status: true, description: 'Computers, servers, and IT equipment', icon: '💻' },
+    // { id: 5, name: 'Real Estate', items: 12, status: false, description: 'Commercial and residential properties', icon: '🏠' },
+    // { id: 6, name: 'Construction Equipment', items: 98, status: true, description: 'Construction tools and machinery', icon: '🚧' },
+    // { id: 7, name: 'Medical Equipment', items: 45, status: true, description: 'Medical devices and hospital equipment', icon: '🏥' },
+    // { id: 8, name: 'Agriculture Tools', items: 67, status: false, description: 'Farming equipment and agricultural tools', icon: '🚜' },
+    // { id: 9, name: 'Sports Equipment', items: 34, status: true, description: 'Sports gear and fitness equipment', icon: '⚽' },
+    // { id: 10, name: 'Art & Collectibles', items: 156, status: true, description: 'Artwork and collectible items', icon: '🎨' },
+    // { id: 11, name: 'Restaurant Equipment', items: 89, status: false, description: 'Kitchen and restaurant equipment', icon: '🍽️' },
+    // { id: 12, name: 'Lab Equipment', items: 43, status: true, description: 'Laboratory instruments and equipment', icon: '🔬' },
   ]);
 
   const [currentPage, setCurrentPage] = useState(1);
@@ -101,7 +101,7 @@ export default function CategoryManagement() {
             </div>
             <div className="category-header-actions">
               <button className="category-primary-action-btn" onClick={
-                () => navigate('/admin/add-category')
+                () => navigate('/manager/add-category')
               }>
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
                   <path d="M12 5V19M5 12H19" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
@@ -126,7 +126,7 @@ export default function CategoryManagement() {
               <div className="category-card-content">
                 <span className="card-label">Total Categories</span>
                 <h3 className="category-card-value">{categories.length}</h3>
-                <span className="category-card-change positive">+12%</span>
+                <span className="category-card-change positive">0%</span>
               </div>
             </div>
 
@@ -143,7 +143,7 @@ export default function CategoryManagement() {
               <div className="category-card-content">
                 <span className="card-label">Active Categories</span>
                 <h3 className="category-card-value">{categories.filter(cat => cat.status).length}</h3>
-                <span className="category-card-change positive">+8%</span>
+                <span className="category-card-change positive">0%</span>
               </div>
             </div>
 
@@ -159,7 +159,7 @@ export default function CategoryManagement() {
               <div className="category-card-content">
                 <span className="card-label">Inactive Categories</span>
                 <h3 className="category-card-value">{categories.filter(cat => !cat.status).length}</h3>
-                <span className="category-card-change negative">-3%</span>
+                <span className="category-card-change negative">0%</span>
               </div>
             </div>
 
@@ -178,7 +178,7 @@ export default function CategoryManagement() {
               <div className="category-card-content">
                 <span className="card-label">Total Items</span>
                 <h3 className="category-card-value">{categories.reduce((sum, cat) => sum + cat.items, 0)}</h3>
-                <span className="category-card-change positive">+24%</span>
+                <span className="category-card-change positive">0%</span>
               </div>
             </div>
           </div>
