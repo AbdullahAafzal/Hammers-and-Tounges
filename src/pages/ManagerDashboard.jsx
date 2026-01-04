@@ -1,5 +1,5 @@
-import React, { useState, useMemo, useEffect } from 'react';
-import { useNavigate } from "react-router-dom";
+import React, { useState, useMemo, useEffect, useRef } from 'react';
+import { useNavigate, useLocation } from "react-router-dom";
 import { managerService } from '../services/interceptors/manager.service';
 import "./ManagerDashboard.css";
 
@@ -19,9 +19,11 @@ const mapStatusToDisplay = (apiStatus) => {
 
 function ManagerDashboard() {
   const navigate = useNavigate();
+  const location = useLocation();
   const [tasks, setTasks] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const fetchTasksRef = useRef(null);
 
   const handleAction = (status, item) => {
     // Check raw status for DRAFT, or display status for others
@@ -53,46 +55,86 @@ function ManagerDashboard() {
   const [selectedRow, setSelectedRow] = useState(null);
   const itemsPerPage = 5;
 
-  // Fetch tasks from API
+  // Fetch tasks function
+  const fetchTasks = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      const response = await managerService.getAssignedTasks();
+      // Transform API response to dashboard format
+      const transformedData = Array.isArray(response) ? response.map((item) => {
+        // Get manager name from manager_details
+        const managerName = item.manager_details 
+          ? `${item.manager_details.first_name || ''} ${item.manager_details.last_name || ''}`.trim() || item.manager_details.email || 'Unassigned'
+          : 'Unassigned';
+        
+        return {
+          id: `INSP-${item.id}`,
+          originalId: item.id,
+          category: item.category_name || 'Unknown',
+          seller: item.seller_details?.name || 'Unknown Seller',
+          status: mapStatusToDisplay(item.status),
+          officer: managerName,
+          date: item.created_at ? new Date(item.created_at).toISOString().split('T')[0] : new Date().toISOString().split('T')[0],
+          title: item.title,
+          description: item.description,
+          rejection_reason: item.rejection_reason,
+          rawData: item // Keep original data for reference
+        };
+      }) : [];
+      setTasks(transformedData);
+    } catch (err) {
+      console.error('Error fetching manager tasks:', err);
+      setError(err.message || 'Failed to load tasks. Please try again.');
+      setTasks([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Store fetchTasks in ref for use in other effects
+  fetchTasksRef.current = fetchTasks;
+  const prevPathnameRef = useRef(location.pathname);
+
+  // Fetch tasks on mount
   useEffect(() => {
-    const fetchTasks = async () => {
-      try {
-        setLoading(true);
-        setError(null);
-        const response = await managerService.getAssignedTasks();
-        // Transform API response to dashboard format
-        const transformedData = Array.isArray(response) ? response.map((item) => {
-          // Get manager name from manager_details
-          const managerName = item.manager_details 
-            ? `${item.manager_details.first_name || ''} ${item.manager_details.last_name || ''}`.trim() || item.manager_details.email || 'Unassigned'
-            : 'Unassigned';
-          
-          return {
-            id: `INSP-${item.id}`,
-            originalId: item.id,
-            category: item.category_name || 'Unknown',
-            seller: item.seller_details?.name || 'Unknown Seller',
-            status: mapStatusToDisplay(item.status),
-            officer: managerName,
-            date: item.created_at ? new Date(item.created_at).toISOString().split('T')[0] : new Date().toISOString().split('T')[0],
-            title: item.title,
-            description: item.description,
-            rejection_reason: item.rejection_reason,
-            rawData: item // Keep original data for reference
-          };
-        }) : [];
-        setTasks(transformedData);
-      } catch (err) {
-        console.error('Error fetching manager tasks:', err);
-        setError(err.message || 'Failed to load tasks. Please try again.');
-        setTasks([]);
-      } finally {
-        setLoading(false);
+    fetchTasks();
+    prevPathnameRef.current = location.pathname;
+  }, []);
+
+  // Refetch tasks when navigating back to dashboard from another route
+  useEffect(() => {
+    const prevPathname = prevPathnameRef.current;
+    const currentPathname = location.pathname;
+    
+    // Only refetch if we navigated TO the dashboard (not if we're already on it)
+    if (currentPathname === '/manager/dashboard' && prevPathname !== currentPathname) {
+      // Small delay to ensure navigation is complete
+      const timeoutId = setTimeout(() => {
+        if (fetchTasksRef.current) {
+          fetchTasksRef.current();
+        }
+      }, 300);
+      
+      prevPathnameRef.current = currentPathname;
+      return () => clearTimeout(timeoutId);
+    } else {
+      prevPathnameRef.current = currentPathname;
+    }
+  }, [location.pathname]);
+
+  // Also refetch when window regains focus (user switches back to tab)
+  useEffect(() => {
+    const handleFocus = () => {
+      if (location.pathname === '/manager/dashboard' && fetchTasksRef.current) {
+        // Only refetch if it's been a while since last fetch (avoid excessive calls)
+        fetchTasksRef.current();
       }
     };
 
-    fetchTasks();
-  }, []);
+    window.addEventListener('focus', handleFocus);
+    return () => window.removeEventListener('focus', handleFocus);
+  }, [location.pathname]);
 
   const sortedData = useMemo(() => {
     // Filter to show only DRAFT status items

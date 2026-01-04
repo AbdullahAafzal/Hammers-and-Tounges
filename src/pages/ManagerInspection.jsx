@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useMemo } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
+import { toast } from 'react-toastify';
 import { managerService } from '../services/interceptors/manager.service';
 import { API_CONFIG } from '../config/api.config';
 import "./ManagerInspection.css";
@@ -26,6 +27,15 @@ const ManagerInspection = () => {
   const [finalNotes, setFinalNotes] = useState("");
   const [files, setFiles] = useState([]);
   const [uploadedImages, setUploadedImages] = useState([]);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // New fields for approval section
+  const [overallRating, setOverallRating] = useState("");
+  const [initialPrice, setInitialPrice] = useState("");
+  const [startDate, setStartDate] = useState("");
+  const [endDate, setEndDate] = useState("");
+  const [buyNowPrice, setBuyNowPrice] = useState("");
+  const [isBuyNowEnabled, setIsBuyNowEnabled] = useState(false);
 
   // Helper function to construct media URL
   const getMediaUrl = (filePath) => {
@@ -152,24 +162,128 @@ const ManagerInspection = () => {
     }));
   };
 
-  const handleApprove = () => {
-    const dataToSave = {
-      generalRating,
-      conditionSummary,
-      exteriorNotes,
-      interiorNotes,
-      finalNotes,
-      files: files.map(file => file.name),
-      checklistData: checkedItems
-    };
+  const handleApprove = async () => {
+    if (isSubmitting) return; // Prevent multiple submissions
 
-    localStorage.setItem("inspectionData", JSON.stringify(dataToSave));
-    alert("Inspection data saved!");
-    navigate("/manager/dashboard");
+    if (!auctionData?.id) {
+      toast.error("Auction ID is missing. Cannot submit inspection.");
+      return;
+    }
+
+    // Validate required fields
+    if (!overallRating || !initialPrice || !startDate || !endDate) {
+      toast.error("Please fill in all required fields: Overall Rating, Initial Price, Start Date, and End Date.");
+      return;
+    }
+
+    setIsSubmitting(true);
+    try {
+      // Prepare checklist data in the format expected by API
+      const checklistData = {};
+      checklistCategories.forEach((category) => {
+        const categoryData = {};
+        category.items.forEach((item) => {
+          const key = `${category.name}-${item.id}`;
+          categoryData[item.name] = checkedItems[key] || false;
+        });
+        if (Object.keys(categoryData).length > 0) {
+          checklistData[category.name] = categoryData;
+        }
+      });
+
+      // Prepare inspection data
+      const inspectionData = {
+        decision: "APPROVED",
+        overall_rating: parseFloat(overallRating),
+        admin_feedback: finalNotes || "",
+        checklist_data: checklistData,
+        initial_price: parseFloat(initialPrice),
+        start_date: new Date(startDate).toISOString(),
+        end_date: new Date(endDate).toISOString(),
+        buy_now_price: buyNowPrice ? parseFloat(buyNowPrice) : null,
+        is_buy_now_enabled: isBuyNowEnabled ? "True" : "False",
+        inspection_images: files
+      };
+
+      console.log("Submitting inspection with data:", inspectionData);
+      console.log("Auction ID:", auctionData.id);
+
+      // Submit inspection
+      const response = await managerService.performInspection(auctionData.id, inspectionData);
+      console.log("Inspection response:", response);
+      toast.success("Inspection approved successfully!");
+      
+      // Navigate after a short delay to allow toast to be visible
+      setTimeout(() => {
+        navigate("/manager/dashboard");
+      }, 1000);
+    } catch (error) {
+      console.error("Error submitting inspection:", error);
+      const errorMessage = error.response?.data?.message || 
+                          error.response?.data?.error || 
+                          error.message || 
+                          "Failed to submit inspection. Please try again.";
+      toast.error(errorMessage);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
-  const handleReject = () => {
-    navigate("/manager/dashboard");
+  const handleReject = async () => {
+    if (isSubmitting) return; // Prevent multiple submissions
+
+    if (!auctionData?.id) {
+      toast.error("Auction ID is missing. Cannot submit inspection.");
+      return;
+    }
+
+    setIsSubmitting(true);
+    // For rejection, we can use a simpler payload
+    // But we still need to send the decision and basic data
+    try {
+      // Prepare checklist data in the format expected by API
+      const checklistData = {};
+      checklistCategories.forEach((category) => {
+        const categoryData = {};
+        category.items.forEach((item) => {
+          const key = `${category.name}-${item.id}`;
+          categoryData[item.name] = checkedItems[key] || false;
+        });
+        if (Object.keys(categoryData).length > 0) {
+          checklistData[category.name] = categoryData;
+        }
+      });
+
+      // Prepare inspection data for rejection
+      const inspectionData = {
+        decision: "REJECTED",
+        admin_feedback: finalNotes || "Inspection rejected by manager.",
+        checklist_data: checklistData,
+        inspection_images: files
+      };
+
+      console.log("Submitting rejection with data:", inspectionData);
+      console.log("Auction ID:", auctionData.id);
+
+      // Submit inspection rejection
+      const response = await managerService.performInspection(auctionData.id, inspectionData);
+      console.log("Rejection response:", response);
+      toast.success("Inspection rejected successfully!");
+      
+      // Navigate after a short delay to allow toast to be visible
+      setTimeout(() => {
+        navigate("/manager/dashboard");
+      }, 1000);
+    } catch (error) {
+      console.error("Error submitting inspection rejection:", error);
+      const errorMessage = error.response?.data?.message || 
+                          error.response?.data?.error || 
+                          error.message || 
+                          "Failed to submit inspection rejection. Please try again.";
+      toast.error(errorMessage);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   // Get specific data for display (e.g., make, model, year for vehicles)
@@ -196,17 +310,27 @@ const ManagerInspection = () => {
               {
                 isStart ? (
                   <div className="inspection-actions">
-                    <button className="action-button secondary" onClick={handleReject}>
+                    <button 
+                      type="button"
+                      className="action-button secondary" 
+                      onClick={handleReject}
+                      disabled={isSubmitting}
+                    >
                       <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
                         <path d="M18 6L6 18M6 6L18 18" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                       </svg>
-                      Reject
+                      {isSubmitting ? "Submitting..." : "Reject"}
                     </button>
-                    <button className="action-button primary" onClick={handleApprove}>
+                    <button 
+                      type="button"
+                      className="action-button primary" 
+                      onClick={handleApprove}
+                      disabled={isSubmitting}
+                    >
                       <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
                         <path d="M20 6L9 17L4 12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                       </svg>
-                      Approve Inspection
+                      {isSubmitting ? "Submitting..." : "Approve Inspection"}
                     </button>
                   </div>
                 ) : (
@@ -515,6 +639,105 @@ const ManagerInspection = () => {
                 )}
               </div>
             </div>
+
+            {/* New Approval Details Section */}
+            {isStart && (
+              <div className="approval-details-section">
+                <div className="approval-details-header">
+                  <h3>Approval Details</h3>
+                  <p className="approval-subtitle">Fill in the required information to approve this inspection</p>
+                </div>
+                <div className="approval-details-form">
+                  <div className="approval-form-grid">
+                    <div className="approval-form-group">
+                      <label className="approval-form-label">
+                        Overall Rating <span className="required">*</span>
+                      </label>
+                      <input
+                        type="number"
+                        className="approval-form-input"
+                        placeholder="e.g., 8.5"
+                        min="0"
+                        max="10"
+                        step="0.1"
+                        value={overallRating}
+                        onChange={(e) => setOverallRating(e.target.value)}
+                        required
+                      />
+                    </div>
+
+                    <div className="approval-form-group">
+                      <label className="approval-form-label">
+                        Initial Price <span className="required">*</span>
+                      </label>
+                      <input
+                        type="number"
+                        className="approval-form-input"
+                        placeholder="e.g., 5000.00"
+                        min="0"
+                        step="0.01"
+                        value={initialPrice}
+                        onChange={(e) => setInitialPrice(e.target.value)}
+                        required
+                      />
+                    </div>
+
+                    <div className="approval-form-group">
+                      <label className="approval-form-label">
+                        Start Date <span className="required">*</span>
+                      </label>
+                      <input
+                        type="datetime-local"
+                        className="approval-form-input"
+                        value={startDate}
+                        onChange={(e) => setStartDate(e.target.value)}
+                        required
+                      />
+                    </div>
+
+                    <div className="approval-form-group">
+                      <label className="approval-form-label">
+                        End Date <span className="required">*</span>
+                      </label>
+                      <input
+                        type="datetime-local"
+                        className="approval-form-input"
+                        value={endDate}
+                        onChange={(e) => setEndDate(e.target.value)}
+                        required
+                      />
+                    </div>
+
+                    <div className="approval-form-group">
+                      <label className="approval-form-label">
+                        Buy Now Price
+                      </label>
+                      <input
+                        type="number"
+                        className="approval-form-input"
+                        placeholder="e.g., 7500.00"
+                        min="0"
+                        step="0.01"
+                        value={buyNowPrice}
+                        onChange={(e) => setBuyNowPrice(e.target.value)}
+                      />
+                    </div>
+
+                    <div className="approval-form-group checkbox-group">
+                      <label className="approval-checkbox-label">
+                        <input
+                          type="checkbox"
+                          className="approval-checkbox"
+                          checked={isBuyNowEnabled}
+                          onChange={(e) => setIsBuyNowEnabled(e.target.checked)}
+                        />
+                        <span>Enable Buy Now Option</span>
+                      </label>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </main>
