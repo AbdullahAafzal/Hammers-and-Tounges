@@ -42,10 +42,7 @@ const SignIn = () => {
       } else if (role === 'seller') {
         navigate('/seller/dashboard', { replace: true })
         return;
-      } else {
-        // Default fallback
-        navigate('/', { replace: true })
-      }
+      } 
     }
   }, [isAuthenticated, user])
 

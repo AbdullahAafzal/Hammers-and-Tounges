@@ -6,7 +6,6 @@ export const API_CONFIG = {
   APP_ENV: import.meta.env.VITE_APP_ENV || 'development',
 };
 
-
 export const API_ROUTES = {
   // Authentication
   REGISTER: '/api/users/register/',
@@ -39,6 +38,4 @@ export const API_ROUTES = {
   // Checklist/Template Routes
   INSPECTION_TEMPLATES: '/api/inspections/templates/',
   INSPECTION_TEMPLATE_DETAIL: '/api/inspections/templates/', // + template_id
-
-
 };
