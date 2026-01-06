@@ -5,6 +5,12 @@
   force = true
 
 [[redirects]]
+  from = "/media/*"
+  to = "http://207.180.233.44:8001/media/:splat"
+  status = 200
+  force = true
+
+[[redirects]]
   from = "/*"
   to = "/index.html"
   status = 200
