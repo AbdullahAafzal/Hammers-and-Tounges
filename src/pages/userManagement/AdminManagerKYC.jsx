@@ -194,6 +194,8 @@ const AdminManagerKYC = () => {
 
   const cleanBaseUrl = API_CONFIG.BASE_URL.replace(/\/api\/?$/, '');
 
+  console.log("cleanBaseUrl KYC: ", cleanBaseUrl);
+  
   return `${cleanBaseUrl}${fieldValue}`;
 };
   const documentTypes = [
