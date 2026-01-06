@@ -201,11 +201,7 @@ const AdminManagerKYC = () => {
 
     console.log('field Values 2: ', fieldValue);
 
-    const cleanBaseUrl = API_CONFIG.BASE_URL.replace(/\/api\/?$/, '');
-
-    console.log("cleanBaseUrl KYC: ", cleanBaseUrl);
-
-    return `${cleanBaseUrl + fieldValue}`;
+    return `${API_CONFIG.MEDIA_BASE_URL}${fieldValue}`;
   };
 
   const documentTypes = useMemo(() => [

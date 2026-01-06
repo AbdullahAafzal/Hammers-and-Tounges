@@ -10,8 +10,10 @@
 export const API_CONFIG = {
   BASE_URL: import.meta.env.PROD ? '/api' : 'http://207.180.233.44:8001/api',
   TIMEOUT: 30000,
+  
   IS_PRODUCTION: import.meta.env.PROD,
   IS_DEVELOPMENT: import.meta.env.DEV,
+  MEDIA_BASE_URL: import.meta.env.VITE_MEDIA_BASE_URL,
   APP_ENV: import.meta.env.VITE_APP_ENV || 'development',
 };
 
