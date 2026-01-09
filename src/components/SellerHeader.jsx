@@ -39,20 +39,20 @@ function SellerHeader() {
             >
               My Products
             </Link>
-            <Link
+            {/* <Link
               to="/seller/auctions"
               className={`seller-header__nav-link ${location.pathname === '/seller/auctions' ? 'active' : ''
                 }`}
             >
               Auctions
-            </Link>
-            <Link
+            </Link> */}
+            {/* <Link
               to="/seller/analytics"
               className={`seller-header__nav-link ${location.pathname === '/seller/analytics' ? 'active' : ''
                 }`}
             >
               Analytics
-            </Link>
+            </Link> */}
           </nav>
 
           <div className="seller-header__right">

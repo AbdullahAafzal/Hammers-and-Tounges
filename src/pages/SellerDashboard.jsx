@@ -6,13 +6,13 @@ import SummaryCard from './SummaryCard'
 const SellerDashboard = () => {
 
     const seller = {
-        name: 'Sarah',
-        totalRevenue: 125000.00,
-        activeListings: 12,
-        itemsSold: 45,
-        pendingPayout: 3250.00,
-        rating: 4.8,
-        totalTransactions: 67,
+        name: 'Seller',
+        totalRevenue: 0.0,
+        activeListings: 0,
+        itemsSold: 0,
+        pendingPayout: 0,
+        rating: 0,
+        totalTransactions: 0,
         activeLabel: 'Active Listings',
         activeSubLabel: 'Items currently for auction',
         soldLabel: 'Items Sold',
@@ -24,116 +24,10 @@ const SellerDashboard = () => {
 
     }
 
-    const activeListings = [
-        {
-            id: 1,
-            title: 'Vintage Leather Armchair',
-            image: 'https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=400&q=80',
-            startingPrice: 200.00,
-            currentBid: 450.00,
-            bids: 12,
-            timeRemaining: '2d 14h 22m',
-            views: 245,
-            status: 'active'
-        },
-        {
-            id: 2,
-            title: 'Antique Oak Desk',
-            image: 'https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=400&q=80',
-            startingPrice: 800.00,
-            currentBid: 1200.00,
-            bids: 8,
-            timeRemaining: '1d 8h 5m',
-            views: 189,
-            status: 'active'
-        },
-    ]
-
-    const recentSales = [
-        {
-            id: 1,
-            title: 'Vintage Tiffany Lamp',
-            image: 'https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=200&q=80',
-            soldPrice: 1250.00,
-            buyer: 'Michael Johnson',
-            date: '2 hours ago',
-            status: 'paid',
-            icon: 'sale'
-        },
-        {
-            id: 2,
-            title: 'Art Deco Coffee Table',
-            image: 'https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=200&q=80',
-            soldPrice: 850.00,
-            buyer: 'Emily Chen',
-            date: '1 day ago',
-            status: 'shipped',
-            icon: 'shipped'
-        },
-        {
-            id: 3,
-            title: 'Persian Silk Carpet',
-            image: 'https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=200&q=80',
-            soldPrice: 3200.00,
-            buyer: 'Robert Wilson',
-            date: '3 days ago',
-            status: 'delivered',
-            icon: 'delivered'
-        },
-        {
-            id: 4,
-            title: 'Victorian Writing Desk',
-            image: 'https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=200&q=80',
-            soldPrice: 1800.00,
-            buyer: 'Lisa Thompson',
-            date: '5 days ago',
-            status: 'completed',
-            icon: 'completed'
-        }
-    ]
-
-    const sellerActivities = [
-        {
-            id: 1,
-            type: 'new_bid',
-            title: 'New bid received on "Vintage Leather Armchair"',
-            description: 'Bid increased to $450',
-            time: '2 minutes ago',
-            amount: 450.00,
-            icon: 'bid',
-            color: '#3B82F6'
-        },
-        {
-            id: 2,
-            type: 'item_sold',
-            title: '"Vintage Tiffany Lamp" sold for $1,250',
-            description: 'Buyer: Michael Johnson',
-            time: '2 hours ago',
-            amount: 1250.00,
-            icon: 'sale',
-            color: '#8CC63F'
-        },
-        {
-            id: 3,
-            type: 'listing_published',
-            title: 'New listing published',
-            description: '"Mid-century Modern Sofa" is now live',
-            time: '3 hours ago',
-            amount: 0,
-            icon: 'listing',
-            color: '#FFC107'
-        },
-        {
-            id: 4,
-            type: 'payout',
-            title: 'Payout processed',
-            description: '$2,500 transferred to your bank account',
-            time: '1 day ago',
-            amount: 2500.00,
-            icon: 'payout',
-            color: '#8B5CF6'
-        }
-    ]
+    // For testing empty states, you can set these to empty arrays:
+    const activeListings = [] // Empty array for testing
+    const recentSales = [] // Empty array for testing
+    const sellerActivities = [] // Empty array for testing
 
     const formatCurrency = (amount) => {
         return new Intl.NumberFormat('en-US', {
@@ -210,33 +104,49 @@ const SellerDashboard = () => {
                                 <Link to="/seller/auction-listings" className="login-link">Manage All</Link>
                             </div>
                             <div className="listings-grid-1">
-                                {activeListings.map((listing) => (
-                                    <Link key={listing.id} to={`/seller/listing/${listing.id}`} className="s-listing-card">
-                                        <div className="s-listing-card-image">
-                                            <img src={listing.image} alt={listing.title} />
-                                        </div>
-                                        <div className="s-listing-card-content">
-                                            <h3 className="s-listing-card-title">{listing.title}</h3>
-                                            <div className="s-listing-card-info">
-                                                <div className="listing-info-item">
-                                                    <span className="listing-info-label">Current Bid</span>
-                                                    <span className="listing-info-value">{formatCurrency(listing.currentBid)}</span>
+                                {activeListings.length > 0 ? (
+                                    activeListings.map((listing) => (
+                                        <Link key={listing.id} to={`/seller/listing/${listing.id}`} className="s-listing-card">
+                                            <div className="s-listing-card-image">
+                                                <img src={listing.image} alt={listing.title} />
+                                            </div>
+                                            <div className="s-listing-card-content">
+                                                <h3 className="s-listing-card-title">{listing.title}</h3>
+                                                <div className="s-listing-card-info">
+                                                    <div className="listing-info-item">
+                                                        <span className="listing-info-label">Current Bid</span>
+                                                        <span className="listing-info-value">{formatCurrency(listing.currentBid)}</span>
+                                                    </div>
+                                                    <div className="listing-info-item">
+                                                        <span className="listing-info-label">Starting Price</span>
+                                                        <span className="listing-info-value">{formatCurrency(listing.startingPrice)}</span>
+                                                    </div>
                                                 </div>
-                                                <div className="listing-info-item">
-                                                    <span className="listing-info-label">Starting Price</span>
-                                                    <span className="listing-info-value">{formatCurrency(listing.startingPrice)}</span>
+                                                <div className="s-listing-card-time">
+                                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                                                        <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2" />
+                                                        <path d="M12 6V12L16 14" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+                                                    </svg>
+                                                    <span>{listing.timeRemaining} left</span>
                                                 </div>
                                             </div>
-                                            <div className="s-listing-card-time">
-                                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-                                                    <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2" />
-                                                    <path d="M12 6V12L16 14" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-                                                </svg>
-                                                <span>{listing.timeRemaining} left</span>
-                                            </div>
+                                        </Link>
+                                    ))
+                                ) : (
+                                    <div className="empty-state">
+                                        <div className="empty-state-icon">
+                                            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" strokeWidth="1.5">
+                                                <path d="M20 7H4C2.89543 7 2 7.89543 2 9V19C2 20.1046 2.89543 21 4 21H20C21.1046 21 22 20.1046 22 19V9C22 7.89543 21.1046 7 20 7Z" strokeLinecap="round" strokeLinejoin="round" />
+                                                <path d="M16 21V5C16 4.46957 15.7893 3.96086 15.4142 3.58579C15.0391 3.21071 14.5304 3 14 3H10C9.46957 3 8.96086 3.21071 8.58579 3.58579C8.21071 3.96086 8 4.46957 8 5V21" strokeLinecap="round" strokeLinejoin="round" />
+                                            </svg>
                                         </div>
-                                    </Link>
-                                ))}
+                                        <h3 className="empty-state-title">No Active Listings</h3>
+                                        <p className="empty-state-description">You don't have any active auction listings at the moment.</p>
+                                        <Link to="/seller/product" className="empty-state-action">
+                                            Create Your First Listing
+                                        </Link>
+                                    </div>
+                                )}
                             </div>
                         </div>
 
@@ -245,26 +155,43 @@ const SellerDashboard = () => {
                                 <h2 className="section-title">Recent Sales</h2>
                             </div>
                             <div className="sales-list">
-                                {recentSales.map((sale) => (
-                                    <Link key={sale.id} className="sale-item">
-                                        <div className="sale-image">
-                                            <img src={sale.image} alt={sale.title} />
+                                {recentSales.length > 0 ? (
+                                    recentSales.map((sale) => (
+                                        <Link key={sale.id} className="sale-item">
+                                            <div className="sale-image">
+                                                <img src={sale.image} alt={sale.title} />
+                                            </div>
+                                            <div className="sale-content">
+                                                <div className="sale-header">
+                                                    <h4 className="sale-title">{sale.title}</h4>
+                                                    <span className="sale-price">{formatCurrency(sale.soldPrice)}</span>
+                                                </div>
+                                                <div className="sale-details">
+                                                    <span className="sale-buyer">Sold to: {sale.buyer}</span>
+                                                    <span className="sale-date">{sale.date}</span>
+                                                </div>
+                                                <div className="sale-footer">
+                                                    <span className="sale-status">{sale.status}</span>
+                                                </div>
+                                            </div>
+                                        </Link>
+                                    ))
+                                ) : (
+                                    <div className="empty-state">
+                                        <div className="empty-state-icon">
+                                            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" strokeWidth="1.5">
+                                                <path d="M20.5 7.5L9 15L4 11" strokeLinecap="round" strokeLinejoin="round" />
+                                                <path d="M3 13V19C3 20.1046 3.89543 21 5 21H19C20.1046 21 21 20.1046 21 19V5C21 3.89543 20.1046 3 19 3H5C3.89543 3 3 3.89543 3 5V9" strokeLinecap="round" strokeLinejoin="round" />
+                                                <circle cx="18" cy="6" r="2" />
+                                            </svg>
                                         </div>
-                                        <div className="sale-content">
-                                            <div className="sale-header">
-                                                <h4 className="sale-title">{sale.title}</h4>
-                                                <span className="sale-price">{formatCurrency(sale.soldPrice)}</span>
-                                            </div>
-                                            <div className="sale-details">
-                                                <span className="sale-buyer">Sold to: {sale.buyer}</span>
-                                                <span className="sale-date">{sale.date}</span>
-                                            </div>
-                                            <div className="sale-footer">
-                                                <span className="sale-status">{sale.status}</span>
-                                            </div>
-                                        </div>
-                                    </Link>
-                                ))}
+                                        <h3 className="empty-state-title">No Recent Sales</h3>
+                                        <p className="empty-state-description">Your recent sales will appear here once you make your first sale.</p>
+                                        <Link to="/seller/auction-listings" className="empty-state-action">
+                                            View Your Listings
+                                        </Link>
+                                    </div>
+                                )}
                             </div>
                         </div>
                     </div>
@@ -272,38 +199,56 @@ const SellerDashboard = () => {
                     <div className="recent-activity">
                         <h2 className="section-title">Recent Activity</h2>
                         <div className="activity-list">
-                            {sellerActivities.map((activity) => (
-                                <div key={activity.id} className="activity-item">
-                                    <div
-                                        className="activity-icon"
-                                        style={{
-                                            backgroundColor: `${activity.color}15`,
-                                            borderColor: `${activity.color}40`,
-                                            color: activity.color
-                                        }}
-                                    >
-                                        {getActivityIcon(activity.icon)}
-                                    </div>
-                                    <div className="activity-content">
-                                        <div className="activity-header">
-                                            <p className="activity-title">{activity.title}</p>
-                                            <span
-                                                className="activity-amount"
-                                                style={{ color: activity.color }}
-                                            >
-                                                {activity.amount > 0 ? formatCurrency(activity.amount) : ''}
-                                            </span>
+                            {sellerActivities.length > 0 ? (
+                                sellerActivities.map((activity) => (
+                                    <div key={activity.id} className="activity-item">
+                                        <div
+                                            className="activity-icon"
+                                            style={{
+                                                backgroundColor: `${activity.color}15`,
+                                                borderColor: `${activity.color}40`,
+                                                color: activity.color
+                                            }}
+                                        >
+                                            {getActivityIcon(activity.icon)}
                                         </div>
-                                        <p className="activity-description">{activity.description}</p>
-                                        <div className="activity-footer">
-                                            <span className="activity-time">{activity.time}</span>
-                                            <div className="activity-actions">
-                                                <button className="action-link">View Details</button>
+                                        <div className="activity-content">
+                                            <div className="activity-header">
+                                                <p className="activity-title">{activity.title}</p>
+                                                <span
+                                                    className="activity-amount"
+                                                    style={{ color: activity.color }}
+                                                >
+                                                    {activity.amount > 0 ? formatCurrency(activity.amount) : ''}
+                                                </span>
+                                            </div>
+                                            <p className="activity-description">{activity.description}</p>
+                                            <div className="activity-footer">
+                                                <span className="activity-time">{activity.time}</span>
+                                                <div className="activity-actions">
+                                                    <button className="action-link">View Details</button>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
+                                ))
+                            ) : (
+                                <div className="empty-state">
+                                    <div className="empty-state-icon">
+                                        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" strokeWidth="1.5">
+                                            <path d="M18 8H6C4.89543 8 4 8.89543 4 10V20C4 21.1046 4.89543 22 6 22H18C19.1046 22 20 21.1046 20 20V10C20 8.89543 19.1046 8 18 8Z" strokeLinecap="round" strokeLinejoin="round" />
+                                            <path d="M16 2H8C7.44772 2 7 2.44772 7 3V5C7 5.55228 7.44772 6 8 6H16C16.5523 6 17 5.55228 17 5V3C17 2.44772 16.5523 2 16 2Z" strokeLinecap="round" strokeLinejoin="round" />
+                                            <path d="M12 11V17" strokeLinecap="round" strokeLinejoin="round" />
+                                            <path d="M15 14L12 17L9 14" strokeLinecap="round" strokeLinejoin="round" />
+                                        </svg>
+                                    </div>
+                                    <h3 className="empty-state-title">No Recent Activity</h3>
+                                    <p className="empty-state-description">Your activity feed will update as you list items and make sales.</p>
+                                    <Link to="/seller/product" className="empty-state-action">
+                                        Start Selling
+                                    </Link>
                                 </div>
-                            ))}
+                            )}
                         </div>
                     </div>
                 </div>

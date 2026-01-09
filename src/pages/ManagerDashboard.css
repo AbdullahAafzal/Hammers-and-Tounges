@@ -370,8 +370,9 @@ body {
   justify-content: center;
 }
 
-.view-btn {
-  padding: 1.25rem 1.25rem;
+.manager-view-btn {
+  background-color: transparent;
+  padding: 0.7rem 1.25rem;
   color: #8CC63F;
   border: 1px solid #8CC63F;
   border-radius: 6px;
@@ -384,16 +385,16 @@ body {
   min-width: 140px;
 }
 
-.view-btn:hover {
+.manager-view-btn:hover {
   background-color: #7BB337;
   color: #000000;
   box-shadow: 0 4px 12px rgba(140, 198, 63, 0.3);
 }
-.view-btn.view-danger-btn {
+.manager-view-btn.view-danger-btn {
   color: #dc3545;
   border-color: #dc3545;
 }
-.view-btn.view-btn.view-danger-btn:hover {
+.manager-view-btn.manager-view-btn.view-danger-btn:hover {
   background-color: #dc3545;
   color: white;
 }
@@ -627,7 +628,7 @@ body {
     padding: 0.875rem;
   }
 
-  .view-btn {
+  .manager-view-btn {
     min-width: 120px;
     font-size: 0.8125rem;
     padding: 0.5rem 1rem;

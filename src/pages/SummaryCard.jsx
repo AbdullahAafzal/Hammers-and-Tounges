@@ -47,7 +47,7 @@ function SummaryCard({ listings, seller}) {
                 </div>
                 <div className="card-content">
                     <span className="card-label">{seller.revenueLabel}</span>
-                    <span className="card-value currency">{ '$1,233.00'}</span>
+                    <span className="card-value currency">$0</span>
                     <span className="card-sublabel">{seller.revenueSubLabel}</span>
                 </div>
             </div>
@@ -63,7 +63,7 @@ function SummaryCard({ listings, seller}) {
                 </div>
                 <div className="card-content">
                     <span className="card-label">{seller.pendingLabel}</span>
-                    <span className="card-value currency" style={{ color: '#8B5CF6' }}>$1,534.00</span>
+                    <span className="card-value currency" style={{ color: '#8B5CF6' }}>$0</span>
                     <span className="card-sublabel">{seller.pendingSubLabel}</span>
                 </div>
             </div>

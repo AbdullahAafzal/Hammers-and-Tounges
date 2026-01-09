@@ -204,10 +204,10 @@ function ManagerDashboard() {
     const isDraft = rawStatus === 'DRAFT';
     
     if (isDraft || status === "Pending Inspection" || status === "In Progress")
-      return <button className="view-btn" onClick={() => handleAction(status, item)}>Start Inspection</button>;
+      return <button className="manager-view-btn" onClick={() => handleAction(status, item)}>Start Inspection</button>;
 
     if (status === "Rejected")
-      return <button className="view-btn view-danger-btn" onClick={() => handleAction(status, item)}>View Report</button>;
+      return <button className="manager-view-btn view-danger-btn" onClick={() => handleAction(status, item)}>View Report</button>;
 
     return <span className="text-gray-500">—</span>;
   }
@@ -245,7 +245,6 @@ function ManagerDashboard() {
                     <circle cx="11" cy="11" r="8" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
                     <path d="M21 21L16.65 16.65" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
                   </svg>
-
                 </button>
                 <input
                   type="text"

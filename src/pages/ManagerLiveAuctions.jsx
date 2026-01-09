@@ -51,8 +51,8 @@ export default function ManagerLiveAuctions() {
   const filteredData = useMemo(() => {
     return tasks.filter((item) => {
       const matchSearch = (item.name?.toLowerCase().includes(search.toLowerCase()) || '') ||
-                          item.id.toLowerCase().includes(search.toLowerCase()) ||
-                          (item.seller?.toLowerCase().includes(search.toLowerCase()) || '');
+        item.id.toLowerCase().includes(search.toLowerCase()) ||
+        (item.seller?.toLowerCase().includes(search.toLowerCase()) || '');
       return matchSearch;
     });
   }, [tasks, search]);
@@ -99,51 +99,21 @@ export default function ManagerLiveAuctions() {
     return pages;
   }
 
-  const exportCSV = () => {
-    const headers = ["Bid ID", "User", "Bid Amount", "Time Stamp", "Status"];
-    const rows = filteredData.map(item => [
-      item.id,
-      item.user,
-      item.amount,
-      item.time,
-      item.status
-    ]);
-    const csvContent = "data:text/csv;charset=utf-8," + [headers, ...rows].map(e => e.join(",")).join("\n");
-    const link = document.createElement("a");
-    link.href = csvContent;
-    link.download = "bid_logs.csv";
-    link.click();
-  };
-
   return (
     <div className="live-auction-wrapper">
       <div className="live-auction-container">
-        
-        {/* <div className="live-auction-breadcrumb">
-          <p className="breadcrumb-text">Auctions / Vintage Collectibles / Vintage Rolex Submariner / Logs</p>
-        </div> */}
 
         <div className="live-auction-section-header">
           <div className="live-auction-header-content">
             <h1 className="live-auction-page-title">Completed Auctions</h1>
             <p className="live-auction-page-subtitle">View all completed and approved auction items</p>
           </div>
-          <div className="live-auction-header-actions">
-            <button className="live-auction-export-btn" onClick={exportCSV}>
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                <polyline points="7 10 12 15 17 10" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                <line x1="12" y1="15" x2="12" y2="3" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-              </svg>
-              Export as CSV
-            </button>
-          </div>
         </div>
 
         <div className="live-auction-filter-section">
           <div className="live-auction-search-container">
             <div className="live-auction-search-input-wrapper">
-             <button className='admin-search-btn'>
+              <button className='admin-search-btn'>
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
                   <circle cx="11" cy="11" r="8" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
                   <path d="M21 21L16.65 16.65" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
@@ -201,8 +171,8 @@ export default function ManagerLiveAuctions() {
                       <div className="live-auction-empty-state">
                         <div className="live-auction-empty-icon" style={{ animation: 'spin 1s linear infinite' }}>
                           <svg width="48" height="48" viewBox="0 0 24 24" fill="none">
-                            <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeDasharray="32" strokeDashoffset="16" opacity="0.3"/>
-                            <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeDasharray="32" strokeDashoffset="16" className="spinner-circle"/>
+                            <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeDasharray="32" strokeDashoffset="16" opacity="0.3" />
+                            <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeDasharray="32" strokeDashoffset="16" className="spinner-circle" />
                           </svg>
                         </div>
                         <h3>Loading completed auctions...</h3>
@@ -216,15 +186,15 @@ export default function ManagerLiveAuctions() {
                       <div className="live-auction-empty-state">
                         <div className="live-auction-empty-icon">
                           <svg width="48" height="48" viewBox="0 0 24 24" fill="none">
-                            <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2"/>
-                            <line x1="12" y1="8" x2="12" y2="12" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
-                            <line x1="12" y1="16" x2="12.01" y2="16" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+                            <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2" />
+                            <line x1="12" y1="8" x2="12" y2="12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+                            <line x1="12" y1="16" x2="12.01" y2="16" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
                           </svg>
                         </div>
                         <h3>Error loading completed auctions</h3>
                         <p>{error}</p>
-                        <button 
-                          onClick={() => window.location.reload()} 
+                        <button
+                          onClick={() => window.location.reload()}
                           className="live-auction-export-btn"
                           style={{ marginTop: '1rem' }}
                         >
@@ -254,12 +224,11 @@ export default function ManagerLiveAuctions() {
                       </td>
                       <td>
                         <div className="live-auction-status-cell">
-                          <span className={`live-auction-status-badge ${
-                            item.status === "CLOSED" ? "badge-winning" :
-                            item.status === "COMPLETED" ? "badge-winning" :
-                            item.status === "APPROVED" ? "badge-winning" :
-                            "badge-ended"
-                          }`}>
+                          <span className={`live-auction-status-badge ${item.status === "CLOSED" ? "badge-winning" :
+                              item.status === "COMPLETED" ? "badge-winning" :
+                                item.status === "APPROVED" ? "badge-winning" :
+                                  "badge-ended"
+                            }`}>
                             {item.status}
                           </span>
                         </div>
@@ -304,7 +273,7 @@ export default function ManagerLiveAuctions() {
                 disabled={page === 1}
               >
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-                  <path d="M15 18L9 12L15 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                  <path d="M15 18L9 12L15 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                 </svg>
                 Previous
               </button>
@@ -332,7 +301,7 @@ export default function ManagerLiveAuctions() {
               >
                 Next
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-                  <path d="M9 18L15 12L9 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                  <path d="M9 18L15 12L9 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                 </svg>
               </button>
             </div>

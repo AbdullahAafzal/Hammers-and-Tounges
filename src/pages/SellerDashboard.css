@@ -301,6 +301,72 @@
   color: #2563eb;
 }
 
+
+/* Empty State Styles */
+.empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 3rem 2rem;
+    text-align: center;
+    background: #ffffff;
+    border-radius: 12px;
+    border: 2px dashed #E5E7EB;
+    width: 100%;
+}
+
+.empty-state-icon {
+    margin-bottom: 1.5rem;
+    color: #9CA3AF;
+}
+
+.empty-state-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #111827;
+    margin-bottom: 0.5rem;
+}
+
+.empty-state-description {
+    font-size: 0.875rem;
+    color: #6B7280;
+    max-width: 300px;
+    margin-bottom: 1.5rem;
+    line-height: 1.5;
+}
+
+.empty-state-action {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.625rem 1.5rem;
+    background: #8cc63f;
+    color: white;
+    border-radius: 8px;
+    font-size: 0.875rem;
+    font-weight: 500;
+    text-decoration: none;
+    transition: all 0.2s ease;
+    border: none;
+    cursor: pointer;
+    color: #000000;
+}
+
+.empty-state-action:hover {
+    background: #7bb32e;
+    box-shadow: 0 4px 12px rgba(140, 198, 63, 0.3);
+}
+
+.listings-grid-1 .empty-state,
+.sales-list .empty-state {
+    grid-column: 1 / -1;
+}
+
+.activity-list .empty-state {
+    margin-top: 1rem;
+}
+
 @media (max-width: 1024px) {
   .dashboard-two-column {
     grid-template-columns: 1fr;
