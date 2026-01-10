@@ -131,13 +131,13 @@ const ManagerProfile = () => {
               </>
             )}
           </button>
-          <button className="mp-btn mp-btn-outline">
+          {/* <button className="mp-btn mp-btn-outline">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
               <path d="M3 16v5h5M21 16v5h-5M16 3v5h5M8 3v5H3" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
               <path d="M16 8h5l-5-5v5zM8 8H3l5-5v5zM8 16H3l5 5v-5zM16 16h5l-5 5v-5z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
             </svg>
             Export Report
-          </button>
+          </button> */}
         </div>
       </div>
 

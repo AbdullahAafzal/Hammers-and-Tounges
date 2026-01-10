@@ -721,13 +721,13 @@ const AdminDashboard = () => {
             <ProfileIcon />
             <span>My Profile</span>
           </button> */}
-          <button
+          {/* <button
             className="admin-dashboard-action-btn admin-dashboard-btn-outline"
             aria-label="Generate report"
           >
             <ReportIcon />
             <span>Generate Report</span>
-          </button>
+          </button> */}
         </div>
       </header>
 

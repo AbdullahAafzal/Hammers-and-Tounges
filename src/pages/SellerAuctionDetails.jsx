@@ -1,7 +1,7 @@
 import React, { useState, useCallback, useMemo, useEffect } from 'react'
 import { useNavigate, Link, useParams } from 'react-router-dom'
 import './SellerAuctionDetails.css'
-import { fetchMyAuctions } from '../store/actions/sellerActions'
+import { deleteAuction } from '../store/actions/sellerActions'
 import { useSelector, useDispatch } from 'react-redux'
 
 const formatCurrency = (amount) => {
@@ -124,7 +124,8 @@ const SellerListingDetails = () => {
         
         if (window.confirm('Are you sure you want to remove this listing? This action cannot be undone.')) {
             console.log('Remove listing clicked for ID:', listing.id)
-            // Add API call to remove listing
+            dispatch(deleteAuction(listing.id));
+            navigate('/seller/auction-listings');
         }
     }
 

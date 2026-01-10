@@ -9,13 +9,14 @@ import { toast } from "react-toastify";
 const SellerProfile = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  
+
   // Get profile data from Redux store
   const { profile: profileData, loading, error } = useSelector((state) => state.profile);
-  
+
   const [activeTab, setActiveTab] = useState("overview");
   const [isEditing, setIsEditing] = useState(false);
-  
+  const [kycUploading, setKycUploading] = useState(false);
+  // const [isUploadingKyc, setIsUploadingKyc] = useState(false);
   // Single state for all form data including files
   const [formData, setFormData] = useState({
     first_name: "",
@@ -139,9 +140,9 @@ const SellerProfile = () => {
         ...prev,
         image: file
       }));
-           console.log( 'selected file profile: ', file );
+      console.log('selected file profile: ', file);
 
-      
+
     } else {
       // For KYC documents
       setFormData(prev => ({
@@ -152,8 +153,8 @@ const SellerProfile = () => {
         }
       }));
 
-      console.log( 'selected file kyc: ', file );
-      
+      console.log('selected file kyc: ', file);
+
     }
 
     // Create preview
@@ -196,28 +197,28 @@ const SellerProfile = () => {
       };
 
       // Add KYC documents if user uploaded new ones
-      if (formData.seller_profile.id_front instanceof File) {
-        updateData.id_front = formData.seller_profile.id_front;
-      }
-      if (formData.seller_profile.id_back instanceof File) {
-        updateData.id_back = formData.seller_profile.id_back;
-      }
-      if (formData.seller_profile.driving_license_front instanceof File) {
-        updateData.driving_license_front = formData.seller_profile.driving_license_front;
-      }
-      if (formData.seller_profile.driving_license_back instanceof File) {
-        updateData.driving_license_back = formData.seller_profile.driving_license_back;
-      }
-      if (formData.seller_profile.passport_front instanceof File) {
-        updateData.passport_front = formData.seller_profile.passport_front;
-      }
+      // if (formData.seller_profile.id_front instanceof File) {
+      //   updateData.id_front = formData.seller_profile.id_front;
+      // }
+      // if (formData.seller_profile.id_back instanceof File) {
+      //   updateData.id_back = formData.seller_profile.id_back;
+      // }
+      // if (formData.seller_profile.driving_license_front instanceof File) {
+      //   updateData.driving_license_front = formData.seller_profile.driving_license_front;
+      // }
+      // if (formData.seller_profile.driving_license_back instanceof File) {
+      //   updateData.driving_license_back = formData.seller_profile.driving_license_back;
+      // }
+      // if (formData.seller_profile.passport_front instanceof File) {
+      //   updateData.passport_front = formData.seller_profile.passport_front;
+      // }
 
       console.log(updateData, 'Updating profile with data');
-      
+
 
       await dispatch(updateProfile(updateData));
       setIsEditing(false);
-      
+
       // Clear previews and file objects after successful save
       setImagePreviews({
         image: null,
@@ -227,13 +228,63 @@ const SellerProfile = () => {
         driving_license_back: null,
         passport_front: null,
       });
-      
+
       // Refresh profile data
       dispatch(fetchProfile());
     } catch (error) {
       console.error("Error updating profile:", error);
     }
   }, [formData, dispatch]);
+
+  const handleKycUpload = useCallback(async () => {
+    try {
+      const kycData = {};
+
+      if (formData.seller_profile.id_front instanceof File) {
+        kycData.id_front = formData.seller_profile.id_front;
+      }
+      if (formData.seller_profile.id_back instanceof File) {
+        kycData.id_back = formData.seller_profile.id_back;
+      }
+      if (formData.seller_profile.driving_license_front instanceof File) {
+        kycData.driving_license_front = formData.seller_profile.driving_license_front;
+      }
+      if (formData.seller_profile.driving_license_back instanceof File) {
+        kycData.driving_license_back = formData.seller_profile.driving_license_back;
+      }
+      if (formData.seller_profile.passport_front instanceof File) {
+        kycData.passport_front = formData.seller_profile.passport_front;
+      }
+
+      if (Object.keys(kycData).length === 0) {
+        toast.warn("Please select at least one document to upload");
+        return;
+      }
+
+      setKycUploading(true);
+
+      await dispatch(updateProfile(kycData));
+
+      toast.success("KYC documents uploaded successfully");
+
+      // clear previews after success
+      setImagePreviews(prev => ({
+        ...prev,
+        id_front: null,
+        id_back: null,
+        driving_license_front: null,
+        driving_license_back: null,
+        passport_front: null,
+      }));
+
+      dispatch(fetchProfile());
+    } catch (err) {
+      console.error("KYC upload error:", err);
+    } finally {
+      setKycUploading(false);
+    }
+  }, [dispatch, formData.seller_profile]);
+
 
   // Handle account deletion
   const handleDeleteAccount = useCallback(async () => {
@@ -252,26 +303,26 @@ const SellerProfile = () => {
   const calculateProfileCompletion = useCallback(() => {
     let completed = 0;
     let total = 0;
-    
+
     const basicFields = ['first_name', 'last_name', 'phone', 'email'];
     basicFields.forEach(field => {
       total++;
       if (formData[field] && formData[field].trim()) completed++;
     });
-    
+
     const businessFields = ['business_name', 'business_reg_no'];
     businessFields.forEach(field => {
       total++;
       if (formData.seller_profile[field] && formData.seller_profile[field].trim()) completed++;
     });
-    
+
     // Check API data for existing documents
     const kycFields = ['id_front', 'id_back', 'passport_front'];
     kycFields.forEach(field => {
       total++;
       if (profileData?.seller_profile?.[field]) completed++;
     });
-    
+
     return Math.round((completed / total) * 100);
   }, [formData, profileData]);
 
@@ -287,11 +338,11 @@ const SellerProfile = () => {
     if (imagePreviews[fieldName]) {
       return imagePreviews[fieldName];
     }
-    
+
     if (fieldName === 'image') {
       return profileData?.image || "https://www.catholicsingles.com/wp-content/uploads/2020/06/blog-header-3.png";
     }
-    
+
     // For KYC documents, return API URL if exists
     return profileData?.seller_profile?.[fieldName] || null;
   }, [imagePreviews, profileData]);
@@ -302,8 +353,12 @@ const SellerProfile = () => {
     const hasNewFile = formData.seller_profile[documentType] instanceof File;
     const hasExistingDocument = profileData?.seller_profile?.[documentType];
 
+    const isAlreadyUploaded =
+      Boolean(profileData?.seller_profile?.[documentType]) &&
+      !(formData.seller_profile[documentType] instanceof File);
+
     console.log('image source:', imageSource);
-    
+
 
     return (
       <div className="document-card">
@@ -311,10 +366,11 @@ const SellerProfile = () => {
           ref={el => fileInputRefs.current[documentType] = el}
           type="file"
           accept="image/*"
+          disabled={isAlreadyUploaded}
           style={{ display: 'none' }}
           onChange={(e) => handleFileSelect(documentType, e)}
         />
-        
+
         <div className="document-header">
           <h4>{title}</h4>
           {hasNewFile && (
@@ -324,11 +380,11 @@ const SellerProfile = () => {
             <span className="document-status uploaded">Uploaded</span>
           )}
         </div>
-        
+
         <div className="document-preview">
           {imageSource ? (
-            <img 
-              src={imageSource} 
+            <img
+              src={imageSource}
               alt={title}
               onError={(e) => {
                 e.target.style.display = 'none';
@@ -347,21 +403,27 @@ const SellerProfile = () => {
           ) : (
             <div className="document-placeholder">
               <svg width="48" height="48" viewBox="0 0 24 24" fill="none">
-                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" stroke="currentColor" strokeWidth="2"/>
-                <polyline points="17 8 12 3 7 8" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                <line x1="12" y1="3" x2="12" y2="15" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" stroke="currentColor" strokeWidth="2" />
+                <polyline points="17 8 12 3 7 8" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                <line x1="12" y1="3" x2="12" y2="15" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
               </svg>
               <p>No document uploaded</p>
             </div>
           )}
         </div>
-        
-        <button 
+
+        <button
           type="button"
           className="document-upload-btn"
-          onClick={() => fileInputRefs.current[documentType]?.click()}
+          // onClick={() => fileInputRefs.current[documentType]?.click()}
+          disabled={isAlreadyUploaded}
+          onClick={() => {
+            if (!isAlreadyUploaded) {
+              fileInputRefs.current[documentType]?.click();
+            }
+          }}
         >
-          Select File
+          {isAlreadyUploaded ? 'Uploaded' : 'Select File'}
         </button>
       </div>
     );
@@ -412,15 +474,15 @@ const SellerProfile = () => {
         <div className="empty-state">
           <div className="empty-state-icon error">
             <svg width="32" height="32" viewBox="0 0 24 24" fill="none">
-              <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2"/>
-              <path d="M12 8v4M12 16h.01" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+              <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2" />
+              <path d="M12 8v4M12 16h.01" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
             </svg>
           </div>
           <h3 className="empty-state-title">Failed to Load Profile</h3>
           <p className="empty-state-description">
             {error || "Unable to load your profile information. Please try again."}
           </p>
-          <button 
+          <button
             className="action-button primary"
             onClick={() => dispatch(fetchProfile())}
           >
@@ -492,7 +554,7 @@ const SellerProfile = () => {
                   style={{ display: 'none' }}
                   onChange={(e) => handleFileSelect('image', e)}
                 />
-                <button 
+                <button
                   className="s-avatar-upload"
                   onClick={() => fileInputRefs.current.image?.click()}
                   title="Upload profile image"
@@ -716,7 +778,7 @@ const SellerProfile = () => {
                   <p className="section-subtitle">
                     Upload your documents to complete KYC verification. All documents are securely encrypted.
                   </p>
-                  
+
                   <div className="documents-grid">
                     <DocumentCard documentType="id_front" title="ID Card - Front" />
                     <DocumentCard documentType="id_back" title="ID Card - Back" />
@@ -724,7 +786,15 @@ const SellerProfile = () => {
                     <DocumentCard documentType="driving_license_back" title="Driving License - Back" />
                     <DocumentCard documentType="passport_front" title="Passport" />
                   </div>
-
+                  <div className="kyc-actions">
+                    <button
+                      className="action-button primary"
+                      onClick={handleKycUpload}
+                      disabled={kycUploading}
+                    >
+                      {kycUploading ? 'Uploading...' : 'Upload KYC Documents'}
+                    </button>
+                  </div>
                   <div className="kyc-instructions">
                     <h4>Instructions:</h4>
                     <ul>
@@ -750,7 +820,7 @@ const SellerProfile = () => {
                         <h4>Change Password</h4>
                         <p>Update your account password</p>
                       </div>
-                      <button 
+                      <button
                         className="action-btn outline small"
                         onClick={() => navigate('/seller/change-password')}
                       >
@@ -780,7 +850,7 @@ const SellerProfile = () => {
                 <div className="danger-zone">
                   <h3 className="section-title">Account Actions</h3>
                   <div className="danger-actions">
-                    <button 
+                    <button
                       className="danger-btn"
                       onClick={() => {
                         dispatch(logout());
@@ -788,19 +858,19 @@ const SellerProfile = () => {
                       }}
                     >
                       <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-                        <path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4" stroke="currentColor" strokeWidth="2"/>
-                        <polyline points="16 17 21 12 16 7" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
-                        <line x1="21" y1="12" x2="9" y2="12" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+                        <path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4" stroke="currentColor" strokeWidth="2" />
+                        <polyline points="16 17 21 12 16 7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+                        <line x1="21" y1="12" x2="9" y2="12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
                       </svg>
                       Logout
                     </button>
-                    <button 
+                    <button
                       className="danger-btn red"
                       onClick={handleDeleteAccount}
                       disabled={loading}
                     >
                       <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-                        <path d="M3 6h18M5 6l1 13a2 2 0 002 2h8a2 2 0 002-2l1-13M10 11v6M14 11v6" stroke="currentColor" strokeWidth="2"/>
+                        <path d="M3 6h18M5 6l1 13a2 2 0 002 2h8a2 2 0 002-2l1-13M10 11v6M14 11v6" stroke="currentColor" strokeWidth="2" />
                       </svg>
                       Delete Account
                     </button>
