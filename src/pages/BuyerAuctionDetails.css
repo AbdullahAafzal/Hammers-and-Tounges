@@ -1,224 +1,59 @@
-.buyer-auction-details-page {
+/* BuyerAuctionDetails.css - Consistent Naming and Responsive Design */
+
+/* ==================== BASE STYLES ==================== */
+.buyer-details-page {
   min-height: 100vh;
   background-color: #000000;
   color: #ffffff;
-  display: flex;
-  flex-direction: column;
+  padding: 2rem 1.5rem;
 }
 
-.buyer-auction-details-header {
-  background-color: rgba(0, 0, 0, 0.95);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-  position: sticky;
-  top: 0;
-  z-index: 1000;
-  backdrop-filter: blur(10px);
-}
-
-.buyer-auction-details-header-container {
-  max-width: 1400px;
+.buyer-details-container {
+  max-width: 1200px;
   margin: 0 auto;
-  padding: 0.75rem 1.5rem;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 1.5rem;
-}
-
-.buyer-auction-details-logo {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  text-decoration: none;
-  color: #ffffff;
-  font-size: 0.9375rem;
-  font-weight: 600;
-  letter-spacing: -0.2px;
-}
-
-.buyer-auction-details-logo img {
-  width: 32px;
-  height: 32px;
-  object-fit: contain;
-}
-
-.buyer-auction-details-nav {
-  display: flex;
-  gap: 1.5rem;
-  align-items: center;
-  flex: 1;
-  justify-content: center;
-}
-
-.buyer-auction-details-nav .nav-link {
-  color: rgba(255, 255, 255, 0.7);
-  text-decoration: none;
-  font-size: 0.8125rem;
-  font-weight: 500;
-  transition: all 0.2s;
-  position: relative;
-  padding: 0.25rem 0;
-}
-
-.buyer-auction-details-nav .nav-link::after {
-  content: '';
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  width: 0;
-  height: 2px;
-  background-color: #8CC63F;
-  transition: width 0.3s;
-}
-
-.buyer-auction-details-nav .nav-link:hover {
-  color: #ffffff;
-}
-
-.buyer-auction-details-nav .nav-link:hover::after {
   width: 100%;
 }
 
-.buyer-auction-details-header-right {
+/* ==================== BREADCRUMBS ==================== */
+.buyer-details-breadcrumbs {
   display: flex;
-  align-items: center;
-  gap: 1rem;
-}
-
-.notification-button,
-.profile-button {
-  background: none;
-  border: none;
-  color: rgba(255, 255, 255, 0.7);
-  cursor: pointer;
-  padding: 0.375rem;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.2s;
-  position: relative;
-  text-decoration: none;
-}
-
-.notification-button:hover,
-.profile-button:hover {
-  background-color: rgba(255, 255, 255, 0.08);
-  color: #ffffff;
-}
-
-.notification-badge {
-  position: absolute;
-  top: 0;
-  right: 0;
-  background-color: #8CC63F;
-  color: #000000;
-  font-size: 0.625rem;
-  font-weight: 700;
-  border-radius: 50%;
-  width: 18px;
-  height: 18px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transform: translate(25%, -25%);
-}
-
-.profile-avatar {
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  background-color: rgba(140, 198, 63, 0.2);
-  border: 2px solid rgba(140, 198, 63, 0.3);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #8CC63F;
-}
-
-/* Auction Details Content */
-.buyer-auction-details-content {
-  flex: 1;
-  padding: 1.5rem 1.5rem;
-}
-
-.buyer-auction-details-container {
-  max-width: 1400px;
-  margin: 0 auto;
-}
-
-.back-button-container {
-  margin-bottom: 1rem;
-}
-
-.back-button {
-  display: inline-flex;
-  align-items: center;
+  flex-wrap: wrap;
   gap: 0.5rem;
-  background-color: transparent;
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  color: rgba(255, 255, 255);
+  margin-bottom: 1.5rem;
   font-size: 0.875rem;
-  font-weight: 500;
-  cursor: pointer;
-  padding: 0.625rem 1rem;
-  border-radius: 6px;
-  transition: all 0.2s;
-}
-
-.back-button:hover {
-  border-color: #8CC63F;
-  color: #8CC63F;
-}
-
-.back-button svg {
-  transition: all 0.2s;
-  color: white;
-}
-
-.back-button:hover svg {
-  transform: translateX(-3px);
-  color: #8CC63F;
-}
-
-.breadcrumbs {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  margin-bottom: 1.25rem;
-  font-size: 0.8125rem;
   color: rgba(255, 255, 255, 0.6);
 }
 
-.breadcrumbs a {
+.buyer-details-breadcrumbs a {
   color: rgba(255, 255, 255, 0.7);
   text-decoration: none;
   transition: color 0.2s;
 }
 
-.breadcrumbs a:hover {
+.buyer-details-breadcrumbs a:hover {
   color: #8CC63F;
 }
 
-.breadcrumbs span {
+.buyer-details-breadcrumbs span {
   color: rgba(255, 255, 255, 0.4);
 }
 
-.auction-details-content {
+/* ==================== CONTENT LAYOUT ==================== */
+.buyer-details-content {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 1.5rem;
+  gap: 2rem;
   align-items: start;
 }
 
-/* Left Panel - Images */
-.auction-images-section {
+/* ==================== IMAGES SECTION ==================== */
+.buyer-details-images {
   display: flex;
   flex-direction: column;
-  gap: 0.75rem;
+  gap: 1rem;
 }
 
-.main-image {
+.buyer-details-main-image {
   width: 100%;
   aspect-ratio: 4 / 3;
   border-radius: 8px;
@@ -227,71 +62,71 @@
   border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-.main-image img {
+.buyer-details-main-image img {
   width: 100%;
   height: 100%;
   object-fit: cover;
 }
 
-.image-thumbnails {
+.buyer-details-thumbnails {
   display: flex;
-  gap: 0.625rem;
+  gap: 0.75rem;
   overflow-x: auto;
   padding-bottom: 0.5rem;
 }
 
-.thumbnail {
+.buyer-details-thumbnail {
   flex-shrink: 0;
-  width: 90px;
-  height: 68px;
+  width: 100px;
+  height: 75px;
   border-radius: 6px;
   overflow: hidden;
-  background: none;
   border: 2px solid transparent;
   cursor: pointer;
-  padding: 0;
   transition: all 0.2s;
+  background: none;
+  padding: 0;
 }
 
-.thumbnail:hover {
-  border-color: rgba(140, 198, 63, 0.5);
+.buyer-details-thumbnail:hover {
+  border-color: rgba(255, 255, 255, 0.2);
 }
 
-.thumbnail.active {
-  border-color: #8CC63F;
+.buyer-details-thumbnail-active {
+  border-color: #8CC63F !important;
 }
 
-.thumbnail img {
+.buyer-details-thumbnail img {
   width: 100%;
   height: 100%;
   object-fit: cover;
 }
 
-/* Right Panel - Details */
-.auction-details-section {
+/* ==================== INFO SECTION ==================== */
+.buyer-details-info {
   display: flex;
   flex-direction: column;
-  gap: 1.25rem;
+  gap: 1.5rem;
 }
 
-.auction-header {
+.buyer-details-header {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
   gap: 1rem;
+  flex-wrap: wrap;
 }
 
-.auction-title {
-  font-size: 1.5rem;
+.buyer-details-title {
+  font-size: 1.75rem;
   font-weight: 700;
-  color: #ffffff;
   margin: 0;
-  letter-spacing: -0.3px;
+  color: #ffffff;
   flex: 1;
 }
 
-.lot-number {
-  font-size: 0.8125rem;
+.buyer-details-lot {
+  font-size: 0.875rem;
   color: rgba(255, 255, 255, 0.6);
   font-weight: 500;
   padding: 0.375rem 0.75rem;
@@ -300,497 +135,334 @@
   border-radius: 4px;
 }
 
-.bid-status-box {
+/* ==================== STATUS SECTION ==================== */
+.buyer-details-status {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: 1fr;
   gap: 1rem;
-  padding: 1rem;
+  padding: 1.25rem;
   background-color: rgba(255, 255, 255, 0.03);
   border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 8px;
 }
 
-.bid-status-item {
+.buyer-details-status-item {
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
 }
 
-.status-label {
-  font-size: 0.6875rem;
+.buyer-details-status-label {
+  font-size: 0.75rem;
   color: rgba(255, 255, 255, 0.6);
+  font-weight: 500;
   text-transform: uppercase;
   letter-spacing: 0.5px;
-  font-weight: 600;
 }
 
-.status-value {
+.buyer-details-status-value {
   font-size: 1.25rem;
-  font-weight: 700;
-  color: #ffffff;
-  letter-spacing: -0.3px;
-}
-
-.status-value.timer {
-  font-family: 'Courier New', monospace;
-  color: #8CC63F;
-  font-size: 1.125rem;
-}
-
-.reserve-status {
-  font-size: 0.6875rem;
   font-weight: 600;
-  padding: 0.25rem 0.5rem;
-  border-radius: 4px;
-  width: fit-content;
-}
-
-.reserve-status.approved {
-  background-color: rgba(140, 198, 63, 0.2);
   color: #8CC63F;
-  border: 1px solid rgba(140, 198, 63, 0.3);
 }
 
-.end-date {
-  font-size: 0.6875rem;
+.buyer-details-end-date {
+  font-size: 0.8125rem;
   color: rgba(255, 255, 255, 0.5);
 }
 
-.bidding-section {
+/* ==================== UPCOMING NOTICE ==================== */
+.buyer-details-upcoming {
   display: flex;
-  flex-direction: column;
-  gap: 0.625rem;
-}
-
-.bid-form {
-  display: flex;
-  gap: 0.625rem;
-  align-items: flex-start;
-}
-
-.bid-input-wrapper {
-  flex: 1;
-  position: relative;
-  display: flex;
-  align-items: center;
-}
-
-.currency-symbol {
-  position: absolute;
-  left: 0.875rem;
-  color: rgba(255, 255, 255, 0.6);
-  font-size: 0.875rem;
-  font-weight: 600;
-  pointer-events: none;
-}
-
-.bid-input {
-  width: 100%;
-  padding: 0.625rem 1rem 0.625rem 2.25rem;
-  background-color: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 6px;
-  color: #ffffff;
-  font-size: 0.875rem;
-  font-family: inherit;
-  transition: all 0.2s;
-}
-
-.bid-input::placeholder {
-  color: rgba(255, 255, 255, 0.3);
-}
-
-.bid-input:focus {
-  outline: none;
-  border-color: #8CC63F;
-  background-color: rgba(255, 255, 255, 0.08);
-}
-
-.place-bid-button {
-  padding: 0.625rem 1.75rem;
-  background-color: #3B82F6;
-  color: #ffffff;
-  border: none;
-  border-radius: 6px;
-  font-size: 0.875rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s;
-  white-space: nowrap;
-}
-
-.place-bid-button:hover {
-  background-color: #2563EB;
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
-}
-
-.minimum-bid {
-  font-size: 0.75rem;
-  color: rgba(255, 255, 255, 0.6);
-  margin: 0;
-}
-
-.deposit-warning {
-  display: flex;
-  gap: 0.625rem;
-  padding: 0.875rem;
+  gap: 0.75rem;
+  padding: 1rem;
   background-color: rgba(255, 193, 7, 0.1);
   border: 1px solid rgba(255, 193, 7, 0.3);
-  border-radius: 6px;
+  border-radius: 8px;
   color: #FFC107;
 }
 
-.deposit-warning svg {
+.buyer-details-upcoming svg {
   flex-shrink: 0;
-  margin-top: 0.125rem;
+  margin-top: 0.25rem;
 }
 
-.warning-content {
+.buyer-details-upcoming-content {
   flex: 1;
-  display: flex;
-  flex-direction: column;
-  gap: 0.25rem;
 }
 
-.warning-content strong {
+.buyer-details-upcoming-content strong {
+  display: block;
+  margin-bottom: 0.25rem;
+  font-size: 0.875rem;
+}
+
+.buyer-details-upcoming-content p {
   font-size: 0.8125rem;
-  font-weight: 600;
-}
-
-.warning-content p {
-  font-size: 0.75rem;
   margin: 0;
-  color: rgba(255, 193, 7, 0.9);
+  color: rgba(255, 193, 7, 0.8);
 }
 
-.deposit-link {
-  color: #FFC107;
-  text-decoration: underline;
-  font-weight: 600;
-  transition: color 0.2s;
-}
-
-.deposit-link:hover {
-  color: #FFD54F;
-}
-
-.info-tabs {
+/* ==================== TABS ==================== */
+.buyer-details-tabs {
   display: flex;
+  flex-wrap: wrap;
   gap: 0.5rem;
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  overflow-x: auto;
 }
 
-.tab {
-  padding: 0.625rem 1.25rem;
+.buyer-details-tab {
+  padding: 0.75rem 1.5rem;
   background: none;
   border: none;
   color: rgba(255, 255, 255, 0.6);
-  font-size: 0.8125rem;
+  font-size: 0.875rem;
   font-weight: 600;
   cursor: pointer;
   border-bottom: 2px solid transparent;
   transition: all 0.2s;
-  margin-bottom: -1px;
+  white-space: nowrap;
 }
 
-.tab:hover {
+.buyer-details-tab:hover {
   color: rgba(255, 255, 255, 0.8);
 }
 
-.tab.active {
-  color: #8CC63F;
-  border-bottom-color: #8CC63F;
+.buyer-details-tab-active {
+  color: #8CC63F !important;
+  border-bottom-color: #8CC63F !important;
 }
 
-.tab-content {
-  padding: 1.25rem 0;
-  min-height: 180px;
+/* ==================== TAB CONTENT ==================== */
+.buyer-details-tab-content {
+  padding: 1.5rem 0;
+  min-height: 200px;
 }
 
-.description-content {
-  display: flex;
-  flex-direction: column;
-  gap: 1.25rem;
-}
-
-.description-text {
-  font-size: 0.875rem;
-  color: rgba(255, 255, 255, 0.8);
-  line-height: 1.7;
-  margin: 0;
-  white-space: pre-line;
-}
-
-.key-details {
-  display: flex;
-  flex-direction: column;
-  gap: 0.625rem;
-  padding-top: 1.25rem;
-  border-top: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-.detail-item {
-  font-size: 0.8125rem;
-  color: rgba(255, 255, 255, 0.7);
+.buyer-details-description-text {
+  font-size: 0.9375rem;
   line-height: 1.6;
+  color: rgba(255, 255, 255, 0.9);
+  margin-bottom: 1.5rem;
 }
 
-.detail-item strong {
-  color: #ffffff;
+.buyer-details-key-details {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.buyer-details-detail-item {
+  font-size: 0.875rem;
+  padding: 0.75rem;
+  background-color: rgba(255, 255, 255, 0.02);
+  border-radius: 6px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.buyer-details-detail-item strong {
+  color: #8CC63F;
   font-weight: 600;
   margin-right: 0.5rem;
 }
 
-.inspection-content,
-.terms-content {
+/* ==================== INSPECTION REPORT ==================== */
+.buyer-details-inspection-content {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.buyer-details-download-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: #8CC63F;
+  text-decoration: none;
+  font-weight: 500;
+  padding: 0.75rem 1.5rem;
+  background-color: rgba(140, 198, 63, 0.1);
+  border: 1px solid rgba(140, 198, 63, 0.3);
+  border-radius: 6px;
+  transition: all 0.2s;
+}
+
+.buyer-details-download-link:hover {
+  background-color: rgba(140, 198, 63, 0.2);
+}
+
+.buyer-details-no-report {
+  color: rgba(255, 255, 255, 0.5);
+  font-style: italic;
+}
+
+/* ==================== TERMS ==================== */
+.buyer-details-terms-title {
+  font-size: 1.125rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+  color: #ffffff;
+}
+
+.buyer-details-terms-list {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 1.5rem 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.buyer-details-terms-list li {
+  position: relative;
+  padding-left: 1.5rem;
   font-size: 0.875rem;
   color: rgba(255, 255, 255, 0.8);
-  line-height: 1.7;
 }
 
-@media (max-width: 1024px) {
-  .auction-details-content {
-    grid-template-columns: 1fr;
-    gap: 1.5rem;
-  }
-
-  .bid-status-box {
-    grid-template-columns: 1fr;
-  }
-
-  .buyer-auction-details-header-container {
-    flex-wrap: wrap;
-  }
-
-  .buyer-auction-details-nav {
-    order: 3;
-    width: 100%;
-    justify-content: flex-start;
-    margin-top: 0.75rem;
-    padding-top: 0.75rem;
-    border-top: 1px solid rgba(255, 255, 255, 0.08);
-  }
+.buyer-details-terms-list li::before {
+  content: '•';
+  position: absolute;
+  left: 0;
+  color: #8CC63F;
+  font-size: 1.5rem;
+  line-height: 1;
 }
 
-@media (max-width: 768px) {
-  .buyer-auction-details-content {
-    padding: 1.25rem 1rem;
-  }
-
-  .auction-title {
-    font-size: 1.25rem;
-  }
-
-  .bid-form {
-    flex-direction: column;
-  }
-
-  .place-bid-button {
-    width: 100%;
-  }
-
-  .image-thumbnails {
-    gap: 0.5rem;
-  }
-
-  .thumbnail {
-    width: 70px;
-    height: 53px;
-  }
-
-  .info-tabs {
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
-  }
-
-  .tab {
-    flex-shrink: 0;
-    padding: 0.625rem 1rem;
-  }
+.buyer-details-reserve {
+  padding: 1rem;
+  background-color: rgba(255, 193, 7, 0.1);
+  border: 1px solid rgba(255, 193, 7, 0.3);
+  border-radius: 6px;
+  color: #FFC107;
+  font-size: 0.875rem;
 }
 
-/* Live Auction Styles */
-.live-auction-page {
-  background-color: #000000;
-  color: #ffffff;
+/* ==================== LIVE AUCTION STYLES ==================== */
+.buyer-details-live-page {
+  background-color: #000000 !important;
+  color: #ffffff !important;
 }
 
-.live-auction-header {
-  margin-bottom: 2rem;
-}
-
-.live-auction-title {
-  font-size: 2rem;
-  font-weight: 700;
-  color: #ffffff;
-  margin: 0 0 0.75rem 0;
-  letter-spacing: -0.5px;
-}
-
-.live-auction-description {
-  font-size: 1rem;
-  color: rgba(255, 255, 255, 0.7);
-  margin: 0;
-  line-height: 1.6;
-}
-
-.live-auction-content {
+.buyer-details-live-content {
   display: grid;
   grid-template-columns: 2fr 1fr;
   gap: 2rem;
   margin-bottom: 2rem;
 }
 
-/* Video Player Section */
-.live-auction-player-section {
-  width: 100%;
-}
-
-.video-player {
-  position: relative;
-  width: 100%;
-  aspect-ratio: 16 / 9;
-  border-radius: 8px;
-  overflow: hidden;
-  background-color: #000000;
-}
-
-.video-player img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-.play-overlay {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  cursor: pointer;
-  transition: opacity 0.3s;
-}
-
-.video-player:hover .play-overlay {
-  opacity: 0.9;
-}
-
-.video-progress {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  padding: 0.75rem 1rem;
-  background: linear-gradient(to top, rgba(0, 0, 0, 0.8), transparent);
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-}
-
-.progress-bar {
-  flex: 1;
-  height: 4px;
-  background-color: rgba(255, 255, 255, 0.3);
-  border-radius: 2px;
-  overflow: hidden;
-}
-
-.progress-fill {
-  height: 100%;
-  background-color: #ffffff;
-  transition: width 0.3s;
-}
-
-.video-time {
-  color: #ffffff;
-  font-size: 0.875rem;
-  font-weight: 500;
-  white-space: nowrap;
-}
-
-/* Bidding Panel */
-.live-auction-bidding-panel {
-  display: flex;
-  flex-direction: column;
+.buyer-details-live-panels {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
   gap: 1.5rem;
 }
 
-.live-timer-section {
-  padding: 1.5rem;
-  background-color: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  border-radius: 8px;
-  text-align: center;
+.buyer-details-live-player {
+  position: relative;
 }
 
-.timer-label {
+.buyer-details-video-player {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  border-radius: 12px;
+  overflow: hidden;
+  background-color: rgba(0, 0, 0, 0.5);
+}
+
+.buyer-details-play-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: rgba(0, 0, 0, 0.3);
+  cursor: pointer;
+}
+
+/* ==================== TIMER ==================== */
+.buyer-details-timer-section {
+  text-align: center;
+  margin-bottom: 1.5rem;
+}
+
+.buyer-details-timer-label {
   font-size: 0.75rem;
   color: rgba(255, 255, 255, 0.6);
   text-transform: uppercase;
-  letter-spacing: 0.5px;
+  letter-spacing: 1px;
+  margin-bottom: 0.5rem;
   font-weight: 600;
-  margin-bottom: 1rem;
 }
 
-.live-timer {
+.buyer-details-timer {
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
 }
 
-.timer-unit {
+.buyer-details-timer-unit {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 0.25rem;
+  min-width: 60px;
 }
 
-.timer-value {
+.buyer-details-timer-value {
   font-size: 2rem;
   font-weight: 700;
-  color: #8CC63F;
-  font-family: 'Courier New', monospace;
+  color: #ffffff;
   line-height: 1;
 }
 
-.timer-value.urgent {
-  color: #dc2626;
+.buyer-details-timer-urgent {
+  color: #f87171 !important;
+  animation: pulse 1s infinite;
 }
 
-.timer-label-small {
-  font-size: 0.625rem;
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+.buyer-details-timer-label-small {
+  font-size: 0.6875rem;
   color: rgba(255, 255, 255, 0.5);
+  margin-top: 0.25rem;
   text-transform: uppercase;
   letter-spacing: 0.5px;
 }
 
-.timer-separator {
-  font-size: 2rem;
-  font-weight: 700;
+.buyer-details-timer-separator {
+  font-size: 1.5rem;
   color: rgba(255, 255, 255, 0.3);
-  margin: 0 0.25rem;
+  margin-bottom: 0.75rem;
 }
 
-.current-bid-box {
-  padding: 1.5rem;
-  background-color: rgba(140, 198, 63, 0.1);
-  border: 1px solid #8CC63F;
-  border-radius: 8px;
+/* ==================== BIDDING PANEL ==================== */
+.buyer-details-current-bid {
   text-align: center;
+  padding: 1.5rem;
+  background-color: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  margin-bottom: 1.5rem;
 }
 
-.current-bid-label {
+.buyer-details-current-bid-label {
   font-size: 0.75rem;
   color: rgba(255, 255, 255, 0.6);
   text-transform: uppercase;
-  letter-spacing: 0.5px;
-  font-weight: 600;
-  margin-bottom: 0.75rem;
-  display: block;
+  letter-spacing: 1px;
+  margin-bottom: 0.5rem;
 }
 
-.current-bid-amount {
+.buyer-details-current-bid-amount {
   font-size: 2.5rem;
   font-weight: 700;
   color: #8CC63F;
@@ -798,233 +470,362 @@
   line-height: 1;
 }
 
-.highest-bidder-info {
+.buyer-details-highest-bidder {
   display: flex;
-  flex-direction: column;
-  gap: 0.25rem;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: 0.75rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-.highest-bidder-label {
+.buyer-details-highest-bidder-label {
   font-size: 0.75rem;
   color: rgba(255, 255, 255, 0.6);
 }
 
-.highest-bidder-name {
+.buyer-details-highest-bidder-name {
   font-size: 0.875rem;
   font-weight: 600;
-  color: #8CC63F;
+  color: #ffffff;
 }
 
-.quick-bid-button {
+/* ==================== BID BUTTONS ==================== */
+.buyer-details-custom-bid {
+  padding: 1rem 0;
+}
+.buyer-details-quick-bid,
+.buyer-details-custom-bid-button {
   width: 100%;
   padding: 1rem;
   background-color: #8CC63F;
   color: #000000;
   border: none;
   border-radius: 8px;
-  font-size: 1rem;
+  font-size: 0.875rem;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s;
+  /* margin-bottom: 1rem; */
 }
 
-.quick-bid-button:hover {
-  background-color: #7BB337;
-  box-shadow: 0 6px 20px rgba(140, 198, 63, 0.3);
+.buyer-details-quick-bid:hover,
+.buyer-details-custom-bid-button:hover {
+  background-color: #7ab42e;
 }
 
-.custom-bid-form {
+.buyer-details-custom-bid {
   display: flex;
-  gap: 0.5rem;
+  gap: 0.75rem;
+  margin-bottom: 1.5rem;
 }
 
-.custom-bid-input {
+.buyer-details-custom-bid-input {
   flex: 1;
-  padding: 0.75rem;
+  padding: 0.3rem 1rem;
   background-color: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  border-radius: 6px;
-  font-size: 0.875rem;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
   color: #ffffff;
+  font-size: 0.875rem;
 }
 
-.custom-bid-input::placeholder {
-  color: rgba(255, 255, 255, 0.4);
-}
-
-.custom-bid-input:focus {
+.buyer-details-custom-bid-input:focus {
   outline: none;
   border-color: #8CC63F;
-  background-color: rgba(255, 255, 255, 0.08);
 }
 
-.custom-bid-button {
-  padding: 0.75rem 1.5rem;
-  background-color: rgba(255, 255, 255, 0.05);
-  color: #ffffff;
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  border-radius: 6px;
+/* ==================== PANELS ==================== */
+.buyer-details-panel-title {
   font-size: 0.875rem;
   font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s;
-  white-space: nowrap;
-}
-
-.custom-bid-button:hover {
-  background-color: rgba(255, 255, 255, 0.1);
-  border-color: #8CC63F;
-  color: #8CC63F;
-}
-
-.bidder-confirmation {
-  padding: 0.75rem;
-  background-color: rgba(140, 198, 63, 0.15);
-  border: 1px solid rgba(140, 198, 63, 0.3);
-  border-radius: 6px;
-  color: #8CC63F;
-  font-size: 0.875rem;
-  text-align: center;
-  font-weight: 500;
-}
-
-/* Bottom Panels */
-.live-auction-bottom-panels {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 1.5rem;
-}
-
-.bidding-feed-panel,
-.active-bidders-panel {
-  padding: 1.5rem;
-  background-color: rgba(255, 255, 255, 0.02);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 8px;
-}
-
-.panel-title {
-  font-size: 1rem;
-  font-weight: 600;
   color: #ffffff;
-  margin: 0 0 1rem 0;
+  margin-bottom: 1rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
-.bidding-feed-list {
+.buyer-details-bidding-list,
+.buyer-details-active-list {
   display: flex;
   flex-direction: column;
   gap: 0.75rem;
-  max-height: 300px;
-  overflow-y: auto;
 }
 
-.bidding-feed-item {
+.buyer-details-bidding-item,
+.buyer-details-active-item {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 0.5rem 0;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  padding: 0.875rem;
+  background-color: rgba(255, 255, 255, 0.02);
+  border-radius: 6px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
 }
 
-.bidding-feed-item:last-child {
-  border-bottom: none;
+.buyer-details-bidder-name {
+  font-size: 0.8125rem;
+  color: rgba(255, 255, 255, 0.6);
 }
 
-.bidder-name {
-  font-size: 0.875rem;
-  color: rgba(255, 255, 255, 0.7);
-}
-
-.bid-amount {
+.buyer-details-bid-amount {
   font-size: 0.875rem;
   font-weight: 600;
   color: #ffffff;
 }
 
-.active-bidders-list {
+/* ==================== LOADING & ERROR STATES ==================== */
+.buyer-details-skeleton {
+  animation: fadeIn 0.3s ease;
+}
+
+.buyer-details-breadcrumbs-skeleton {
+  height: 14px;
+  width: 200px;
+  margin-bottom: 1.5rem;
+}
+
+.buyer-details-content-skeleton {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2rem;
+}
+
+.buyer-details-images-skeleton {
   display: flex;
   flex-direction: column;
-  gap: 0.75rem;
+  gap: 1rem;
 }
 
-.active-bidder-item {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 0.5rem 0;
-  font-size: 0.875rem;
-  color: rgba(255, 255, 255, 0.7);
+.buyer-details-main-image-skeleton {
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  border-radius: 8px;
 }
 
-.active-bidder-item svg {
-  color: rgba(255, 255, 255, 0.5);
-  flex-shrink: 0;
-}
-
-/* Upcoming Notice */
-.upcoming-notice {
+.buyer-details-thumbnails-skeleton {
   display: flex;
   gap: 0.75rem;
-  padding: 1rem;
-  background-color: rgba(255, 193, 7, 0.1);
-  border: 1px solid rgba(255, 193, 7, 0.3);
+}
+
+.buyer-details-thumbnail-skeleton {
+  width: 100px;
+  height: 75px;
   border-radius: 6px;
-  color: #FFC107;
 }
 
-.upcoming-notice svg {
-  flex-shrink: 0;
-  margin-top: 0.125rem;
+.buyer-details-header-skeleton {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1rem;
 }
 
-.notice-content {
-  flex: 1;
+.buyer-details-title-skeleton {
+  height: 28px;
+  width: 70%;
+  border-radius: 4px;
+}
+
+.buyer-details-lot-skeleton {
+  height: 28px;
+  width: 80px;
+  border-radius: 4px;
+}
+
+.buyer-details-status-skeleton {
+  height: 80px;
+  width: 100%;
+  border-radius: 8px;
+  margin-bottom: 1rem;
+}
+
+.buyer-details-tabs-skeleton {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.buyer-details-tab-skeleton {
+  height: 36px;
+  width: 100px;
+  border-radius: 4px;
+}
+
+.buyer-details-content-area-skeleton {
   display: flex;
   flex-direction: column;
-  gap: 0.25rem;
+  gap: 1rem;
 }
 
-.notice-content strong {
-  font-size: 0.875rem;
+.buyer-details-description-skeleton {
+  height: 80px;
+  width: 100%;
+  border-radius: 6px;
+}
+
+.buyer-details-details-skeleton {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.buyer-details-detail-skeleton {
+  height: 40px;
+  width: 100%;
+  border-radius: 6px;
+}
+
+.skeleton-shimmer {
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0.05) 25%,
+    rgba(255, 255, 255, 0.08) 50%,
+    rgba(255, 255, 255, 0.05) 75%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+}
+
+@keyframes shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.buyer-details-error,
+.buyer-details-not-found {
+  text-align: center;
+  padding: 4rem 2rem;
+  max-width: 400px;
+  margin: 0 auto;
+}
+
+.buyer-details-error svg,
+.buyer-details-not-found svg {
+  margin-bottom: 1.5rem;
+  opacity: 0.8;
+}
+
+.buyer-details-error h3,
+.buyer-details-not-found h3 {
+  font-size: 1.25rem;
   font-weight: 600;
-  color: #FFC107;
+  margin-bottom: 0.5rem;
+  color: #ffffff;
 }
 
-.notice-content p {
-  font-size: 0.8125rem;
-  margin: 0;
-  color: rgba(255, 193, 7, 0.9);
+.buyer-details-error p,
+.buyer-details-not-found p {
+  color: rgba(255, 255, 255, 0.6);
+  margin-bottom: 1.5rem;
+  line-height: 1.5;
 }
 
+.buyer-details-back-link {
+  display: inline-block;
+  padding: 0.75rem 1.5rem;
+  background-color: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #ffffff;
+  text-decoration: none;
+  border-radius: 6px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  transition: all 0.2s;
+}
+
+.buyer-details-back-link:hover {
+  background-color: rgba(255, 255, 255, 0.08);
+  border-color: rgba(140, 198, 63, 0.3);
+}
+
+/* ==================== RESPONSIVE DESIGN ==================== */
 @media (max-width: 1024px) {
-  .live-auction-content {
+  .buyer-details-content,
+  .buyer-details-live-content,
+  .buyer-details-live-panels {
     grid-template-columns: 1fr;
   }
-
-  .live-auction-bottom-panels {
+  
+  .buyer-details-content-skeleton {
     grid-template-columns: 1fr;
   }
 }
 
 @media (max-width: 768px) {
-  .live-auction-title {
+  .buyer-details-page {
+    padding: 1.5rem 1rem;
+  }
+  
+  .buyer-details-title,
+  .buyer-details-live-title {
     font-size: 1.5rem;
   }
-
-  .timer-value {
+  
+  .buyer-details-thumbnail {
+    width: 80px;
+    height: 60px;
+  }
+  
+  .buyer-details-tab {
+    padding: 0.5rem 1rem;
+    font-size: 0.8125rem;
+  }
+  
+  .buyer-details-timer-value {
     font-size: 1.5rem;
   }
-
-  .current-bid-amount {
+  
+  .buyer-details-current-bid-amount {
     font-size: 2rem;
   }
-
-  .custom-bid-form {
+  
+  .buyer-details-custom-bid {
     flex-direction: column;
   }
-
-  .custom-bid-button {
+  
+  .buyer-details-custom-bid-button,
+  .buyer-details-quick-bid {
     width: 100%;
   }
 }
 
+@media (max-width: 480px) {
+  .buyer-details-page {
+    padding: 1rem;
+  }
+  
+  .buyer-details-title {
+    font-size: 1.25rem;
+  }
+  
+  .buyer-details-lot {
+    font-size: 0.75rem;
+  }
+  
+  .buyer-details-timer-label,
+  .buyer-details-timer-label-small {
+    font-size: 0.625rem;
+  }
+  
+  .buyer-details-thumbnails {
+    gap: 0.5rem;
+  }
+  
+  .buyer-details-thumbnail {
+    width: 70px;
+    height: 52.5px;
+  }
+  
+  .buyer-details-status {
+    padding: 1rem;
+  }
+  
+  .buyer-details-status-value {
+    font-size: 1.125rem;
+  }
+}

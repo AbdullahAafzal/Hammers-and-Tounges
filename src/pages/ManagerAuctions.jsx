@@ -162,9 +162,9 @@ export default function ManagerAuctions() {
                 </svg>
               </div>
             </div>
-            <div className="auction-card-content">
+            <div className="manager-auction-card-content">
               <span className="m-auction-card-label">Active Bidders</span>
-              <h3 className="auction-card-value">0</h3>
+              <h3 className="auction-card-value"></h3>
               <span className="auction-card-change positive">0</span>
             </div>
           </div>
@@ -180,9 +180,9 @@ export default function ManagerAuctions() {
                 </svg>
               </div>
             </div>
-            <div className="auction-card-content">
+            <div className="manager-auction-card-content">
               <span className="m-auction-card-label">Total Lots</span>
-              <h3 className="auction-card-value">0</h3>
+              <h3 className="auction-card-value"></h3>
               <span className="auction-card-change positive">0</span>
             </div>
           </div>
@@ -197,9 +197,9 @@ export default function ManagerAuctions() {
                 </svg>
               </div>
             </div>
-            <div className="auction-card-content">
+            <div className="manager-auction-card-content">
               <span className="m-auction-card-label">Live Auctions</span>
-              <h3 className="auction-card-value">0</h3>
+              <h3 className="auction-card-value"></h3>
               <span className="auction-card-change positive">0</span>
             </div>
           </div>

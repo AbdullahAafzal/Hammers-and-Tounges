@@ -73,6 +73,7 @@ import { Bounce, ToastContainer } from "react-toastify";
 import ForgotPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
 import ResetVerifyOtp from "./pages/ResetVerifyOTP";
+import SellerSales from "./pages/SellerSales";
 function App() {
   return (
     <Provider store={store}>
@@ -81,7 +82,11 @@ function App() {
           <Routes>
             {/* Public Routes */}
             <Route path="/" element={<><Header /><Home /><Footer /></>} />
-            <Route path="/auctions" element={<><Header /><Auctions /><Footer /></>} />
+            <Route path="/auctions" element={<>
+              <Header />
+              <Auctions />
+              <Footer />
+            </>} />
             <Route path="/auction/:id" element={<><Header /><AuctionDetails /><Footer /></>} />
             <Route path="/about" element={<><Header /><About /><Footer /></>} />
             <Route path="/contact" element={<><Header /><Contact /><Footer /></>} />
@@ -115,6 +120,7 @@ function App() {
                 <Route path="/seller/auction-listings" element={<SellerAuctionListings />} />
                 <Route path="/seller/listing/:id" element={<SellerListingDetails />} />
                 <Route path="/seller/auctions" element={<SellerAuctions />} />
+                <Route path="/seller/sales" element={<SellerSales />} />
                 <Route path="/seller/product" element={<SellerCreateProduct />} />
                 <Route path="/seller/analytics" element={<SellerAnalytics />} />
                 <Route path="/seller/profile" element={<SellerProfile />} />

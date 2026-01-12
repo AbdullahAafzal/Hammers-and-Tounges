@@ -65,12 +65,17 @@ export const API_ROUTES = {
   UPDATE_AUCTION: '/auctions/listings/', // + auction_id
   DELETE_AUCTION: '/auctions/listings/', // + auction_id
 
+  AUCTION_APPROVAL_REQUEST: '/auctions/listings/',
+  
+
   // Buyer Routes
   PLACE_BID: '/auctions/bid/',
   GET_AUCTION_BIDS: '/auctions/listings/', // + auction_id + /bids/
 
-  AUCTION_BID_HISTORY: '/auctions/listings/:id/bids/', // + auction_id + /bid-history/
+
+  AUCTION_BID_HISTORY: '/auctions/listings/', // + auction_id + /bid-history/
   BIDS_LIST: '/auctions/bids/my/',
+  // BIDS_NO: '/auctions/bids//my/',
   WATCH_LIST: '/auctions/watchlist/',
 
 };

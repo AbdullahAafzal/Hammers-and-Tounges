@@ -124,4 +124,17 @@ export const sellerService = {
       throw error;
     }
   },
+
+  sellerAuctionApprovalRequest: async (auctionId) => {
+    try {
+      const { data } = await apiClient.post( API_ROUTES.AUCTION_APPROVAL_REQUEST + `${auctionId}/approval-request/` );
+      return data;
+    } catch (error) {
+      if (error.isNetworkError) {
+        throw new Error('Unable to connect to server. Please try again later.');
+      } 
+      throw error;
+    }
+  },
+
 };

@@ -125,7 +125,7 @@ const Contact = () => {
                   type="text"
                   id="name"
                   name="name"
-                  className="form-input"
+                  className="about-form-input"
                   value={formData.name}
                   onChange={handleChange}
                   required
@@ -138,7 +138,7 @@ const Contact = () => {
                   type="email"
                   id="email"
                   name="email"
-                  className="form-input"
+                  className="about-form-input"
                   value={formData.email}
                   onChange={handleChange}
                   required
@@ -151,7 +151,7 @@ const Contact = () => {
                   type="text"
                   id="subject"
                   name="subject"
-                  className="form-input"
+                  className="about-form-input"
                   value={formData.subject}
                   onChange={handleChange}
                   required

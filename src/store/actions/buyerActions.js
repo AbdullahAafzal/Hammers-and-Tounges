@@ -25,9 +25,13 @@ export const placeBid = createAsyncThunk(
   async (bidData, { rejectWithValue }) => {
     try {
       const response = await buyerService.placeBid(bidData);
+      console.log("response: ", response);
+      
       toast.success('Bid placed successfully!');
       return response;
     } catch (error) {
+      console.log(error);
+      
       const message =
         error.response?.data?.message ||
         error.response?.data?.error ||

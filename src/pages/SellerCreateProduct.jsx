@@ -776,7 +776,7 @@ const SellerCreateProduct = () => {
                   </div>
 
                   <div className="create-auction-form-grid create-auction-form-grid-1">
-                    {/* Pickup Address (for PICKUP and BOTH) */}
+                    {/* Pickup Address (for DELIVERY) */}
                     {(formData.handover_type === 'DELIVERY' && (
                       <>
                         <div className="create-auction-form-group">
@@ -796,7 +796,7 @@ const SellerCreateProduct = () => {
                             }
                             className={`create-auction-form-input ${errors.delivery_datetime ? 'create-auction-form-error' : ''
                               }`}
-                            min={new Date().toISOString().slice(0, 16)}
+                            // min={new Date().toISOString().slice(0, 16)}
                             required
                           />
 
@@ -814,7 +814,7 @@ const SellerCreateProduct = () => {
 
                   {/* Conditional Fields Based on Handover Type */}
                   <div className="create-auction-form-grid create-auction-form-grid-1">
-                    {/* Pickup Address (for PICKUP and BOTH) */}
+                    {/* Pickup Address (for PICKUP) */}
                     {(formData.handover_type === 'PICKUP' || formData.handover_type === 'BOTH') && (
                       <>
                         <div className="create-auction-form-group create-auction-form-group-full">

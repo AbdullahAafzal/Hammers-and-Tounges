@@ -2,10 +2,12 @@ import React, { useState } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import logo from '../assets/logo.png'
 import './BuyerHeader.css'
+import { useSelector } from 'react-redux'
 
 function BuyerHeader() {
   const location = useLocation()
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+  const { token } = useSelector(state => state.auth)
 
   const toggleMobileMenu = () => {
     setMobileMenuOpen(!mobileMenuOpen)

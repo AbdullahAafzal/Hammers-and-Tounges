@@ -211,6 +211,8 @@
   line-height: 1.4;
 }
 
+
+
 @media (max-width: 1024px) {
   .auctions-grid {
     grid-template-columns: repeat(2, 1fr);

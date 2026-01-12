@@ -821,13 +821,13 @@ const SellerProfile = () => {
                         <p>Update your account password</p>
                       </div>
                       <button
-                        className="action-btn outline small"
+                        className="s-action-btn s-secondary small"
                         onClick={() => navigate('/seller/change-password')}
                       >
                         Change
                       </button>
                     </div>
-                    <div className="setting-item">
+                    {/* <div className="setting-item">
                       <div className="setting-info">
                         <h4>Two-Factor Authentication</h4>
                         <p>Add extra security to your account</p>
@@ -843,7 +843,7 @@ const SellerProfile = () => {
                         <input type="checkbox" defaultChecked />
                         <span className="slider round"></span>
                       </label>
-                    </div>
+                    </div> */}
                   </div>
                 </div>
 

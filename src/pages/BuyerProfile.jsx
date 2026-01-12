@@ -112,12 +112,12 @@ const BuyerProfile = () => {
               </>
             )}
           </button>
-          <button className="b-action-btn b-outline">
+          {/* <button className="b-action-btn b-outline">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
               <path d="M3 16v5h5M21 16v5h-5M16 3v5h5M8 3v5H3" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
             </svg>
             Export Data
-          </button>
+          </button> */}
         </div>
       </div>
 

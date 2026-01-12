@@ -196,10 +196,7 @@ const BuyerDashboard = () => {
               <h1 className="welcome-title">Welcome, {user.name}!</h1>
               <p className="welcome-subtitle">Here's a summary of your auction activity.</p>
             </div>
-            <div className="welcome-actions">
-              <button className="action-button primary">Deposit Funds</button>
-              <button className="action-button secondary">View Invoices</button>
-            </div>
+          
           </div>
 
           {/* <div className="summary-cards">

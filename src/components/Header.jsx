@@ -2,18 +2,18 @@ import React, { useState } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import logo from '../assets/logo.png'
 import './Header.css'
-import { getLocalStorage } from '../utils/localStorage';
+// import { getLocalStorage } from '../utils/localStorage';
 import { FaSignInAlt } from "react-icons/fa";
-
+import { useSelector } from 'react-redux';
 
 
 function Header() {
   const location = useLocation()
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
-  const [user, setUser] = useState(() =>
-    getLocalStorage('user', { name: '', email: '', isAuth: false, role: 'buyer' })
-  )
-
+  // const [user, setUser] = useState(() =>
+  //   getLocalStorage('user', { name: '', email: '', isAuth: false, role: 'buyer' })
+  // )
+  const { token, user } = useSelector(state => state.auth)
 
   const toggleMobileMenu = () => {
     setMobileMenuOpen(!mobileMenuOpen)
@@ -73,8 +73,8 @@ function Header() {
               </svg>
             </button>
             {
-              user && user.isAuth ? (
-                <Link to={`${user.role}/profile`} className="buyer-header__profile-btn" aria-label="Profile">
+              token ? (
+                <Link to={`${user?.role}/profile`} className="buyer-header__profile-btn" aria-label="Profile">
                   <div className="buyer-header__avatar">
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
                       <path

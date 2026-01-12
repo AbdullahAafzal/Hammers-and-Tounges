@@ -85,3 +85,22 @@ export const deleteAuction = createAsyncThunk(
   }
 );
 
+
+export const requestAuctionApproval = createAsyncThunk(
+  'seller/requestAuctionApproval',
+  async (auctionId, { rejectWithValue }) => {
+    try {
+      const response = await sellerService.sellerAuctionApprovalRequest(auctionId);
+      toast.success('Auction approval requested successfully!');
+      return response;
+    } catch (error) {
+      const message =
+        error.response?.data?.message ||
+        error.response?.data?.error ||
+        'Failed to request auction approval';
+      toast.error(message);
+      return rejectWithValue(error.response?.data || { message });
+    }
+  }
+);
+

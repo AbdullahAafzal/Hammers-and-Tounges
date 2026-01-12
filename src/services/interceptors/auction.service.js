@@ -3,7 +3,7 @@ import { API_ROUTES } from '../../config/api.config';
 
 export const auctionService = {
   // Get all auctions (with optional filters)
-  getAuctions: async (params = {}) => {
+  getAuctions: async (params) => {
     try {
       const { data } = await apiClient.get(API_ROUTES.AUCTIONS_LIST, {
         params,

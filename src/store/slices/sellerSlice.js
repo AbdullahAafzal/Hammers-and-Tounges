@@ -1,6 +1,6 @@
 
 import { createSlice } from '@reduxjs/toolkit';
-import { createAuction, deleteAuction, fetchMyAuctions, updateAuction } from '../actions/sellerActions';
+import { createAuction, deleteAuction, fetchMyAuctions, updateAuction, requestAuctionApproval } from '../actions/sellerActions';
 import { fetchCategories } from '../actions/AuctionsActions';
 
 const initialState = {

@@ -6,36 +6,9 @@ import { toast } from 'react-toastify';
 
 export const fetchAuctionsList = createAsyncThunk(
   'auctions/fetchAuctionsList',
-  async (params = {}, { rejectWithValue }) => {
+  async (params, { rejectWithValue }) => {
     try {
-      // Transform filter parameters for backend
-      const queryParams = {
-        page: params.page || 1,
-        ...params
-      };
-
-      // Handle category filtering (could be array or single value)
-      if (params.category) {
-        if (Array.isArray(params.category)) {
-          queryParams.category = params.category.join(',');
-        }
-      }
-
-      // Handle status filtering
-      if (params.status) {
-        if (Array.isArray(params.status)) {
-          queryParams.status = params.status.join(',');
-        }
-      }
-
-      // Remove undefined values
-      Object.keys(queryParams).forEach(key => {
-        if (queryParams[key] === undefined || queryParams[key] === '') {
-          delete queryParams[key];
-        }
-      });
-
-      const response = await auctionService.getAuctions(queryParams);
+      const response = await auctionService.getAuctions(params);
       return response;
     } catch (error) {
       const message =

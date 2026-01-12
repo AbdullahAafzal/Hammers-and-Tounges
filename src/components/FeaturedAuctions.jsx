@@ -1,163 +1,246 @@
-import React, { useState, useEffect, useMemo } from 'react'
+import React, { useState, useEffect, useMemo, useCallback } from 'react'
 import { useNavigate } from 'react-router-dom'
 import './FeaturedAuctions.css'
 import { useSelector, useDispatch } from 'react-redux'
-import { browseAuctions } from '../store/actions/buyerActions'
+import { fetchAuctionsList } from '../store/actions/AuctionsActions'
 import { toast } from 'react-toastify'
+
 const FeaturedAuctions = ({ selectedCategory }) => {
-  const navigate = useNavigate()
-  const dispatch = useDispatch()
-  const [currentPage, setCurrentPage] = useState(1)
-  const { browseAuctionsList, isLoading } = useSelector(state => state.buyer);
-  const { token } = useSelector(state => state.auth);
-  const auctions = browseAuctionsList?.results || []
-  const totalCount = browseAuctionsList?.count || 0
-  const PAGE_SIZE = 20
+const navigate = useNavigate()
+const dispatch = useDispatch()
+const { token } = useSelector(state => state.auth)
 
-  const [currentIndex, setCurrentIndex] = useState(0)
-  const [itemsPerRow, setItemsPerRow] = useState(4)
+const [page, setPage] = useState(1)
+const [allAuctions, setAllAuctions] = useState([])
+const [isLoadingAllPages, setIsLoadingAllPages] = useState(false)
+const [error, setError] = useState(null)
 
-  useEffect(() => {
-    dispatch(browseAuctions());
-  }, [dispatch]);
+// Fetch all pages of auctions on mount
+useEffect(() => {
+const fetchAllPages = async () => {
+setIsLoadingAllPages(true)
+setError(null)
+try {
+let allResults = []
+let nextPage = 1
+let hasMore = true
 
-  useEffect(() => {
-    const calculateItemsPerRow = () => {
-      if (typeof window !== 'undefined') {
-        const width = window.innerWidth
-        if (width >= 1400) return 8
-        if (width >= 1024) return 8
-        if (width >= 768) return 6
-        return 1
+    while (hasMore) {
+      const response = await dispatch(fetchAuctionsList({ page: nextPage })).unwrap()
+      allResults = [...allResults, ...(response.results || [])]
+
+      if (response.next) {
+        nextPage += 1
+      } else {
+        hasMore = false
       }
-      return 5
-    }
-    setItemsPerRow(calculateItemsPerRow())
-    const handleResize = () => {
-      const newItemsPerRow = calculateItemsPerRow()
-      setItemsPerRow(newItemsPerRow)
-      const maxIndex = Math.ceil(filteredAuctions.length / newItemsPerRow) - 1
-      if (currentIndex > maxIndex) setCurrentIndex(0)
     }
 
-    window.addEventListener('resize', handleResize)
-    return () => window.removeEventListener('resize', handleResize)
-  }, [currentIndex])
+    setAllAuctions(allResults)
+  } catch (err) {
+    console.error('Error fetching all auctions:', err)
+    setError('Failed to load auctions')
+    toast.error('Failed to load complete auction list')
+  } finally {
+    setIsLoadingAllPages(false)
+  }
+}
 
-  const filteredAuctions = useMemo(() => {
-    if (!selectedCategory) {
-      return auctions.filter(a => a.status === 'ACTIVE')
-    }
-    return auctions.filter(
-      a =>
-        a.category_name === selectedCategory &&
-        a.status === 'ACTIVE'
-    )
-  }, [auctions, selectedCategory])
+fetchAllPages()
+}, [dispatch])
 
+// Filter auctions: ACTIVE status + selected category
+const filteredAuctions = useMemo(() => {
+return allAuctions.filter(auction => {
+if (auction.status !== 'ACTIVE') return false
 
-  const totalPages = Math.ceil(totalCount / PAGE_SIZE)
-  const startIndex = currentIndex * itemsPerRow
-  const endIndex = startIndex + itemsPerRow
-  const visibleAuctions = filteredAuctions.slice(startIndex, endIndex)
+  if (selectedCategory && auction.category_name !== selectedCategory) {
+    return false
+  }
 
-  const handlePrevious = () => setCurrentIndex(prev => (prev > 0 ? prev - 1 : totalPages - 1))
-  const handleNext = () => setCurrentIndex(prev => (prev < totalPages - 1 ? prev + 1 : 0))
+  return true
+})
+}, [allAuctions, selectedCategory])
 
-  return (
-    <section className="featured-section">
-      <div className="featured-container">
-        <div className="featured-header">
-          <h2 className="featured-title">Featured Auctions</h2>
-          <div className="featured-nav">
-            <button className="nav-arrow left-arrow" onClick={handlePrevious} aria-label="Previous">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-                <path d="M15 18L9 12L15 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-              </svg>
-            </button>
-            <button className="nav-arrow right-arrow" onClick={handleNext} aria-label="Next">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-                <path d="M9 18L15 12L9 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-              </svg>
-            </button>
-          </div>
-        </div>
+// Paginate filtered results (10 per page)
+const itemsPerPage = 10
+const totalFilteredCount = filteredAuctions.length
+const totalPages = Math.ceil(totalFilteredCount / itemsPerPage)
+const startIndex = (page - 1) * itemsPerPage
+const endIndex = startIndex + itemsPerPage
+const paginatedAuctions = filteredAuctions.slice(startIndex, endIndex)
+
+// Reset to page 1 when category changes
+useEffect(() => {
+setPage(1)
+}, [selectedCategory])
+
+// Get auction image with fallback
+const getAuctionImage = useCallback((auction) => {
+if (auction?.media?.[0]?.file) {
+return auction.media[0].file
+}
+return 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200"%3E%3Crect fill="%23e5e7eb" width="200" height="200"/%3E%3Ctext x="50%" y="50%" text-anchor="middle" dy=".3em" fill="%239ca3af" font-size="14"%3ENo Image%3C/text%3E%3C/svg%3E'
+}, [])
+
+// Handle authentication check
+const handleCheckAuth = useCallback(() => {
+if (!token) {
+toast.info('Please sign in to view auction details')
+navigate('/signin')
+}
+}, [token, navigate])
+
+// Pagination handlers
+const handleNext = useCallback(() => {
+if (page < totalPages) {
+setPage(prev => prev + 1)
+}
+}, [page, totalPages])
+
+const handlePrevious = useCallback(() => {
+if (page > 1) {
+setPage(prev => prev - 1)
+}
+}, [page])
+
+const hasNextPage = page < totalPages
+const hasPrevPage = page > 1
+
+return (
+<section className="featured-section">
+<div className="featured-container">
+<div className="featured-header">
+<h2 className="featured-title">Featured Auctions</h2>
+<span className="featured-results-count">
+{isLoadingAllPages ? 'Loading...' : `${totalFilteredCount} Results`}
+</span>
+</div>
+
+    {/* Loading State */}
+    {isLoadingAllPages && allAuctions.length === 0 && (
+      <div className="featured-loading">
+        <div className="featured-spinner"></div>
+        <p>Loading auctions...</p>
+      </div>
+    )}
+
+    {/* Error State */}
+    {error && !isLoadingAllPages && allAuctions.length === 0 && (
+      <div className="featured-error">
+        <svg width="48" height="48" viewBox="0 0 24 24" fill="none">
+          <circle cx="12" cy="12" r="10" stroke="#fca5a5" strokeWidth="2" />
+          <path d="M12 8v4M12 16h.01" stroke="#fca5a5" strokeWidth="2" strokeLinecap="round" />
+        </svg>
+        <p className="featured-error-message">{error}</p>
+        <button
+          className="featured-retry-btn"
+          onClick={() => window.location.reload()}
+        >
+          Retry
+        </button>
+      </div>
+    )}
+
+    {/* Empty State */}
+    {!isLoadingAllPages && !error && paginatedAuctions.length === 0 && (
+      <div className="featured-empty">
+        <svg width="64" height="64" viewBox="0 0 24 24" fill="none">
+          <path d="M9 11L12 14L22 4" stroke="#d1d5db" strokeWidth="2" strokeLinecap="round" />
+          <path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11" stroke="#d1d5db" strokeWidth="2" />
+        </svg>
+        <h2>No auctions found</h2>
+        <p>
+          There are currently no active auctions
+          {selectedCategory ? ` in ${selectedCategory}.` : '.'}
+        </p>
+      </div>
+    )}
+
+    {/* Auctions Grid */}
+    {!isLoadingAllPages && !error && paginatedAuctions.length > 0 && (
+      <>
         <div className="auctions-grid">
-          {visibleAuctions.length === 0 ? (
-            <div className="featured-empty-state">
-              <div className="featured-empty-icon">📦</div>
-              <h3 className="featured-empty-title">
-                No auctions available
-              </h3>
-              <p className="featured-empty-text">
-                There are currently no active auctions
-                {selectedCategory ? ` in this category.` : '.'}
-              </p>
-            </div>
-          ) : (
-            visibleAuctions.map((auction) => (
-              <div key={auction.id} className="feature-auction-card">
-                <div className="auction-image">
-                  <img
-                    src={auction?.media?.[0]?.file}
-                    alt={auction.title}
-                  />
-                </div>
+          {paginatedAuctions.map(auction => (
+            <div key={auction.id} className="feature-auction-card">
+              <div className="auction-image">
+                <img
+                  src={getAuctionImage(auction)}
+                  alt={auction.title}
+                  onError={(e) => {
+                    e.target.src = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200"%3E%3Crect fill="%23e5e7eb" width="200" height="200"/%3E%3Ctext x="50%" y="50%" text-anchor="middle" dy=".3em" fill="%239ca3af" font-size="14"%3EImage Error%3C/text%3E%3C/svg%3E'
+                  }}
+                />
+              </div>
 
-                <div className="auction-content">
-                  <h3 className="auction-title">{auction.title}</h3>
+              <div className="auction-content">
+                <h3 className="auction-title">{auction.title}</h3>
 
-                  <div className="auction-details">
-                    <div className="auction-bid">
-                      <span className="detail-label">Starting Price</span>
-                      <span className="detail-value">
-                        {`${auction?.currency || 'USD'} ${auction.initial_price}`}
-                      </span>
-                    </div>
-
-                    <div className="auction-time">
-                      <span className="detail-label">Total Bids</span>
-                      <span className="detail-value">
-                        {auction?.total_bids}
-                      </span>
-                    </div>
+                <div className="auction-details">
+                  <div className="auction-bid">
+                    <span className="detail-label">Starting Price</span>
+                    <span className="detail-value">
+                      {`${auction?.currency || 'USD'} ${auction.initial_price}`}
+                    </span>
                   </div>
 
-                  <button
-                    className="auction-button"
-                    onClick={() => {
-                      token
-                        ? navigate(`/auction/${auction.id}`)
-                        : (
-                          toast.info(
-                            'Please sign in to view auction details.'
-                          ),
-                          navigate('/signin')
-                        )
-                    }}
-                  >
-                    View Details
-                  </button>
+                  <div className="auction-time">
+                    <span className="detail-label">Total Bids</span>
+                    <span className="detail-value">
+                      {auction.total_bids}
+                    </span>
+                  </div>
                 </div>
+
+                <button
+                  className="auction-button"
+                  onClick={() => {
+                    token
+                      ? navigate(`/auction/${auction.id}`)
+                      : handleCheckAuth()
+                  }}
+                  disabled={isLoadingAllPages}
+                >
+                  View Details
+                </button>
               </div>
-            ))
-          )}
+            </div>
+          ))}
         </div>
-        {totalPages > 1 && (
-          <div className="slider-indicators">
-            {Array.from({ length: totalPages }).map((_, index) => (
-              <button
-                key={index}
-                className={`indicator ${currentPage === index + 1 ? 'active' : ''}`}
-                onClick={() => setCurrentPage(index + 1)}
-              />
-            ))}
+
+        {/* Pagination Controls */}
+        {totalFilteredCount > itemsPerPage && (
+          <div className="flex justify-center gap-4 mt-6">
+            <button
+              onClick={handlePrevious}
+              disabled={!hasPrevPage || isLoadingAllPages}
+              className={`px-3 py-2 text-sm rounded border-[1px] ${hasPrevPage && !isLoadingAllPages
+                ? 'text-[#8cc63f] border-[#8cc63f] hover:bg-[#8cc63f] hover:text-black cursor-pointer transition-all duration-200'
+                : 'border-white/20 bg-black text-white/40 cursor-not-allowed'
+                }`}
+            >
+              Previous
+            </button>
+            <button disabled className="px-3 py-2 text-sm  rounded-sm border-[1px] border-[#8cc63f] text-[#8cc63f] bg-black">
+              <strong className='text-sm'>{page} of {totalPages}</strong>
+            </button>
+            <button
+              onClick={handleNext}
+              disabled={!hasNextPage || isLoadingAllPages}
+              className={`px-3 py-2 text-sm rounded border-[1px] ${hasNextPage && !isLoadingAllPages
+                ? 'text-[#8cc63f] border-[#8cc63f] hover:bg-[#8cc63f] hover:text-black cursor-pointer transition-all duration-200'
+                : 'border-white/20 bg-black text-white/40 cursor-not-allowed'
+                }`}
+            >
+              Next
+            </button>
           </div>
         )}
-
-      </div>
-    </section>
-  )
+      </>
+    )}
+  </div>
+</section>
+)
 }
 
 export default FeaturedAuctions

@@ -1,418 +1,503 @@
-import React, { useState, useMemo } from 'react'
-import { useNavigate } from 'react-router-dom'
-import './BuyerAuctions.css'
+import React, { useState, useEffect, useMemo, useCallback, lazy, Suspense } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
+import debounce from 'lodash/debounce';
+import { fetchAuctionsList, fetchCategories } from '../store/actions/AuctionsActions';
+import { clearBuyerError } from '../store/slices/buyerSlice';
+import './BuyerAuctions.css';
+import { toast } from 'react-toastify';
+
+const BuyerAuctionCard = lazy(() => import('../components/BuyerAuctionCard'));
 
 const BuyerAuctions = () => {
-  const navigate = useNavigate()
-  const [selectedCategories, setSelectedCategories] = useState([])
-  const [selectedStatus, setSelectedStatus] = useState([])
-  const [priceRange, setPriceRange] = useState({ min: '', max: '' })
-  const [sortBy, setSortBy] = useState('newest');
-  const [currentPage, setCurrentPage] = useState(1);
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const [page, setPage] = useState(1);
 
-  const auctions = [
-    {
-      id: 1,
-      price: 50000,
-      image: 'https://images.unsplash.com/photo-1549317661-bd32c8ce0db2?w=800&q=80',
-      status: 'LIVE',
-      category: 'Vehicles',
-      title: 'Monthly Executive Vehicle Auction',
-      timer: '02:18:45:10',
-      timerType: 'ends'
-    },
-    {
-      id: 2,
-      price: 1200000,
-      image: 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=800&q=80',
-      status: 'UPCOMING',
-      category: 'Real Estate',
-      title: 'Exclusive Sandton Residence',
-      timer: '15:08:30:22',
-      timerType: 'starts'
-    },
-    {
-      id: 3,
-      price: 90000,
-      image: 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=800&q=80',
-      status: 'LIVE',
-      category: 'Jewelry',
-      title: 'Timeless Timepieces & Jewelry',
-      timer: '00:05:15:54',
-      timerType: 'ends'
-    },
-    {
-      id: 4,
-      price: 250000,
-      image: 'https://images.unsplash.com/photo-1578301978018-3005759f48f7?w=800&q=80',
-      status: 'UPCOMING',
-      category: 'Fine Art',
-      title: 'Modern & Contemporary Art',
-      timer: '21:12:05:30',
-      timerType: 'starts'
-    },
-    {
-      id: 5,
-      price: 150000,
-      image: 'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=800&q=80',
-      status: 'LIVE',
-      category: 'Electronics',
-      title: 'Liquidation: Heavy Equipment',
-      timer: '01:23:59:01',
-      timerType: 'ends'
-    },
-    {
-      id: 6,
-      price: 350000,
-      image: 'https://images.unsplash.com/photo-1552519507-da3b142c6e3d?w=800&q=80',
-      status: 'UPCOMING',
-      category: 'Vehicles',
-      title: "Collector's Dream Car Auction",
-      timer: '08:14:10:45',
-      timerType: 'starts'
-    },
-    {
-      id: 7,
-      price: 800000,
-      image: 'https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=800&q=80',
-      status: 'LIVE',
-      category: 'Real Estate',
-      title: 'Luxury Penthouse Collection',
-      timer: '03:45:20:15',
-      timerType: 'ends'
-    },
-    {
-      id: 8,
-      price: 450000,
-      image: 'https://images.unsplash.com/photo-1541961017774-22349e4a1262?w=800&q=80',
-      status: 'UPCOMING',
-      category: 'Fine Art',
-      title: 'Vintage Masterpieces',
-      timer: '12:30:15:40',
-      timerType: 'starts'
-    }
-  ]
+  // Redux state
+  const { auctions, isLoading, error, categories } = useSelector(state => state.buyer);
+  const { token } = useSelector(state => state.auth);
 
-  const categories = ['Vehicles', 'Real Estate', 'Fine Art', 'Jewelry', 'Electronics', 'Collectibles']
-  const statusOptions = ['LIVE', 'UPCOMING', 'ENDED']
+  // Local state for complete dataset and filters
+  const [allAuctions, setAllAuctions] = useState([]);
+  const [isLoadingAllPages, setIsLoadingAllPages] = useState(false);
+  const [selectedCategories, setSelectedCategories] = useState([]);
+  const [selectedStatus, setSelectedStatus] = useState([]);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [debouncedSearch, setDebouncedSearch] = useState('');
 
-  const handleCategoryToggle = (category) => {
+  // Status options
+  const statusOptions = useMemo(() => [
+    { value: 'ACTIVE', label: 'Active' },
+    { value: 'APPROVED', label: 'Approved' },
+    { value: 'COMPLETED', label: 'Completed' },
+    { value: 'DRAFT', label: 'Draft' }
+  ], []);
+
+  // Extract categories
+  const extractedCategories = useMemo(() => {
+    if (!categories || !Array.isArray(categories)) return [];
+    return categories.map(cat => ({
+      name: cat.name || cat.category_name,
+      value: cat.id || cat.category,
+      label: cat.name || cat.category_name
+    }));
+  }, [categories]);
+
+  // Check if filters are active
+  const hasActiveFilters = useMemo(() =>
+    selectedCategories.length > 0 ||
+    selectedStatus.length > 0 ||
+    debouncedSearch
+    , [selectedCategories, selectedStatus, debouncedSearch]);
+
+  // Debounced search
+  const debouncedSetSearch = useMemo(() =>
+    debounce((query) => setDebouncedSearch(query), 500)
+    , []);
+
+  // Handlers
+  const handleSearchChange = useCallback((e) => {
+    const value = e.target.value;
+    setSearchQuery(value);
+    debouncedSetSearch(value);
+  }, [debouncedSetSearch]);
+
+  const handleCategoryToggle = useCallback((category) => {
     setSelectedCategories(prev =>
       prev.includes(category)
         ? prev.filter(c => c !== category)
         : [...prev, category]
-    )
-    setCurrentPage(1)
-  }
+    );
+  }, []);
 
-  const handleStatusToggle = (status) => {
+  const handleStatusToggle = useCallback((status) => {
     setSelectedStatus(prev =>
       prev.includes(status)
         ? prev.filter(s => s !== status)
         : [...prev, status]
-    )
-    setCurrentPage(1)
-  }
+    );
+  }, []);
 
-  const handlePriceChange = (e) => {
-    setPriceRange({ ...priceRange, [e.target.name]: e.target.value })
-    setCurrentPage(1)
-  }
+  const handleClearFilters = useCallback(() => {
+    setSelectedCategories([]);
+    setSelectedStatus([]);
+    setSearchQuery('');
+    setDebouncedSearch('');
+    setPage(1);
+  }, []);
 
-  const handleClearFilters = () => {
-    setSelectedCategories([])
-    setSelectedStatus([])
-    setPriceRange({ min: '', max: '' })
-    setSortBy('newest')
-    setCurrentPage(1)
-  }
-
-  const formatTimer = (timer) => {
-    const parts = timer.split(':')
-    if (parts.length === 4) {
-      const [days, hours, minutes, seconds] = parts
-      return `${days}d ${hours}h ${minutes}m ${seconds}s`
+  const handleCheckAuth = useCallback(() => {
+    if (!token) {
+      toast.info('Please sign in to view auction details');
+      navigate('/signin');
     }
-    return timer
-  }
+  }, [token, navigate]);
 
+  // Fetch categories on mount
+  useEffect(() => {
+    dispatch(fetchCategories());
+  }, [dispatch]);
+
+  // Fetch all pages of auctions
+  useEffect(() => {
+    const fetchAllPages = async () => {
+      setIsLoadingAllPages(true);
+      try {
+        let allResults = [];
+        let nextPage = 1;
+        let hasMore = true;
+
+        while (hasMore) {
+          const response = await dispatch(fetchAuctionsList({ page: nextPage })).unwrap();
+          allResults = [...allResults, ...(response.results || [])];
+
+          if (response.next) {
+            nextPage += 1;
+          } else {
+            hasMore = false;
+          }
+        }
+
+        setAllAuctions(allResults);
+      } catch (err) {
+        console.error('Error fetching all auctions:', err);
+        toast.error('Failed to load complete auction list');
+      } finally {
+        setIsLoadingAllPages(false);
+      }
+    };
+
+    fetchAllPages();
+  }, [dispatch]);
+
+  // Apply filters to complete dataset
   const filteredAuctions = useMemo(() => {
-    let result = [...auctions]
+    return allAuctions.filter(auction => {
 
-    if (selectedCategories.length > 0) {
-      result = result.filter(a => selectedCategories.includes(a.category))
-    }
 
-    if (selectedStatus.length > 0) {
-      result = result.filter(a => selectedStatus.includes(a.status))
-    }
+      // ✅ ONLY ACTIVE AUCTIONS
+      if (auction.status !== 'ACTIVE') return false;
 
-    if (priceRange.min !== '' && priceRange.min !== null) {
-      result = result.filter(a => a.price >= Number(priceRange.min))
-    }
-
-    if (priceRange.max !== '' && priceRange.max !== null) {
-      result = result.filter(a => a.price <= Number(priceRange.max))
-    }
-
-    if (sortBy === "newest") {
-      result = [...result].reverse()
-    } else if (sortBy === "oldest") {
-      result = [...result]
-    } else if (sortBy === "price-low") {
-      result = [...result].sort((a, b) => a.price - b.price)
-    } else if (sortBy === "price-high") {
-      result = [...result].sort((a, b) => b.price - a.price)
-    }
-
-    return result
-  }, [selectedCategories, selectedStatus, priceRange, sortBy])
-
-  const itemsPerPage = 6
-  const totalPages = Math.ceil(filteredAuctions.length / itemsPerPage)
-  
-  const paginatedAuctions = filteredAuctions.slice(
-    (currentPage - 1) * itemsPerPage,
-    currentPage * itemsPerPage
-  )
-
-  const handlePageChange = (page) => {
-    setCurrentPage(page)
-    window.scrollTo({ top: 0, behavior: 'smooth' })
-  }
-
-  const generatePageNumbers = () => {
-    const pages = []
-    const maxVisiblePages = 10
-
-    if (totalPages <= maxVisiblePages) {
-      for (let i = 1; i <= totalPages; i++) {
-        pages.push(i)
+      // CATEGORY FILTER
+      if (
+        selectedCategories.length > 0 &&
+        !selectedCategories.includes(Number(auction.category))
+      ) {
+        return false;
       }
-    } else {
-      if (currentPage <= 3) {
-        for (let i = 1; i <= 4; i++) {
-          pages.push(i)
-        }
-        pages.push('...')
-        pages.push(totalPages)
-      } else if (currentPage >= totalPages - 2) {
-        pages.push(1)
-        pages.push('...')
-        for (let i = totalPages - 3; i <= totalPages; i++) {
-          pages.push(i)
-        }
-      } else {
-        pages.push(1)
-        pages.push('...')
-        for (let i = currentPage - 1; i <= currentPage + 1; i++) {
-          pages.push(i)
-        }
-        pages.push('...')
-        pages.push(totalPages)
-      }
-    }
 
-    return pages
-  }
+      // STATUS FILTER
+      if (
+        selectedStatus.length > 0 &&
+        !selectedStatus.includes(auction.status)
+      ) {
+        return false;
+      }
+
+      // SEARCH FILTER
+      if (debouncedSearch) {
+        const searchLower = debouncedSearch.toLowerCase();
+        const title = auction.title?.toLowerCase() || '';
+        if (!title.includes(searchLower)) {
+          return false;
+        }
+      }
+
+      return true;
+    });
+  }, [allAuctions, selectedCategories, selectedStatus, debouncedSearch]);
+
+  // Paginate filtered results (10 per page)
+  const itemsPerPage = 10;
+  const totalFilteredCount = filteredAuctions.length;
+  const totalPages = Math.ceil(totalFilteredCount / itemsPerPage);
+  const startIndex = (page - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const paginatedAuctions = filteredAuctions.slice(startIndex, endIndex);
+
+  // Reset to page 1 when filters change
+  useEffect(() => {
+    setPage(1);
+  }, [selectedCategories, selectedStatus, debouncedSearch]);
+
+  // Cleanup
+  useEffect(() => {
+    return () => {
+      dispatch(clearBuyerError());
+      debouncedSetSearch.cancel();
+    };
+  }, [dispatch, debouncedSetSearch]);
+
+  // Pagination handlers
+  const handleNext = useCallback(() => {
+    if (page < totalPages) {
+      setPage(prev => prev + 1);
+    }
+  }, [page, totalPages]);
+
+  const handlePrevious = useCallback(() => {
+    if (page > 1) {
+      setPage(prev => prev - 1);
+    }
+  }, [page]);
+
+  const hasNextPage = page < totalPages;
+  const hasPrevPage = page > 1;
 
   return (
-    <div className="buyer-auctions-page">
-      <div className="buyer-auctions-content">
-        <div className="buyer-auctions-container">
-          <aside className="filters-sidebar">
-            <div className="filters-header">
-              <h2 className="filters-title">Filter By :</h2>
-              <button className="clear-all-btn" onClick={handleClearFilters}>Clear All</button>
-            </div>
+    <div className="auctions-page pb-5">
+      {/* Sticky Filter Bar */}
+      <div className="auctions-filter-bar">
+        <div className="auctions-filter-bar-content">
+          <div className="filter-search-container">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+              <path d="M21 21L15 15M17 10C17 13.866 13.866 17 10 17C6.134 17 3 13.866 3 10C3 6.134 6.134 3 10 3C13.866 3 17 6.134 17 10Z" stroke="currentColor" strokeWidth="2" />
+            </svg>
+            <input
+              type="text"
+              placeholder="Search auctions..."
+              className="filter-search-input"
+              value={searchQuery}
+              onChange={handleSearchChange}
+              disabled={isLoadingAllPages}
+            />
+          </div>
 
-            <div className="filter-section">
-              <h3 className="filter-section-title">Category</h3>
-              <div className="filter-options">
-                {categories.map(category => (
-                  <label key={category} className="filter-checkbox">
-                    <input
-                      type="checkbox"
-                      checked={selectedCategories.includes(category)}
-                      onChange={() => handleCategoryToggle(category)}
-                    />
-                    <span>{category}</span>
-                  </label>
-                ))}
-              </div>
-            </div>
+          {/* Desktop Filters */}
+          <div className="desktop-filters">
+            <FilterDropdown
+              label="Category"
+              options={extractedCategories}
+              selectedValues={selectedCategories}
+              onToggle={handleCategoryToggle}
+              disabled={isLoadingAllPages}
+            />
+            {/* <FilterDropdown
+              label="Status"
+              options={statusOptions}
+              selectedValues={selectedStatus}
+              onToggle={handleStatusToggle}
+              disabled={isLoadingAllPages}
+            /> */}
 
-            <div className="filter-section">
-              <h3 className="filter-section-title">Status</h3>
-              <div className="filter-options">
-                {statusOptions.map(status => (
-                  <label key={status} className="filter-checkbox">
-                    <input
-                      type="checkbox"
-                      checked={selectedStatus.includes(status)}
-                      onChange={() => handleStatusToggle(status)}
-                    />
-                    <span>{status}</span>
-                  </label>
-                ))}
-              </div>
-            </div>
+            {hasActiveFilters && (
+              <button
+                className="clear-filters-btn"
+                onClick={handleClearFilters}
+                disabled={isLoadingAllPages}
+              >
+                Clear All
+              </button>
+            )}
+          </div>
+        </div>
+      </div>
 
-            <div className="filter-section">
-              <h3 className="filter-section-title">Price Range</h3>
-              <div className="price-inputs">
-                <div className="price-input-group">
-                  <label className="price-label">Min</label>
-                  <input
-                    type="number"
-                    name="min"
-                    className="price-input"
-                    value={priceRange.min}
-                    onChange={handlePriceChange}
-                    placeholder="0"
-                  />
-                </div>
-                <span className="price-separator">-</span>
-                <div className="price-input-group">
-                  <label className="price-label">Max</label>
-                  <input
-                    type="number"
-                    name="max"
-                    className="price-input"
-                    value={priceRange.max}
-                    onChange={handlePriceChange}
-                    placeholder="Any"
-                  />
-                </div>
-              </div>
-            </div>
-
-            <div className="filter-section">
-              <h3 className="filter-section-title">Sort By</h3>
-              <div className="filter-options">
-                <label className="filter-checkbox">
-                  <input
-                    type="checkbox"
-                    name="sort"
-                    checked={sortBy === "newest"}
-                    onChange={() => setSortBy("newest")}
-                  />
-                  <span>Newest</span>
-                </label>
-                <label className="filter-checkbox">
-                  <input
-                    type="checkbox"
-                    name="sort"
-                    checked={sortBy === "oldest"}
-                    onChange={() => setSortBy("oldest")}
-                  />
-                  <span>Oldest</span>
-                </label>
-                <label className="filter-checkbox">
-                  <input
-                    type="checkbox"
-                    name="sort"
-                    checked={sortBy === "price-low"}
-                    onChange={() => setSortBy("price-low")}
-                  />
-                  <span>Price Low → High</span>
-                </label>
-                <label className="filter-checkbox">
-                  <input
-                    type="checkbox"
-                    name="sort"
-                    checked={sortBy === "price-high"}
-                    onChange={() => setSortBy("price-high")}
-                  />
-                  <span>Price High → Low</span>
-                </label>
-              </div>
-            </div>
-          </aside>
-
-          <main className="auctions-main">
-            <div className="auctions-header-main">
-              <div className="header-left">
-                <h1 className="auctions-page-title">Live & Upcoming Auctions</h1>
-                <span className="results-count">{filteredAuctions.length} Results</span>
-              </div>
-            </div>
-
-            <div className="buyer-auctions-grid">
-              {paginatedAuctions.map(auction => (
-                <div key={auction.id} className="auctions-card">
-                  <div className="auction-image-wrapper">
-                    <img src={auction.image} alt={auction.title} />
-                    <span className={`status-badge ${auction.status.toLowerCase()}`}>
-                      {auction.status}
-                    </span>
-                  </div>
-                  <div className="auctions-card-content">
-                    <p className="auction-category-1">{auction.category}</p>
-                    <h3 className="buyer-auctions-card-title">{auction.title}</h3>
-                    <div className="buyer-auction-timer">
-                      <span className="buyer-timer-label">
-                        AUCTION {auction.timerType === 'ends' ? 'ENDS' : 'STARTS'} IN
-                      </span>
-                      <span className="buyer-timer-value">{formatTimer(auction.timer)}</span>
-                    </div>
-                    <button
-                      className="view-auctions-btn"
-                      onClick={() => navigate(`/buyer/auction/${auction.id}`)}
-                    >
-                      View Auction
-                    </button>
-                  </div>
-                </div>
-              ))}
-            </div>
-
-            {filteredAuctions.length > itemsPerPage && (
-              <div className="b-auctions-pagination">
+      {/* Active Filter Tags */}
+      {hasActiveFilters && (
+        <div className="active-filter-tags">
+          {selectedCategories.map(cat => {
+            const category = extractedCategories.find(c => c.value === cat);
+            return category ? (
+              <span key={cat} className="active-filter-tag">
+                {category.label}
                 <button
-                  className="b-auctions-pagination-btn b-auctions-prev-btn"
-                  onClick={() => handlePageChange(currentPage - 1)}
-                  disabled={currentPage === 1}
+                  onClick={() => handleCategoryToggle(cat)}
+                  disabled={isLoadingAllPages}
                 >
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-                    <path d="M15 18L9 12L15 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                  </svg>
+                  ×
+                </button>
+              </span>
+            ) : null;
+          })}
+          {selectedStatus.map(status => {
+            const statusObj = statusOptions.find(s => s.value === status);
+            return statusObj ? (
+              <span key={status} className="active-filter-tag">
+                {statusObj.label}
+                <button
+                  onClick={() => handleStatusToggle(status)}
+                  disabled={isLoadingAllPages}
+                >
+                  ×
+                </button>
+              </span>
+            ) : null;
+          })}
+
+          {debouncedSearch && (
+            <span className="active-filter-tag">
+              Search: "{debouncedSearch}"
+              <button
+                onClick={() => {
+                  setSearchQuery('');
+                  setDebouncedSearch('');
+                }}
+                disabled={isLoadingAllPages}
+              >
+                ×
+              </button>
+            </span>
+          )}
+        </div>
+      )}
+
+      {/* Error Banner */}
+      {error && (
+        <div className="auctions-error-banner">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+            <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2" />
+            <path d="M12 8v4M12 16h.01" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+          </svg>
+          {error.message || error.detail || 'Failed to load auctions'}
+          <button
+            className="error-dismiss-btn"
+            onClick={() => dispatch(clearBuyerError())}
+          >
+            ×
+          </button>
+        </div>
+      )}
+
+      {/* Main Content */}
+      <main className="auctions-main">
+        <div className="auctions-header">
+          <div className="auctions-header-content">
+            <h1 className="buyer-auctions-page-title">Live Auctions</h1>
+            <span className="auctions-results-count">
+              {isLoadingAllPages ? 'Loading...' : `${totalFilteredCount} Results`}
+            </span>
+          </div>
+        </div>
+
+        {/* Loading State */}
+        {isLoadingAllPages && allAuctions.length === 0 && (
+          <div className="auctions-loading">
+            <div className="auctions-spinner"></div>
+            <p>Loading auctions...</p>
+          </div>
+        )}
+
+        {/* Error State */}
+        {error && !isLoadingAllPages && allAuctions.length === 0 && (
+          <div className="auctions-error">
+            <svg width="48" height="48" viewBox="0 0 24 24" fill="none">
+              <circle cx="12" cy="12" r="10" stroke="#fca5a5" strokeWidth="2" />
+              <path d="M12 8v4M12 16h.01" stroke="#fca5a5" strokeWidth="2" strokeLinecap="round" />
+            </svg>
+            <p className="auctions-error-message">
+              {error.message || error.detail || 'Failed to load auctions'}
+            </p>
+            <button
+              className="auctions-retry-btn"
+              onClick={() => window.location.reload()}
+            >
+              Retry
+            </button>
+          </div>
+        )}
+
+        {/* Empty State */}
+        {!isLoadingAllPages && !error && paginatedAuctions.length === 0 && (
+          <div className="auctions-empty">
+            <svg width="64" height="64" viewBox="0 0 24 24" fill="none">
+              <path d="M9 11L12 14L22 4" stroke="#d1d5db" strokeWidth="2" strokeLinecap="round" />
+              <path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11" stroke="#d1d5db" strokeWidth="2" />
+            </svg>
+            <h2>No auctions found</h2>
+            <p>Try adjusting your filters or check back later</p>
+            {hasActiveFilters && (
+              <button
+                className="auctions-clear-filters-btn"
+                onClick={handleClearFilters}
+              >
+                Clear All Filters
+              </button>
+            )}
+          </div>
+        )}
+
+        {/* Auctions Grid */}
+        {!isLoadingAllPages && !error && paginatedAuctions.length > 0 && (
+          <>
+            <div className="auctions-grid">
+              <Suspense fallback={
+                <div className="auctions-loading">
+                  <div className="auctions-spinner"></div>
+                </div>
+              }>
+                {paginatedAuctions.map(auction => (
+                  <BuyerAuctionCard
+                    key={auction.id}
+                    auction={{
+                      ...auction,
+                      categoryname: auction.category_name,
+                      initialprice: auction.initial_price,
+                      startdate: auction.start_date,
+                      enddate: auction.end_date,
+                      totalbids: auction.total_bids,
+                      status: auction.status
+                    }}
+                    onClick={() => navigate(`/buyer/auction/${auction.id}`, { state: { from: 'buyer-auctions',  listing: auction } })}
+                  />))}
+              </Suspense>
+            </div>
+
+            {/* Pagination Controls */}
+            {totalFilteredCount > itemsPerPage && (
+              <div className="flex justify-center gap-4 mt-6">
+                <button
+                  onClick={handlePrevious}
+                  disabled={!hasPrevPage}
+                  className={`px-4 py-2 rounded border-[1px] ${hasPrevPage
+                    ? 'text-[#8cc63f] border-[#8cc63f] hover:bg-[#8cc63f] hover:text-black cursor-pointer transition-all duration-200'
+                    : 'border-white/20 bg-black text-white/40 cursor-not-allowed'
+                    }`}
+                >
                   Previous
                 </button>
-
-                <div className="b-auctions-page-numbers">
-                  {generatePageNumbers().map((page, index) => (
-                    page === '...' ? (
-                      <span key={`dots-${index}`} className="b-auctions-page-dots">...</span>
-                    ) : (
-                      <button
-                        key={page}
-                        className={`b-auctions-page-number ${currentPage === page ? 'active' : ''}`}
-                        onClick={() => handlePageChange(page)}
-                      >
-                        {page}
-                      </button>
-                    )
-                  ))}
-                </div>
-                  
+                <button disabled className="px-4 py-2 rounded-sm border-[1px] border-[#8cc63f] text-[#8cc63f] bg-black">
+                  <strong className='text-sm'>{page} of {totalPages}</strong>
+                </button>
                 <button
-                  className="b-auctions-pagination-btn b-auctions-next-btn"
-                  onClick={() => handlePageChange(currentPage + 1)}
-                  disabled={currentPage === totalPages}
+                  onClick={handleNext}
+                  disabled={!hasNextPage}
+                  className={`px-4 py-2 rounded border-[1px] ${hasNextPage
+                    ? 'text-[#8cc63f] border-[#8cc63f] hover:bg-[#8cc63f] hover:text-black cursor-pointer transition-all duration-200'
+                    : 'border-white/20 bg-black text-white/40 cursor-not-allowed'
+                    }`}
                 >
                   Next
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-                    <path d="M9 18L15 12L9 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                  </svg>
                 </button>
               </div>
             )}
-          </main>
-        </div>
-      </div>
+          </>
+        )}
+      </main>
     </div>
-  )
-}
+  );
+};
 
-export default BuyerAuctions
+// Filter Dropdown Component
+const FilterDropdown = ({ label, options, selectedValues, onToggle, disabled, type = 'checkbox' }) => {
+  const [isOpen, setIsOpen] = useState(false);
+  const dropdownRef = React.useRef(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setIsOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  const handleToggle = (value) => {
+    onToggle(value);
+    if (type === 'radio') setIsOpen(false);
+  };
+
+  const selectionCount = Array.isArray(selectedValues) ? selectedValues.length : (selectedValues ? 1 : 0);
+
+  return (
+    <div className="filter-dropdown" ref={dropdownRef}>
+      <button
+        className={`filter-dropdown-trigger ${selectionCount > 0 ? 'active' : ''}`}
+        onClick={() => setIsOpen(!isOpen)}
+        disabled={disabled}
+      >
+        {label}
+        {selectionCount > 0 && <span className="filter-badge">{selectionCount}</span>}
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none">
+          <path d="M6 9L12 15L18 9" stroke="currentColor" strokeWidth="2" />
+        </svg>
+      </button>
+      {isOpen && (
+        <div className="filter-dropdown-menu">
+          {options.length === 0 ? (
+            <div className="filter-dropdown-empty">No options available</div>
+          ) : (
+            options.map(option => (
+              <label key={option.value} className="filter-dropdown-item">
+                <input
+                  type={type}
+                  name={type === 'radio' ? label : undefined}
+                  checked={Array.isArray(selectedValues)
+                    ? selectedValues.includes(option.value)
+                    : selectedValues === option.value}
+                  onChange={() => handleToggle(option.value)}
+                  disabled={disabled}
+                />
+                <span>{option.label}</span>
+              </label>
+            ))
+          )}
+        </div>
+      )}
+    </div>
+  );
+};
+
+export default BuyerAuctions;

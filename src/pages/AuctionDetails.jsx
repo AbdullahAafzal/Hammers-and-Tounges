@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
-import { fetchAuctionsList } from '../store/actions/AuctionsActions';
+import { placeBid } from '../store/actions/buyerActions'
 
 import './AuctionDetails.css';
 
 const AuctionDetails = () => {
-  const { id } = useParams();
+
   const dispatch = useDispatch();
   const { auctions, isLoading, error } = useSelector((state) => state.buyer);
   const selectedAuction = auctions?.results?.find((auction) => auction?.id.toString() === id);
@@ -55,21 +55,14 @@ const AuctionDetails = () => {
     }).format(amount);
   };
 
-  const handleBidSubmit = (e) => {
-    e.preventDefault();
-    console.log('Placing bid:', bidAmount);
-  };
-
   const handleCustomBidSubmit = (e) => {
-    e.preventDefault();
-    console.log('Placing custom bid:', customBidAmount);
+   e.preventDefault()
+    console.log('Placing custom bid:', customBidAmount)
+    dispatch(placeBid({ auction_id: auction.id, amount: parseFloat(customBidAmount) }))
+    
   };
 
-  const handleQuickBid = () => {
-    const minimumBid = parseFloat(selectedAuction.initial_price) + 100;
-    setBidAmount(minimumBid.toString());
-    console.log('Quick bid:', minimumBid);
-  };
+ 
 
   if (isLoading) {
     return (
@@ -186,9 +179,9 @@ const AuctionDetails = () => {
                 </div>
               </div>
 
-              <button className="quick-bid-button" onClick={handleQuickBid}>
-                Place Quick Bid
-              </button>
+               <button className="quick-bid-button">
+                Place Bid Here
+              </button> 
 
               <form className="custom-bid-form" onSubmit={handleCustomBidSubmit}>
                 <input

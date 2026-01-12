@@ -48,7 +48,7 @@ export const buyerService = {
   getMyBids: async () => {
     try {
       // Assuming there's an endpoint for this, adjust if needed
-      const { data } = await apiClient.get('/api/auctions/my-bids/');
+      const { data } = await apiClient.get(API_ROUTES.BIDS_LIST);
       return data;
     } catch (error) {
       if (error.isNetworkError) {

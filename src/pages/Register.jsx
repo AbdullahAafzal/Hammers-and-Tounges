@@ -515,9 +515,9 @@ const Register = () => {
                   <input type="checkbox" required disabled={isRegistering} />
                   <span>
                     I agree to the{' '}
-                    <Link to="/terms" className="terms-link">Terms of Service</Link>{' '}
+                    <Link  className="terms-link">Terms of Service</Link>{' '}
                     and{' '}
-                    <Link to="/privacy" className="terms-link">Privacy Policy</Link>
+                    <Link className="terms-link">Privacy Policy</Link>
                   </span>
                 </label>
               </div>
@@ -539,11 +539,11 @@ const Register = () => {
                 </button>
               </div>
 
-              <div className="divider">
+              {/* <div className="divider">
                 <span>or continue with</span>
-              </div>
+              </div> */}
 
-              <div className="social-login">
+              {/* <div className="social-login">
                 <button
                   type="button"
                   className="social-button google"
@@ -567,7 +567,7 @@ const Register = () => {
                   </svg>
                   Apple
                 </button>
-              </div>
+              </div> */}
 
               <div className="kyc-notice">
                 <div className="kyc-icon">

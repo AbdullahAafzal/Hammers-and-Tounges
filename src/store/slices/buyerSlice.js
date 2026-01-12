@@ -12,6 +12,11 @@ const initialState = {
   isPlacingBid: false,
   error: null,
   bidSuccess: false,
+  
+  totalCount: 0,
+  nextPage: null,
+  prevPage: null,
+  currentPage: 1,
 };
 
 // Buyer Slice
@@ -43,6 +48,10 @@ const buyerSlice = createSlice({
       .addCase(browseAuctions.fulfilled, (state, action) => {
         state.isLoading = false;
         state.browseAuctionsList = action.payload;
+
+        state.totalCount = action?.payload?.count ?? 0;
+        state.nextPage = action?.payload?.next;
+        state.prevPage = action?.payload?.previous;
       })
       .addCase(browseAuctions.rejected, (state, action) => {
         state.isLoading = false;
@@ -55,10 +64,13 @@ const buyerSlice = createSlice({
         state.error = null;
       })
       .addCase(fetchAuctionsList.fulfilled, (state, action) => {
-        console.log(action.payload, "payload in buyer slice");
-        
+
         state.isLoading = false;
         state.auctions = action.payload;
+
+        state.totalCount = action?.payload?.count ?? 0;
+        state.nextPage = action?.payload?.next;
+        state.prevPage = action?.payload?.previous;
       })
       .addCase(fetchAuctionsList.rejected, (state, action) => {
         state.isLoading = false;
