@@ -19,7 +19,6 @@ const AdminManagerDetails = () => {
     first_name: '',
     last_name: '',
     email: '',
-    phone: '',
     password: '',
     image: null,
     imagePreview: null,
@@ -57,7 +56,6 @@ const AdminManagerDetails = () => {
         first_name: firstName,
         last_name: lastName,
         email: selectedManager.email || '',
-        phone: selectedManager.profile?.phone || '',
         password: '',
         image: null,
         imagePreview: selectedManager.profile?.image || null,
@@ -130,10 +128,6 @@ const AdminManagerDetails = () => {
         // Email is not included as it cannot be edited
       };
 
-      if (formData.phone.trim()) {
-        updateData.phone = formData.phone.trim();
-      }
-
       if (formData.password.trim()) {
         updateData.password = formData.password.trim();
       }
@@ -168,7 +162,6 @@ const AdminManagerDetails = () => {
         first_name: firstName,
         last_name: lastName,
         email: selectedManager.email || '',
-        phone: selectedManager.profile?.phone || '',
         password: '',
         image: null,
         imagePreview: selectedManager.profile?.image || null,
@@ -313,17 +306,6 @@ const AdminManagerDetails = () => {
               </div>
 
               <div className="manager-details-form-group">
-                <label>Phone Number</label>
-                <input
-                  type="tel"
-                  name="phone"
-                  value={formData.phone}
-                  onChange={handleInputChange}
-                  disabled={isUpdating}
-                />
-              </div>
-
-              <div className="manager-details-form-group">
                 <label>Password</label>
                 <input
                   type="password"
@@ -389,10 +371,6 @@ const AdminManagerDetails = () => {
               <div className="manager-details-info-item">
                 <label>Email Address</label>
                 <span>{selectedManager.email || "N/A"}</span>
-              </div>
-              <div className="manager-details-info-item">
-                <label>Phone Number</label>
-                <span>{selectedManager.profile?.phone || "N/A"}</span>
               </div>
               <div className="manager-details-info-item">
                 <label>Account Status</label>
