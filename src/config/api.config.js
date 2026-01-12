@@ -72,7 +72,6 @@ export const API_ROUTES = {
   PLACE_BID: '/auctions/bid/',
   GET_AUCTION_BIDS: '/auctions/listings/', // + auction_id + /bids/
 
-
   AUCTION_BID_HISTORY: '/auctions/listings/', // + auction_id + /bid-history/
   BIDS_LIST: '/auctions/bids/my/',
   // BIDS_NO: '/auctions/bids//my/',

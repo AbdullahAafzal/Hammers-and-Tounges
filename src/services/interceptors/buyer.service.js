@@ -18,12 +18,18 @@ export const buyerService = {
 
   // Get bids for an auction
   getAuctionBids: async (auctionId) => {
+    console.log(auctionId);
+    
     try {
       const { data } = await apiClient.get(
         `${API_ROUTES.GET_AUCTION_BIDS}${auctionId}/bids/`
       );
+      console.log(data, "data");
+      
       return data;
     } catch (error) {
+      console.log(error);
+      
       if (error.isNetworkError) {
         throw new Error('Unable to connect to server. Please try again later.');
       }

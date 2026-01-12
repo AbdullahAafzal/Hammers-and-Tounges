@@ -15,21 +15,21 @@ const store = configureStore({
     seller: sellerReducer,
     buyer: buyerReducer,
   },
-  middleware: (getDefaultMiddleware) =>
-    getDefaultMiddleware({
-      serializableCheck: {
-        ignoredActions: [
-          'auth/login/fulfilled',
-          'auth/register/fulfilled',
-          'manager/performInspection/pending',
-          'seller/createAuction/pending',
-          'seller/updateAuction/pending',
-        ],
-        ignoredActionPaths: ['payload.timestamp', 'meta.arg'],
-        ignoredPaths: ['auth.timestamp'],
-      },
-    }),
-  devTools: import.meta.env.DEV,
+  // middleware: (getDefaultMiddleware) =>
+  //   getDefaultMiddleware({
+  //     serializableCheck: {
+  //       ignoredActions: [
+  //         'auth/login/fulfilled',
+  //         'auth/register/fulfilled',
+  //         'manager/performInspection/pending',
+  //         'seller/createAuction/pending',
+  //         'seller/updateAuction/pending',
+  //       ],
+  //       ignoredActionPaths: ['payload.timestamp', 'meta.arg'],
+  //       ignoredPaths: ['auth.timestamp'],
+  //     },
+  //   }),
+  // devTools: import.meta.env.DEV,
 });
 
 export { store };

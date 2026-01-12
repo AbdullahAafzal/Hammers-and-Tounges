@@ -198,54 +198,6 @@ const BuyerDashboard = () => {
             </div>
           
           </div>
-
-          {/* <div className="summary-cards">
-            <div className="summary-card">
-              <div className="card-background-gradient" ></div>
-              <div className="card-icon" style={{ backgroundColor: 'rgba(59, 130, 246, 0.2)', borderColor: 'rgba(59, 130, 246, 0.4)' }}>
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-                  <path d="M12 2L2 7L12 12L22 7L12 2Z" stroke="#3B82F6" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                  <path d="M2 17L12 22L22 17" stroke="#3B82F6" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                  <path d="M2 12L12 17L22 12" stroke="#3B82F6" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                </svg>
-              </div>
-              <div className="card-content">
-                <span className="card-label">My Active Bids</span>
-                <span className="card-value">{user.activeBids}</span>
-                <span className="card-sublabel">Items you're bidding on</span>
-              </div>
-            </div>
-
-            <div className="summary-card">
-              <div className="card-background-gradient" style={{ background: 'linear-gradient(135deg, rgba(140, 198, 63, 0.15) 0%, rgba(140, 198, 63, 0.05) 100%)' }}></div>
-              <div className="card-icon" style={{ backgroundColor: 'rgba(140, 198, 63, 0.2)', borderColor: 'rgba(140, 198, 63, 0.4)' }}>
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-                  <path d="M6 9L12 15L18 9" stroke="#8CC63F" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                  <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z" stroke="#8CC63F" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                </svg>
-              </div>
-              <div className="card-content">
-                <span className="card-label">Items Won</span>
-                <span className="card-value">{user.itemsWon}</span>
-                <span className="card-sublabel">Successful auctions</span>
-              </div>
-            </div>
-
-            <Link to="/wallet" className="summary-card highlight" style={{ textDecoration: 'none', cursor: 'pointer' }}>
-              <div className="card-background-gradient" ></div>
-              <div className="card-icon" style={{ backgroundColor: 'rgba(19, 3, 3, 0.33)', borderColor: 'rgba(150, 129, 67, 0.5)' }}>
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-                  <path d="M12 2V22M17 5H9.5C8.57174 5 7.6815 5.36875 7.02513 6.02513C6.36875 6.6815 6 7.57174 6 8.5C6 9.42826 6.36875 10.3185 7.02513 10.9749C7.6815 11.6312 8.57174 12 9.5 12H14.5C15.4283 12 16.3185 12.3687 16.9749 13.0251C17.6312 13.6815 18 14.5717 18 15.5C18 16.4283 17.6312 17.3185 16.9749 17.9749C16.3185 18.6312 15.4283 19 14.5 19H6" stroke="#FFC107" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                </svg>
-              </div>
-              <div className="card-content">
-                <span className="card-label">Wallet Balance</span>
-                <span className="card-value currency" style={{ color: 'white' }}> {formatCurrency(user.walletBalance)}</span>
-                <span className="card-sublabel">Available for bidding</span>
-              </div>
-            </Link>
-          </div> */}
-
             <SummaryCard seller={seller}/>
 
           <div className="active-bids-section">

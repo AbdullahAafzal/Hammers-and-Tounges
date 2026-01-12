@@ -45,10 +45,16 @@ export const placeBid = createAsyncThunk(
 export const fetchAuctionBids = createAsyncThunk(
   'buyer/fetchAuctionBids',
   async (auctionId, { rejectWithValue }) => {
+    console.log(auctionId);
+    
     try {
       const response = await buyerService.getAuctionBids(auctionId);
+      console.log("response: ", response);
       return response;
+      
     } catch (error) {
+      console.log("error:", error);
+      
       const message =
         error.response?.data?.message ||
         error.response?.data?.error ||

@@ -1,18 +1,14 @@
 import React, { useState, useEffect, useMemo, useCallback, memo } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useParams } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
-import { placeBid, fetchAuctionBids } from '../store/actions/buyerActions'
+import { placeBid, fetchAuctionBids } from '../store/actions/buyerActions';
 import './BuyerAuctionDetails.css';
 
-// favorite, // fetch, post, delete
-// fetch bid history // id (url /id (user-id) / bids)  // mybids
-// 
+// ==================== MEMOIZED COMPONENTS ====================
 
-// Memoized child components
 const LoadingSkeleton = memo(() => (
   <div className="buyer-details-skeleton">
     <div className="buyer-details-breadcrumbs-skeleton skeleton-shimmer"></div>
-    
     <div className="buyer-details-content-skeleton">
       <div className="buyer-details-images-skeleton">
         <div className="buyer-details-main-image-skeleton skeleton-shimmer"></div>
@@ -22,28 +18,19 @@ const LoadingSkeleton = memo(() => (
           ))}
         </div>
       </div>
-      
       <div className="buyer-details-info-skeleton">
         <div className="buyer-details-header-skeleton">
           <div className="buyer-details-title-skeleton skeleton-shimmer"></div>
           <div className="buyer-details-lot-skeleton skeleton-shimmer"></div>
         </div>
-        
         <div className="buyer-details-status-skeleton skeleton-shimmer"></div>
-        
         <div className="buyer-details-tabs-skeleton">
-          {['description', 'inspection', 'terms'].map((tab) => (
+          {['description', 'bids'].map((tab) => (
             <div key={tab} className="buyer-details-tab-skeleton skeleton-shimmer"></div>
           ))}
         </div>
-        
         <div className="buyer-details-content-area-skeleton">
           <div className="buyer-details-description-skeleton skeleton-shimmer"></div>
-          <div className="buyer-details-details-skeleton">
-            {[1, 2, 3, 4].map((item) => (
-              <div key={item} className="buyer-details-detail-skeleton skeleton-shimmer"></div>
-            ))}
-          </div>
         </div>
       </div>
     </div>
@@ -61,9 +48,7 @@ const ErrorState = memo(({ error }) => (
         </svg>
         <h3>Error loading auction</h3>
         <p>{error}</p>
-        <Link to="/auctions" className="buyer-details-back-link">
-          Back to Auctions
-        </Link>
+        <Link to="/auctions" className="buyer-details-back-link">Back to Auctions</Link>
       </div>
     </div>
   </div>
@@ -80,9 +65,7 @@ const NotFoundState = memo(() => (
         </svg>
         <h3>Auction not found</h3>
         <p>The auction you're looking for doesn't exist or has been removed.</p>
-        <Link to="/auctions" className="buyer-details-back-link">
-          Back to Auctions
-        </Link>
+        <Link to="/auctions" className="buyer-details-back-link">Back to Auctions</Link>
       </div>
     </div>
   </div>
@@ -108,7 +91,7 @@ const ImageGallery = memo(({ images, selectedImage, onSelectImage, title }) => (
   <div className="buyer-details-images">
     <div className="buyer-details-main-image">
       <img
-        src={images[selectedImage] || 'https://via.placeholder.com/800x600?text=No+Image'}
+        src={images[selectedImage] || 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600"%3E%3Crect fill="%23222" width="800" height="600"/%3E%3Ctext x="50%25" y="50%25" font-size="32" fill="%23666" text-anchor="middle" dominant-baseline="middle" font-family="Arial"%3ENo Image Available%3C/text%3E%3C/svg%3E'}
         alt={title}
       />
     </div>
@@ -156,93 +139,74 @@ const Timer = memo(({ timeRemaining }) => (
 
 Timer.displayName = 'Timer';
 
-const TabContent = memo(({ activeTab, auction, inspectionReport, formatCurrency }) => {
-  if (activeTab === 'description') {
-    return (
-      <div className="buyer-details-description">
-        <p className="buyer-details-description-text">{auction?.description || 'No description available.'}</p>
-        <div className="buyer-details-key-details">
-          {auction?.specific_data && Object.entries(auction.specific_data).map(([key, value]) => (
-            <div key={key} className="buyer-details-detail-item">
-              <strong>{key.replace(/_/g, ' ').toUpperCase()}:</strong> {value}
+const BidHistoryPanel = memo(({ bids, formatCurrency }) => (
+  <div className="buyer-details-bid-history">
+    <h3 className="buyer-details-panel-title">Bid History</h3>
+    {bids && bids.length > 0 ? (
+      <div className="buyer-details-bid-list">
+        {bids.map((bid, index) => (
+          <div key={bid.id} className="buyer-details-bid-item">
+            <div className="buyer-details-bid-rank">#{index + 1}</div>
+            <div className="buyer-details-bid-info">
+              <div className="buyer-details-bid-bidder">{bid.bidder_name}</div>
+              <div className="buyer-details-bid-time">
+                {new Date(bid.created_at).toLocaleString()}
+              </div>
             </div>
-          ))}
-          {auction?.pickup_address && (
-            <div className="buyer-details-detail-item">
-              <strong>Location:</strong> {auction.pickup_address}
-            </div>
-          )}
-          {auction?.category_name && (
-            <div className="buyer-details-detail-item">
-              <strong>Category:</strong> {auction.category_name}
-            </div>
-          )}
-          {auction?.handover_type && (
-            <div className="buyer-details-detail-item">
-              <strong>Handover Type:</strong> {auction.handover_type}
-            </div>
-          )}
-          {auction?.initial_price && (
-            <div className="buyer-details-detail-item">
-              <strong>Initial Price:</strong> {formatCurrency(auction.initial_price)}
-            </div>
-          )}
-          {auction?.is_buy_now_enabled && auction?.buy_now_price && (
-            <div className="buyer-details-detail-item">
-              <strong>Buy Now Price:</strong> {formatCurrency(auction.buy_now_price)}
-            </div>
-          )}
-        </div>
-      </div>
-    );
-  }
-
-  if (activeTab === 'inspection') {
-    return (
-      <div className="buyer-details-inspection">
-        {inspectionReport ? (
-          <div className="buyer-details-inspection-content">
-            <p>Inspection report available for download:</p>
-            <a
-              href={inspectionReport.file}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="buyer-details-download-link"
-            >
-              Download Inspection Report
-            </a>
+            <div className="buyer-details-bid-amount">{formatCurrency(parseFloat(bid.amount))}</div>
           </div>
-        ) : auction?.specific_data?.inspection_report ? (
-          <p>{auction.specific_data.inspection_report}</p>
-        ) : (
-          <p className="buyer-details-no-report">No inspection report available.</p>
-        )}
+        ))}
       </div>
-    );
-  }
+    ) : (
+      <p className="buyer-details-no-bids">No bids yet. Be the first to bid!</p>
+    )}
+  </div>
+));
 
-  return (
-    <div className="buyer-details-terms">
-      <h4 className="buyer-details-terms-title">Auction Terms & Conditions</h4>
-      <ul className="buyer-details-terms-list">
-        <li>All bids are final and binding</li>
-        <li>Payment must be made within 48 hours of auction close</li>
-        <li>Items are sold as-is, where-is</li>
-        <li>Buyer is responsible for pickup or shipping arrangements</li>
-        <li>A buyer's premium may apply</li>
-      </ul>
-      {auction?.seller_expected_price && (
-        <p className="buyer-details-reserve">
-          <strong>Reserve Price:</strong> This auction has a reserve price.
-        </p>
+BidHistoryPanel.displayName = 'BidHistoryPanel';
+
+const DescriptionTab = memo(({ auction, formatCurrency }) => (
+  <div className="buyer-details-description">
+    <p className="buyer-details-description-text">{auction?.description || 'No description available.'}</p>
+    <div className="buyer-details-key-details">
+      {auction?.specific_data && Object.entries(auction.specific_data).map(([key, value]) => (
+        <div key={key} className="buyer-details-detail-item">
+          <strong>{key.replace(/_/g, ' ').toUpperCase()}:</strong> {value}
+        </div>
+      ))}
+      {auction?.pickup_address && (
+        <div className="buyer-details-detail-item">
+          <strong>Pickup Location:</strong> {auction.pickup_address}
+        </div>
+      )}
+      {auction?.category_name && (
+        <div className="buyer-details-detail-item">
+          <strong>Category:</strong> {auction.category_name}
+        </div>
+      )}
+      {auction?.handover_type && (
+        <div className="buyer-details-detail-item">
+          <strong>Handover Type:</strong> {auction.handover_type}
+        </div>
+      )}
+      {auction?.initial_price && (
+        <div className="buyer-details-detail-item">
+          <strong>Starting Price:</strong> {formatCurrency(parseFloat(auction.initial_price))}
+        </div>
+      )}
+      {auction?.is_buy_now_enabled && auction?.buy_now_price && (
+        <div className="buyer-details-detail-item">
+          <strong>Buy Now Price:</strong> {formatCurrency(parseFloat(auction.buy_now_price))}
+        </div>
       )}
     </div>
-  );
-});
+  </div>
+));
 
-TabContent.displayName = 'TabContent';
+DescriptionTab.displayName = 'DescriptionTab';
 
-// Static utility functions
+// ==================== UTILITY FUNCTIONS ====================
+
 const calculateTimeRemaining = (endDate) => {
   const now = new Date().getTime();
   const endDateMs = new Date(endDate).getTime();
@@ -257,19 +221,19 @@ const calculateTimeRemaining = (endDate) => {
   return { hours: 0, minutes: 0, seconds: 0 };
 };
 
+// ==================== MAIN COMPONENT ====================
+
 const BuyerAuctionDetails = () => {
+  const { id } = useParams();
   const dispatch = useDispatch();
   const location = useLocation();
   const auctionObj = location.state?.listing;
-  const { auctionBids } = useSelector( state => state.buyer )
+  const { auctionBids } = useSelector(state => state.buyer);
 
-  
-  // useEffect( ()=> {
-  //   dispatch( fetchAuctionBids( {id: auctionObj?.id} ) )
-  // }, [dispatch] )
-  
-  console.log(auctionBids);
-  // Consolidated state
+  useEffect(() => {
+    dispatch(fetchAuctionBids(id));
+  }, [id, dispatch]);
+
   const [state, setState] = useState({
     selectedAuction: auctionObj || null,
     activeTab: 'description',
@@ -286,14 +250,11 @@ const BuyerAuctionDetails = () => {
     auction?.media?.filter(m => m.media_type === 'image').map(m => m.file) || [],
     [auction?.media]
   );
-  const inspectionReport = useMemo(() =>
-    auction?.media?.find(m => m.label === 'inspection_report'),
-    [auction?.media]
-  );
   const isLive = useMemo(() => auction?.status === 'ACTIVE', [auction?.status]);
   const isUpcoming = useMemo(() => auction?.status === 'APPROVED', [auction?.status]);
+  const isClosed = useMemo(() => auction?.status === 'CLOSED', [auction?.status]);
+  const isAwaitingPayment = useMemo(() => auction?.status === 'AWAITING_PAYMENT', [auction?.status]);
 
-  // Memoized currency formatter
   const formatCurrency = useCallback((amount) => {
     return new Intl.NumberFormat('en-US', {
       style: 'currency',
@@ -303,7 +264,7 @@ const BuyerAuctionDetails = () => {
     }).format(amount);
   }, [auction?.currency]);
 
-  // Memoized event handlers
+  // Event handlers
   const handleSelectImage = useCallback((index) => {
     setState(prev => ({ ...prev, selectedImage: index }));
   }, []);
@@ -318,8 +279,6 @@ const BuyerAuctionDetails = () => {
 
   const handleCustomBidSubmit = useCallback((e) => {
     e.preventDefault();
-
-
     if (auction && state.customBidAmount) {
       dispatch(placeBid({ 
         auction_id: auction.id, 
@@ -329,7 +288,7 @@ const BuyerAuctionDetails = () => {
     }
   }, [auction, state.customBidAmount, dispatch]);
 
-  // Timer effect - isolated to prevent cascading re-renders
+  // Timer effect
   useEffect(() => {
     if (isLive && auction?.end_date) {
       setState(prev => ({
@@ -369,116 +328,21 @@ const BuyerAuctionDetails = () => {
     return <NotFoundState />;
   }
 
-  // Live auction view
-  if (isLive && state.timeRemaining.hours + state.timeRemaining.minutes + state.timeRemaining.seconds > 0) {
-    return (
-      <div className="buyer-details-page buyer-details-live-page">
-        <div className="buyer-details-container">
-          <Breadcrumbs auction={auction} />
-
-          <div className="buyer-details-live-header">
-            <h1 className="buyer-details-live-title">{auction?.title || 'Auction'}</h1>
-            <p className="buyer-details-live-description">{auction?.description || ''}</p>
-          </div>
-
-          <div className="buyer-details-live-content">
-            <div className="buyer-details-live-player">
-              <div className="buyer-details-video-player">
-                <img
-                  src={images[state.selectedImage] || 'https://via.placeholder.com/800x600?text=No+Image'}
-                  alt={auction?.title || 'Auction item'}
-                  className="buyer-details-main-image"
-                />
-                <div className="buyer-details-play-overlay">
-                  <svg width="64" height="64" viewBox="0 0 24 24" fill="none">
-                    <circle cx="12" cy="12" r="10" fill="rgba(255, 255, 255, 0.9)" />
-                    <path d="M10 8L16 12L10 16V8Z" fill="#000000" />
-                  </svg>
-                </div>
-              </div>
-            </div>
-
-            <div className="buyer-details-live-bidding">
-              <Timer timeRemaining={state.timeRemaining} />
-
-              <div className="buyer-details-current-bid">
-                <div className="buyer-details-current-bid-label">Current Price</div>
-                <div className="buyer-details-current-bid-amount">{formatCurrency(auction?.initial_price || 0)}</div>
-                <div className="buyer-details-highest-bidder">
-                  <span className="buyer-details-highest-bidder-label">Total Bids</span>
-                  <span className="buyer-details-highest-bidder-name">{auction?.total_bids || 0}</span>
-                </div>
-              </div>
-
-              <button className="buyer-details-quick-bid">
-                Place Bid Here
-              </button>
-
-              <form className="buyer-details-custom-bid" onSubmit={handleCustomBidSubmit}>
-                <input
-                  type="number"
-                  className="buyer-details-custom-bid-input"
-                  placeholder="Enter custom bid"
-                  value={state.customBidAmount}
-                  onChange={handleCustomBidChange}
-                  min={parseFloat(auction?.initial_price || 0) + 10}
-                />
-                <button type="submit" className="buyer-details-custom-bid-button">Place Bid</button>
-              </form>
-            </div>
-          </div>
-
-          <div className="buyer-details-live-panels">
-            <div className="buyer-details-bidding-feed">
-              <h3 className="buyer-details-panel-title">Auction Information</h3>
-              <div className="buyer-details-bidding-list">
-                {auction?.seller_name && (
-                  <div className="buyer-details-bidding-item">
-                    <span className="buyer-details-bidder-name">Seller:</span>
-                    <span className="buyer-details-bid-amount">{auction.seller_name}</span>
-                  </div>
-                )}
-                {auction?.auction_manager_name && (
-                  <div className="buyer-details-bidding-item">
-                    <span className="buyer-details-bidder-name">Manager:</span>
-                    <span className="buyer-details-bid-amount">{auction.auction_manager_name}</span>
-                  </div>
-                )}
-                {auction?.category_name && (
-                  <div className="buyer-details-bidding-item">
-                    <span className="buyer-details-bidder-name">Category:</span>
-                    <span className="buyer-details-bid-amount">{auction.category_name}</span>
-                  </div>
-                )}
-              </div>
-            </div>
-
-            <div className="buyer-details-active-bidders">
-              <h3 className="buyer-details-panel-title">Details</h3>
-              <div className="buyer-details-active-list">
-                {auction?.handover_type && (
-                  <div className="buyer-details-active-item">
-                    <span>Handover: {auction.handover_type}</span>
-                  </div>
-                )}
-                {auction?.pickup_address && (
-                  <div className="buyer-details-active-item">
-                    <span>Location: {auction.pickup_address}</span>
-                  </div>
-                )}
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  // Standard auction view
+  // Render based on auction status
   return (
-    <div className="buyer-details-page">
+    <div className={`buyer-details-page ${isLive ? 'buyer-details-live-page' : ''}`}>
       <div className="buyer-details-container">
         <Breadcrumbs auction={auction} />
+
+        <div className="buyer-details-header-section">
+          <h1 className="buyer-details-title">{auction?.title || 'Auction'}</h1>
+          <div className="buyer-details-status-badge" data-status={auction?.status}>
+            {auction?.status === 'ACTIVE' && 'ACTIVE'}
+            {auction?.status === 'APPROVED' && 'Upcoming'}
+            {auction?.status === 'CLOSED' && 'Closed'}
+            {auction?.status === 'AWAITING_PAYMENT' && 'Awaiting Payment'}
+          </div>
+        </div>
 
         <div className="buyer-details-content">
           <ImageGallery 
@@ -489,69 +353,141 @@ const BuyerAuctionDetails = () => {
           />
 
           <div className="buyer-details-info">
-            <div className="buyer-details-header">
-              <h1 className="buyer-details-title">{auction?.title || 'Auction'}</h1>
-              <span className="buyer-details-lot">Lot #{auction?.id || 'N/A'}</span>
+            <div className="buyer-details-auction-meta">
+              <div className="buyer-details-meta-item">
+                <span className="buyer-details-meta-label">Lot Number</span>
+                <span className="buyer-details-meta-value">#{auction?.id || 'N/A'}</span>
+              </div>
+              <div className="buyer-details-meta-item">
+                <span className="buyer-details-meta-label">Category</span>
+                <span className="buyer-details-meta-value">{auction?.category_name || 'N/A'}</span>
+              </div>
+              <div className="buyer-details-meta-item">
+                <span className="buyer-details-meta-label">Total Bids</span>
+                <span className="buyer-details-meta-value">{auction?.total_bids || 0}</span>
+              </div>
             </div>
 
-            <div className="buyer-details-status">
-              <div className="buyer-details-status-item">
-                <span className="buyer-details-status-label">
-                  {isUpcoming ? 'Auction Starts' : 'Auction Status'}
+            <div className="buyer-details-price-section">
+              <div className="buyer-details-price-item">
+                <span className="buyer-details-price-label">Starting Price</span>
+                <span className="buyer-details-price-value">{formatCurrency(parseFloat(auction?.initial_price || 0))}</span>
+              </div>
+              {auction?.is_buy_now_enabled && auction?.buy_now_price && (
+                <div className="buyer-details-price-item">
+                  <span className="buyer-details-price-label">Buy Now</span>
+                  <span className="buyer-details-price-value">{formatCurrency(parseFloat(auction.buy_now_price))}</span>
+                </div>
+              )}
+            </div>
+
+            <div className="buyer-details-timeline">
+              <div className="buyer-details-timeline-item">
+                <span className="buyer-details-timeline-label">Starts</span>
+                <span className="buyer-details-timeline-value">
+                  {new Date(auction?.start_date).toLocaleString()}
                 </span>
-                <span className="buyer-details-status-value">
-                  {isUpcoming
-                    ? new Date(auction?.start_date).toLocaleString()
-                    : auction?.status || 'N/A'
-                  }
-                </span>
-                <span className="buyer-details-end-date">
-                  Ends: {auction?.end_date ? new Date(auction.end_date).toLocaleDateString() : 'N/A'}
+              </div>
+              <div className="buyer-details-timeline-item">
+                <span className="buyer-details-timeline-label">Ends</span>
+                <span className="buyer-details-timeline-value">
+                  {new Date(auction?.end_date).toLocaleString()}
                 </span>
               </div>
             </div>
 
+            {isLive && state.timeRemaining.hours + state.timeRemaining.minutes + state.timeRemaining.seconds > 0 && (
+              <Timer timeRemaining={state.timeRemaining} />
+            )}
+
             {isUpcoming && (
-              <div className="buyer-details-upcoming">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+              <div className="buyer-details-upcoming-notice">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
                   <path d="M12 8V12M12 16H12.01M21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3C16.9706 3 21 7.02944 21 12Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                 </svg>
-                <div className="buyer-details-upcoming-content">
-                  <strong>This auction has not started yet</strong>
+                <div>
+                  <strong>Auction hasn't started yet</strong>
                   <p>Bidding will be available when the auction goes live.</p>
                 </div>
               </div>
             )}
 
-            <div className="buyer-details-tabs">
-              <button
-                className={`buyer-details-tab ${state.activeTab === 'description' ? 'buyer-details-tab-active' : ''}`}
-                onClick={() => handleSetActiveTab('description')}
-              >
-                Description
-              </button>
-              <button
-                className={`buyer-details-tab ${state.activeTab === 'inspection' ? 'buyer-details-tab-active' : ''}`}
-                onClick={() => handleSetActiveTab('inspection')}
-              >
-                Inspection Report
-              </button>
-              <button
-                className={`buyer-details-tab ${state.activeTab === 'terms' ? 'buyer-details-tab-active' : ''}`}
-                onClick={() => handleSetActiveTab('terms')}
-              >
-                Terms
-              </button>
-            </div>
+            {isClosed && (
+              <div className="buyer-details-closed-notice">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                  <path d="M9 12l2 2 4-4m7 0a9 9 0 11-18 0 9 9 0 0118 0z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+                <div>
+                  <strong>This auction has ended</strong>
+                  <p>No more bids can be placed.</p>
+                </div>
+              </div>
+            )}
 
-            <div className="buyer-details-tab-content">
-              <TabContent 
-                activeTab={state.activeTab}
-                auction={auction}
-                inspectionReport={inspectionReport}
-                formatCurrency={formatCurrency}
-              />
+            {isAwaitingPayment && (
+              <div className="buyer-details-payment-notice">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                  <path d="M12 8c-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4-1.79-4-4-4zm0 6c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm0-10C6.48 4 2 6.69 2 10c0 3.72 4.64 7 10 7 .93 0 1.83-.13 2.71-.38.67.52 1.49.99 2.29.99 1.1 0 2-.9 2-2 0-.78-.49-1.45-1.19-1.78.71-1.03 1.19-2.3 1.19-3.83 0-3.31-4.48-6-10-6z" stroke="currentColor" strokeWidth="2" />
+                </svg>
+                <div>
+                  <strong>Awaiting payment</strong>
+                  <p>Complete your payment to finalize this purchase.</p>
+                </div>
+              </div>
+            )}
+
+            {isLive && (
+              <form className="buyer-details-bidding-form" onSubmit={handleCustomBidSubmit}>
+                <input
+                  type="number"
+                  className="buyer-details-bid-input"
+                  placeholder="Enter your bid amount"
+                  value={state.customBidAmount}
+                  onChange={handleCustomBidChange}
+                  min={parseFloat(auction?.initial_price || 0) + 1}
+                  step="0.01"
+                />
+                <button type="submit" className="buyer-details-bid-button">Place Bid</button>
+              </form>
+            )}
+
+            <div className="buyer-details-location-info">
+              <h4>Pickup Information</h4>
+              <div className="buyer-details-location-item">
+                <span className="buyer-details-location-label">Handover Type:</span>
+                <span className="buyer-details-location-value">{auction?.handover_type || 'N/A'}</span>
+              </div>
+              <div className="buyer-details-location-item">
+                <span className="buyer-details-location-label">Location:</span>
+                <span className="buyer-details-location-value">{auction?.pickup_address || 'N/A'}</span>
+              </div>
             </div>
+          </div>
+        </div>
+
+        <div className="buyer-details-tabs-section">
+          <div className="buyer-details-tabs">
+            <button
+              className={`buyer-details-tab ${state.activeTab === 'description' ? 'buyer-details-tab-active' : ''}`}
+              onClick={() => handleSetActiveTab('description')}
+            >
+              Description
+            </button>
+            <button
+              className={`buyer-details-tab ${state.activeTab === 'bids' ? 'buyer-details-tab-active' : ''}`}
+              onClick={() => handleSetActiveTab('bids')}
+            >
+              Bid History ({auctionBids?.length || 0})
+            </button>
+          </div>
+
+          <div className="buyer-details-tab-content">
+            {state.activeTab === 'description' && (
+              <DescriptionTab auction={auction} formatCurrency={formatCurrency} />
+            )}
+            {state.activeTab === 'bids' && (
+              <BidHistoryPanel bids={auctionBids} formatCurrency={formatCurrency} />
+            )}
           </div>
         </div>
       </div>
