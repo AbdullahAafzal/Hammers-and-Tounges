@@ -20,6 +20,9 @@ const AdminManagerKYC = () => {
     target_id: null,
     role: '',
   });
+  const [rejectionReason, setRejectionReason] = useState('');
+  const [showRejectForm, setShowRejectForm] = useState(false);
+  const [rejectionError, setRejectionError] = useState('');
   const dispatch = useDispatch();
   const { users, isLoading, isPerformingAction, actionSuccess } = useSelector((state) => state.admin);
 
@@ -156,13 +159,41 @@ const AdminManagerKYC = () => {
     });
   };
 
-  const handleUserAction = async (userId, actionType) => {
+  const handleUserAction = async (userId, actionType, rejectionReason = null) => {
     const actionData = {
       type: actionType,
       target_id: userId,
     };
 
+    // Add rejection_reason if it's a rejection action
+    if (actionType === 'REJECT_SELLER' && rejectionReason) {
+      actionData.rejection_reason = rejectionReason;
+    }
+
     await dispatch(performUserAction(actionData));
+  };
+
+  const handleRejectClick = () => {
+    setShowRejectForm(true);
+    setRejectionError('');
+  };
+
+  const handleCancelReject = () => {
+    setShowRejectForm(false);
+    setRejectionReason('');
+    setRejectionError('');
+  };
+
+  const handleSubmitReject = async () => {
+    // Validate rejection reason
+    if (!rejectionReason.trim()) {
+      setRejectionError('Rejection reason is required');
+      return;
+    }
+
+    setRejectionError('');
+    await handleUserAction(selectedUser.id, 'REJECT_SELLER', rejectionReason.trim());
+    navigate("/admin/users");
   };
 
   // Get role display name
@@ -180,6 +211,9 @@ const AdminManagerKYC = () => {
   const getKYCStatus = () => {
     if (!selectedUser) return "Unknown";
     if (selectedUser.role === "seller" && selectedUser.seller_details) {
+      if (selectedUser.seller_details.is_rejected) {
+        return "Rejected";
+      }
       return selectedUser.seller_details.verified ? "Verified" : "Pending Review";
     }
     return "Not Applicable";
@@ -267,7 +301,11 @@ const AdminManagerKYC = () => {
               Review user identity documents and approve or reject verification requests.
             </p>
           </div>
-          <span className={`kyc-status ${getKYCStatus() === "Verified" ? "verified" : "pending"}`}>
+          <span className={`kyc-status ${
+            getKYCStatus() === "Verified" ? "verified" : 
+            getKYCStatus() === "Rejected" ? "rejected" : 
+            "pending"
+          }`}>
             {getKYCStatus()}
           </span>
         </header>
@@ -311,49 +349,91 @@ const AdminManagerKYC = () => {
 
           <div className="kyc-card-form admin-panel">
             <h3>Admin Review Panel</h3>
-            <div className="action-buttons">
-              {
-                selectedUser && selectedUser?.seller_details?.verified ? '' : (
-                  <button className="approve" disabled={isPerformingAction} onClick={() => {
-                    handleUserAction(selectedUser.id, 'VERIFY_SELLER')
-                    navigate("/admin/users")
-                  }
-                  }>
-                    {isPerformingAction ?
-                      (
-                        <>
-                          <span className="kyc-spinner"></span>
-                          Approving
-                        </>
-                      ) : "Approve"}
+            {selectedUser && selectedUser?.seller_details?.is_rejected ? (
+              <div className="rejected-state">
+                <div className="rejected-message">
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                    <path d="M18 6L6 18M6 6L18 18" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                  </svg>
+                  <h4>KYC Rejected</h4>
+                  {selectedUser.seller_details.rejection_reason && (
+                    <div className="rejection-reason-display">
+                      <label>Rejection Reason:</label>
+                      <p>{selectedUser.seller_details.rejection_reason}</p>
+                    </div>
+                  )}
+                </div>
+                <div className="action-buttons">
+                  <button className="go-back" onClick={() => navigate("/admin/users")}>
+                    Go Back
                   </button>
-
-                )
-              }
-              <button className="reject" onClick={() => navigate("/admin/users")}>
-                Go Back
-              </button>
-            </div>
-
-            {/* Rejection functionality will be implemented later */}
-            {/* 
-            <label className="reason-label">Reason for Rejection</label>
-            <textarea
-              className="textarea-form"
-              placeholder="Provide a clear reason for rejecting this user's KYC documents..."
-            />
-            <div className="checkbox-row">
-              <input type="checkbox" />
-              <span>Flag for additional verification</span>
-            </div>
-            <div className="rejection-log">
-              <h4>Previous Rejection Log</h4>
-              <p>
-                <strong>18 Nov 2023</strong> – National ID front is blurry. Please re-upload a clearer
-                image.
-              </p>
-            </div>
-            */}
+                </div>
+              </div>
+            ) : selectedUser && selectedUser?.seller_details?.verified ? (
+              <div className="action-buttons">
+                <button className="go-back" onClick={() => navigate("/admin/users")}>
+                  Go Back
+                </button>
+              </div>
+            ) : !showRejectForm ? (
+              <div className="action-buttons">
+                <button className="approve" disabled={isPerformingAction} onClick={() => {
+                  handleUserAction(selectedUser.id, 'VERIFY_SELLER')
+                  navigate("/admin/users")
+                }
+                }>
+                  {isPerformingAction ?
+                    (
+                      <>
+                        <span className="kyc-spinner"></span>
+                        Approving
+                      </>
+                    ) : "Approve"}
+                </button>
+                <button className="reject" disabled={isPerformingAction} onClick={handleRejectClick}>
+                  Reject
+                </button>
+                <button className="go-back" onClick={() => navigate("/admin/users")}>
+                  Go Back
+                </button>
+              </div>
+            ) : (
+              <div className="rejection-form">
+                <label className="reason-label">Rejection Reason <span className="required">*</span></label>
+                <textarea
+                  className="textarea-form"
+                  placeholder="Provide a clear reason for rejecting this user's KYC documents..."
+                  value={rejectionReason}
+                  onChange={(e) => {
+                    setRejectionReason(e.target.value);
+                    if (rejectionError) setRejectionError('');
+                  }}
+                  disabled={isPerformingAction}
+                />
+                {rejectionError && <div className="error-message">{rejectionError}</div>}
+                <div className="rejection-form-actions">
+                  <button 
+                    className="submit-reject" 
+                    disabled={isPerformingAction} 
+                    onClick={handleSubmitReject}
+                  >
+                    {isPerformingAction ? (
+                      <>
+                        <span className="kyc-spinner"></span>
+                        Rejecting
+                      </>
+                    ) : "Submit Rejection"}
+                  </button>
+                  <button 
+                    className="cancel-reject" 
+                    disabled={isPerformingAction} 
+                    onClick={handleCancelReject}
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
         </div>
 

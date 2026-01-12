@@ -9,9 +9,13 @@
 
 /* Header Styles */
 .user-management-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
   margin-bottom: clamp(1.5rem, 3vw, 2rem);
   padding-bottom: 1.5rem;
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  gap: 1.5rem;
 }
 
 .user-management-title {
@@ -30,6 +34,39 @@
   font-size: clamp(0.75rem, 1.5vw, 0.875rem);
   line-height: 1.5;
   margin: 0;
+}
+
+.user-management-create-btn {
+  background: #8cc63f;
+  color: #000;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+
+.user-management-create-btn:hover:not(:disabled) {
+  background: #7bb335;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(140, 198, 63, 0.3);
+}
+
+.user-management-create-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.user-management-create-btn svg {
+  width: 16px;
+  height: 16px;
 }
 
 /* Filters Section */
@@ -273,6 +310,12 @@
   border: 1px solid rgba(239, 68, 68, 0.3);
 }
 
+.user-management-status-rejected {
+  background: linear-gradient(135deg, rgba(239, 68, 68, 0.15), rgba(239, 68, 68, 0.1));
+  color: #ef4444;
+  border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
 /* Actions Dropdown */
 .user-management-actions-cell {
   position: relative;
@@ -503,6 +546,18 @@
   .user-management-container {
     padding: 1rem;
   }
+
+  .user-management-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+
+  .user-management-create-btn {
+    width: 100%;
+    justify-content: center;
+  }
+
     .user-management-filters {
     flex-direction: column;
   }

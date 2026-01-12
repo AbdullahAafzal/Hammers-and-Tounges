@@ -124,10 +124,33 @@ body {
   box-shadow: 0 4px 12px rgba(239, 68, 68, 0.2);
 }
 
-.control-action-btn.btn-end:hover {
+.control-action-btn.btn-end:hover:not(:disabled) {
   background-color: #DC2626;
   box-shadow: 0 6px 16px rgba(239, 68, 68, 0.3);
   transform: translateY(-1px);
+}
+
+.control-action-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.control-action-btn .spinner {
+  animation: spin 1s linear infinite;
+}
+
+.control-action-btn .spinner-circle {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 .control-grid {

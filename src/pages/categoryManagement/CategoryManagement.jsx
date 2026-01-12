@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchCategories, deleteCategory } from '../../store/actions/adminActions';
+import { adminService } from '../../services/interceptors/admin.service';
+import { toast } from 'react-toastify';
 import './CategoryManagement.css';
 
 export default function CategoryManagement() {
@@ -28,8 +30,36 @@ export default function CategoryManagement() {
 
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 8;
+  const [togglingCategoryId, setTogglingCategoryId] = useState(null);
 
-  const handleStatusToggle = (id) => {
+  const handleStatusToggle = async (id) => {
+    const category = categories.find(cat => cat.id === id);
+    if (!category) return;
+
+    // Prevent multiple toggles
+    if (togglingCategoryId === id) return;
+
+    setTogglingCategoryId(id);
+    const newStatus = !category.status;
+
+    try {
+      await adminService.toggleCategory(id, {
+        id: id,
+        name: category.name,
+        is_active: newStatus
+      });
+      
+      toast.success(`Category ${newStatus ? 'activated' : 'deactivated'} successfully!`);
+      // Refresh categories list after successful toggle
+      dispatch(fetchCategories());
+    } catch (error) {
+      const message = error.response?.data?.message || 
+                     error.response?.data?.error ||
+                     'Failed to toggle category status';
+      toast.error(message);
+    } finally {
+      setTogglingCategoryId(null);
+    }
   };
 
   const handleEdit = (id) => {
@@ -267,13 +297,14 @@ export default function CategoryManagement() {
                         <td>
                           <div className="category-status-cell">
                             <div
-                              className={`category-status-toggle ${category.status ? 'active' : ''}`}
+                              className={`category-status-toggle ${category.status ? 'active' : ''} ${togglingCategoryId === category.id ? 'toggling' : ''}`}
                               onClick={() => handleStatusToggle(category.id)}
+                              style={{ cursor: togglingCategoryId === category.id ? 'wait' : 'pointer' }}
                             >
                               <div className="category-toggle-handle"></div>
                             </div>
                             <span className={`category-status-label ${category.status ? 'active' : 'inactive'}`}>
-                              {category.status ? 'Active' : 'Inactive'}
+                              {togglingCategoryId === category.id ? 'Updating...' : (category.status ? 'Active' : 'Inactive')}
                             </span>
                           </div>
                         </td>

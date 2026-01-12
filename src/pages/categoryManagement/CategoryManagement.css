@@ -436,6 +436,25 @@
   background-color: #8CC63F;
 }
 
+.category-status-toggle.toggling {
+  opacity: 0.6;
+  cursor: wait !important;
+  pointer-events: none;
+}
+
+.category-status-toggle.toggling .category-toggle-handle {
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
 .category-status-label {
   font-size: 0.8125rem;
   font-weight: 600;

@@ -153,4 +153,62 @@ export const adminService = {
       throw error;
     }
   },
+
+  // Update Manager/User Details
+  updateUser: async (userId, userData) => {
+    try {
+      const formData = new FormData();
+      Object.keys(userData).forEach((key) => {
+        if (userData[key] !== null && userData[key] !== undefined && userData[key] !== '') {
+          if (key === 'image' && userData[key] instanceof File) {
+            formData.append(key, userData[key]);
+          } else {
+            formData.append(key, userData[key]);
+          }
+        }
+      });
+      const { data } = await apiClient.patch(
+        `${API_ROUTES.ADMIN_UPDATE_USER}${userId}/update/`,
+        formData,
+        {
+          headers: { 'Content-Type': 'multipart/form-data' },
+        }
+      );
+      return data;
+    } catch (error) {
+      if (error.isNetworkError) {
+        throw new Error('Unable to connect to server. Please try again later.');
+      }
+      throw error;
+    }
+  },
+
+  // Create Manager/Staff
+  createStaff: async (staffData) => {
+    try {
+      const { data } = await apiClient.post(API_ROUTES.ADMIN_CREATE_STAFF, staffData);
+      return data;
+    } catch (error) {
+      if (error.isNetworkError) {
+        throw new Error('Unable to connect to server. Please try again later.');
+      }
+      throw error;
+    }
+  },
+
+  // Toggle Category Active/Inactive Status
+  toggleCategory: async (categoryId, categoryData) => {
+    try {
+      const { data } = await apiClient.post(
+        `${API_ROUTES.TOGGLE_CATEGORY}${categoryId}/toggle/`,
+        categoryData
+      );
+      return data;
+    } catch (error) {
+      if (error.isNetworkError) {
+        throw new Error('Unable to connect to server. Please try again later.');
+      }
+      throw error;
+    }
+  },
 };

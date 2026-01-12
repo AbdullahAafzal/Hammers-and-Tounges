@@ -38,11 +38,14 @@ export const API_ROUTES = {
   ADMIN_USER_ACTION: '/inspections/admin/user-action/',
   ADMIN_ASSIGN_AUCTION: '/inspections/admin/assign/',
   ADMIN_USERS_LIST: '/inspections/admin/users/',
+  ADMIN_UPDATE_USER: '/users/admin/', // + userId + /update/
+  ADMIN_CREATE_STAFF: '/users/admin/create-staff/',
   AUCTION_LISTINGS: '/auctions/listings/',
   FETCH_CATEGORIES: '/auctions/categories/',
   CREATE_CATEGORY: '/auctions/categories/',
   UPDATE_CATEGORY: '/auctions/categories/',
   DELETE_CATEGORY: '/auctions/categories/',
+  TOGGLE_CATEGORY: '/auctions/categories/', // + categoryId + /toggle/
 
   // Manager Routes
   MANAGER_TASKS: '/inspections/manager/tasks/',
@@ -66,7 +69,7 @@ export const API_ROUTES = {
   DELETE_AUCTION: '/auctions/listings/', // + auction_id
 
   AUCTION_APPROVAL_REQUEST: '/auctions/listings/',
-  
+  AUCTION_ACTION: '/auctions/listings/', // + auction_id + /action/
 
   // Buyer Routes
   PLACE_BID: '/auctions/bid/',

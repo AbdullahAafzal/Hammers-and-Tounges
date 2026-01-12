@@ -1,15 +1,19 @@
 import React, { useState, useEffect, useMemo } from "react";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { API_CONFIG } from '../config/api.config';
+import { managerService } from '../services/interceptors/manager.service';
+import { toast } from 'react-toastify';
 import "./ManagerAuctionControlPanel.css";
 
 export default function ManagerAuctionControlPanel() {
   const location = useLocation();
+  const navigate = useNavigate();
   const auctionData = location?.state?.auctionData;
   const isActive = auctionData?.status === 'ACTIVE';
   
   const [isRunning, setIsRunning] = useState(false);
   const [activeTab, setActiveTab] = useState("disputes");
+  const [isEndingAuction, setIsEndingAuction] = useState(false);
   
   // Calculate remaining time from end_date
   const calculateRemainingTime = useMemo(() => {
@@ -71,6 +75,32 @@ export default function ManagerAuctionControlPanel() {
   const handleResolveDispute = (disputeId) => {
     alert(`Resolving dispute ${disputeId}`);
     // Add your resolve logic here
+  };
+
+  const handleEndAuction = async () => {
+    if (!auctionData?.id) {
+      toast.error('Auction ID is missing');
+      return;
+    }
+
+    if (window.confirm('Are you sure you want to end this auction? This action cannot be undone.')) {
+      setIsEndingAuction(true);
+      try {
+        await managerService.performAuctionAction(auctionData.id, {
+          action: 'CLOSE'
+        });
+        toast.success('Auction ended successfully!');
+        // Navigate back to auctions list or refresh the page
+        navigate('/manager/auctions');
+      } catch (error) {
+        const message = error.response?.data?.message || 
+                       error.response?.data?.error ||
+                       'Failed to end auction';
+        toast.error(message);
+      } finally {
+        setIsEndingAuction(false);
+      }
+    }
   };
 
   // Auto-update timer when active
@@ -169,18 +199,27 @@ export default function ManagerAuctionControlPanel() {
           </div>
           {isActive && (
             <div className="control-header-actions">
-              <button className="control-action-btn btn-pause" onClick={() => setIsRunning(false)}>
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-                  <rect x="6" y="4" width="4" height="16" stroke="currentColor" strokeWidth="2" fill="currentColor"/>
-                  <rect x="14" y="4" width="4" height="16" stroke="currentColor" strokeWidth="2" fill="currentColor"/>
-                </svg>
-                Pause Auction
-              </button>
-              <button className="control-action-btn btn-end" onClick={() => setTime(0)}>
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-                  <rect x="5" y="5" width="14" height="14" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="currentColor"/>
-                </svg>
-                End Auction
+              <button 
+                className="control-action-btn btn-end" 
+                onClick={handleEndAuction}
+                disabled={isEndingAuction}
+              >
+                {isEndingAuction ? (
+                  <>
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" className="spinner">
+                      <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeDasharray="32" strokeDashoffset="16" opacity="0.3"/>
+                      <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeDasharray="32" strokeDashoffset="16" className="spinner-circle"/>
+                    </svg>
+                    Ending...
+                  </>
+                ) : (
+                  <>
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                      <rect x="5" y="5" width="14" height="14" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="currentColor"/>
+                    </svg>
+                    End Auction
+                  </>
+                )}
               </button>
             </div>
           )}

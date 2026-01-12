@@ -54,6 +54,8 @@ import ManualPaymentAuthorization from './pages/ManualPaymentAuthorization'
 import PaymentVerification from './pages/paymentVerification/PaymentVerification'
 import UserManagement from './pages/userManagement/UserManagement'
 import AdminManagerKYC from './pages/userManagement/AdminManagerKYC'
+import AdminManagerDetails from './pages/userManagement/AdminManagerDetails'
+import AdminCreateManager from './pages/userManagement/AdminCreateManager'
 
 // Route Guards
 import BuyerGuard from "./guards/BuyerGuard";
@@ -222,6 +224,16 @@ function App() {
                 <Route path="/admin/kycverification/:id" element={
                   <>
                     <AdminManagerKYC />
+                  </>
+                } />
+                <Route path="/admin/manager/:id" element={
+                  <>
+                    <AdminManagerDetails />
+                  </>
+                } />
+                <Route path="/admin/manager/create" element={
+                  <>
+                    <AdminCreateManager />
                   </>
                 } />
                 <Route path="/admin/category" element={

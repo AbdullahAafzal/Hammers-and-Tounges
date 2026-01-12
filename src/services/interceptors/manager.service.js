@@ -140,4 +140,20 @@ export const managerService = {
       throw error;
     }
   },
+
+  // Perform Auction Action (CLOSE, etc.)
+  performAuctionAction: async (auctionId, actionData) => {
+    try {
+      const { data } = await apiClient.post(
+        `${API_ROUTES.AUCTION_ACTION}${auctionId}/action/`,
+        actionData
+      );
+      return data;
+    } catch (error) {
+      if (error.isNetworkError) {
+        throw new Error('Unable to connect to server. Please try again later.');
+      }
+      throw error;
+    }
+  },
 };

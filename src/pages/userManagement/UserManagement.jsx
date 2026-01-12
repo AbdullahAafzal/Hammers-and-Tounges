@@ -34,8 +34,14 @@ const UserManagement = () => {
 
   // Get user status based on role and verification
   const getUserStatus = (user) => {
+    if (user.role === 'manager') {
+      return user.is_active ? "Active" : "Inactive";
+    }
     if (user.is_suspended) return "Suspended";
-    if (user.role === 'seller' && !user?.seller_details?.verified) return "Pending";
+    if (user.role === 'seller' && user?.seller_details) {
+      if (user.seller_details.is_rejected) return "Rejected";
+      if (!user.seller_details.verified) return "Pending";
+    }
     return "Active";
   };
 
@@ -131,8 +137,14 @@ console.log("filteredUsers: ", filteredUsers);
 
   // Get status class
   const getStatusClass = (user) => {
-    // if (user.is_suspended) return "suspended";
-    if (user.role === 'seller' && !user?.seller_details?.verified) return "pending";
+    if (user.role === 'manager') {
+      return user.is_active ? "active" : "suspended";
+    }
+    if (user.is_suspended) return "suspended";
+    if (user.role === 'seller' && user?.seller_details) {
+      if (user.seller_details.is_rejected) return "rejected";
+      if (!user.seller_details.verified) return "pending";
+    }
     return "active";
   };
 
@@ -165,8 +177,22 @@ console.log("filteredUsers: ", filteredUsers);
     <div className="user-management-container">
       {/* Page Header */}
       <header className="user-management-header">
-        <h1 className="user-management-title">User Management</h1>
-        <p className="user-management-subtitle">Manage all users on the Hammer & Tongues platform.</p>
+        <div>
+          <h1 className="user-management-title">User Management</h1>
+          <p className="user-management-subtitle">Manage all users on the Hammer & Tongues platform.</p>
+        </div>
+        {roleFilter === 'manager' && (
+          <button 
+            className="user-management-create-btn"
+            onClick={() => navigate('/admin/manager/create')}
+            disabled={isLoading}
+          >
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+              <path d="M12 5V19M5 12H19" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
+            Create Manager
+          </button>
+        )}
       </header>
 
       {/* Filters Section */}
@@ -247,8 +273,19 @@ console.log("filteredUsers: ", filteredUsers);
                 <tr 
                   key={user.id} 
                   className="user-management-table-row" 
-                  onClick={roleFilter === 'seller' && user.role === 'seller' ? () => navigate(`/admin/kycverification/${user.id}`) : undefined}
-                  style={roleFilter !== 'seller' || user.role !== 'seller' ? { cursor: 'default' } : { cursor: 'pointer' }}
+                  onClick={
+                    roleFilter === 'seller' && user.role === 'seller' 
+                      ? () => navigate(`/admin/kycverification/${user.id}`)
+                      : roleFilter === 'manager' && user.role === 'manager'
+                      ? () => navigate(`/admin/manager/${user.id}`)
+                      : undefined
+                  }
+                  style={
+                    (roleFilter === 'seller' && user.role === 'seller') || 
+                    (roleFilter === 'manager' && user.role === 'manager')
+                      ? { cursor: 'pointer' } 
+                      : { cursor: 'default' }
+                  }
                 >
                   <td className="user-management-name-cell">
                     <div className="user-management-avatar">
