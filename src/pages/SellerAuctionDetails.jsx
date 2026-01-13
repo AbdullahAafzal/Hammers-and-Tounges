@@ -12,8 +12,6 @@ const SellerAuctionDetails = () => {
   const { myAuctions, isLoading } = useSelector((state) => state.seller);
   const { auctionBids } = useSelector((state) => state.buyer);
 
-
-
   const selectedAuction = useMemo(() =>
     myAuctions?.results?.find((auction) => auction?.id === parseInt(id)),
     [myAuctions, id]
@@ -108,24 +106,48 @@ const SellerAuctionDetails = () => {
     }
   }
 
+  // const handleSendForApproval = async () => {
+  //   if (!selectedAuction) return;
+
+  //   if (window.confirm('Send this listing for admin approval?')) {
+  //     try {
+  //       // Call the edit API with PENDING status
+  //       await dispatch(updateAuction({
+  //         auctionId: selectedAuction.id,
+  //         auctionData: { status: 'PENDING' }
+  //       })).unwrap();
+
+  //       // Navigate back to listings page after successful submission
+  //       navigate('/seller/auction-listings');
+  //     } catch (error) {
+  //       console.error('Error sending for approval:', error);
+  //     }
+  //   }
+  // }
+
   const handleSendForApproval = async () => {
     if (!selectedAuction) return;
 
-    if (window.confirm('Send this listing for admin approval?')) {
-      try {
-        // Call the edit API with PENDING status
-        await dispatch(updateAuction({
-          auctionId: selectedAuction.id,
-          auctionData: { status: 'PENDING' }
-        })).unwrap();
+    if (!window.confirm('Send this listing for admin approval?')) return;
 
-        // Navigate back to listings page after successful submission
-        navigate('/seller/auction-listings');
-      } catch (error) {
-        console.error('Error sending for approval:', error);
-      }
+    try {
+    await dispatch(updateAuction({
+      auctionId: selectedAuction.id,
+      auctionData: { status: 'PENDING' }
+    })).unwrap();
+
+    // // Refresh the auctions list to get updated data
+    // await dispatch(fetchMyAuctions());
+    
+    // Now navigation will work!
+    navigate('/seller/auction-listings', { replace: true });
+
+
+    } catch (error) {
+      console.error('Error sending for approval:', error);
     }
-  }
+  };
+
 
 
   const getStatusColor = (status) => {
@@ -325,11 +347,11 @@ const SellerAuctionDetails = () => {
               </div>
               {/* Listing Actions - Only show when status is DRAFT */}
             </div>
-              {selectedAuction.status?.toUpperCase() === 'DRAFT' && (
-                <div className="w-full flex flex-col gap-6 rounded-2xl p-6 shadow-md ">
-                  {/* Header */}
-                  <div className="flex items-center gap-3">
-                    {/* <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-indigo-100 text-indigo-600">
+            {selectedAuction.status?.toUpperCase() === 'DRAFT' && (
+              <div className="w-full flex flex-col gap-6 rounded-2xl p-6 shadow-md ">
+                {/* Header */}
+                <div className="flex items-center gap-3">
+                  {/* <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-indigo-100 text-indigo-600">
                       <svg
                         width="20"
                         height="20"
@@ -351,101 +373,101 @@ const SellerAuctionDetails = () => {
                       </svg>
                     </div> */}
 
-                  </div>
-
-                  {/* Buttons */}
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                    {/* Edit */}
-                    <button
-                      onClick={handleEditListing}
-                      className="seller-details-button flex items-center justify-center gap-2 bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm transition-all hover:bg-indigo-700 hover:shadow-md"
-                    >
-                      <svg
-                        width="18"
-                        height="18"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                        className="transition-transform group-hover:rotate-6"
-                      >
-                        <path
-                          d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                        />
-                        <path
-                          d="M18.5 2.5a2.121 2.121 0 113 3L12 15l-4 1 1-4 9.5-9.5z"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                        />
-                      </svg>
-                      Edit Listing
-                    </button>
-
-                    {/* Approval */}
-                    <button
-                      onClick={handleSendForApproval}
-                      className="seller-details-button flex items-center justify-center gap-2 bg-emerald-600 px-4 py-2 text-sm font-medium text-white shadow-sm transition-all hover:bg-emerald-700 hover:shadow-md"
-                    >
-                      <svg
-                        width="18"
-                        height="18"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                        className="transition-transform group-hover:scale-110"
-                      >
-                        <path
-                          d="M22 11.08V12c0 5.523-4.477 10-10 10S2 17.523 2 12 6.477 2 12 2"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                        />
-                        <path
-                          d="M22 4L12 14l-3-3"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                        />
-                      </svg>
-                      Send for Approval
-                    </button>
-
-                    {/* Delete */}
-                    <button
-                      onClick={handleRemoveListing}
-                      className="seller-details-button flex items-center justify-center gap-2 bg-red-600 px-4 py-2 text-sm font-medium text-white shadow-sm transition-all hover:bg-red-700"
-                    >
-                      <svg
-                        width="18"
-                        height="18"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                        className="transition-transform group-hover:scale-110"
-                      >
-                        <path
-                          d="M3 6h18"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                        />
-                        <path
-                          d="M8 6V4a2 2 0 012-2h4a2 2 0 012 2v2"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                        />
-                        <path
-                          d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                        />
-                      </svg>
-                      Remove Listing
-                    </button>
-                  </div>
                 </div>
-              )}
+
+                {/* Buttons */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                  {/* Edit */}
+                  <button
+                    onClick={handleEditListing}
+                    className="seller-details-button flex items-center justify-center gap-2 bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm transition-all hover:bg-indigo-700 hover:shadow-md"
+                  >
+                    <svg
+                      width="18"
+                      height="18"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      className="transition-transform group-hover:rotate-6"
+                    >
+                      <path
+                        d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      />
+                      <path
+                        d="M18.5 2.5a2.121 2.121 0 113 3L12 15l-4 1 1-4 9.5-9.5z"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      />
+                    </svg>
+                    Edit Listing
+                  </button>
+
+                  {/* Approval */}
+                  <button
+                    onClick={handleSendForApproval}
+                    className="seller-details-button flex items-center justify-center gap-2 bg-emerald-600 px-4 py-2 text-sm font-medium text-white shadow-sm transition-all hover:bg-emerald-700 hover:shadow-md"
+                  >
+                    <svg
+                      width="18"
+                      height="18"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      className="transition-transform group-hover:scale-110"
+                    >
+                      <path
+                        d="M22 11.08V12c0 5.523-4.477 10-10 10S2 17.523 2 12 6.477 2 12 2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      />
+                      <path
+                        d="M22 4L12 14l-3-3"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      />
+                    </svg>
+                    Send for Approval
+                  </button>
+
+                  {/* Delete */}
+                  <button
+                    onClick={handleRemoveListing}
+                    className="seller-details-button flex items-center justify-center gap-2 bg-red-600 px-4 py-2 text-sm font-medium text-white shadow-sm transition-all hover:bg-red-700"
+                  >
+                    <svg
+                      width="18"
+                      height="18"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      className="transition-transform group-hover:scale-110"
+                    >
+                      <path
+                        d="M3 6h18"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      />
+                      <path
+                        d="M8 6V4a2 2 0 012-2h4a2 2 0 012 2v2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      />
+                      <path
+                        d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      />
+                    </svg>
+                    Remove Listing
+                  </button>
+                </div>
+              </div>
+            )}
 
             {/* Timer Section for Live Auctions */}
             {isLive && timeRemaining.hours + timeRemaining.minutes + timeRemaining.seconds > 0 && (

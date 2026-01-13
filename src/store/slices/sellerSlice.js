@@ -89,12 +89,19 @@ const sellerSlice = createSlice({
       })
       .addCase(updateAuction.fulfilled, (state, action) => {
         state.isUpdating = false;
-        const index = state.myAuctions.findIndex(
-          (a) => a.id === action.payload.id
-        );
-        if (index !== -1) {
-          state.myAuctions[index] = action.payload;
-        }
+
+        // ✅ Fix: Access the results array
+    if (state.myAuctions?.results && Array.isArray(state.myAuctions.results)) {
+      const index = state.myAuctions.results.findIndex(
+        (a) => a.id === action.payload.id
+      );
+      if (index !== -1) {
+        state.myAuctions.results[index] = action.payload;
+      }
+    }
+    
+    
+
         state.actionSuccess = true;
       })
       .addCase(updateAuction.rejected, (state, action) => {
