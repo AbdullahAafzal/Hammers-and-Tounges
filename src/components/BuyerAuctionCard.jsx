@@ -1,6 +1,7 @@
 import React, { useState, useCallback } from 'react';
 import { useCountdownTimer } from '../hooks/useCountdownTimer';
 import { formatPrice } from '../utils/auctionUtils';
+import { getMediaUrl } from '../config/api.config';
 import './BuyerAuctionCard.css';
 
 const BuyerAuctionCard = ({ auction, onClick }) => {
@@ -99,8 +100,8 @@ const BuyerAuctionCard = ({ auction, onClick }) => {
         const imageMedia = auction.media.find(m =>
             m.mediatype === 'image' || m.media_type === 'image'
         );
-        return imageMedia?.file || auction.media[0]?.file ||
-            'https://images.unsplash.com/photo-1549317661-bd32c8ce0db2?w=800&q=80';
+        const rawUrl = imageMedia?.file || auction.media[0]?.file;
+        return rawUrl ? getMediaUrl(rawUrl) : 'https://images.unsplash.com/photo-1549317661-bd32c8ce0db2?w=800&q=80';
     }, [auction.media]);
 
     const handleCardClick = useCallback((e) => {

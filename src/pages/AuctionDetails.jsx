@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { placeBid } from '../store/actions/buyerActions'
+import { getMediaUrl } from '../config/api.config';
 
 import './AuctionDetails.css';
 
@@ -56,13 +57,13 @@ const AuctionDetails = () => {
   };
 
   const handleCustomBidSubmit = (e) => {
-   e.preventDefault()
+    e.preventDefault()
     console.log('Placing custom bid:', customBidAmount)
     dispatch(placeBid({ auction_id: auction.id, amount: parseFloat(customBidAmount) }))
-    
+
   };
 
- 
+
 
   if (isLoading) {
     return (
@@ -107,7 +108,7 @@ const AuctionDetails = () => {
   }
 
   const auction = selectedAuction;
-  const images = auction.media?.filter(m => m.media_type === 'image').map(m => m.file) || [];
+  const images = auction.media?.filter(m => m.media_type === 'image').map(m => getMediaUrl(m.file)) || [];
   const inspectionReport = auction.media?.find(m => m.label === 'inspection_report');
   const isLive = auction.status === 'ACTIVE';
   const isUpcoming = auction.status === 'APPROVED';
@@ -179,9 +180,9 @@ const AuctionDetails = () => {
                 </div>
               </div>
 
-               <button className="quick-bid-button">
+              <button className="quick-bid-button">
                 Place Bid Here
-              </button> 
+              </button>
 
               <form className="custom-bid-form" onSubmit={handleCustomBidSubmit}>
                 <input
@@ -364,7 +365,7 @@ const AuctionDetails = () => {
                     <div>
                       <p>Inspection report available for download:</p>
                       <a
-                        href={inspectionReport.file}
+                        href={getMediaUrl(inspectionReport.file)}
                         target="_blank"
                         rel="noopener noreferrer"
                         style={{ color: '#007bff', textDecoration: 'underline' }}

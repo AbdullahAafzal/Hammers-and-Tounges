@@ -37,37 +37,42 @@ export const API_CONFIG = {
 // };
 
 // Helper function to get full API URL
-// export const getApiUrl = (endpoint) => {
-//   // Remove leading slash if present to avoid double slashes
-//   const cleanEndpoint = endpoint.startsWith('/') ? endpoint.slice(1) : endpoint;
+export const getApiUrl = (endpoint) => {
+  // Remove leading slash if present to avoid double slashes
+  const cleanEndpoint = endpoint.startsWith('/') ? endpoint.slice(1) : endpoint;
   
-//   if (API_CONFIG.IS_PRODUCTION) {
-//     // In production, use relative URLs that will be proxied by Netlify
-//     return `/${cleanEndpoint}`;
-//   }
+  if (API_CONFIG.IS_PRODUCTION) {
+    // In production, use relative URLs that will be proxied by Netlify
+    return `/${cleanEndpoint}`;
+  }
   
-//   // In development, use full URL
-//   return `${API_CONFIG.BASE_URL}/${cleanEndpoint}`;
-// };
+  // In development, use full URL
+  return `${API_CONFIG.BASE_URL}/${cleanEndpoint}`;
+};
 
 // Helper function to get full media URL
-// export const getMediaUrl = (mediaPath) => {
-//   if (!mediaPath) return '';
+export const getMediaUrl = (mediaPath) => {
+  if (!mediaPath) return '';
   
-//   // If it's already a full URL, return as is
-//   if (mediaPath.startsWith('http://') || mediaPath.startsWith('https://')) {
-//     return mediaPath;
-//   }
+  // If it's the specific insecure backend, strip it to make it relative (proxied)
+  if (mediaPath.startsWith('http://207.180.233.44:8001')) {
+     return mediaPath.replace('http://207.180.233.44:8001', '');
+  }
+
+  // If it's another full URL (e.g. unsplash), return as is
+  if (mediaPath.startsWith('http://') || mediaPath.startsWith('https://')) {
+    return mediaPath;
+  }
   
-//   // Remove leading slash to avoid double slashes
-//   const cleanPath = mediaPath.startsWith('/') ? mediaPath.slice(1) : mediaPath;
+  // Remove leading slash to avoid double slashes
+  const cleanPath = mediaPath.startsWith('/') ? mediaPath.slice(1) : mediaPath;
   
-//   if (API_CONFIG.IS_PRODUCTION) {
-//     return `/media/${cleanPath}`;
-//   }
+  if (API_CONFIG.IS_PRODUCTION) {
+    return `/media/${cleanPath}`;
+  }
   
-//   return `${API_CONFIG.MEDIA_BASE_URL}/${cleanPath}`;
-// };
+  return `${API_CONFIG.MEDIA_BASE_URL}/${cleanPath}`;
+};
 
 export const API_ROUTES = {
   // Authentication
