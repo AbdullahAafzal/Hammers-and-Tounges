@@ -2,6 +2,7 @@ import React, { useState, useEffect, useMemo, useCallback, memo } from 'react';
 import { Link, useLocation, useParams } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { placeBid, fetchAuctionBids } from '../store/actions/buyerActions';
+import { getMediaUrl } from '../config/api.config';
 import './BuyerAuctionDetails.css';
 
 // ==================== MEMOIZED COMPONENTS ====================
@@ -246,8 +247,8 @@ const BuyerAuctionDetails = () => {
 
   // Memoized computed values
   const auction = state.selectedAuction;
-  const images = useMemo(() => 
-    auction?.media?.filter(m => m.media_type === 'image').map(m => m.file) || [],
+  const images = useMemo(() =>
+    auction?.media?.filter(m => m.media_type === 'image').map(m => getMediaUrl(m.file)) || [],
     [auction?.media]
   );
   const isLive = useMemo(() => auction?.status === 'ACTIVE', [auction?.status]);
@@ -280,9 +281,9 @@ const BuyerAuctionDetails = () => {
   const handleCustomBidSubmit = useCallback((e) => {
     e.preventDefault();
     if (auction && state.customBidAmount) {
-      dispatch(placeBid({ 
-        auction_id: auction.id, 
-        amount: parseFloat(state.customBidAmount) 
+      dispatch(placeBid({
+        auction_id: auction.id,
+        amount: parseFloat(state.customBidAmount)
       }));
       setState(prev => ({ ...prev, customBidAmount: '' }));
     }
@@ -345,7 +346,7 @@ const BuyerAuctionDetails = () => {
         </div>
 
         <div className="buyer-details-content">
-          <ImageGallery 
+          <ImageGallery
             images={images}
             selectedImage={state.selectedImage}
             onSelectImage={handleSelectImage}
