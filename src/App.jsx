@@ -78,7 +78,7 @@ import ForgotPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
 import ResetVerifyOtp from "./pages/ResetVerifyOTP";
 import SellerSales from "./pages/SellerSales";
-import BuyerBidDetails from "./components/buyerBidDetails";
+import BuyerBidDetails from "./components/BuyerBidDetails";
 function App() {
   return (
     <Provider store={store}>

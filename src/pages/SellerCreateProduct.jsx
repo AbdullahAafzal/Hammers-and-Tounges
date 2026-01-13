@@ -1364,8 +1364,9 @@ const SellerCreateProduct = () => {
                     className="create-auction-secondary-button-action"
                     // disabled={isCreating || isUpdating}
                   >
-                    { isCreating && 'Save as Draft' }
-                    { isUpdating && 'Update Auction' }
+                    
+                    {/* { } */}
+                    { isUpdating ? 'Update Auction' :  'Save as Draft' }
                     {/* { isUpdating ? 'Updating...' : 'Save as Draft' } */}
                     {/* {isCreating || isUpdating
                       ? (isUpdating ? 'Updating...' : 'Saving...')
