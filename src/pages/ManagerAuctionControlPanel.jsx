@@ -11,6 +11,9 @@ export default function ManagerAuctionControlPanel() {
   const auctionData = location?.state?.auctionData;
   const isActive = auctionData?.status === 'ACTIVE';
 
+  console.log("auctionData: ", auctionData);
+  
+
   const [isRunning, setIsRunning] = useState(false);
   const [activeTab, setActiveTab] = useState("disputes");
   const [isEndingAuction, setIsEndingAuction] = useState(false);
@@ -303,7 +306,7 @@ export default function ManagerAuctionControlPanel() {
                             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" className="control-bid-icon">
                               <polyline points="18 15 12 9 6 15" stroke="#8CC63F" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                             </svg>
-                            <span className="control-bid-user">{bid.user || bid.user_name || 'Anonymous'}</span>
+                            <span className="control-bid-user">{bid.user || bid.bidder_name || 'Anonymous'}</span>
                             <span className="control-bid-text">placed a bid</span>
                           </div>
                           <div className="control-bid-details">
