@@ -3,6 +3,7 @@ import { useNavigate, Link } from 'react-router-dom'
 import './BuyerBids.css'
 import { useSelector, useDispatch } from 'react-redux'
 import { fetchMyBids } from '../store/actions/buyerActions'
+import { getMediaUrl } from '../config/api.config'
 
 const BuyerBids = () => {
   const navigate = useNavigate()
@@ -12,8 +13,8 @@ const BuyerBids = () => {
   const [currentPageUrl, setCurrentPageUrl] = useState(null)
 
   console.log(myBids, "My Bids");
-  
-  
+
+
   useEffect(() => {
     dispatch(fetchMyBids())
   }, [dispatch])
@@ -38,12 +39,12 @@ const BuyerBids = () => {
 
   const getFirstImage = (auctionMedia) => {
     console.log("auctionMedia: ", auctionMedia);
-    
+
     if (!auctionMedia || auctionMedia.length === 0) {
       return 'https://images.unsplash.com/photo-1578301978018-3005759f48f7?w=800&q=80'
     }
     const imageMedia = auctionMedia.find(media => media.media_type === 'image')
-    return imageMedia ? imageMedia.file : 'https://images.unsplash.com/photo-1578301978018-3005759f48f7?w=800&q=80'
+    return imageMedia ? getMediaUrl(imageMedia.file) : 'https://images.unsplash.com/photo-1578301978018-3005759f48f7?w=800&q=80'
   }
 
   const filteredBids = (myBids?.results?.filter(bid => {
@@ -54,7 +55,7 @@ const BuyerBids = () => {
   }))
 
   console.log("filteredBids: ", filteredBids);
-  
+
 
   const handlePageChange = (url) => {
     if (url) {
@@ -177,7 +178,7 @@ const BuyerBids = () => {
                       </div>
 
                       {/* <div className="status-message"> */}
-                        {/* {bid.status === 'ACTIVE' && (
+                      {/* {bid.status === 'ACTIVE' && (
                           <div className="status-banner active-banner">
                             <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
                               <path d="M20 6L9 17L4 12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
@@ -185,7 +186,7 @@ const BuyerBids = () => {
                             <span>Bid is active</span>
                           </div>
                         )} */}
-                        {/* {bid.status === 'CLOSED' && (
+                      {/* {bid.status === 'CLOSED' && (
                           <div className="status-banner closed-banner">
                             <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
                               <path d="M12 8V12M12 16H12.01M21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3C16.9706 3 21 7.02944 21 12Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
@@ -193,7 +194,7 @@ const BuyerBids = () => {
                             <span>Auction closed</span>
                           </div>
                         )} */}
-                        {/* {bid.status === 'AWAITING_PAYMENT' && (
+                      {/* {bid.status === 'AWAITING_PAYMENT' && (
                           <div className="status-banner payment-banner">
                             <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
                               <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm3.5-9c.83 0 1.5-.67 1.5-1.5S16.33 8 15.5 8 14 8.67 14 9.5s.67 1.5 1.5 1.5zm-7 0c.83 0 1.5-.67 1.5-1.5S9.33 8 8.5 8 7 8.67 7 9.5 7.67 11 8.5 11zm3.5 6.5c2.33 0 4.31-1.46 5.11-3.5H6.89c.8 2.04 2.78 3.5 5.11 3.5z" stroke="currentColor" strokeWidth="2" />
@@ -207,7 +208,7 @@ const BuyerBids = () => {
                     <div className="mybid-actions">
                       <button
                         className="bids-action-btn secondary"
-                        onClick={() => navigate(`/buyer/bid/${bid.auction_id}`,  {state: {listing: bid}})}
+                        onClick={() => navigate(`/buyer/bid/${bid.auction_id}`, { state: { listing: bid } })}
                       >
                         View Auction
                       </button>
