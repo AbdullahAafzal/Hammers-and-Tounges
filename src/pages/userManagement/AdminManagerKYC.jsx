@@ -4,6 +4,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchUsersList, performUserAction } from "../../store/actions/adminActions";
 import { clearActionSuccess } from "../../store/slices/adminSlice";
+import { getMediaUrl } from "../../config/api.config";
 import KYCDocumentPreview from "./KYCDocumentPreview";
 
 const AdminManagerKYC = () => {
@@ -234,27 +235,27 @@ const AdminManagerKYC = () => {
     {
       key: "id_front",
       label: "National ID (Front)",
-      path: getDocumentPath(selectedUser?.seller_details?.id_front),
+      path: getMediaUrl(getDocumentPath(selectedUser?.seller_details?.id_front)),
     },
     {
       key: "id_back",
       label: "National ID (Back)",
-      path: getDocumentPath(selectedUser?.seller_details?.id_back),
+      path: getMediaUrl(getDocumentPath(selectedUser?.seller_details?.id_back)),
     },
     {
       key: "driving_license_front",
       label: "Driving License (Front)",
-      path: getDocumentPath(selectedUser?.seller_details?.driving_license_front),
+      path: getMediaUrl(getDocumentPath(selectedUser?.seller_details?.driving_license_front)),
     },
     {
       key: "driving_license_back",
       label: "Driving License (Back)",
-      path: getDocumentPath(selectedUser?.seller_details?.driving_license_back),
+      path: getMediaUrl(getDocumentPath(selectedUser?.seller_details?.driving_license_back)),
     },
     {
       key: "passport_front",
       label: "Passport",
-      path: getDocumentPath(selectedUser?.seller_details?.passport_front),
+      path: getMediaUrl(getDocumentPath(selectedUser?.seller_details?.passport_front)),
     },
   ], [selectedUser]);
 
@@ -301,11 +302,10 @@ const AdminManagerKYC = () => {
               Review user identity documents and approve or reject verification requests.
             </p>
           </div>
-          <span className={`kyc-status ${
-            getKYCStatus() === "Verified" ? "verified" : 
-            getKYCStatus() === "Rejected" ? "rejected" : 
-            "pending"
-          }`}>
+          <span className={`kyc-status ${getKYCStatus() === "Verified" ? "verified" :
+              getKYCStatus() === "Rejected" ? "rejected" :
+                "pending"
+            }`}>
             {getKYCStatus()}
           </span>
         </header>
@@ -353,7 +353,7 @@ const AdminManagerKYC = () => {
               <div className="rejected-state">
                 <div className="rejected-message">
                   <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-                    <path d="M18 6L6 18M6 6L18 18" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                    <path d="M18 6L6 18M6 6L18 18" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                   </svg>
                   <h4>KYC Rejected</h4>
                   {selectedUser.seller_details.rejection_reason && (
@@ -412,9 +412,9 @@ const AdminManagerKYC = () => {
                 />
                 {rejectionError && <div className="error-message">{rejectionError}</div>}
                 <div className="rejection-form-actions">
-                  <button 
-                    className="submit-reject" 
-                    disabled={isPerformingAction} 
+                  <button
+                    className="submit-reject"
+                    disabled={isPerformingAction}
                     onClick={handleSubmitReject}
                   >
                     {isPerformingAction ? (
@@ -424,9 +424,9 @@ const AdminManagerKYC = () => {
                       </>
                     ) : "Submit Rejection"}
                   </button>
-                  <button 
-                    className="cancel-reject" 
-                    disabled={isPerformingAction} 
+                  <button
+                    className="cancel-reject"
+                    disabled={isPerformingAction}
                     onClick={handleCancelReject}
                   >
                     Cancel
