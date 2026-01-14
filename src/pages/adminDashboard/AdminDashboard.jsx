@@ -12,7 +12,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { fetchUsersList } from "../../store/actions/adminActions";
 import { adminService } from "../../services/interceptors/admin.service";
 import { toast } from "react-toastify";
-import { API_CONFIG } from "../../config/api.config";
+import { API_CONFIG, getMediaUrl } from "../../config/api.config";
 
 // Lazy load images for better performance
 // const Car1 = lazy(() => import('../../assets/admin-assests/1.png'));
@@ -28,20 +28,7 @@ const mockAuctionsData = {
   results: []
 };
 
-// Helper function to construct media URL
-const getMediaUrl = (filePath) => {
-  if (!filePath) return null;
-  // If it's already a full URL, return as is
-  if (filePath.startsWith('http://') || filePath.startsWith('https://')) {
-    return filePath;
-  }
-  // If it starts with /, prepend the base URL
-  if (filePath.startsWith('/')) {
-    return `${API_CONFIG.BASE_URL}${filePath}`;
-  }
-  // Otherwise return as is (might be a relative path)
-  return filePath;
-};
+
 
 // Memoized SVG components for better performance
 const ProfileIcon = () => (
@@ -161,10 +148,10 @@ const AuctionRow = React.memo(({ auction, onViewDetails, onAssignManager }) => {
 
   // Map DRAFT to PENDING for display
   const displayStatus = auction.status === "DRAFT" ? "PENDING" : auction.status;
-  
+
   // Check if manager is assigned
   const managerAssigned = hasManagerAssigned(auction);
-  
+
   // Check if assign button should be shown (only for pending/draft auctions without manager)
   const showAssignButton = (auction.status === "DRAFT" || auction.status === "PENDING") && !managerAssigned;
 
@@ -502,10 +489,10 @@ const AdminDashboard = () => {
     (auctionId) => {
       const auction = auctions.find((a) => a.id === auctionId);
       if (!auction) return;
-      
+
       // Check if manager is assigned
       const managerAssigned = hasManagerAssigned(auction);
-      
+
       // For pending auctions without manager, show modal with manager assignment option
       // For pending auctions with manager, navigate to details page
       if (
@@ -554,8 +541,8 @@ const AdminDashboard = () => {
       console.error("Error assigning manager:", error);
       toast.error(
         error.response?.data?.message ||
-          error.message ||
-          "Failed to assign manager. Please try again."
+        error.message ||
+        "Failed to assign manager. Please try again."
       );
     } finally {
       setIsAssigning(false);
@@ -947,7 +934,7 @@ const AdminDashboard = () => {
             <div className="admin-dashboard-modal-header">
               <h3 className="admin-dashboard-modal-title">
                 {selectedAuction.status === "DRAFT" ||
-                selectedAuction.status === "PENDING"
+                  selectedAuction.status === "PENDING"
                   ? "Assign Manager"
                   : "View Auction Details"}
               </h3>
@@ -988,12 +975,11 @@ const AdminDashboard = () => {
                 <p className="admin-dashboard-modal-auction-status">
                   Status:{" "}
                   <span
-                    className={`admin-dashboard-status-badge ${
-                      selectedAuction.status === "DRAFT" ||
-                      selectedAuction.status === "PENDING"
+                    className={`admin-dashboard-status-badge ${selectedAuction.status === "DRAFT" ||
+                        selectedAuction.status === "PENDING"
                         ? "admin-dashboard-status-warning"
                         : ""
-                    }`}
+                      }`}
                   >
                     {selectedAuction.status === "DRAFT"
                       ? "PENDING"
@@ -1004,43 +990,42 @@ const AdminDashboard = () => {
 
               {(selectedAuction.status === "DRAFT" ||
                 selectedAuction.status === "PENDING") && (
-                <div className="admin-dashboard-modal-form">
-                  <label className="admin-dashboard-modal-label">
-                    Select Manager
-                    <span className="admin-dashboard-required">*</span>
-                  </label>
-                  <select
-                    className="admin-dashboard-modal-select"
-                    value={selectedManagerId}
-                    onChange={(e) => setSelectedManagerId(e.target.value)}
-                    disabled={isAssigning}
-                  >
-                    <option value="">Choose a manager...</option>
-                    {managers.map((manager) => (
-                      <option key={manager.id} value={manager.id}>
-                        {manager.full_name ||
-                          `${manager.first_name || ""} ${
-                            manager.last_name || ""
-                          }`.trim() ||
-                          manager.email}
-                        {manager.email ? ` (${manager.email})` : ""}
-                      </option>
-                    ))}
-                  </select>
-                  {managers.length === 0 && (
-                    <p
-                      className="admin-dashboard-modal-hint"
-                      style={{
-                        color: "rgba(255, 255, 255, 0.6)",
-                        fontSize: "0.875rem",
-                        marginTop: "0.5rem"
-                      }}
+                  <div className="admin-dashboard-modal-form">
+                    <label className="admin-dashboard-modal-label">
+                      Select Manager
+                      <span className="admin-dashboard-required">*</span>
+                    </label>
+                    <select
+                      className="admin-dashboard-modal-select"
+                      value={selectedManagerId}
+                      onChange={(e) => setSelectedManagerId(e.target.value)}
+                      disabled={isAssigning}
                     >
-                      No managers available. Please add managers first.
-                    </p>
-                  )}
-                </div>
-              )}
+                      <option value="">Choose a manager...</option>
+                      {managers.map((manager) => (
+                        <option key={manager.id} value={manager.id}>
+                          {manager.full_name ||
+                            `${manager.first_name || ""} ${manager.last_name || ""
+                              }`.trim() ||
+                            manager.email}
+                          {manager.email ? ` (${manager.email})` : ""}
+                        </option>
+                      ))}
+                    </select>
+                    {managers.length === 0 && (
+                      <p
+                        className="admin-dashboard-modal-hint"
+                        style={{
+                          color: "rgba(255, 255, 255, 0.6)",
+                          fontSize: "0.875rem",
+                          marginTop: "0.5rem"
+                        }}
+                      >
+                        No managers available. Please add managers first.
+                      </p>
+                    )}
+                  </div>
+                )}
             </div>
 
             <div className="admin-dashboard-modal-footer">
@@ -1053,14 +1038,14 @@ const AdminDashboard = () => {
               </button>
               {(selectedAuction.status === "DRAFT" ||
                 selectedAuction.status === "PENDING") && (
-                <button
-                  className="admin-dashboard-modal-btn admin-dashboard-modal-btn-primary"
-                  onClick={handleAssignManager}
-                  disabled={!selectedManagerId || isAssigning}
-                >
-                  {isAssigning ? "Assigning..." : "Assign Manager"}
-                </button>
-              )}
+                  <button
+                    className="admin-dashboard-modal-btn admin-dashboard-modal-btn-primary"
+                    onClick={handleAssignManager}
+                    disabled={!selectedManagerId || isAssigning}
+                  >
+                    {isAssigning ? "Assigning..." : "Assign Manager"}
+                  </button>
+                )}
             </div>
           </div>
         </div>

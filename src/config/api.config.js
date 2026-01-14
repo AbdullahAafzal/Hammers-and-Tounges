@@ -40,12 +40,12 @@ export const API_CONFIG = {
 export const getApiUrl = (endpoint) => {
   // Remove leading slash if present to avoid double slashes
   const cleanEndpoint = endpoint.startsWith('/') ? endpoint.slice(1) : endpoint;
-  
+
   if (API_CONFIG.IS_PRODUCTION) {
     // In production, use relative URLs that will be proxied by Netlify
     return `/${cleanEndpoint}`;
   }
-  
+
   // In development, use full URL
   return `${API_CONFIG.BASE_URL}/${cleanEndpoint}`;
 };
@@ -53,25 +53,40 @@ export const getApiUrl = (endpoint) => {
 // Helper function to get full media URL
 export const getMediaUrl = (mediaPath) => {
   if (!mediaPath) return '';
-  
-  // If it's the specific insecure backend, strip it to make it relative (proxied)
-  if (mediaPath.startsWith('http://207.180.233.44:8001')) {
-     return mediaPath.replace('http://207.180.233.44:8001', '');
+
+  let path = String(mediaPath);
+
+  // 1. Handle the specific insecure backend origin
+  if (path.startsWith('http://207.180.233.44:8001')) {
+    path = path.replace('http://207.180.233.44:8001', '');
+  } else if (path.startsWith('http://') || path.startsWith('https://')) {
+    // 2. Handle other full URLs (e.g. unsplash)
+    return path;
   }
 
-  // If it's another full URL (e.g. unsplash), return as is
-  if (mediaPath.startsWith('http://') || mediaPath.startsWith('https://')) {
-    return mediaPath;
+  // 3. Normalize leading slashes
+  while (path.startsWith('/')) {
+    path = path.slice(1);
   }
-  
-  // Remove leading slash to avoid double slashes
-  const cleanPath = mediaPath.startsWith('/') ? mediaPath.slice(1) : mediaPath;
-  
+
+  // 4. In production, we want it to be relative to the domain (proxied by Netlify)
   if (API_CONFIG.IS_PRODUCTION) {
-    return `/media/${cleanPath}`;
+    // If it already starts with 'media/', just ensure it has a single leading slash
+    if (path.startsWith('media/')) {
+      return `/${path}`;
+    }
+    // Otherwise, prepend '/media/'
+    return `/media/${path}`;
   }
-  
-  return `${API_CONFIG.MEDIA_BASE_URL}/${cleanPath}`;
+
+  // 5. In development, use MEDIA_BASE_URL
+  // If path already starts with 'media/', we might need to be careful.
+  // Assuming MEDIA_BASE_URL is the origin (http://...:8001)
+  if (path.startsWith('media/')) {
+    return `${API_CONFIG.MEDIA_BASE_URL || 'http://207.180.233.44:8001'}/${path}`;
+  }
+
+  return `${API_CONFIG.MEDIA_BASE_URL || 'http://207.180.233.44:8001'}/media/${path}`;
 };
 
 export const API_ROUTES = {

@@ -6,6 +6,7 @@ import { fetchUsersList, performUserAction } from "../../store/actions/adminActi
 import { clearActionSuccess } from "../../store/slices/adminSlice";
 import { adminService } from "../../services/interceptors/admin.service";
 import { toast } from "react-toastify";
+import { getMediaUrl } from "../../config/api.config";
 
 const AdminManagerDetails = () => {
   const navigate = useNavigate();
@@ -58,7 +59,7 @@ const AdminManagerDetails = () => {
         email: selectedManager.email || '',
         password: '',
         image: null,
-        imagePreview: selectedManager.profile?.image || null,
+        imagePreview: getMediaUrl(selectedManager.profile?.image) || null,
       });
     }
   }, [selectedManager]);
@@ -106,7 +107,7 @@ const AdminManagerDetails = () => {
 
   const validateForm = () => {
     const errors = {};
-    
+
     if (!formData.first_name.trim()) {
       errors.first_name = 'First name is required';
     }
@@ -141,9 +142,9 @@ const AdminManagerDetails = () => {
       setIsEditing(false);
       dispatch(fetchUsersList());
     } catch (error) {
-      const message = error.response?.data?.message || 
-                     error.response?.data?.error ||
-                     'Failed to update manager details';
+      const message = error.response?.data?.message ||
+        error.response?.data?.error ||
+        'Failed to update manager details';
       toast.error(message);
     } finally {
       setIsUpdating(false);
@@ -164,7 +165,7 @@ const AdminManagerDetails = () => {
         email: selectedManager.email || '',
         password: '',
         image: null,
-        imagePreview: selectedManager.profile?.image || null,
+        imagePreview: getMediaUrl(selectedManager.profile?.image) || null,
       });
     }
     setIsEditing(false);
@@ -236,8 +237,8 @@ const AdminManagerDetails = () => {
         <div>
           <h1 className="manager-details-title">Manager Details</h1>
           <p className="manager-details-subtitle">
-              View and manage manager information and account settings.
-            </p>
+            View and manage manager information and account settings.
+          </p>
         </div>
         <span className={`manager-details-status ${selectedManager.is_active ? "active" : "inactive"}`}>
           {selectedManager.is_active ? "ACTIVE" : "INACTIVE"}
@@ -249,14 +250,14 @@ const AdminManagerDetails = () => {
           <div className="manager-details-card-header">
             <h3>Manager Information</h3>
             {!isEditing && (
-              <button 
+              <button
                 className="manager-details-edit-btn"
                 onClick={() => setIsEditing(true)}
                 disabled={isPerformingAction}
               >
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-                  <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" stroke="currentColor" strokeWidth="2"/>
-                  <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" stroke="currentColor" strokeWidth="2"/>
+                  <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" stroke="currentColor" strokeWidth="2" />
+                  <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" stroke="currentColor" strokeWidth="2" />
                 </svg>
                 Edit Details
               </button>
@@ -409,7 +410,7 @@ const AdminManagerDetails = () => {
                 ) : (
                   <>
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-                      <path d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+                      <path d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
                     </svg>
                     Suspend Manager
                   </>
@@ -429,7 +430,7 @@ const AdminManagerDetails = () => {
                 ) : (
                   <>
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-                      <path d="M20 6L9 17L4 12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                      <path d="M20 6L9 17L4 12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                     </svg>
                     Activate Manager
                   </>
