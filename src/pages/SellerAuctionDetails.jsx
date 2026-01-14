@@ -150,7 +150,7 @@ const SellerAuctionDetails = () => {
 
   const selectedAuction = useMemo(() =>
     allAuctions?.find((auction) => auction?.id === parseInt(id)),
-    [myAuctions, id]
+    [allAuctions, id]
   );
 
   useEffect(() => {
