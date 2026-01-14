@@ -174,6 +174,12 @@ const BuyerBidDetails = () => {
                   {bidDetails.amount ? formatCurrency(parseFloat(bidDetails.amount)) : 'N/A'}
                 </span>
               </div>
+              <div className="bid-summary-item primary">
+                <span className="bid-summary-label">Current Highest Bid</span>
+                <span className="bid-summary-value">
+                  {bidDetails.amount ? formatCurrency(parseFloat(bidHistory?.[0]?.amount)) : 'N/A'}
+                </span>
+              </div>
               <div className="bid-summary-divider"></div>
               <div className="bid-summary-item">
                 <span className="bid-summary-label">Auction Title</span>

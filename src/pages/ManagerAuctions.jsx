@@ -263,7 +263,7 @@ export default function ManagerAuctions() {
                   <th className="auction-table-end">End Date</th>
                   <th className="auction-table-lots">Lots</th>
                   <th className="auction-table-value">Current Value</th>
-                  <th className="auction-table-actions">Actions</th>
+                  {/* <th className="auction-table-actions">Actions</th> */}
                 </tr>
               </thead>
 
@@ -354,7 +354,7 @@ export default function ManagerAuctions() {
                         <span className="auction-value">{item.value}</span>
                       </td>
 
-                      <td className="auction-table-actions">
+                      {/* <td className="auction-table-actions">
                         <div className="auction-action-buttons">
                           <button
                             className="auction-action-btn auction-view-btn"
@@ -388,7 +388,7 @@ export default function ManagerAuctions() {
                             </svg>
                           </button>
                         </div>
-                      </td>
+                      </td> */}
                     </tr>
                   ))
                 ) : (

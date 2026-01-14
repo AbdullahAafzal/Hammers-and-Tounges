@@ -96,6 +96,8 @@ export default function CategoryManagement() {
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
   const currentCategories = filteredCategories.slice(indexOfFirstItem, indexOfLastItem);
 
+  
+
   const generatePageNumbers = () => {
     const pages = [];
     const maxVisible = 5;

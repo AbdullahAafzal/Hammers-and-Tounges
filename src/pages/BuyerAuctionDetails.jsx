@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo, useCallback, memo } from 'react';
-import { Link, useLocation, useParams } from 'react-router-dom';
+import { Link, useLocation, useParams, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { placeBid, fetchAuctionBids } from '../store/actions/buyerActions';
 import { getMediaUrl } from '../config/api.config';
@@ -226,6 +226,7 @@ const calculateTimeRemaining = (endDate) => {
 
 const BuyerAuctionDetails = () => {
   const { id } = useParams();
+  const navigate = useNavigate()
   const dispatch = useDispatch();
   const location = useLocation();
   const auctionObj = location.state?.listing;
@@ -286,7 +287,9 @@ const BuyerAuctionDetails = () => {
         amount: parseFloat(state.customBidAmount)
       }));
       setState(prev => ({ ...prev, customBidAmount: '' }));
+      navigate('/buyer/auctions', {replace: true})
     }
+
   }, [auction, state.customBidAmount, dispatch]);
 
   // Timer effect
@@ -371,8 +374,16 @@ const BuyerAuctionDetails = () => {
 
             <div className="buyer-details-price-section">
               <div className="buyer-details-price-item">
+                <div className='flex justify-between items-center'>
                 <span className="buyer-details-price-label">Starting Price</span>
                 <span className="buyer-details-price-value">{formatCurrency(parseFloat(auction?.initial_price || 0))}</span>
+
+                </div>
+                <div  className='flex justify-between items-center'>
+
+                <span className="buyer-details-price-label">Highest Bid</span>
+                <span className="buyer-details-price-value">{formatCurrency(parseFloat(auctionBids?.[0]?.amount || 0))}</span>
+                </div>
               </div>
               {auction?.is_buy_now_enabled && auction?.buy_now_price && (
                 <div className="buyer-details-price-item">

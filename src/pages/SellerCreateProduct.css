@@ -745,14 +745,14 @@
 }
 
 /* DateTime Input Styling */
-input[type="datetime-local"].create-auction-form-input {
+/* input[type="datetime-local"].create-auction-form-input {
   color-scheme: dark;
-}
+} */
 
-input[type="datetime-local"].create-auction-form-input::-webkit-calendar-picker-indicator {
+/* input[type="datetime-local"].create-auction-form-input::-webkit-calendar-picker-indicator {
   filter: invert(1);
   cursor: pointer;
-}
+} */
 
 /* Error Message Container */
 .create-auction-error-message {

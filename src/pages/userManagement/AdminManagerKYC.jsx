@@ -27,8 +27,6 @@ const AdminManagerKYC = () => {
   const dispatch = useDispatch();
   const { users, isLoading, isPerformingAction, actionSuccess } = useSelector((state) => state.admin);
 
-
-
   // Fetch users on component mount
   useEffect(() => {
     dispatch(fetchUsersList());
@@ -133,6 +131,8 @@ const AdminManagerKYC = () => {
   };
 
   const downloadImage = async (imageUrl, filename) => {
+    console.log("image url: ", imageUrl);
+    
     try {
       const response = await fetch(imageUrl);
       const blob = await response.blob();
