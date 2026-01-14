@@ -16,6 +16,8 @@ const FeaturedAuctions = ({ selectedCategory }) => {
   const [isLoadingAllPages, setIsLoadingAllPages] = useState(false)
   const [error, setError] = useState(null)
 
+  
+
   // Fetch all pages of auctions on mount
   useEffect(() => {
     const fetchAllPages = async () => {
