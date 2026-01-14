@@ -2,7 +2,7 @@ import React, { useState, useEffect, useMemo } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { toast } from 'react-toastify';
 import { managerService } from '../services/interceptors/manager.service';
-import { API_CONFIG } from '../config/api.config';
+import { API_CONFIG, getMediaUrl } from '../config/api.config';
 import "./ManagerInspection.css";
 
 const ManagerInspection = () => {
@@ -37,20 +37,6 @@ const ManagerInspection = () => {
   const [buyNowPrice, setBuyNowPrice] = useState("");
   const [isBuyNowEnabled, setIsBuyNowEnabled] = useState(false);
 
-  // Helper function to construct media URL
-  const getMediaUrl = (filePath) => {
-    if (!filePath) return null;
-    // If it's already a full URL, return as is
-    if (filePath.startsWith('http://') || filePath.startsWith('https://')) {
-      return filePath;
-    }
-    // If it starts with /, prepend the base URL
-    if (filePath.startsWith('/')) {
-      return `${API_CONFIG.BASE_URL}${filePath}`;
-    }
-    // Otherwise return as is (might be a relative path)
-    return filePath;
-  };
 
   // Get images from auctionData media - only use real images from API, no static fallbacks
   const images = useMemo(() => {
@@ -62,23 +48,23 @@ const ManagerInspection = () => {
           return getMediaUrl(filePath);
         })
         .filter(url => url !== null); // Remove null values
-      
+
       return imageMedia;
     }
     return []; // Return empty array if no images
   }, [auctionData?.media]);
 
   console.log("image: ", images);
-  
+
   useEffect(() => {
-  setMainImage(0);
-}, [images]);
+    setMainImage(0);
+  }, [images]);
 
   // Get seller name
   const sellerName = auctionData?.seller_details?.name || 'Unknown Seller';
 
   // Get manager name
-  const managerName = auctionData?.manager_details 
+  const managerName = auctionData?.manager_details
     ? `${auctionData.manager_details.first_name || ''} ${auctionData.manager_details.last_name || ''}`.trim() || auctionData.manager_details.email || 'Unknown Manager'
     : 'Unknown Manager';
 
@@ -102,18 +88,18 @@ const ManagerInspection = () => {
       try {
         setLoadingChecklist(true);
         const checklists = await managerService.getChecklists();
-        
+
         if (Array.isArray(checklists) && checklists.length > 0) {
           // Match category name with checklist title
           // e.g., "Vehicles" -> "Vehicles Inspection"
           const normalizedCategoryName = categoryName.toLowerCase().trim();
-          
+
           const matchingChecklist = checklists.find(cl => {
             if (!cl.title) return false;
             const checklistTitle = cl.title.trim().toLowerCase();
             return checklistTitle === `${normalizedCategoryName} inspection` ||
-                   checklistTitle === normalizedCategoryName ||
-                   checklistTitle.startsWith(normalizedCategoryName);
+              checklistTitle === normalizedCategoryName ||
+              checklistTitle.startsWith(normalizedCategoryName);
           });
 
           if (matchingChecklist && matchingChecklist.template_data && typeof matchingChecklist.template_data === 'object') {
@@ -217,17 +203,17 @@ const ManagerInspection = () => {
       // Submit inspection
       const response = await managerService.performInspection(auctionData.id, inspectionData);
       toast.success("Inspection approved successfully!");
-      
+
       // Navigate after a short delay to allow toast to be visible
       setTimeout(() => {
         navigate("/manager/dashboard");
       }, 1000);
     } catch (error) {
       console.error("Error submitting inspection:", error);
-      const errorMessage = error.response?.data?.message || 
-                          error.response?.data?.error || 
-                          error.message || 
-                          "Failed to submit inspection. Please try again.";
+      const errorMessage = error.response?.data?.message ||
+        error.response?.data?.error ||
+        error.message ||
+        "Failed to submit inspection. Please try again.";
       toast.error(errorMessage);
     } finally {
       setIsSubmitting(false);
@@ -270,17 +256,17 @@ const ManagerInspection = () => {
       // Submit inspection rejection
       const response = await managerService.performInspection(auctionData.id, inspectionData);
       toast.success("Inspection rejected successfully!");
-      
+
       // Navigate after a short delay to allow toast to be visible
       setTimeout(() => {
         navigate("/manager/dashboard");
       }, 1000);
     } catch (error) {
       console.error("Error submitting inspection rejection:", error);
-      const errorMessage = error.response?.data?.message || 
-                          error.response?.data?.error || 
-                          error.message || 
-                          "Failed to submit inspection rejection. Please try again.";
+      const errorMessage = error.response?.data?.message ||
+        error.response?.data?.error ||
+        error.message ||
+        "Failed to submit inspection rejection. Please try again.";
       toast.error(errorMessage);
     } finally {
       setIsSubmitting(false);
@@ -308,9 +294,9 @@ const ManagerInspection = () => {
               {
                 isStart ? (
                   <div className="inspection-actions">
-                    <button 
+                    <button
                       type="button"
-                      className="action-button secondary" 
+                      className="action-button secondary"
                       onClick={handleReject}
                       disabled={isSubmitting}
                     >
@@ -319,9 +305,9 @@ const ManagerInspection = () => {
                       </svg>
                       {isSubmitting ? "Submitting..." : "Reject"}
                     </button>
-                    <button 
+                    <button
                       type="button"
-                      className="action-button primary" 
+                      className="action-button primary"
                       onClick={handleApprove}
                       disabled={isSubmitting}
                     >
@@ -372,9 +358,9 @@ const ManagerInspection = () => {
                     <div className="vehicle-main-image">
                       <div className="no-image-placeholder">
                         <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                          <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
-                          <circle cx="8.5" cy="8.5" r="1.5"/>
-                          <polyline points="21 15 16 10 5 21"/>
+                          <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
+                          <circle cx="8.5" cy="8.5" r="1.5" />
+                          <polyline points="21 15 16 10 5 21" />
                         </svg>
                         <p>No images available</p>
                       </div>

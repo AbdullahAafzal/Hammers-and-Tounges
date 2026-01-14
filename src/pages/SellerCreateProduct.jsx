@@ -7,6 +7,7 @@ import { fetchCategories } from '../store/actions/AuctionsActions';
 import { fetchProfile } from '../store/actions/profileActions';
 import { toast } from 'react-toastify';
 import { getCurrentLocation } from '../utils/location';
+import { getMediaUrl } from '../config/api.config';
 
 const SellerCreateProduct = () => {
   // const { id } = useParams();
@@ -139,7 +140,7 @@ const SellerCreateProduct = () => {
       if (selectedAuction.media && selectedAuction.media.length > 0) {
         const existingMedia = selectedAuction.media.map(item => ({
           id: item.id,
-          url: item.file,
+          url: getMediaUrl(item.file),
           label: item.label || `gallery_${item.id}`,
           media_type: item.media_type,
           isExisting: true,
@@ -1362,11 +1363,11 @@ const SellerCreateProduct = () => {
                   <button
                     type="submit"
                     className="create-auction-secondary-button-action"
-                    // disabled={isCreating || isUpdating}
+                  // disabled={isCreating || isUpdating}
                   >
-                    
+
                     {/* { } */}
-                    { isUpdating ? 'Update Auction' :  'Save as Draft' }
+                    {isUpdating ? 'Update Auction' : 'Save as Draft'}
                     {/* { isUpdating ? 'Updating...' : 'Save as Draft' } */}
                     {/* {isCreating || isUpdating
                       ? (isUpdating ? 'Updating...' : 'Saving...')

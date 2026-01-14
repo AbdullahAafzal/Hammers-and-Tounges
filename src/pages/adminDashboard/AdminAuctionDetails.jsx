@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { adminService } from '../../services/interceptors/admin.service';
-import { API_CONFIG } from '../../config/api.config';
+import { API_CONFIG, getMediaUrl } from '../../config/api.config';
 import './AdminAuctionDetails.css';
 
 const AdminAuctionDetails = () => {
@@ -11,21 +11,6 @@ const AdminAuctionDetails = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
   const [selectedImage, setSelectedImage] = useState(0);
-
-  // Helper function to construct media URL
-  const getMediaUrl = (filePath) => {
-    if (!filePath) return null;
-    // If it's already a full URL, return as is
-    if (filePath.startsWith('http://') || filePath.startsWith('https://')) {
-      return filePath;
-    }
-    // If it starts with /, prepend the base URL
-    if (filePath.startsWith('/')) {
-      return `${API_CONFIG.BASE_URL}${filePath}`;
-    }
-    // Otherwise return as is (might be a relative path)
-    return filePath;
-  };
 
   useEffect(() => {
     const fetchAuction = async () => {
@@ -147,12 +132,12 @@ const AdminAuctionDetails = () => {
   return (
     <div className="admin-auction-details-container">
       <div className="admin-auction-details-header">
-        <button 
-          onClick={() => navigate('/admin/dashboard')} 
+        <button
+          onClick={() => navigate('/admin/dashboard')}
           className="admin-auction-details-back-btn"
         >
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-            <path d="M19 12H5M5 12L12 19M5 12L12 5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+            <path d="M19 12H5M5 12L12 19M5 12L12 5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
           </svg>
           Back to Dashboard
         </button>
@@ -165,8 +150,8 @@ const AdminAuctionDetails = () => {
           {imageMedia.length > 0 ? (
             <>
               <div className="admin-auction-details-main-image">
-                <img 
-                  src={getMediaUrl(imageMedia[selectedImage]?.file)} 
+                <img
+                  src={getMediaUrl(imageMedia[selectedImage]?.file)}
                   alt={auction.title}
                   onError={(e) => {
                     e.target.onerror = null;
@@ -182,8 +167,8 @@ const AdminAuctionDetails = () => {
                       className={`admin-auction-details-thumbnail ${selectedImage === index ? 'active' : ''}`}
                       onClick={() => setSelectedImage(index)}
                     >
-                      <img 
-                        src={getMediaUrl(media.file)} 
+                      <img
+                        src={getMediaUrl(media.file)}
                         alt={media.label || `Image ${index + 1}`}
                         onError={(e) => {
                           e.target.onerror = null;
@@ -199,9 +184,9 @@ const AdminAuctionDetails = () => {
             <div className="admin-auction-details-no-image">
               <div className="admin-auction-details-image-placeholder">
                 <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
-                  <circle cx="8.5" cy="8.5" r="1.5"/>
-                  <polyline points="21 15 16 10 5 21"/>
+                  <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
+                  <circle cx="8.5" cy="8.5" r="1.5" />
+                  <polyline points="21 15 16 10 5 21" />
                 </svg>
                 <p>No images available</p>
               </div>
@@ -275,7 +260,7 @@ const AdminAuctionDetails = () => {
               <div className="admin-auction-details-info-item">
                 <label>Manager</label>
                 <span>
-                  {auction.manager_details 
+                  {auction.manager_details
                     ? `${auction.manager_details.first_name || ''} ${auction.manager_details.last_name || ''}`.trim() || auction.manager_details.email || 'Not assigned'
                     : auction.auction_manager_name || 'Not assigned'}
                 </span>
@@ -406,17 +391,17 @@ const AdminAuctionDetails = () => {
                     className="admin-auction-details-file-link"
                   >
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                      <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
-                      <polyline points="14 2 14 8 20 8"/>
-                      <line x1="16" y1="13" x2="8" y2="13"/>
-                      <line x1="16" y1="17" x2="8" y2="17"/>
-                      <polyline points="10 9 9 9 8 9"/>
+                      <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                      <polyline points="14 2 14 8 20 8" />
+                      <line x1="16" y1="13" x2="8" y2="13" />
+                      <line x1="16" y1="17" x2="8" y2="17" />
+                      <polyline points="10 9 9 9 8 9" />
                     </svg>
                     <span>{file.label || 'Document'}</span>
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                      <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>
-                      <polyline points="15 3 21 3 21 9"/>
-                      <line x1="10" y1="14" x2="21" y2="3"/>
+                      <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
+                      <polyline points="15 3 21 3 21 9" />
+                      <line x1="10" y1="14" x2="21" y2="3" />
                     </svg>
                   </a>
                 ))}

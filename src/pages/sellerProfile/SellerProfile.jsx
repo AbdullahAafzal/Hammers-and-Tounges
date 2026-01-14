@@ -6,6 +6,7 @@ import { logout } from "../../store/slices/authSlice";
 import { fetchProfile, updateProfile, deleteProfile } from "../../store/actions/profileActions";
 import { fetchMyAuctions } from "../../store/actions/sellerActions";
 import { toast } from "react-toastify";
+import { getMediaUrl } from "../../config/api.config";
 
 const SellerProfile = () => {
   const navigate = useNavigate();
@@ -13,7 +14,7 @@ const SellerProfile = () => {
 
   // Get profile data from Redux store
   const { profile: profileData, loading, error } = useSelector((state) => state.profile);
-  
+
   // Get seller auctions for dashboard stats
   const { myAuctions } = useSelector((state) => state.seller);
 
@@ -66,12 +67,12 @@ const SellerProfile = () => {
   // Calculate dashboard stats from auctions (matching dashboard)
   const dashboardStats = useMemo(() => {
     const allAuctions = myAuctions?.results || [];
-    
+
     // Calculate metrics from auction data
     const totalVehicles = allAuctions.length;
     const soldVehicles = allAuctions.filter(auction => auction.status === 'CLOSED' || auction.status === 'COMPLETED').length;
     const unsoldVehicles = allAuctions.filter(auction => auction.status !== 'CLOSED' && auction.status !== 'COMPLETED').length;
-    
+
     // Calculate total earnings from sold auctions (using currentBid as sold price for closed/completed auctions)
     const totalEarnings = allAuctions
       .filter(auction => auction.status === 'CLOSED' || auction.status === 'COMPLETED')
@@ -87,45 +88,45 @@ const SellerProfile = () => {
     };
 
     return [
-      { 
-        id: 1, 
-        label: "Total Earnings", 
+      {
+        id: 1,
+        label: "Total Earnings",
         sublabel: "Lifetime earnings",
-        value: formatCurrency(totalEarnings), 
-        icon: "earnings", 
+        value: formatCurrency(totalEarnings),
+        icon: "earnings",
         color: "#FFC107",
         gradient: "linear-gradient(135deg, rgba(255, 193, 7, 0.4) 50%, rgba(255, 193, 7, 0.05) 100%)",
         iconBg: "rgba(255, 193, 7, 0.25)",
         iconBorder: "rgba(255, 193, 7, 0.5)"
       },
-      { 
-        id: 2, 
-        label: "Total Vehicles", 
+      {
+        id: 2,
+        label: "Total Vehicles",
         sublabel: "All vehicles listed",
-        value: totalVehicles.toString(), 
-        icon: "vehicles", 
+        value: totalVehicles.toString(),
+        icon: "vehicles",
         color: "#3B82F6",
         gradient: "linear-gradient(135deg, rgba(59, 130, 246, 0.4) 50%, rgba(59, 130, 246, 0.05) 100%)",
         iconBg: "rgba(59, 130, 246, 0.2)",
         iconBorder: "rgba(59, 130, 246, 0.4)"
       },
-      { 
-        id: 3, 
-        label: "Sold Vehicles", 
+      {
+        id: 3,
+        label: "Sold Vehicles",
         sublabel: "Successfully sold",
-        value: soldVehicles.toString(), 
-        icon: "sold", 
+        value: soldVehicles.toString(),
+        icon: "sold",
         color: "#8CC63F",
         gradient: "linear-gradient(135deg, rgba(140, 198, 63, 0.4) 50%, rgba(140, 198, 63, 0.05) 100%)",
         iconBg: "rgba(140, 198, 63, 0.2)",
         iconBorder: "rgba(140, 198, 63, 0.4)"
       },
-      { 
-        id: 4, 
-        label: "Unsold Vehicles", 
+      {
+        id: 4,
+        label: "Unsold Vehicles",
         sublabel: "Not yet sold",
-        value: unsoldVehicles.toString(), 
-        icon: "unsold", 
+        value: unsoldVehicles.toString(),
+        icon: "unsold",
         color: "#EF4444",
         gradient: "linear-gradient(135deg, rgba(239, 68, 68, 0.4) 50%, rgba(239, 68, 68, 0.05) 100%)",
         iconBg: "rgba(239, 68, 68, 0.2)",
@@ -395,7 +396,7 @@ const SellerProfile = () => {
   }, [formData, profileData]);
 
   console.log(profileData);
-  
+
 
   // Get display name
   const getDisplayName = useCallback(() => {
@@ -411,11 +412,11 @@ const SellerProfile = () => {
     }
 
     if (fieldName === 'image') {
-      return profileData?.image || null;
+      return getMediaUrl(profileData?.image) || null;
     }
 
     // For KYC documents, return API URL if exists
-    return profileData?.seller_profile?.[fieldName] || null;
+    return getMediaUrl(profileData?.seller_profile?.[fieldName]) || null;
   }, [imagePreviews, profileData]);
 
   // Document Card Component
@@ -830,22 +831,22 @@ const SellerProfile = () => {
                     </div>
                     <div className="kyc-status-info">
                       <h3 className="kyc-status-title">
-                        {profileData?.seller_profile?.verified 
-                          ? 'KYC Verified' 
-                          : profileData?.seller_profile?.is_rejected 
-                          ? 'KYC Rejected' 
-                          : profileData?.seller_profile?.id_front || profileData?.seller_profile?.passport_front || profileData?.seller_profile?.driving_license_front
-                          ? 'KYC Pending Review'
-                          : 'KYC Not Started'}
+                        {profileData?.seller_profile?.verified
+                          ? 'KYC Verified'
+                          : profileData?.seller_profile?.is_rejected
+                            ? 'KYC Rejected'
+                            : profileData?.seller_profile?.id_front || profileData?.seller_profile?.passport_front || profileData?.seller_profile?.driving_license_front
+                              ? 'KYC Pending Review'
+                              : 'KYC Not Started'}
                       </h3>
                       <p className="kyc-status-description">
-                        {profileData?.seller_profile?.verified 
+                        {profileData?.seller_profile?.verified
                           ? 'Your identity has been successfully verified. You can now participate in auctions.'
-                          : profileData?.seller_profile?.is_rejected 
-                          ? profileData.seller_profile.rejection_reason || 'Your documents did not meet verification requirements. Please upload new documents.'
-                          : profileData?.seller_profile?.id_front || profileData?.seller_profile?.passport_front || profileData?.seller_profile?.driving_license_front
-                          ? 'Your documents are under review. You will be notified once verification is complete.'
-                          : 'Complete your identity verification to participate in auctions. Upload your documents to get started.'}
+                          : profileData?.seller_profile?.is_rejected
+                            ? profileData.seller_profile.rejection_reason || 'Your documents did not meet verification requirements. Please upload new documents.'
+                            : profileData?.seller_profile?.id_front || profileData?.seller_profile?.passport_front || profileData?.seller_profile?.driving_license_front
+                              ? 'Your documents are under review. You will be notified once verification is complete.'
+                              : 'Complete your identity verification to participate in auctions. Upload your documents to get started.'}
                       </p>
                     </div>
                   </div>
@@ -864,54 +865,54 @@ const SellerProfile = () => {
                       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                         <path d="M9 12l2 2 4-4M21 12c0 4.97-4.03 9-9 9s-9-4.03-9-9 4.03-9 9-9 9 4.03 9 9z" strokeLinecap="round" strokeLinejoin="round" />
                       </svg>
-                      {profileData?.seller_profile?.verified 
+                      {profileData?.seller_profile?.verified
                         ? 'View Verification Status'
                         : profileData?.seller_profile?.is_rejected
-                        ? 'Upload New Documents'
-                        : 'Start KYC Verification'}
+                          ? 'Upload New Documents'
+                          : 'Start KYC Verification'}
                     </button>
                   </div>
                 </div>
 
                 {/* Document Summary - Only show if documents exist */}
-                {(profileData?.seller_profile?.id_front || 
-                  profileData?.seller_profile?.id_back || 
-                  profileData?.seller_profile?.driving_license_front || 
-                  profileData?.seller_profile?.driving_license_back || 
+                {(profileData?.seller_profile?.id_front ||
+                  profileData?.seller_profile?.id_back ||
+                  profileData?.seller_profile?.driving_license_front ||
+                  profileData?.seller_profile?.driving_license_back ||
                   profileData?.seller_profile?.passport_front) && (
-                  <div className="kyc-documents-summary">
-                    <h4 className="kyc-summary-title">Uploaded Documents</h4>
-                    <div className="kyc-summary-grid">
-                      {profileData.seller_profile.id_front && profileData.seller_profile.id_back && (
-                        <div className="kyc-summary-item">
-                          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                            <path d="M9 12l2 2 4-4" strokeLinecap="round" strokeLinejoin="round" />
-                            <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2" />
-                          </svg>
-                          <span>National ID</span>
-                        </div>
-                      )}
-                      {profileData.seller_profile.driving_license_front && profileData.seller_profile.driving_license_back && (
-                        <div className="kyc-summary-item">
-                          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                            <path d="M9 12l2 2 4-4" strokeLinecap="round" strokeLinejoin="round" />
-                            <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2" />
-                          </svg>
-                          <span>Driver's License</span>
-                        </div>
-                      )}
-                      {profileData.seller_profile.passport_front && (
-                        <div className="kyc-summary-item">
-                          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                            <path d="M9 12l2 2 4-4" strokeLinecap="round" strokeLinejoin="round" />
-                            <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2" />
-                          </svg>
-                          <span>Passport</span>
-                        </div>
-                      )}
+                    <div className="kyc-documents-summary">
+                      <h4 className="kyc-summary-title">Uploaded Documents</h4>
+                      <div className="kyc-summary-grid">
+                        {profileData.seller_profile.id_front && profileData.seller_profile.id_back && (
+                          <div className="kyc-summary-item">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                              <path d="M9 12l2 2 4-4" strokeLinecap="round" strokeLinejoin="round" />
+                              <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2" />
+                            </svg>
+                            <span>National ID</span>
+                          </div>
+                        )}
+                        {profileData.seller_profile.driving_license_front && profileData.seller_profile.driving_license_back && (
+                          <div className="kyc-summary-item">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                              <path d="M9 12l2 2 4-4" strokeLinecap="round" strokeLinejoin="round" />
+                              <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2" />
+                            </svg>
+                            <span>Driver's License</span>
+                          </div>
+                        )}
+                        {profileData.seller_profile.passport_front && (
+                          <div className="kyc-summary-item">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                              <path d="M9 12l2 2 4-4" strokeLinecap="round" strokeLinejoin="round" />
+                              <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2" />
+                            </svg>
+                            <span>Passport</span>
+                          </div>
+                        )}
+                      </div>
                     </div>
-                  </div>
-                )}
+                  )}
               </div>
             )}
 

@@ -1,6 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { API_CONFIG } from '../config/api.config';
+import { API_CONFIG, getMediaUrl } from '../config/api.config';
 import './ManagerAuctionDetails.css';
 
 const ManagerAuctionDetails = () => {
@@ -8,18 +8,6 @@ const ManagerAuctionDetails = () => {
   const navigate = useNavigate();
   const auctionData = location?.state?.auctionData;
   const [selectedImage, setSelectedImage] = useState(0);
-
-  // Helper function to construct media URL
-  const getMediaUrl = (filePath) => {
-    if (!filePath) return null;
-    if (filePath.startsWith('http://') || filePath.startsWith('https://')) {
-      return filePath;
-    }
-    if (filePath.startsWith('/')) {
-      return `${API_CONFIG.BASE_URL}${filePath}`;
-    }
-    return filePath;
-  };
 
   // Get images from auctionData media
   const images = useMemo(() => {
@@ -83,8 +71,8 @@ const ManagerAuctionDetails = () => {
             <h1 className="manager-auction-details-title">Auction Details</h1>
             <p className="manager-auction-details-subtitle">View complete auction information</p>
           </div>
-          <button 
-            onClick={() => navigate('/manager/auctions')} 
+          <button
+            onClick={() => navigate('/manager/auctions')}
             className="manager-auction-details-back-btn"
           >
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
@@ -123,9 +111,9 @@ const ManagerAuctionDetails = () => {
               ) : (
                 <div className="manager-auction-details-no-image">
                   <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                    <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
-                    <circle cx="8.5" cy="8.5" r="1.5"/>
-                    <polyline points="21 15 16 10 5 21"/>
+                    <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
+                    <circle cx="8.5" cy="8.5" r="1.5" />
+                    <polyline points="21 15 16 10 5 21" />
                   </svg>
                   <p>No images available</p>
                 </div>

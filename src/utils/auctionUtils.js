@@ -1,3 +1,5 @@
+import { getMediaUrl } from '../config/api.config';
+
 export const formatPrice = (price, currency = 'USD') => {
   const numPrice = typeof price === 'string' ? parseFloat(price) : price;
   return new Intl.NumberFormat('en-US', {
@@ -12,7 +14,7 @@ export const getAuctionImage = (auction) => {
   if (auction.media && auction.media.length > 0) {
     const imageMedia = auction.media.find(m => m.media_type === 'image');
     if (imageMedia) {
-      return imageMedia.file;
+      return getMediaUrl(imageMedia.file);
     }
   }
   return 'https://images.unsplash.com/photo-1549317661-bd32c8ce0db2?w=800&q=80';

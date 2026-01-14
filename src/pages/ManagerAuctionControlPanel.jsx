@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { API_CONFIG } from '../config/api.config';
+import { API_CONFIG, getMediaUrl } from '../config/api.config';
 import { managerService } from '../services/interceptors/manager.service';
 import { toast } from 'react-toastify';
 import "./ManagerAuctionControlPanel.css";
@@ -10,11 +10,11 @@ export default function ManagerAuctionControlPanel() {
   const navigate = useNavigate();
   const auctionData = location?.state?.auctionData;
   const isActive = auctionData?.status === 'ACTIVE';
-  
+
   const [isRunning, setIsRunning] = useState(false);
   const [activeTab, setActiveTab] = useState("disputes");
   const [isEndingAuction, setIsEndingAuction] = useState(false);
-  
+
   // Calculate remaining time from end_date
   const calculateRemainingTime = useMemo(() => {
     if (!auctionData?.end_date) return 0;
@@ -23,9 +23,9 @@ export default function ManagerAuctionControlPanel() {
     const diff = Math.max(0, Math.floor((endDate - now) / 1000)); // Difference in seconds
     return diff;
   }, [auctionData?.end_date]);
-  
+
   const [time, setTime] = useState(calculateRemainingTime);
-  
+
   // Update time when calculateRemainingTime changes and auto-start for ACTIVE auctions
   useEffect(() => {
     if (isActive && calculateRemainingTime > 0) {
@@ -93,9 +93,9 @@ export default function ManagerAuctionControlPanel() {
         // Navigate back to auctions list or refresh the page
         navigate('/manager/auctions');
       } catch (error) {
-        const message = error.response?.data?.message || 
-                       error.response?.data?.error ||
-                       'Failed to end auction';
+        const message = error.response?.data?.message ||
+          error.response?.data?.error ||
+          'Failed to end auction';
         toast.error(message);
       } finally {
         setIsEndingAuction(false);
@@ -133,21 +133,9 @@ export default function ManagerAuctionControlPanel() {
       seconds: secs.toString().padStart(2, "0")
     };
   };
-  
+
   const timeDisplay = formatTime(time);
-  
-  // Helper function to construct media URL
-  const getMediaUrl = (filePath) => {
-    if (!filePath) return null;
-    if (filePath.startsWith('http://') || filePath.startsWith('https://')) {
-      return filePath;
-    }
-    if (filePath.startsWith('/')) {
-      return `${API_CONFIG.BASE_URL}${filePath}`;
-    }
-    return filePath;
-  };
-  
+
   // Get images from auctionData media
   const images = useMemo(() => {
     if (auctionData?.media?.length > 0) {
@@ -162,7 +150,7 @@ export default function ManagerAuctionControlPanel() {
     }
     return [];
   }, [auctionData?.media]);
-  
+
   const formatDate = (dateString) => {
     if (!dateString) return 'N/A';
     const date = new Date(dateString);
@@ -174,7 +162,7 @@ export default function ManagerAuctionControlPanel() {
       minute: '2-digit'
     });
   };
-  
+
   const formatPrice = (price) => {
     if (!price) return 'N/A';
     return `$${parseFloat(price).toLocaleString('en-US', {
@@ -182,14 +170,14 @@ export default function ManagerAuctionControlPanel() {
       maximumFractionDigits: 2
     })}`;
   };
-  
+
   const specificData = auctionData?.specific_data || {};
   const sellerDetails = auctionData?.seller_details || {};
 
   return (
     <div className="control-wrapper">
       <div className="control-container">
-        
+
         <div className="control-section-header">
           <div className="control-header-content">
             <h1 className="control-page-title">Auction Control Panel</h1>
@@ -199,23 +187,23 @@ export default function ManagerAuctionControlPanel() {
           </div>
           {isActive && (
             <div className="control-header-actions">
-              <button 
-                className="control-action-btn btn-end" 
+              <button
+                className="control-action-btn btn-end"
                 onClick={handleEndAuction}
                 disabled={isEndingAuction}
               >
                 {isEndingAuction ? (
                   <>
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" className="spinner">
-                      <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeDasharray="32" strokeDashoffset="16" opacity="0.3"/>
-                      <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeDasharray="32" strokeDashoffset="16" className="spinner-circle"/>
+                      <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeDasharray="32" strokeDashoffset="16" opacity="0.3" />
+                      <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeDasharray="32" strokeDashoffset="16" className="spinner-circle" />
                     </svg>
                     Ending...
                   </>
                 ) : (
                   <>
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-                      <rect x="5" y="5" width="14" height="14" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="currentColor"/>
+                      <rect x="5" y="5" width="14" height="14" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="currentColor" />
                     </svg>
                     End Auction
                   </>
@@ -228,7 +216,7 @@ export default function ManagerAuctionControlPanel() {
         <div className="control-grid">
           {/* LEFT COLUMN */}
           <div className="control-left-column">
-            
+
             {/* TIMER CARD */}
             <div className="control-card">
               <h3 className="control-card-title">Lot Timer</h3>
@@ -301,7 +289,7 @@ export default function ManagerAuctionControlPanel() {
 
           {/* RIGHT COLUMN */}
           <div className="control-right-column">
-            
+
             {/* LIVE BID FEED CARD - Only show for ACTIVE status */}
             {isActive && (
               <>
@@ -313,7 +301,7 @@ export default function ManagerAuctionControlPanel() {
                         <div key={i} className="control-bid-row">
                           <div className="control-bid-info">
                             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" className="control-bid-icon">
-                              <polyline points="18 15 12 9 6 15" stroke="#8CC63F" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                              <polyline points="18 15 12 9 6 15" stroke="#8CC63F" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                             </svg>
                             <span className="control-bid-user">{bid.user || bid.user_name || 'Anonymous'}</span>
                             <span className="control-bid-text">placed a bid</span>
@@ -331,7 +319,7 @@ export default function ManagerAuctionControlPanel() {
                     )}
                   </div>
                 </div>
-                
+
                 {/* PRODUCT INFO SECTION */}
                 <div className="control-card">
                   <h3 className="control-card-title">Product Information</h3>
@@ -362,7 +350,7 @@ export default function ManagerAuctionControlPanel() {
                         </div>
                       </div>
                     </div>
-                    
+
                     {/* Pricing Information */}
                     <div className="control-info-section">
                       <h4 className="control-info-section-title">Pricing</h4>
@@ -383,7 +371,7 @@ export default function ManagerAuctionControlPanel() {
                         </div>
                       </div>
                     </div>
-                    
+
                     {/* Auction Dates */}
                     <div className="control-info-section">
                       <h4 className="control-info-section-title">Auction Dates</h4>
@@ -398,7 +386,7 @@ export default function ManagerAuctionControlPanel() {
                         </div>
                       </div>
                     </div>
-                    
+
                     {/* Specific Data (Category-specific fields) */}
                     {Object.keys(specificData).length > 0 && (
                       <div className="control-info-section">
@@ -415,7 +403,7 @@ export default function ManagerAuctionControlPanel() {
                         </div>
                       </div>
                     )}
-                    
+
                     {/* Seller Information */}
                     {sellerDetails && Object.keys(sellerDetails).length > 0 && (
                       <div className="control-info-section">
