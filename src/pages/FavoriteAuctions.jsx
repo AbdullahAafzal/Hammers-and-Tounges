@@ -1,13 +1,10 @@
 import React, { useState, useEffect, useMemo, useCallback, lazy, Suspense } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
-// import { fetchAuctionsList } from '../store/actions/AuctionsActions';
-// import { buyerService } from '../services/interceptors/buyer.service';
 import { clearBuyerError } from '../store/slices/buyerSlice';
 import './FavoriteAuctions.css';
 import { toast } from 'react-toastify';
 import { getMyFavoriteAuctions } from '../store/actions/buyerActions';
-
 
 const FavoriteAuctionCard = lazy(() => import('../components/FavoriteAuctionCard'));
 
@@ -32,38 +29,36 @@ const FavoriteAuctions = () => {
   }, [token, navigate]);
 
   // Fetch all pages of auctions
-  useEffect(() => {
-    const fetchAllPages = async () => {
-      setIsLoadingAllPages(true);
-      try {
-        let allResults = [];
-        let nextPage = 1;
-        let hasMore = true;
+  const fetchAllPages = useCallback(async () => {
+    setIsLoadingAllPages(true);
+    try {
+      let allResults = [];
+      let nextPage = 1;
+      let hasMore = true;
 
-        while (hasMore) {
-          const response = await dispatch(getMyFavoriteAuctions({ page: nextPage })).unwrap();
-          allResults = [...allResults, ...(response.results || [])];
+      while (hasMore) {
+        const response = await dispatch(getMyFavoriteAuctions({ page: nextPage })).unwrap();
+        allResults = [...allResults, ...(response.results || [])];
 
-          if (response.next) {
-            nextPage += 1;
-          } else {
-            hasMore = false;
-          }
+        if (response.next) {
+          nextPage += 1;
+        } else {
+          hasMore = false;
         }
-
-        setAllAuctions(allResults);
-      } catch (err) {
-        console.log(err, 'errorssss');
-        
-        console.error('Error fetching all auctions:', err);
-        toast.error('Failed to load complete auction list');
-      } finally {
-        setIsLoadingAllPages(false);
       }
-    };
 
-    fetchAllPages();
+      setAllAuctions(allResults);
+    } catch (err) {
+      console.error('Error fetching all auctions:', err);
+      toast.error('Failed to load complete auction list');
+    } finally {
+      setIsLoadingAllPages(false);
+    }
   }, [dispatch]);
+
+  useEffect(() => {
+    fetchAllPages();
+  }, [fetchAllPages]);
 
   // Apply filters to show only ACTIVE and APPROVED auctions
   const filteredAuctions = useMemo(() => {
@@ -97,8 +92,23 @@ const FavoriteAuctions = () => {
   const hasNextPage = page < totalPages;
   const hasPrevPage = page > 1;
 
-    // Handle favorite update from AuctionCard
-    const handleFavoriteUpdate = useCallback((auctionId, isFavorite) => {
+  // Handle favorite update from AuctionCard
+  const handleFavoriteUpdate = useCallback((auctionId, isFavorite) => {
+    if (!isFavorite) {
+      // Remove the auction from the list when unfavorited
+      setAllAuctions(prevAuctions => 
+        prevAuctions.filter(auction => auction.id !== auctionId)
+      );
+
+      // If current page becomes empty after removal, go to previous page
+      const remainingCount = allAuctions.length - 1;
+      const remainingPages = Math.ceil(remainingCount / itemsPerPage);
+      
+      if (page > remainingPages && remainingPages > 0) {
+        setPage(remainingPages);
+      }
+    } else {
+      // Update the auction's favorite status (in case it's re-added)
       setAllAuctions(prevAuctions =>
         prevAuctions.map(auction =>
           auction.id === auctionId
@@ -106,8 +116,8 @@ const FavoriteAuctions = () => {
             : auction
         )
       );
-    }, []);
-
+    }
+  }, [allAuctions.length, itemsPerPage, page]);
 
   // Cleanup
   useEffect(() => {
@@ -116,7 +126,6 @@ const FavoriteAuctions = () => {
     };
   }, [dispatch]);
 
-
   return (
     <div className="buyer-dashboard-page">
       <main className="buyer-dashboard-main">
@@ -124,6 +133,11 @@ const FavoriteAuctions = () => {
           <div className="dashboard-welcome">
             <div className="welcome-content">
               <h1 className="welcome-title">Favorite Auctions</h1>
+              {!isLoadingAllPages && allAuctions.length > 0 && (
+                <p style={{ color: 'rgba(255,255,255,0.6)', fontSize: '14px', marginTop: '8px' }}>
+                  {allAuctions.length} {allAuctions.length === 1 ? 'auction' : 'auctions'} in your favorites
+                </p>
+              )}
             </div>
           </div>
 
@@ -147,7 +161,7 @@ const FavoriteAuctions = () => {
               </p>
               <button
                 className="auctions-retry-btn"
-                onClick={() => window.location.reload()}
+                onClick={() => fetchAllPages()}
               >
                 Retry
               </button>
@@ -158,11 +172,10 @@ const FavoriteAuctions = () => {
           {!isLoadingAllPages && !error && paginatedAuctions.length === 0 && (
             <div className="auctions-empty">
               <svg width="64" height="64" viewBox="0 0 24 24" fill="none">
-                <path d="M9 11L12 14L22 4" stroke="#d1d5db" strokeWidth="2" strokeLinecap="round" />
-                <path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11" stroke="#d1d5db" strokeWidth="2" />
+                <path d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" stroke="#d1d5db" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
               </svg>
-              <h2>No auctions found</h2>
-              <p>Check back later for new auctions</p>
+              <h2>No favorite auctions</h2>
+              <p>Start adding auctions to your favorites to see them here</p>
             </div>
           )}
 
@@ -191,7 +204,7 @@ const FavoriteAuctions = () => {
                         if (token) {
                           navigate(`/buyer/auction/${auction.id}`, { 
                             state: { 
-                              from: 'buyer-dashboard', 
+                              from: 'favorite-auctions', 
                               listing: auction 
                             } 
                           });
@@ -199,7 +212,7 @@ const FavoriteAuctions = () => {
                           handleCheckAuth();
                         }
                       }}
-                       onFavoriteUpdate={handleFavoriteUpdate}
+                      onFavoriteUpdate={handleFavoriteUpdate}
                     />
                   ))}
                 </Suspense>

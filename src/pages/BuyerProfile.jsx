@@ -18,6 +18,9 @@ const BuyerProfile = () => {
     error
   } = useSelector((state) => state.profile);
 
+  console.log(profileData, 'profile data');
+  
+
   const [activeTab, setActiveTab] = useState("overview");
   const [isEditing, setIsEditing] = useState(false);
   const [formData, setFormData] = useState({
@@ -551,6 +554,23 @@ const BuyerProfile = () => {
                           {formData.phone || "-"}
                         </div>
                       )}
+                    </div>
+                    <div className="info-item">
+                      <label>Bid Points</label>
+                      {/* {isEditing ? (
+                        <input
+                          type="tel"
+                          className="edit-input"
+                          value={formData.phone}
+                          // onChange={(e) =>
+                          //   handleInputChange("phone", e.target.value)
+                          // }
+                        /> */}
+                      {/* ) : ( */}
+                        <div className="info-value">
+                          {profileData?.buyer_profile?.points}
+                        </div>
+                      {/* )} */}
                     </div>
                     <div className="info-item" style={{ gridColumn: "1 / -1" }}>
                       <label>Bio</label>

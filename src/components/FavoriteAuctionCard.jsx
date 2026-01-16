@@ -116,13 +116,13 @@ const FavoriteAuctionCard = ({ auction, onClick, onFavoriteUpdate }) => {
         return rawUrl ? getMediaUrl(rawUrl) : 'https://images.unsplash.com/photo-1549317661-bd32c8ce0db2?w=800&q=80';
     }, [auction.media]);
 
-    // const handleCardClick = useCallback((e) => {
-    //     e.preventDefault();
-    //     e.stopPropagation();
-    //     if (isClickable) {
-    //         onClick?.(auction);
-    //     }
-    // }, [auction, onClick, isClickable]);
+    const handleCardClick = useCallback((e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        if (isClickable) {
+            onClick?.(auction);
+        }
+    }, [auction, onClick, isClickable]);
 
     const imageUrl = getAuctionImage();
     const fallbackImage = 'https://images.unsplash.com/photo-1549317661-bd32c8ce0db2?w=800&q=80';
@@ -191,7 +191,6 @@ const FavoriteAuctionCard = ({ auction, onClick, onFavoriteUpdate }) => {
     return (
         <article
             className='auction-card'
-         
         >
             {/* Image & Status Badge */}
             <div className="auction-card-image-wrapper">
@@ -260,6 +259,7 @@ const FavoriteAuctionCard = ({ auction, onClick, onFavoriteUpdate }) => {
 
                 {/* Action Button */}
                 <button
+                onClick={handleCardClick}
                     className={`auctions-view-btn`}
                 >
                     {currentStatus === 'approved'

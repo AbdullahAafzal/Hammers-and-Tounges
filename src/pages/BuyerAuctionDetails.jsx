@@ -5,6 +5,7 @@ import { placeBid, fetchAuctionBids } from '../store/actions/buyerActions';
 import { getMediaUrl } from '../config/api.config';
 import './BuyerAuctionDetails.css';
 import { fetchProfile } from '../store/actions/profileActions';
+import { toast } from 'react-toastify';
 
 // ==================== MEMOIZED COMPONENTS ====================
 
@@ -232,7 +233,7 @@ const BuyerAuctionDetails = () => {
   const location = useLocation();
   const { profile } = useSelector(state => state.profile)
   const auctionObj = location.state?.listing;
-  const { auctionBids, isPlacingBid } = useSelector(state => state.buyer);
+  const { auctionBids, isPlacingBid, error } = useSelector(state => state.buyer);
   const buyerProfile = profile?.buyer_profile
 
 
@@ -274,11 +275,17 @@ const BuyerAuctionDetails = () => {
     return Math.ceil(bidAmount * 0.5); // 50% of bid amount
   }, [state.customBidAmount]);
 
+  console.log("requiredPoints: ", requiredPoints);
+
+
   // Check if user has enough points
   const hasEnoughPoints = useMemo(() => {
-    const userPoints = buyerProfile?.points || 0;
+    const userPoints = parseFloat(buyerProfile?.points) || 0;
     return userPoints >= requiredPoints;
   }, [buyerProfile?.points, requiredPoints]);
+
+  console.log("hasEnoughPoints: ", hasEnoughPoints);
+
 
   // Memoized computed values
   const auction = state.selectedAuction;
@@ -290,6 +297,9 @@ const BuyerAuctionDetails = () => {
   const isUpcoming = useMemo(() => auction?.status === 'APPROVED', [auction?.status]);
   const isClosed = useMemo(() => auction?.status === 'CLOSED', [auction?.status]);
   const isAwaitingPayment = useMemo(() => auction?.status === 'AWAITING_PAYMENT', [auction?.status]);
+
+  console.log("isUpcoming: ", isUpcoming);
+
 
   const formatCurrency = useCallback((amount) => {
     return new Intl.NumberFormat('en-US', {
@@ -337,32 +347,46 @@ const BuyerAuctionDetails = () => {
 
   // Timer effect
 
+  console.log(state, 'state');
+
 
   const handleCustomBidSubmit = useCallback((e) => {
     e.preventDefault();
-
-    if (!auction || !state.customBidAmount) {
-      return;
-    }
-
-    const bidAmount = parseFloat(state.customBidAmount);
-    const minBidAmount = parseFloat(auction?.initial_price || 0) + 1;
-
-    // Validate bid amount
-    if (bidAmount < minBidAmount) {
-      setState(prev => ({
-        ...prev,
-        showPointsWarning: false
-      }));
-      return;
-    }
-
     // Check if user has enough points
     if (!hasEnoughPoints) {
       setState(prev => ({
         ...prev,
         showPointsWarning: true
       }));
+      return;
+    }
+
+    if (!auction || !state.customBidAmount) {
+      return;
+    }
+
+
+    const bidAmount = parseFloat(state.customBidAmount);
+    const minBidAmount = parseFloat(auction?.initial_price || 0) + 1;
+    const highBidAmount = parseFloat(auctionBids?.[0]?.amount) + 1;
+
+    // Validate bid amount
+    if (bidAmount < highBidAmount) {
+      setState(prev => ({
+        ...prev,
+        showPointsWarning: false
+      }));
+      toast.info('Bid must be greater than the highest bid')
+
+      return;
+    }
+    // Validate bid amount
+    if (bidAmount < minBidAmount) {
+      setState(prev => ({
+        ...prev,
+        showPointsWarning: false
+      }));
+      toast.info('Bid must be greater than the current price')
       return;
     }
 
@@ -436,7 +460,7 @@ const BuyerAuctionDetails = () => {
           <h1 className="buyer-details-title">{auction?.title || 'Auction'}</h1>
           <div className="buyer-details-status-badge" data-status={auction?.status}>
             {auction?.status === 'ACTIVE' && 'ACTIVE'}
-            {auction?.status === 'APPROVED' && 'UPCOMING'}
+            {auction?.status === 'APPROVED' && 'APPROVED'}
             {auction?.status === 'CLOSED' && 'Closed'}
             {auction?.status === 'AWAITING_PAYMENT' && 'Awaiting Payment'}
           </div>
@@ -589,7 +613,7 @@ const BuyerAuctionDetails = () => {
                     />
 
                     {/* Dynamic Points Calculation */}
-                    {state.customBidAmount && (
+                    {/* {state.customBidAmount && (
                       <div className={`p-3 mt-2 w-full rounded-lg border ${hasEnoughPoints ? 'bg-green-700/10 border-green-500/30' : 'bg-amber-500/10 border-amber-500/30'}`}>
                         <div className="flex items-center justify-between text-sm">
                           <span className={hasEnoughPoints ? 'text-green-300' : 'text-amber-300'}>
@@ -615,11 +639,11 @@ const BuyerAuctionDetails = () => {
                           </div>
                         )}
                       </div>
-                    )}
+                    )} */}
 
                     {/* Insufficient Points Warning */}
-                    {state.showPointsWarning && !hasEnoughPoints && (
-                      <div className="bg-red-500/10 border border-red-500/30 rounded-lg p-3">
+                    {state.showPointsWarning || !hasEnoughPoints && (
+                      <div className="bg-red-500/10 border border-red-500/30 rounded-lg p-3 mt-3">
                         <div className="flex items-start gap-2">
                           <svg className="w-5 h-5 text-red-400 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />

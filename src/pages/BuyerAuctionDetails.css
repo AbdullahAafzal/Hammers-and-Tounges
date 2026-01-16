@@ -60,15 +60,15 @@
 }
 
 .buyer-details-status-badge[data-status="ACTIVE"] {
-  background-color: rgba(34, 197, 94, 0.2);
-  color: #22c55e;
-  border: 1px solid rgba(34, 197, 94, 0.5);
+  background-color: rgba(140, 198, 63, 0.15);
+  color: #8CC63F;
+  border: 1px solid rgba(140, 198, 63, 0.5);
 }
 
 .buyer-details-status-badge[data-status="APPROVED"] {
-  background-color: rgba(59, 130, 246, 0.2);
-  color: #3b82f6;
-  border: 1px solid rgba(59, 130, 246, 0.5);
+  background: rgba(251, 191, 36, 0.15) !important;
+  color: rgba(251, 191, 36);
+  border: 1px solid rgba(251, 191, 36, 0.5);
 }
 
 .buyer-details-status-badge[data-status="CLOSED"] {
@@ -457,6 +457,9 @@
 
 .buyer-details-bid-button:active {
   transform: translateY(0);
+}
+.buyer-details-bid-button:disabled {
+  cursor: not-allowed;
 }
 
 /* ==================== LOCATION INFO ==================== */

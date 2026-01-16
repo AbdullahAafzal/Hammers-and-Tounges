@@ -264,6 +264,8 @@
 
 .action-button.primary svg {
   color: #000000 !important;
+  height: 100%;
+  width: 100%;
 }
 
 .s-primary-button,
