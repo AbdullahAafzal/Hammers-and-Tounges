@@ -833,10 +833,10 @@ const SellerAuctionDetails = () => {
                   </span>
                 </div>
                 {
-                  selectedAuction?.rejection_reason && (
+                  selectedAuction?.status === 'REJECTED' && (
                     <div className="seller-details-info-row">
                       <span className="seller-details-info-label">Rejection Reason </span>
-                      <span className="seller-details-info-value">{selectedAuction?.rejection_reason || 'USD'}</span>
+                      <span className="seller-details-info-value">{selectedAuction?.rejection_reason || ''}</span>
                     </div>
                   )
                 }

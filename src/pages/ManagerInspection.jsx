@@ -305,7 +305,7 @@ const ManagerInspection = () => {
                       <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
                         <path d="M18 6L6 18M6 6L18 18" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                       </svg>
-                      {isSubmitting ? "Submitting..." : "Reject"}
+                       Reject
                     </button>
                     <button
                       type="button"
@@ -316,7 +316,7 @@ const ManagerInspection = () => {
                       <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
                         <path d="M20 6L9 17L4 12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                       </svg>
-                      {isSubmitting ? "Submitting..." : "Approve Inspection"}
+                     Approve Inspection
                     </button>
                   </div>
                 ) : (
