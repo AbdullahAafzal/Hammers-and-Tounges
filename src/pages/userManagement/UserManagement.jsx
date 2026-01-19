@@ -4,8 +4,6 @@ import { useNavigate } from "react-router-dom";
 import { fetchUsersList } from "../../store/actions/adminActions";
 import "./UserManagement.css";
 
-const ROWS_PER_PAGE = 5;
-
 const UserManagement = () => {
   const navigate = useNavigate()
   const dispatch = useDispatch();
@@ -19,12 +17,19 @@ const UserManagement = () => {
   const [search, setSearch] = useState("");
   const [roleFilter, setRoleFilter] = useState("manager");
   const [page, setPage] = useState(1);
+  const [localUsers, setLocalUsers] = useState([]);
 
-
-  // Fetch users on component mount and when roleFilter changes
+  // Fetch users on component mount and when page changes
   useEffect(() => {
-    dispatch(fetchUsersList());
-  }, [dispatch, roleFilter]);
+    dispatch(fetchUsersList({ page }));
+  }, [dispatch, page]);
+
+  // Update localUsers when users data changes from API
+  useEffect(() => {
+    if (users?.results) {
+      setLocalUsers(users.results);
+    }
+  }, [users?.results]);
 
   // // Refresh users list after successful action
   // useEffect(() => {
@@ -85,9 +90,9 @@ const UserManagement = () => {
   // console.log('Filtered Data: ', filteredUsers);
   
 const filteredUsers = useMemo(() => {
-  if (!users?.results) return [];
+  if (!localUsers || localUsers.length === 0) return [];
 
-  return users.results.filter((user) => {
+  return localUsers.filter((user) => {
     const searchableText = `
       ${user.full_name || ""}
       ${user.email || ""}
@@ -97,43 +102,51 @@ const filteredUsers = useMemo(() => {
 
     const matchesSearch = searchableText.includes(search.toLowerCase());
 
-    // ✅ Future-safe is_staff normalization
+    // Future-safe is_staff normalization
     const isStaff =
       user?.is_staff === true ||
       user?.is_staff === "true" ||
       user?.is_staff === 1 ||
       false;
 
-    // ✅ Role-based filtering
-    const matchesRole =
-      roleFilter === "manager"
-        ? user.role === "manager" && !isStaff
-        : user.role === roleFilter;
-
-    // ✅ Seller filtering: Only show if verified OR (pending with images)
-    if (user.role === 'seller' && roleFilter === 'seller') {
+    // Role-based filtering
+    let matchesRole;
+    if (roleFilter === "manager") {
+      matchesRole = user.role === "manager" && !isStaff;
+    } else if (roleFilter === "seller") {
+      // Seller filtering: Only show if verified OR (pending with images)
       const isVerified = user?.seller_details?.verified === true;
       const isPending = !isVerified;
       
-      // If pending, only show if they have KYC images
-      if (isPending && !hasKYCImages(user)) {
-        return false;
+      if (user.role !== 'seller') {
+        matchesRole = false;
+      } else if (isPending && !hasKYCImages(user)) {
+        matchesRole = false;
+      } else {
+        matchesRole = true;
       }
+    } else {
+      matchesRole = user.role === roleFilter;
     }
 
     return matchesSearch && matchesRole;
   });
-}, [users, search, roleFilter]);
+}, [localUsers, search, roleFilter]);
 
 
 console.log("filteredUsers: ", filteredUsers);
 
 
-  const totalPages = Math.ceil(filteredUsers.length / ROWS_PER_PAGE);
-  const paginatedUsers = filteredUsers.slice(
-    (page - 1) * ROWS_PER_PAGE,
-    page * ROWS_PER_PAGE
-  );
+  // Use API pagination data for "all" filter, show all filtered users for other filters
+  const totalPages = users?.total_pages || 1;
+  const hasNext = users?.has_next || false;
+  const hasPrevious = users?.has_previous || false;
+  const totalCount = users?.count || 0;
+  const currentPage = users?.current_page || 1;
+  
+  // For "all" filter, use filteredUsers directly (API already paginates)
+  // For other filters, show all filtered users without pagination
+  const displayUsers = filteredUsers;
 
   // Get status class
   const getStatusClass = (user) => {
@@ -269,7 +282,7 @@ console.log("filteredUsers: ", filteredUsers);
             </thead>
 
             <tbody>
-              {paginatedUsers.map((user) => (
+              {displayUsers.map((user) => (
                 <tr 
                   key={user.id} 
                   className="user-management-table-row" 
@@ -370,62 +383,50 @@ console.log("filteredUsers: ", filteredUsers);
             </tbody>
           </table>
 
-          {/* Empty State */}
-          {filteredUsers.length === 0 ? (
-            <div className="user-management-empty-state">
-              <svg width="48" height="48" viewBox="0 0 24 24" fill="none">
-                <path d="M14 2H6C5.46957 2 4.96086 2.21071 4.58579 2.58579C4.21071 2.96086 4 3.46957 4 4V20C4 20.5304 4.21071 21.0391 4.58579 21.4142C4.96086 21.7893 5.46957 22 6 22H18C18.5304 22 19.0391 21.7893 19.4142 21.4142C19.7893 21.0391 20 20.5304 20 20V8L14 2Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                <path d="M14 2V8H20" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                <path d="M16 13H8" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                <path d="M16 17H8" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                <path d="M10 9H9H8" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-              </svg>
-              <h3>No users found</h3>
-              <p>Try adjusting your filters or search term</p>
+          {/* Pagination - shown for all filters using API response */}
+          <div className="user-management-pagination">
+            <div className="user-management-pagination-info">
+              {displayUsers.length === 0 
+                ? `No ${roleFilter}s on this page. Try other pages.`
+                : `Showing ${displayUsers.length} ${roleFilter}${displayUsers.length !== 1 ? 's' : ''} on page ${currentPage} of ${totalPages}`
+              }
             </div>
-          ) : (
-            /* Pagination */
-            <div className="user-management-pagination">
-              <div className="user-management-pagination-info">
-                Showing {((page - 1) * ROWS_PER_PAGE) + 1} to {Math.min(page * ROWS_PER_PAGE, filteredUsers.length)} of {filteredUsers.length} users
+
+            <div className="user-management-pagination-controls">
+              <button
+                className="user-management-pagination-btn user-management-pagination-prev"
+                onClick={() => setPage(p => p - 1)}
+                disabled={!hasPrevious || isLoading}
+              >
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                  <path d="M15 18L9 12L15 6" stroke="currentColor" strokeWidth="2" />
+                </svg>
+              </button>
+
+              <div className="user-management-page-numbers">
+                {[...Array(totalPages)].map((_, i) => (
+                  <button
+                    key={i}
+                    className={`user-management-page-number ${page === i + 1 ? "user-management-page-active" : ""}`}
+                    onClick={() => setPage(i + 1)}
+                    disabled={isLoading}
+                  >
+                    {i + 1}
+                  </button>
+                ))}
               </div>
 
-              <div className="user-management-pagination-controls">
-                <button
-                  className="user-management-pagination-btn user-management-pagination-prev"
-                  onClick={() => setPage(p => p - 1)}
-                  disabled={page === 1 || isLoading}
-                >
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-                    <path d="M15 18L9 12L15 6" stroke="currentColor" strokeWidth="2" />
-                  </svg>
-                </button>
-
-                <div className="user-management-page-numbers">
-                  {[...Array(totalPages)].map((_, i) => (
-                    <button
-                      key={i}
-                      className={`user-management-page-number ${page === i + 1 ? "user-management-page-active" : ""}`}
-                      onClick={() => setPage(i + 1)}
-                      disabled={isLoading}
-                    >
-                      {i + 1}
-                    </button>
-                  ))}
-                </div>
-
-                <button
-                  className="user-management-pagination-btn user-management-pagination-next"
-                  onClick={() => setPage(p => p + 1)}
-                  disabled={page === totalPages || isLoading}
-                >
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-                    <path d="M9 18L15 12L9 6" stroke="currentColor" strokeWidth="2" />
-                  </svg>
-                </button>
-              </div>
+              <button
+                className="user-management-pagination-btn user-management-pagination-next"
+                onClick={() => setPage(p => p + 1)}
+                disabled={!hasNext || isLoading}
+              >
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                  <path d="M9 18L15 12L9 6" stroke="currentColor" strokeWidth="2" />
+                </svg>
+              </button>
             </div>
-          )}
+          </div>
         </div>
       )}
     </div>
