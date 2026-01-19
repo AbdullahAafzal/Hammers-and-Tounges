@@ -24,7 +24,7 @@ const PaymentVerification = () => {
             <main className="dashboard-main">
                 <div className="dashboard-container">
                     <div className="payment-verification-header">
-                        <div className="welcome-content">
+                        <div className="payment-welcome-content">
                             <h1 className="welcome-title">Payment Verification</h1>
                             <p className="welcome-subtitle">Match deposits against gateway logs to validate transactions</p>
                         </div>
@@ -74,7 +74,7 @@ const PaymentVerification = () => {
                                     onChange={(e) => setSearchTerm(e.target.value)}
                                     className="search-input"
                                 />
-                                {searchTerm && (
+                                {/* {searchTerm && (
                                     <button 
                                         className="clear-search"
                                         onClick={() => setSearchTerm("")}
@@ -84,7 +84,7 @@ const PaymentVerification = () => {
                                             <path d="M18 6L6 18M6 6L18 18" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                                         </svg>
                                     </button>
-                                )}
+                                )} */}
                             </div>
                         </div>
 
@@ -265,13 +265,13 @@ const PaymentVerification = () => {
                     </div>
 
                     <div className="verification-actions">
-                        <button className="action-button warning" onClick={handleFlagForReview}>
+                        <button className="payment-action-button warning" onClick={handleFlagForReview}>
                             <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
                                 <path d="M12 9V12M12 15H12.01M5.07183 19H18.9282C20.4678 19 21.4301 17.3333 20.6603 16L13.7321 4C12.9623 2.66667 11.0377 2.66667 10.2679 4L3.33975 16C2.56995 17.3333 3.53216 19 5.07183 19Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                             </svg>
                             Flag for Review
                         </button>
-                        <button className="action-button primary" onClick={handleVerifyAndMatch}>
+                        <button className="payment-action-button primary" onClick={handleVerifyAndMatch}>
                             <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
                                 <path d="M20 6L9 17L4 12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                             </svg>
