@@ -9,12 +9,7 @@
 .payment-welcome-content .welcome-subtitle {
     margin-top: 10px;
 }
-/* .clear-search {
-    position: absolute;
-    top: 50%;
-    right: 50px;
-    transform: translateY(-50%) !important;
-} */
+
 .verification-stats {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));

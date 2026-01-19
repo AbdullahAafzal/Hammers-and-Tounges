@@ -59,7 +59,6 @@ const PaymentVerification = () => {
                             </div>
                         </div>
                     </div>
-
                     <div className="verification-filters">
                         <div className="search-section">
                             <div className="search-input-wrapper">
