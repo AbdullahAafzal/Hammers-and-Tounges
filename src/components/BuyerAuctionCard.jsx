@@ -25,14 +25,6 @@ const BuyerAuctionCard = ({ auction, onClick, onFavoriteUpdate }) => {
         state => state.buyer.allBids[auction?.id]
     );
 
-
-
-    // const highestBid = bids?.length
-    //     ? Math.max(...bids.map(b => Number(b.amount)))
-    //     : null;
-
-    // console.log(highestBid);
-
     const highestBid = useMemo(() => {
         if (!bids?.length) return null;
 

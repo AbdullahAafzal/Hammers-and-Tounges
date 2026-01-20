@@ -8,9 +8,12 @@ import { verifyOtp, resendOtp } from '../store/actions/authActions'
 const OTPVerification = () => {
   const navigate = useNavigate()
   const location = useLocation()
+  const OTP_EXPIRY_KEY = 'otp_expiry_time'
+  const OTP_FIRST_VISIT_KEY = 'otp_first_visit'
+  const OTP_DURATION = 300 // seconds
   const [otp, setOtp] = useState(['', '', '', '', '', ''])
-  const [timer, setTimer] = useState(300) // 5 minutes in seconds
-  const [canResend, setCanResend] = useState(false)
+  const [timer, setTimer] = useState(0)
+  const [canResend, setCanResend] = useState(true)
   const inputRefs = useRef([])
   const dispatch = useDispatch()
   const {
@@ -20,33 +23,74 @@ const OTPVerification = () => {
 
   // Get userType and email from location state
   const email = location.state?.email || 'your email'
+  const isFromRegistration = location.state?.fromRegistration || false
 
   // Mask email for display
   const maskedEmail = email.includes('@')
     ? `******${email.split('@')[0].slice(-4)}@${email.split('@')[1]}`
     : `******${email.slice(-4)}`
 
+  // Initialize timer from localStorage
   useEffect(() => {
-    // Focus first input on mount
+    const expiryTime = localStorage.getItem(OTP_EXPIRY_KEY)
+    const isFirstVisit = localStorage.getItem(OTP_FIRST_VISIT_KEY)
+
+    // Agar registration se aaye hain (first time)
+    if (isFromRegistration && !isFirstVisit) {
+      const expiry = Date.now() + OTP_DURATION * 1000
+      localStorage.setItem(OTP_EXPIRY_KEY, expiry)
+      localStorage.setItem(OTP_FIRST_VISIT_KEY, 'true')
+      setTimer(OTP_DURATION)
+      setCanResend(false)
+    } 
+    // Agar pehle se timer chal raha hai
+    else if (expiryTime) {
+      const remaining = Math.floor((Number(expiryTime) - Date.now()) / 1000)
+
+      if (remaining > 0) {
+        setTimer(remaining)
+        setCanResend(false)
+      } else {
+        // Timer expired - 0 pe set karo
+        setTimer(0)
+        setCanResend(true)
+        localStorage.removeItem(OTP_EXPIRY_KEY)
+      }
+    } 
+    // Koi active timer nahi
+    else {
+      setTimer(0)
+      setCanResend(true)
+    }
+  }, [isFromRegistration])
+
+  // Focus first input on mount
+  useEffect(() => {
     if (inputRefs.current[0]) {
       inputRefs.current[0].focus()
     }
   }, [])
 
+  // Countdown timer
   useEffect(() => {
-    // Timer countdown
-    if (timer > 0) {
-      const interval = setInterval(() => {
-        setTimer(prev => {
-          if (prev <= 1) {
-            setCanResend(true)
-            return 0
-          }
-          return prev - 1
-        })
-      }, 1000)
-      return () => clearInterval(interval)
+    if (timer <= 0) {
+      setCanResend(true)
+      return
     }
+
+    const interval = setInterval(() => {
+      setTimer(prev => {
+        if (prev <= 1) {
+          clearInterval(interval)
+          setCanResend(true)
+          localStorage.removeItem(OTP_EXPIRY_KEY)
+          return 0
+        }
+        return prev - 1
+      })
+    }, 1000)
+
+    return () => clearInterval(interval)
   }, [timer])
 
   const formatTime = (seconds) => {
@@ -89,23 +133,32 @@ const OTPVerification = () => {
     const otpCode = otp.join('')
 
     if (otpCode.length === 6) {
-      // Handle OTP verification
-      await dispatch(verifyOtp({ email, code: otpCode }))
-      navigate('/signin')
+      const res = await dispatch(verifyOtp({ email, code: otpCode }))
+      if (res.meta.requestStatus === 'fulfilled') {
+        localStorage.removeItem(OTP_EXPIRY_KEY)
+        localStorage.removeItem(OTP_FIRST_VISIT_KEY)
+        navigate('/signin')
+      }
     }
   }
 
   const handleResend = async () => {
-    if (canResend) {
-      setTimer(600) // Reset to 10 minutes
-      setCanResend(false)
-      setOtp(['', '', '', '', '', ''])
-      if (inputRefs.current[0]) {
-        inputRefs.current[0].focus()
-      }
-      // Handle resend OTP logic here
-      await dispatch(resendOtp(email))
-    }
+    if (!canResend) return
+
+    // Set new expiry time
+    const expiry = Date.now() + OTP_DURATION * 1000
+    localStorage.setItem(OTP_EXPIRY_KEY, expiry)
+
+    // Start timer
+    setTimer(OTP_DURATION)
+    setCanResend(false)
+
+    // Clear OTP inputs
+    setOtp(['', '', '', '', '', ''])
+    inputRefs.current[0]?.focus()
+
+    // Send OTP
+    await dispatch(resendOtp(email))
   }
 
   return (
@@ -115,7 +168,7 @@ const OTPVerification = () => {
           <button
             type="button"
             className="back-button"
-            onClick={() => navigate('/register', {replace: true})}
+            onClick={() => navigate('/register', { replace: true })}
             aria-label="Go back"
           >
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
@@ -169,11 +222,7 @@ const OTPVerification = () => {
             <div className="otp-timer">
               {timer > 0 ? (
                 <span>Resend OTP in <strong>{formatTime(timer)}</strong></span>
-              ) : (
-                <button type="button" className="resend-button" onClick={handleResend}>
-                  Resend Code
-                </button>
-              )}
+              ) : ''}
             </div>
 
             <button type="submit" className="verify-button" disabled={otp.join('').length !== 6}>
@@ -184,10 +233,9 @@ const OTPVerification = () => {
                     Verifying Otp
                   </>
                 ) : 'Verify & Proceed'
-
               }
             </button>
-            
+
             <button
               type="button"
               className="resend-verify-button"
@@ -204,10 +252,6 @@ const OTPVerification = () => {
               )}
             </button>
           </form>
-
-          <div className="otp-footer-links">
-            <a href="/help" className="footer-link">Having trouble?</a>
-          </div>
         </div>
       </div>
     </div>
@@ -215,5 +259,3 @@ const OTPVerification = () => {
 }
 
 export default OTPVerification
-
-

@@ -29,11 +29,11 @@ const SellerDashboard = () => {
         unsoldVehicles: unsoldVehicles,
         totalEarningsLabel: 'Total Earnings',
         totalEarningsSubLabel: 'Lifetime earnings',
-        totalVehiclesLabel: 'Total Vehicles',
-        totalVehiclesSubLabel: 'All vehicles listed',
-        soldVehiclesLabel: 'Sold Vehicles',
+        totalVehiclesLabel: 'Total Items',
+        totalVehiclesSubLabel: 'All items listed',
+        soldVehiclesLabel: 'Sold Items',
         soldVehiclesSubLabel: 'Successfully sold',
-        unsoldVehiclesLabel: 'Unsold Vehicles',
+        unsoldVehiclesLabel: 'Unsold Items',
         unsoldVehiclesSubLabel: 'Not yet sold',
     }
 

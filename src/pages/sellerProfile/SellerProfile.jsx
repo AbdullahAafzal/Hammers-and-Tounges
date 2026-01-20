@@ -101,8 +101,8 @@ const SellerProfile = () => {
       },
       {
         id: 2,
-        label: "Total Vehicles",
-        sublabel: "All vehicles listed",
+        label: "Total Items",
+        sublabel: "All items listed",
         value: totalVehicles.toString(),
         icon: "vehicles",
         color: "#3B82F6",
@@ -112,7 +112,7 @@ const SellerProfile = () => {
       },
       {
         id: 3,
-        label: "Sold Vehicles",
+        label: "Sold Items",
         sublabel: "Successfully sold",
         value: soldVehicles.toString(),
         icon: "sold",
@@ -123,7 +123,7 @@ const SellerProfile = () => {
       },
       {
         id: 4,
-        label: "Unsold Vehicles",
+        label: "Unsold Items",
         sublabel: "Not yet sold",
         value: unsoldVehicles.toString(),
         icon: "unsold",

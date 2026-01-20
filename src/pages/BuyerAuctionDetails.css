@@ -190,6 +190,8 @@
 .buyer-details-meta-item {
   display: flex;
   flex-direction: column;
+  justify-content: center;
+  align-items: center;
   gap: 0.25rem;
   padding: 1rem;
   background-color: rgba(255, 255, 255, 0.03);
@@ -243,9 +245,13 @@
 }
 
 .buyer-details-price-value {
-  font-size: 1.5rem;
+  font-size: 1.3rem;
   font-weight: 700;
   color: #8CC63F;
+}
+.buyer-details-status-warning {
+  
+  color: #ef4444 !important;
 }
 
 .buyer-details-name-value {
@@ -640,6 +646,7 @@
   border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 8px;
   transition: all 0.2s;
+  position: relative;
 }
 
 .buyer-details-bid-item:hover {
@@ -873,6 +880,41 @@
   100% {
     transform: translateX(100%);
   }
+}
+.mets-flex-item {
+  justify-content: center;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.buyer-auctions-right-icon {
+    /* position: absolute;
+    top: 16px;
+    right: 16px; */
+    background: rgba(0, 0, 0, 0.55);
+    backdrop-filter: blur(20px);
+    /* color: #fff; */
+    /* padding: 0.3rem 0.7rem; */
+    border-radius: 5px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    /* border: 1px solid rgba(255, 255, 255); */
+    /* animation: pulse 2s infinite; */
+}
+
+.heart-icon {
+    stroke: #ff0000;
+}
+
+.heart-icon-outline {
+    fill: none;
+    stroke-width: 2;
+}
+
+.heart-icon-filled {
+    fill: #ff0000;
+    stroke-width: 0;
 }
 
 /* ==================== RESPONSIVE DESIGN ==================== */

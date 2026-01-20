@@ -218,11 +218,14 @@
   gap: 1rem;
 }
 
-.bid-summary-item {
+.bid-summary-item, .bid-summary-item-form {
   display: flex;
   justify-content: space-between;
   align-items: center;
   gap: 1rem;
+}
+.bid-summary-item-form {
+  flex-direction: column;
 }
 
 .bid-summary-item.primary {
@@ -320,6 +323,137 @@
   transform: translateY(-2px);
   box-shadow: 0 4px 12px rgba(140, 198, 63, 0.4);
 }
+
+
+/* ==================== NOTICES ==================== */
+.buyer-details-upcoming-notice,
+.buyer-details-closed-notice,
+.buyer-details-payment-notice {
+  display: flex;
+  gap: 1rem;
+  padding: 1rem;
+  border-radius: 8px;
+  font-size: 0.875rem;
+  align-items: flex-start;
+}
+
+.buyer-details-upcoming-notice svg,
+.buyer-details-closed-notice svg,
+.buyer-details-payment-notice svg {
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.buyer-details-upcoming-notice,
+.buyer-details-notice {
+  background-color: rgba(140, 198, 63, 0.1);
+  border: 1px solid rgba(140, 198, 63, 0.5);
+  /* color: #8CC63F; */
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.buyer-details-upcoming-notice svg {
+  color: #8CC63F;
+}
+
+
+.buyer-details-closed-notice {
+  background-color: rgba(107, 114, 128, 0.1);
+  border: 1px solid rgba(107, 114, 128, 0.3);
+  color: #9ca3af;
+}
+
+.buyer-details-closed-notice svg {
+  color: #9ca3af;
+}
+
+.buyer-details-payment-notice {
+  background-color: rgba(251, 146, 60, 0.1);
+  border: 1px solid rgba(251, 146, 60, 0.3);
+  color: #fb923c;
+}
+
+.buyer-details-payment-notice svg {
+  color: #fb923c;
+}
+
+.buyer-details-upcoming-notice strong,
+.buyer-details-closed-notice strong,
+.buyer-details-payment-notice strong {
+  display: block;
+  margin-bottom: 0.25rem;
+  font-weight: 600;
+}
+
+.buyer-details-upcoming-notice p,
+.buyer-details-closed-notice p,
+.buyer-details-payment-notice p {
+  margin: 0;
+  opacity: 0.9;
+}
+
+
+/* ==================== BIDDING FORM ==================== */
+.buyer-details-bidding-form {
+  width: 100%;
+  display: flex;
+  gap: 0.75rem;
+  padding: 1.5rem;
+  background-color: rgba(140, 198, 63, 0.1);
+  /* background: linear-gradient(135deg, rgba(140, 198, 63, 0.15) 0%, rgba(140, 198, 63, 0.08) 100%); */
+  border: 1px solid rgba(140, 198, 63, 0.3);
+  border-radius: 12px;
+}
+
+.buyer-details-bid-input {
+  width: 100%;
+  flex: 1;
+  padding: 0.875rem 1rem;
+  background-color: rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 8px;
+  color: #ffffff;
+  font-size: 1rem;
+  transition: all 0.2s;
+  outline: none;
+}
+
+.buyer-details-bid-input:focus {
+  border-color: #8CC63F;
+  background-color: rgba(0, 0, 0, 0.4);
+  box-shadow: 0 0 0 3px rgba(140, 198, 63, 0.1);
+}
+
+.buyer-details-bid-input::placeholder {
+  color: rgba(255, 255, 255, 0.4);
+}
+
+.buyer-details-bid-button {
+  padding: 0.875rem 2rem;
+  background: #8CC63F;
+  border: none;
+  border-radius: 8px;
+  color: black;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  white-space: nowrap;
+  margin-top: 15px;
+}
+
+.buyer-details-bid-button:hover {
+  background: '#7AB32';
+}
+
+.buyer-details-bid-button:active {
+  transform: translateY(0);
+}
+
+.buyer-details-bid-button:disabled {
+  cursor: not-allowed;
+}
+
 
 /* ==================== TABS SECTION ==================== */
 .bid-details-tabs-section {

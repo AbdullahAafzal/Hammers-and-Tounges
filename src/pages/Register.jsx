@@ -38,7 +38,8 @@ const Register = () => {
         {
           state: {
             email: formData.email,
-            userType: formData.role
+            userType: formData.role,
+            fromRegistration: true  // Ye zaroori hai
           }
         },
         { replace: true }
@@ -246,9 +247,8 @@ const Register = () => {
           <div className="user-type-tabs">
             <button
               type="button"
-              className={`user-type-tab ${
-                userType === "buyer" ? "active" : ""
-              }`}
+              className={`user-type-tab ${userType === "buyer" ? "active" : ""
+                }`}
               onClick={() => handleUserTypeChange("buyer")}
               disabled={isRegistering}
             >
@@ -268,9 +268,8 @@ const Register = () => {
             </button>
             <button
               type="button"
-              className={`user-type-tab ${
-                userType === "seller" ? "active" : ""
-              }`}
+              className={`user-type-tab ${userType === "seller" ? "active" : ""
+                }`}
               onClick={() => handleUserTypeChange("seller")}
               disabled={isRegistering}
             >
@@ -315,9 +314,8 @@ const Register = () => {
                     type="text"
                     id="first_name"
                     name="first_name"
-                    className={`form-input ${
-                      formErrors.first_name ? "error" : ""
-                    }`}
+                    className={`form-input ${formErrors.first_name ? "error" : ""
+                      }`}
                     placeholder="John"
                     value={formData.first_name}
                     onChange={handleChange}
@@ -337,9 +335,8 @@ const Register = () => {
                     type="text"
                     id="last_name"
                     name="last_name"
-                    className={`form-input ${
-                      formErrors.last_name ? "error" : ""
-                    }`}
+                    className={`form-input ${formErrors.last_name ? "error" : ""
+                      }`}
                     placeholder="Doe"
                     value={formData.last_name}
                     onChange={handleChange}
@@ -396,9 +393,8 @@ const Register = () => {
                       type="tel"
                       id="phone"
                       name="phone"
-                      className={`form-input ${
-                        formErrors.phone ? "error" : ""
-                      }`}
+                      className={`form-input ${formErrors.phone ? "error" : ""
+                        }`}
                       placeholder="77X XXX XXX"
                       value={formData.phone}
                       onChange={handlePhoneChange}
@@ -427,9 +423,8 @@ const Register = () => {
                       type={showPassword ? "text" : "password"}
                       id="password"
                       name="password"
-                      className={`form-input ${
-                        formErrors.password ? "error" : ""
-                      }`}
+                      className={`form-input ${formErrors.password ? "error" : ""
+                        }`}
                       placeholder="Create a password"
                       value={formData.password}
                       onChange={handleChange}
@@ -515,9 +510,8 @@ const Register = () => {
                       type={showConfirmPassword ? "text" : "password"}
                       id="confirmPassword"
                       name="confirmPassword"
-                      className={`form-input ${
-                        formErrors.confirmPassword ? "error" : ""
-                      }`}
+                      className={`form-input ${formErrors.confirmPassword ? "error" : ""
+                        }`}
                       placeholder="Confirm your password"
                       value={formData.confirmPassword}
                       onChange={handleChange}
@@ -596,56 +590,54 @@ const Register = () => {
               </div>
             </div>
 
-                  {  formData.role == 'seller' && 
-            <div className="register-form-section">
-              <div className="form-grid">
-                <div className="form-group">
-                  <label htmlFor="business_name" className="form-label">
-                    Business Name
-                  </label>
-                  <input
-                    type="text"
-                    id="business_name"
-                    name="business_name"
-                    className={`form-input ${
-                      formErrors.business_name ? "error" : ""
-                    }`}
-                    placeholder="Your Business Name"
-                    value={formData.business_name}
-                    onChange={handleChange}
-                    disabled={isRegistering}
-                  />
-                  {formErrors.business_name && (
-                    <span className="field-error">
-                      {formErrors.business_name}
-                    </span>
-                  )}
-                </div>
+            {formData.role == 'seller' &&
+              <div className="register-form-section">
+                <div className="form-grid">
+                  <div className="form-group">
+                    <label htmlFor="business_name" className="form-label">
+                      Business Name
+                    </label>
+                    <input
+                      type="text"
+                      id="business_name"
+                      name="business_name"
+                      className={`form-input ${formErrors.business_name ? "error" : ""
+                        }`}
+                      placeholder="Your Business Name"
+                      value={formData.business_name}
+                      onChange={handleChange}
+                      disabled={isRegistering}
+                    />
+                    {formErrors.business_name && (
+                      <span className="field-error">
+                        {formErrors.business_name}
+                      </span>
+                    )}
+                  </div>
 
-                <div className="form-group">
-                  <label htmlFor="business_reg_no" className="form-label">
-                    Business Registration
-                  </label>
-                  <input
-                    type="text"
-                    id="business_reg_no"
-                    name="business_reg_no"
-                    className={`form-input ${
-                      formErrors.business_reg_no ? "error" : ""
-                    }`}
-                    placeholder="BRN-00923898"
-                    value={formData.business_reg_no}
-                    onChange={handleChange}
-                    disabled={isRegistering}
-                  />
-                  {formErrors.business_reg_no && (
-                    <span className="field-error">
-                      {formErrors.business_reg_no}
-                    </span>
-                  )}
+                  <div className="form-group">
+                    <label htmlFor="business_reg_no" className="form-label">
+                      Business Registration
+                    </label>
+                    <input
+                      type="text"
+                      id="business_reg_no"
+                      name="business_reg_no"
+                      className={`form-input ${formErrors.business_reg_no ? "error" : ""
+                        }`}
+                      placeholder="BRN-00923898"
+                      value={formData.business_reg_no}
+                      onChange={handleChange}
+                      disabled={isRegistering}
+                    />
+                    {formErrors.business_reg_no && (
+                      <span className="field-error">
+                        {formErrors.business_reg_no}
+                      </span>
+                    )}
+                  </div>
                 </div>
               </div>
-            </div>
             }
 
             <div className="register-form-section">
@@ -727,7 +719,7 @@ const Register = () => {
                     </svg>
                   </div>
                   <p>
-                    <strong>Note:</strong> To place adds, you'll need to
+                    <strong>Note:</strong> To sell goods, you'll need to
                     complete identity verification (KYC) after registration.
                   </p>
                 </div>

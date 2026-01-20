@@ -54,10 +54,10 @@ export const buyerService = {
   },
 
   // Get my bids
-  getMyBids: async () => {
+  getMyBids: async (params) => {
     try {
       // Assuming there's an endpoint for this, adjust if needed
-      const { data } = await apiClient.get(API_ROUTES.BIDS_LIST);
+      const { data } = await apiClient.get(API_ROUTES.BIDS_LIST, { params });
       return data;
     } catch (error) {
       if (error.isNetworkError) {

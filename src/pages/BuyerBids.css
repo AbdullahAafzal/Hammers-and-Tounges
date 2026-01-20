@@ -293,7 +293,7 @@
 .bid-status {
   font-size: 0.75rem;
   font-weight: 600;
-  padding: 0.25rem 0.5rem;
+  padding: 0.25rem 0rem;
   border-radius: 3px;
   text-transform: uppercase;
 }
@@ -349,6 +349,15 @@
   background-color: rgba(245, 158, 11, 0.1);
   color: #f59e0b;
   border: 1px solid rgba(245, 158, 11, 0.3);
+}
+.bid-status.leading {
+  color: #8CC63F;
+  font-weight: 600;
+}
+
+.bid-status.outbid {
+  color: #ef4444;
+  font-weight: 600;
 }
 
 .mybid-actions {
@@ -442,18 +451,19 @@
 
 .loading-state,
 .error-state,
-.empty-state {
+.buyer-details-empty-state {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   padding: 3rem 1rem;
   text-align: center;
+  margin: auto ;
 }
 
 .loading-state p,
 .error-state p,
-.empty-state p {
+.buyer-details-empty-state p {
   margin: 1rem 0 0 0;
   color: rgba(255, 255, 255, 0.7);
   font-size: 0.9375rem;
@@ -491,7 +501,7 @@
   background-color: #7bb337;
 }
 
-.empty-state svg {
+.buyer-details-empty-state svg {
   width: 48px;
   height: 48px;
   color: rgba(255, 255, 255, 0.3);

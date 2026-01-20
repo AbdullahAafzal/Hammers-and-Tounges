@@ -68,9 +68,9 @@ export const fetchAuctionBids = createAsyncThunk(
 
 export const fetchMyBids = createAsyncThunk(
   'buyer/fetchMyBids',
-  async (_, { rejectWithValue }) => {
+  async (params, { rejectWithValue }) => {
     try {
-      const response = await buyerService.getMyBids();
+      const response = await buyerService.getMyBids(params);
       return response;
     } catch (error) {
       const message =

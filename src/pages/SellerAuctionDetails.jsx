@@ -387,7 +387,7 @@ const SellerAuctionDetails = () => {
       case 'ACTIVE':
         return { bg: 'rgba(34, 197, 94, 0.2)', border: 'rgba(34, 197, 94, 0.5)', color: '#22c55e' };
       case 'APPROVED':
-        return { bg: 'rgba(59, 130, 246, 0.2)', border: 'rgba(59, 130, 246, 0.5)', color: '#3b82f6' };
+        return { bg: 'rgba(251, 146, 60, 0.2)', border: 'rgba(251, 146, 60, 0.5)', color: '#fb923c' };
       case 'PENDING':
         return { bg: 'rgba(59, 130, 246, 0.2)', border: 'rgba(59, 130, 246, 0.5)', color: '#3b82f6' };
       case 'CLOSED':
@@ -447,7 +447,7 @@ const SellerAuctionDetails = () => {
             </svg>
             <h2>Auction Not Found</h2>
             <p>The auction you're looking for doesn't exist or has been removed.</p>
-            <Link to="/seller/auction-listings" className="seller-details-back-btn">Back to My Auctions</Link>
+            <Link to="/seller/auction-listings" className="seller-details-back-btn">Back to My Products</Link>
           </div>
         </div>
       </div>
@@ -463,7 +463,7 @@ const SellerAuctionDetails = () => {
         <nav className="seller-details-breadcrumbs">
           <Link to="/seller/dashboard">Home</Link>
           <span>/</span>
-          <Link to="/seller/auction-listings">My Auctions</Link>
+          <Link to="/seller/auction-listings">My Products</Link>
           <span>/</span>
           <span>{selectedAuction?.category_name || 'Category'}</span>
         </nav>
@@ -491,7 +491,7 @@ const SellerAuctionDetails = () => {
             {selectedAuction?.status === 'ACTIVE' && 'ACTIVE'}
             {selectedAuction?.status === 'DRAFT' && 'DRAFT'}
             {selectedAuction?.status === 'PENDING' && 'PENDING'}
-            {selectedAuction?.status === 'APPROVED' && 'UPCOMING'}
+            {selectedAuction?.status === 'APPROVED' && 'APPROVED'}
             {selectedAuction?.status === 'CLOSED' && 'CLOSED'}
             {selectedAuction?.status === 'AWAITING_PAYMENT' && 'AWAITING PAYMENT'}
             {selectedAuction?.status === 'REJECTED' && 'REJECTED'}

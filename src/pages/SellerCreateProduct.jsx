@@ -1313,12 +1313,12 @@ const SellerCreateProduct = () => {
                               </button>
 
                             </div>
-                            <div className="create-auction-media-info">
+                            {/* <div className="create-auction-media-info">
                               <p className="create-auction-media-name">{file.label}</p>
                               <p className="create-auction-media-size">
                                 {file.isExisting ? 'Existing File' : `${(file.size / 1024 / 1024).toFixed(2)} MB`}
                               </p>
-                            </div>
+                            </div> */}
                           </div>
                         ))}
 

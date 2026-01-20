@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useMemo, useCallback, memo } from 'react';
 import { Link, useLocation, useParams, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
-import { placeBid, fetchAuctionBids } from '../store/actions/buyerActions';
+import { placeBid, fetchAuctionBids, fetchMyBids } from '../store/actions/buyerActions';
 import { getMediaUrl } from '../config/api.config';
 import './BuyerAuctionDetails.css';
 import { fetchProfile } from '../store/actions/profileActions';
@@ -157,6 +157,16 @@ const BidHistoryPanel = memo(({ bids, formatCurrency }) => (
               </div>
             </div>
             <div className="buyer-details-bid-amount">{formatCurrency(parseFloat(bid.amount))}</div>
+            {
+              index === 0 && (
+                <div className="bid-history-your-bid">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                    <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z" fill="currentColor" />
+                  </svg>
+                  Highest
+                </div>
+              )
+            }
           </div>
         ))}
       </div>
@@ -233,7 +243,7 @@ const BuyerAuctionDetails = () => {
   const location = useLocation();
   const { profile } = useSelector(state => state.profile)
   const auctionObj = location.state?.listing;
-  const { auctionBids, isPlacingBid, error } = useSelector(state => state.buyer);
+  const { auctionBids, isPlacingBid, error, myBids } = useSelector(state => state.buyer);
   const buyerProfile = profile?.buyer_profile
 
   console.log(auctionBids);
@@ -285,9 +295,10 @@ const BuyerAuctionDetails = () => {
 
   console.log("hasEnoughPoints: ", hasEnoughPoints);
 
-
   // Memoized computed values
   const auction = state.selectedAuction;
+  console.log("auction: ", auction);
+
   const images = useMemo(() =>
     auction?.media?.filter(m => m.media_type === 'image').map(m => getMediaUrl(m.file)) || [],
     [auction?.media]
@@ -347,6 +358,24 @@ const BuyerAuctionDetails = () => {
   // Timer effect
 
   console.log(state, 'state');
+  const myBidAmount = myBids?.results?.find(bids => bids.auction_id === auction.id)
+  console.log("myBidAmount: ", myBidAmount);
+
+  const highestBidAmount = useMemo(() => {
+    return parseFloat(auctionBids?.[0]?.amount || 0);
+  }, [auctionBids]);
+
+  const myBidValue = useMemo(() => {
+    return parseFloat(myBidAmount?.amount || 0);
+  }, [myBidAmount]);
+
+  const bidStatus = useMemo(() => {
+    if (!myBidValue) return 'NO_BID';
+    if (myBidValue >= highestBidAmount) return 'LEADING';
+    return 'OUTBID';
+  }, [myBidValue, highestBidAmount]);
+
+
 
 
   const handleCustomBidSubmit = useCallback((e) => {
@@ -409,6 +438,10 @@ const BuyerAuctionDetails = () => {
     navigate('/buyer/auctions', { replace: true })
   }, [auction, state.customBidAmount, hasEnoughPoints, dispatch, id]);
 
+  useEffect(() => {
+    dispatch(fetchMyBids())
+  }, [dispatch])
+
 
   useEffect(() => {
     if (isLive && auction?.end_date) {
@@ -462,6 +495,8 @@ const BuyerAuctionDetails = () => {
             {auction?.status === 'APPROVED' && 'APPROVED'}
             {auction?.status === 'CLOSED' && 'Closed'}
             {auction?.status === 'AWAITING_PAYMENT' && 'Awaiting Payment'}
+
+
           </div>
         </div>
 
@@ -475,10 +510,38 @@ const BuyerAuctionDetails = () => {
 
           <div className="buyer-details-info">
             <div className="buyer-details-auction-meta">
-              {/* <div className="buyer-details-meta-item">
-                <span className="buyer-details-meta-label">Lot Number</span>
-                <span className="buyer-details-meta-value">#{auction?.id || 'N/A'}</span>
-              </div> */}
+              <div className="buyer-details-meta-item mets-flex-item">
+                <span className="buyer-details-meta-label">  Favorite / Unfavorite</span>
+
+
+                {auction?.is_favourite ? (
+                  <button
+                    // onClick={(e) => favoriteAuctionToggle(e, auction?.id)}
+                    className='buyer-auctions-right-icon'
+                  // title='Remove From Favorite'
+                  // disabled={isUpdating}
+                  // style={{ opacity: isUpdating ? 0.6 : 1 }}
+                  >
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill='currentColor' className="heart-icon heart-icon-filled">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="0"
+                        d="M11.645 20.91l-.007-.003-.022-.012a15.247 15.247 0 01-.383-.218 25.18 25.18 0 01-4.244-3.17C4.688 15.36 2.25 12.174 2.25 8.25 2.25 5.322 4.714 3 7.688 3A5.5 5.5 0 0112 5.052 5.5 5.5 0 0116.313 3c2.973 0 5.437 2.322 5.437 5.25 0 3.925-2.438 7.111-4.739 9.256a25.175 25.175 0 01-4.244 3.17 15.247 15.247 0 01-.383.219l-.022.012-.007.004-.003.001a.752.752 0 01-.704 0l-.003-.001z" />
+                    </svg>
+                  </button>
+                ) : (
+                  <button
+                    // onClick={(e) => favoriteAuctionToggle(e, auction?.id)}
+                    className='buyer-auctions-right-icon'
+                  // title='Add to Favorite'
+                  // disabled={isUpdating}
+                  // style={{ opacity: isUpdating ? 0.6 : 1 }}
+                  >
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#d1d5db">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"
+                        d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                    </svg>
+                  </button>
+                )}
+              </div>
               <div className="buyer-details-meta-item">
                 <span className="buyer-details-meta-label">Category</span>
                 <span className="buyer-details-meta-value">{auction?.category_name || 'N/A'}</span>
@@ -494,13 +557,37 @@ const BuyerAuctionDetails = () => {
                 <div className='flex justify-between items-center'>
                   <span className="buyer-details-price-label">Starting Bid</span>
                   <span className="buyer-details-price-value">{formatCurrency(parseFloat(auction?.initial_price || 0))}</span>
-
                 </div>
                 <div className='flex justify-between items-center'>
-
+                  <span className="buyer-details-price-label">Your Bid Amount</span>
+                  <span className="buyer-details-price-value">{formatCurrency(parseFloat(myBidAmount?.amount || 0))}</span>
+                </div>
+                <div className='flex justify-between items-center'>
                   <span className="buyer-details-price-label">Highest Bid</span>
                   <span className="buyer-details-price-value">{formatCurrency(parseFloat(auctionBids?.[0]?.amount || 0))}</span>
                 </div>
+                <div className='flex justify-between items-center'>
+                  <span className="buyer-details-price-label">Bid Status</span>
+
+                  {bidStatus === 'NO_BID' && (
+                    <span className="buyer-details-price-value buyer-details-status-primary text-gray-400">
+                      No bid placed yet
+                    </span>
+                  )}
+
+                  {bidStatus === 'OUTBID' && (
+                    <span className="buyer-details-price-value buyer-details-status-warning font-semibold">
+                      You’re outbid
+                    </span>
+                  )}
+
+                  {bidStatus === 'LEADING' && (
+                    <span className="buyer-details-price-value buyer-details-status-primary font-semibold">
+                      You’re leading the bid
+                    </span>
+                  )}
+                </div>
+
                 <div className='flex justify-between items-center'>
 
                   {

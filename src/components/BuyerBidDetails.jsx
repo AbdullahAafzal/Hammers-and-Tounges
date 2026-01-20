@@ -1,19 +1,33 @@
-import React, { useState, useMemo, useEffect } from 'react';
-import { Link, useLocation, useParams } from 'react-router-dom';
+import React, { useState, useMemo, useEffect, useCallback } from 'react';
+import { Link, useLocation, useParams, useNavigate } from 'react-router-dom';
 import './BuyerBidDetails.css';
 import { useSelector, useDispatch } from 'react-redux';
-import { fetchAuctionBids } from '../store/actions/buyerActions';
+import { fetchAuctionBids, placeBid } from '../store/actions/buyerActions';
+import { fetchAuctionsList } from '../store/actions/AuctionsActions';
 import { getMediaUrl } from '../config/api.config';
+import { fetchProfile } from '../store/actions/profileActions';
+
+import { toast } from 'react-toastify';
 
 const BuyerBidDetails = () => {
   const { id } = useParams()
+  const navigate = useNavigate();
   const location = useLocation();
   const dispatch = useDispatch()
   const bidDetails = location.state?.listing;
+  const { profile } = useSelector(state => state.profile)
   //   const bidHistory = location.state?.bidHistory || [];
-  const { auctionBids: bidHistory } = useSelector(state => state.buyer)
+  const { auctionBids: bidHistory, auctions, isPlacingBid, auctionBids } = useSelector(state => state.buyer)
   const [activeTab, setActiveTab] = useState('information');
   const [selectedImage, setSelectedImage] = useState(0);
+  const buyerProfile = profile?.buyer_profile
+
+  console.log("bidDetails: ", bidDetails);
+  console.log("auctions: ", auctions);
+
+  const auction = auctions?.results?.find(auction => auction?.id === parseInt(id))
+  console.log(auction);
+
 
   // Memoized values
   const images = useMemo(() =>
@@ -30,6 +44,17 @@ const BuyerBidDetails = () => {
     }).format(amount);
   };
 
+  useEffect(() => {
+    dispatch(fetchAuctionsList())
+  }, [dispatch])
+
+  useEffect(() => {
+    dispatch(fetchProfile())
+  }, dispatch)
+
+
+
+
   const formatDate = (dateString) => {
     if (!dateString) return 'N/A';
     return new Date(dateString).toLocaleString('en-US', {
@@ -44,6 +69,17 @@ const BuyerBidDetails = () => {
   useEffect(() => {
     dispatch(fetchAuctionBids(id))
   }, [id, dispatch])
+
+  const [state, setState] = useState({
+    // selectedAuction: auctionObj || null,
+    // activeTab: 'description',
+    customBidAmount: '',
+    // selectedImage: 0,
+    // timeRemaining: { hours: 0, minutes: 0, seconds: 0 },
+    // isLoading: !auctionObj,
+    error: null,
+    showPointsWarning: false,
+  });
 
   const formatRelativeTime = (dateString) => {
     if (!dateString) return 'N/A';
@@ -61,6 +97,101 @@ const BuyerBidDetails = () => {
     if (minutes > 0) return `${minutes} minute${minutes > 1 ? 's' : ''} ago`;
     return 'Just now';
   };
+
+
+
+  const isLive = useMemo(() => auction?.status === 'ACTIVE', [auction?.status]);
+  const isUpcoming = useMemo(() => auction?.status === 'APPROVED', [auction?.status]);
+  const isClosed = useMemo(() => auction?.status === 'CLOSED', [auction?.status]);
+  const isAwaitingPayment = useMemo(() => auction?.status === 'AWAITING_PAYMENT', [auction?.status]);
+
+
+  const requiredPoints = useMemo(() => {
+    const bidAmount = parseFloat(state.customBidAmount) || 0;
+    return Math.ceil(bidAmount * 0.5); // 50% of bid amount
+  }, [state.customBidAmount]);
+
+  console.log("requiredPoints: ", requiredPoints);
+
+  // Check if user has enough points
+  const hasEnoughPoints = useMemo(() => {
+    const userPoints = parseFloat(buyerProfile?.points) || 0;
+    return userPoints >= requiredPoints;
+  }, [buyerProfile?.points, requiredPoints]);
+
+  console.log("hasEnoughPoints: ", hasEnoughPoints);
+
+  const handleCustomBidChange = useCallback((e) => {
+    const value = e.target.value;
+    setState(prev => ({
+      ...prev,
+      customBidAmount: value,
+      showPointsWarning: false
+    }));
+  }, []);
+
+
+  const handleCustomBidSubmit = useCallback((e) => {
+    e.preventDefault();
+    // Check if user has enough points
+    if (!hasEnoughPoints) {
+      setState(prev => ({
+        ...prev,
+        showPointsWarning: true
+      }));
+      return;
+    }
+
+    if (!auction || !state.customBidAmount) {
+      return;
+    }
+
+
+    const bidAmount = parseFloat(state.customBidAmount);
+    const minBidAmount = parseFloat(auction?.initial_price || 0) + 1;
+    const highBidAmount = parseFloat(auctionBids?.[0]?.amount) + 1;
+
+    // Validate bid amount
+    if (bidAmount < highBidAmount) {
+      setState(prev => ({
+        ...prev,
+        showPointsWarning: false
+      }));
+      toast.info('Bid must be greater than the highest bid')
+
+      return;
+    }
+    // Validate bid amount
+    if (bidAmount < minBidAmount) {
+      setState(prev => ({
+        ...prev,
+        showPointsWarning: false
+      }));
+      toast.info('Bid must be greater than the current price')
+      return;
+    }
+
+    // Place bid if validation passes
+    dispatch(placeBid({
+      auction_id: auction?.id,
+      amount: bidAmount
+    })).then((result) => {
+      if (result.type === 'buyer/placeBid/fulfilled') {
+        setState(prev => ({
+          ...prev,
+          customBidAmount: '',
+          showPointsWarning: false
+        }));
+        // Refresh bids and profile
+        dispatch(fetchAuctionBids(id));
+        dispatch(fetchProfile());
+      }
+    });
+
+    navigate('/buyer/bids', { replace: true })
+  }, [auction, state.customBidAmount, hasEnoughPoints, dispatch, id]);
+
+
 
   const getStatusColor = (status) => {
     switch (status) {
@@ -105,8 +236,8 @@ const BuyerBidDetails = () => {
           <Link to="/buyer/dashboard">Home</Link>
           <span>/</span>
           <Link to="/buyer/bids">My Bids</Link>
-          <span>/</span>
-          <span>Bid #{bidDetails.id}</span>
+          {/* <span>/</span> */}
+          {/* <span>Bid #{bidDetails.id}</span> */}
         </nav>
 
         {/* Header */}
@@ -168,6 +299,17 @@ const BuyerBidDetails = () => {
               <h3>Your Bid Summary</h3>
             </div>
             <div className="bid-summary-content">
+              <div className="bid-summary-item">
+                <span className="bid-summary-label">Title</span>
+                <span className="bid-summary-value-small">{bidDetails.auction_title || 'N/A'}</span>
+              </div>
+              <div className="bid-summary-divider"></div>
+              <div className="bid-summary-item primary">
+                <span className="bid-summary-label">Starting Bid</span>
+                <span className="bid-summary-value">
+                  {auction?.initial_price ? formatCurrency(parseFloat(auction?.initial_price)) : 'N/A'}
+                </span>
+              </div>
               <div className="bid-summary-item primary">
                 <span className="bid-summary-label">Your Bid Amount</span>
                 <span className="bid-summary-value">
@@ -180,11 +322,115 @@ const BuyerBidDetails = () => {
                   {bidDetails.amount ? formatCurrency(parseFloat(bidHistory?.[0]?.amount)) : 'N/A'}
                 </span>
               </div>
-              <div className="bid-summary-divider"></div>
-              <div className="bid-summary-item">
-                <span className="bid-summary-label">Auction Title</span>
-                <span className="bid-summary-value-small">{bidDetails.auction_title || 'N/A'}</span>
+              <div className="bid-summary-item-form primary">
+                {/* <span className="bid-summary-label">Current Highest Bid</span>
+                <span className="bid-summary-value">
+                  {bidDetails.amount ? formatCurrency(parseFloat(bidHistory?.[0]?.amount)) : 'N/A'}
+                </span> */}
+
+                {isUpcoming && (
+                  <div className="buyer-details-upcoming-notice">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                      <path d="M12 8V12M12 16H12.01M21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3C16.9706 3 21 7.02944 21 12Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                    </svg>
+                    <div>
+                      <strong>This auction is not live yet</strong>
+                      <p>Bidding will be available when the auction goes live.</p>
+                    </div>
+                  </div>
+                )}
+
+                {isClosed && (
+                  <div className="buyer-details-closed-notice">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                      <path d="M9 12l2 2 4-4m7 0a9 9 0 11-18 0 9 9 0 0118 0z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                    </svg>
+                    <div>
+                      <strong>This auction has ended</strong>
+                      <p>No more bids can be placed.</p>
+                    </div>
+                  </div>
+                )}
+
+                {isAwaitingPayment && (
+                  <div className="buyer-details-payment-notice">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                      <path d="M12 8c-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4-1.79-4-4-4zm0 6c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm0-10C6.48 4 2 6.69 2 10c0 3.72 4.64 7 10 7 .93 0 1.83-.13 2.71-.38.67.52 1.49.99 2.29.99 1.1 0 2-.9 2-2 0-.78-.49-1.45-1.19-1.78.71-1.03 1.19-2.3 1.19-3.83 0-3.31-4.48-6-10-6z" stroke="currentColor" strokeWidth="2" />
+                    </svg>
+                    <div>
+                      <strong>Awaiting payment</strong>
+                      <p>Complete your payment to finalize this purchase.</p>
+                    </div>
+                  </div>
+                )}
+
+
+                {isLive && (
+                  <>
+                    {/* Points Information Notice */}
+                    <div className="buyer-details-notice rounded-lg p-4 mb-4">
+                      <div className="flex items-start gap-3">
+                        <svg className="w-5 h-5 flex-shrink-0 mt-0.5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        <div className="flex-1">
+                          <h4 className="text-white font-semibold mb-1">Funds Required</h4>
+                          <p className="text-sm ">
+                            You must have at least <strong>50% of your bid amount</strong> in your funds balance to place a bid.
+
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+
+                    <form className="buyer-details-bidding-form" onSubmit={handleCustomBidSubmit}>
+                      <div className="space-y-3 w-full">
+                        <input
+                          type="number"
+                          className="buyer-details-bid-input"
+                          placeholder="Enter your bid amount"
+                          value={state.customBidAmount}
+                          onChange={handleCustomBidChange}
+                          // min={parseFloat(auction?.initial_price || 0) + 1}
+                          // step="0.01"
+                          disabled={isPlacingBid}
+                        />
+
+                        {/* Insufficient Points Warning */}
+                        {state.showPointsWarning || !hasEnoughPoints && (
+                          <div className="bg-red-500/10 border border-red-500/30 rounded-lg p-3 mt-3">
+                            <div className="flex items-start gap-2">
+                              <svg className="w-5 h-5 text-red-400 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                              </svg>
+                              <div className="flex-1">
+                                <h4 className="text-red-300 font-semibold mb-1">Insufficient Funds</h4>
+                                <p className="text-red-200 text-sm mb-2">
+                                  You do not have enough funds to place this bid. Please try one of the following:
+                                </p>
+                                <ul className="text-red-200 text-sm space-y-1 list-disc list-inside">
+                                  {/* <li>Lower your bid amount</li> */}
+                                  <li>Purchase more funds</li>
+                                </ul>
+                              </div>
+                            </div>
+                          </div>
+                        )}
+
+                        <button
+                          type="submit"
+                          className="buyer-details-bid-button w-full disabled:opacity-50 disabled:cursor-not-allowed"
+                          disabled={isPlacingBid || !state.customBidAmount || !hasEnoughPoints}
+                        >
+                          {isPlacingBid ? 'Placing Bid...' : 'Place Bid'}
+                        </button>
+                      </div>
+                    </form>
+                  </>
+                )}
               </div>
+
+
               {/* <div className="bid-summary-item">
                 <span className="bid-summary-label">Auction ID</span>
                 <span className="bid-summary-value-small">#{bidDetails.auction_id || 'N/A'}</span>
@@ -211,11 +457,7 @@ const BuyerBidDetails = () => {
               </div>
             )}
 
-            {/* <div className="bid-summary-actions">
-              <Link to={`/buyer/auction/${bidDetails.auction_id}`} className="bid-action-btn primary">
-                View Auction Details
-              </Link>
-            </div> */}
+
           </div>
         </div>
 
@@ -248,7 +490,7 @@ const BuyerBidDetails = () => {
             {activeTab === 'information' && (
               <div className="bid-information-panel">
                 <div className="bid-info-section">
-                  <h3 className="bid-info-section-title">Bid Details</h3>
+                  {/* <h3 className="bid-info-section-title">Bid Details</h3> */}
                   <div className="bid-info-grid">
                     <div className="bid-info-item">
                       <span className="bid-info-label">Status</span>
@@ -256,58 +498,15 @@ const BuyerBidDetails = () => {
                         {bidDetails.status ? bidDetails.status.replace(/_/g, ' ') : 'N/A'}
                       </span>
                     </div>
-                    <div className="bid-info-item">
-                      <span className="bid-info-label">Bid Amount</span>
-                      <span className="bid-info-value highlight">
-                        {bidDetails.amount ? formatCurrency(parseFloat(bidDetails.amount)) : 'N/A'}
-                      </span>
-                    </div>
-                    {/* <div className="bid-info-item">
-                      <span className="bid-info-label">Bid ID</span>
-                      <span className="bid-info-value">#{bidDetails.id}</span>
-                    </div> */}
-
-                    {/* <div className="bid-info-item">
-                      <span className="bid-info-label">Auction Title</span>
-                      <span className="bid-info-value">{bidDetails.auction_title || 'N/A'}</span>
-                    </div> */}
 
                     <div className="bid-info-item">
                       <span className="bid-info-label">Bid Created</span>
                       <span className="bid-info-value">{formatDate(bidDetails.created_at)}</span>
                     </div>
-                    {/* <div className="bid-info-item">
-                      <span className="bid-info-label">Auction ID</span>
-                      <span className="bid-info-value">#{bidDetails.auction_id || 'N/A'}</span>
-                    </div> */}
+
                   </div>
                 </div>
 
-                {/* {bidDetails.auction_media && bidDetails.auction_media.length > 0 && (
-                    <div className="bid-info-section">
-                    <h3 className="bid-info-section-title">Auction Media</h3>
-                    <div className="bid-media-grid">
-                      {bidDetails.auction_media.map((media, index) => (
-                          <div key={media.id || index} className="bid-media-item">
-                          {media.media_type === 'image' ? (
-                              <>
-                              <img src={media.file} alt={media.label || `Media ${index + 1}`} />
-                              <span className="bid-media-label">{media.label || `Image ${index + 1}`}</span>
-                            </>
-                          ) : (
-                            <div className="bid-media-placeholder">
-                              <svg width="32" height="32" viewBox="0 0 24 24" fill="none">
-                                <path d="M14 2H6C5.46957 2 4.96086 2.21071 4.58579 2.58579C4.21071 2.96086 4 3.46957 4 4V20C4 20.5304 4.21071 21.0391 4.58579 21.4142C4.96086 21.7893 5.46957 22 6 22H18C18.5304 22 19.0391 21.7893 19.4142 21.4142C19.7893 21.0391 20 20.5304 20 20V8L14 2Z" stroke="currentColor" strokeWidth="2" />
-                                <path d="M14 2V8H20" stroke="currentColor" strokeWidth="2" />
-                              </svg>
-                              <span>{media.media_type}</span>
-                            </div>
-                          )}
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )} */}
               </div>
             )}
 
@@ -331,14 +530,27 @@ const BuyerBidDetails = () => {
                         <div className="bid-history-amount">
                           {formatCurrency(parseFloat(bid.amount))}
                         </div>
-                        {bid.id === bidDetails.id && (
-                          <div className="bid-history-your-bid">
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-                              <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z" fill="currentColor" />
-                            </svg>
-                            Your Bid
-                          </div>
-                        )}
+                        {/* {bid.id === bidDetails.id && (
+                          <>
+                            <div className="bid-history-your-bid">
+                              <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                                <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z" fill="currentColor" />
+                              </svg>
+                              Your Bid
+                            </div>
+
+                          </>
+                        )} */}
+                        {
+                          index === 0 && (
+                            <div className="bid-history-your-bid">
+                              <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                                <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z" fill="currentColor" />
+                              </svg>
+                              Highest
+                            </div>
+                          )
+                        }
                       </div>
                     ))}
                   </div>

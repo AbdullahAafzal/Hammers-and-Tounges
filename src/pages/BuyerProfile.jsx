@@ -4,12 +4,15 @@ import "./BuyerProfile.css";
 import { logout } from "../store/slices/authSlice";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchProfile, updateProfile } from "../store/actions/profileActions";
+import { fetchMyBids } from "../store/actions/buyerActions";
 import { toast } from "react-toastify";
 import { getMediaUrl } from "../config/api.config";
 
 const BuyerProfile = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
+  const { myBids } = useSelector( state => state.buyer )
+
 
   // Get profile data from Redux store
   const {
@@ -48,6 +51,10 @@ const BuyerProfile = () => {
   useEffect(() => {
     dispatch(fetchProfile());
   }, [dispatch]);
+
+  useEffect( ()=> {
+    dispatch( fetchMyBids() )
+  }, [dispatch] )
 
   // Update formData when profileData changes from API
   useEffect(() => {
@@ -555,24 +562,58 @@ const BuyerProfile = () => {
                         </div>
                       )}
                     </div>
-                    <div className="info-item">
-                      <label>Bid Funds</label>
-                      {/* {isEditing ? (
+                    {/* <div className="info-item">
+                      <label>Phone Number</label>
+                      {isEditing ? (
                         <input
                           type="tel"
                           className="edit-input"
                           value={formData.phone}
-                          // onChange={(e) =>
+                          onChange={(e) =>
+                            handleInputChange("phone", e.target.value)
+                          }
+                        />
+                      ) : (
+                        <div className="info-value">
+                          {formData.phone || "-"}
+                        </div>
+                      )}
+                    </div> */}
+                    <div className="info-item">
+                      {/* {isEditing ? (
+                        <input
+                        type="tel"
+                        className="edit-input"
+                        value={formData.phone}
+                        // onChange={(e) =>
                           //   handleInputChange("phone", e.target.value)
                           // }
-                        /> */}
+                          /> */}
                       {/* ) : ( */}
+                      {/* )} */}
+                          <label>Bid Funds</label>
                         <div className="info-value">
                           {profileData?.buyer_profile?.points}
                         </div>
-                      {/* )} */}
                     </div>
-                    <div className="info-item" style={{ gridColumn: "1 / -1" }}>
+                    <div className="info-item">
+                      {/* {isEditing ? (
+                        <input
+                        type="tel"
+                        className="edit-input"
+                        value={formData.phone}
+                        // onChange={(e) =>
+                          //   handleInputChange("phone", e.target.value)
+                          // }
+                          /> */}
+                      {/* ) : ( */}
+                      {/* )} */}
+                          <label> Total bid{myBids?.count !== 1 ? 's' : ''}</label>
+                        <div className="info-value">
+                          {myBids?.count || 0}
+                        </div>
+                    </div>
+                    <div className="info-item">
                       <label>Bio</label>
                       {isEditing ? (
                         <textarea
