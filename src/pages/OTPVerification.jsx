@@ -236,6 +236,9 @@ const OTPVerification = () => {
               }
             </button>
 
+              {
+                timer <= 0 &&
+
             <button
               type="button"
               className="resend-verify-button"
@@ -251,6 +254,11 @@ const OTPVerification = () => {
                 'Resend OTP'
               )}
             </button>
+              }
+              {
+                timer > 0 &&
+              <p className='text-center'> Resend OTP Button will appear after 5 minutes </p>
+              }
           </form>
         </div>
       </div>
