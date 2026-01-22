@@ -479,6 +479,7 @@ const SellerAuctionDetails = () => {
               </svg>
               {selectedAuction?.pickup_address || 'N/A'}
             </p> */}
+            <div className='text-gray-400 font-medium py-2'> Lot Number #<strong>{selectedAuction?.id} </strong> </div>
           </div>
           <div
             className="seller-details-status-badge"
@@ -497,7 +498,6 @@ const SellerAuctionDetails = () => {
             {selectedAuction?.status === 'REJECTED' && 'REJECTED'}
           </div>
         </div>
-
         {/* Main Content */}
         <div className="seller-details-content">
           {/* Image Gallery */}
@@ -806,14 +806,14 @@ const SellerAuctionDetails = () => {
             >
               Product Information
             </button>
-            {paperDetails.length > 0 && (
+            {/* {paperDetails.length > 0 && (
               <button
                 className={`seller-details-tab ${activeTab === 'paper-details' ? 'active' : ''}`}
                 onClick={() => setActiveTab('paper-details')}
               >
                 Paper Details
               </button>
-            )}
+            )} */}
             <button
               className={`seller-details-tab ${activeTab === 'bid-history' ? 'active' : ''}`}
               onClick={() => setActiveTab('bid-history')}
@@ -850,12 +850,12 @@ const SellerAuctionDetails = () => {
                   <span className="seller-details-info-label">Currency</span>
                   <span className="seller-details-info-value">{selectedAuction?.currency || 'USD'}</span>
                 </div>
-                <div className="seller-details-info-row">
+                {/* <div className="seller-details-info-row">
                   <span className="seller-details-info-label">Expected Price</span>
                   <span className="seller-details-info-value highlight">
                     {formatCurrency(parseFloat(selectedAuction?.seller_expected_price || 0))}
                   </span>
-                </div>
+                </div> */}
                 {/* <div className="seller-details-info-row">
                   <span className="seller-details-info-label">Handover Type</span>
                   <span className="seller-details-info-value">{selectedAuction?.handover_type || 'N/A'}</span>
@@ -914,7 +914,7 @@ const SellerAuctionDetails = () => {
             )}
 
             {/* Paper Details Tab - DYNAMIC */}
-            {activeTab === 'paper-details' && paperDetails.length > 0 && (
+            {/* {activeTab === 'paper-details' && paperDetails.length > 0 && (
               <div className="seller-details-info-grid">
                 {paperDetails.map((paper, index) => (
                   <div key={`paper-${index}`} className="seller-details-info-row">
@@ -923,7 +923,7 @@ const SellerAuctionDetails = () => {
                   </div>
                 ))}
               </div>
-            )}
+            )} */}
 
             {/* Bid History Tab */}
             {activeTab === 'bid-history' && (

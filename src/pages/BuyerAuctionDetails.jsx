@@ -83,8 +83,8 @@ const Breadcrumbs = memo(({ auction }) => (
     <Link to="/buyer/auctions">Auctions</Link>
     <span>/</span>
     <span>{auction?.category_name || 'Category'}</span>
-    {/* <span>/</span>
-    <span>Lot #{auction?.id || 'N/A'}</span> */}
+    <span>/</span>
+    <span>Lot Number #{auction?.id || 'N/A'}</span>
   </nav>
 ));
 

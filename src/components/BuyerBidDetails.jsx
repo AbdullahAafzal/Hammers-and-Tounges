@@ -243,8 +243,10 @@ const BuyerBidDetails = () => {
         {/* Header */}
         <div className="bid-details-header">
           <div className="bid-details-header-content">
-            <h1 className="bid-details-title">{bidDetails.auction_title || 'Untitled Auction'}</h1>
-            {/* <p className="bid-details-subtitle">Bid ID: #{bidDetails.id}</p> */}
+            <h1 className="bid-details-title">{bidDetails?.auction_title || 'Untitled Auction'}</h1>
+            {/* <p className="bid-details-subtitle">Bid ID: #{bidDetails?.auction_id}</p> */}
+            <div className='text-gray-400 font-medium py-2'> Lot Number # <strong> {bidDetails?.auction_id} </strong> </div>
+
           </div>
           {bidDetails.status && (
             <div

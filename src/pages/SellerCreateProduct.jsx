@@ -1,12 +1,12 @@
 import React, { useEffect, useState, useMemo, useRef } from 'react';
-import { Link, useNavigate, useParams, useLocation } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import './SellerCreateProduct.css';
 import { useSelector, useDispatch } from 'react-redux';
 import { createAuction, updateAuction, fetchMyAuctions } from '../store/actions/sellerActions';
 import { fetchCategories } from '../store/actions/AuctionsActions';
 import { fetchProfile } from '../store/actions/profileActions';
 import { toast } from 'react-toastify';
-import { getCurrentLocation } from '../utils/location';
+// import { getCurrentLocation } from '../utils/location';
 import { getMediaUrl } from '../config/api.config';
 
 const SellerCreateProduct = () => {
@@ -27,12 +27,12 @@ const SellerCreateProduct = () => {
   const [formData, setFormData] = useState({
     title: '',
     description: '',
-    handover_type: 'PICKUP',
-    pickup_address: '',
-    pickup_latitude: '',
-    pickup_longitude: '',
-    // seller_expected_price: '',
-    delivery_datetime: "2026-01-10T14:30:00.000Z"
+    // handover_type: 'PICKUP',
+    // pickup_address: '',
+    // pickup_latitude: '',
+    // pickup_longitude: '',
+    // // seller_expected_price: '',
+    // delivery_datetime: "2026-01-10T14:30:00.000Z"
   });
   const [specificData, setSpecificData] = useState({});
   const [mediaFiles, setMediaFiles] = useState([]);
@@ -49,10 +49,10 @@ const SellerCreateProduct = () => {
   }, [selectedAuction])
 
   // Handover type options
-  const handoverTypes = [
-    { value: 'PICKUP', label: 'Pickup' },
-    { value: 'DELIVERY', label: 'Delivery' },
-  ];
+  // const handoverTypes = [
+  //   { value: 'PICKUP', label: 'Pickup' },
+  //   { value: 'DELIVERY', label: 'Delivery' },
+  // ];
 
   useEffect(() => {
     dispatch(fetchMyAuctions());
@@ -123,14 +123,14 @@ const SellerCreateProduct = () => {
       setFormData({
         title: selectedAuction?.title || '',
         description: selectedAuction?.description || '',
-        handover_type: selectedAuction?.handover_type || 'PICKUP',
-        pickup_address: selectedAuction?.pickup_address || '',
-        pickup_latitude: selectedAuction?.pickup_latitude?.toString() || '',
-        pickup_longitude: selectedAuction?.pickup_longitude?.toString() || '',
+        // handover_type: selectedAuction?.handover_type || 'PICKUP',
+        // pickup_address: selectedAuction?.pickup_address || '',
+        // pickup_latitude: selectedAuction?.pickup_latitude?.toString() || '',
+        // pickup_longitude: selectedAuction?.pickup_longitude?.toString() || '',
         // seller_expected_price: selectedAuction?.seller_expected_price?.toString() || '',
-        delivery_datetime: selectedAuction?.delivery_datetime
-          ? new Date(selectedAuction?.delivery_datetime).toISOString().slice(0, 16)
-          : new Date(Date.now() + 10 * 60000).toISOString().slice(0, 16),
+        // delivery_datetime: selectedAuction?.delivery_datetime
+        //   ? new Date(selectedAuction?.delivery_datetime).toISOString().slice(0, 16)
+        //   : new Date(Date.now() + 10 * 60000).toISOString().slice(0, 16),
       });
 
       // Set specific data
@@ -164,43 +164,45 @@ const SellerCreateProduct = () => {
   }, [selectedCategory, categories]);
 
   /////////////
-  const isValidLatitude = (lat) => {
-    const value = parseFloat(lat);
-    return !isNaN(value) && value >= -90 && value <= 90;
-  };
+  
+  // const isValidLatitude = (lat) => {
+  //   const value = parseFloat(lat);
+  //   return !isNaN(value) && value >= -90 && value <= 90;
+  // };
 
-  const isValidLongitude = (lng) => {
-    const value = parseFloat(lng);
-    return !isNaN(value) && value >= -180 && value <= 180;
-  };
+  // const isValidLongitude = (lng) => {
+  //   const value = parseFloat(lng);
+  //   return !isNaN(value) && value >= -180 && value <= 180;
+  // };
+
   ////////////////
-  const handleUseLiveLocation = async () => {
-    try {
-      const { latitude, longitude } = await getCurrentLocation();
+  // const handleUseLiveLocation = async () => {
+  //   try {
+  //     const { latitude, longitude } = await getCurrentLocation();
 
-      setFormData(prev => ({
-        ...prev,
-        pickup_latitude: latitude.toFixed(6),
-        pickup_longitude: longitude.toFixed(6),
-      }));
+  //     setFormData(prev => ({
+  //       ...prev,
+  //       pickup_latitude: latitude.toFixed(6),
+  //       pickup_longitude: longitude.toFixed(6),
+  //     }));
 
-      toast.success('Location fetched successfully');
-    } catch (error) {
-      switch (error.code) {
-        case error.PERMISSION_DENIED:
-          toast.error('Location permission denied');
-          break;
-        case error.POSITION_UNAVAILABLE:
-          toast.error('Location unavailable. Turn on GPS.');
-          break;
-        case error.TIMEOUT:
-          toast.error('Location request timed out. Try again.');
-          break;
-        default:
-          toast.error('Failed to get location');
-      }
-    }
-  };
+  //     toast.success('Location fetched successfully');
+  //   } catch (error) {
+  //     switch (error.code) {
+  //       case error.PERMISSION_DENIED:
+  //         toast.error('Location permission denied');
+  //         break;
+  //       case error.POSITION_UNAVAILABLE:
+  //         toast.error('Location unavailable. Turn on GPS.');
+  //         break;
+  //       case error.TIMEOUT:
+  //         toast.error('Location request timed out. Try again.');
+  //         break;
+  //       default:
+  //         toast.error('Failed to get location');
+  //     }
+  //   }
+  // };
 
   // Get validation schema for selected category
   const validationSchema = useMemo(() => {
@@ -304,13 +306,13 @@ const SellerCreateProduct = () => {
           error = 'Description must be at least 10 characters';
         }
         break;
-      case 'pickup_address':
-        if (formData.handover_type === 'PICKUP' || formData.handover_type === 'DELIVERY') {
-          if (!value || value.trim() === '') {
-            error = 'Pickup address is required for pickup option';
-          }
-        }
-        break;
+      // case 'pickup_address':
+      //   if (formData.handover_type === 'PICKUP' || formData.handover_type === 'DELIVERY') {
+      //     if (!value || value.trim() === '') {
+      //       error = 'Pickup address is required for pickup option';
+      //     }
+      //   }
+      //   break;
       // case 'seller_expected_price':
       //   if (!value || value.trim() === '') {
       //     error = 'Starting price is required';
@@ -318,13 +320,13 @@ const SellerCreateProduct = () => {
       //     error = 'Starting price must be a positive number';
       //   }
       //   break;
-      case 'delivery_datetime':
-        if (!value) {
-          error = 'Auction start time is required';
-        } else if (new Date(value) <= new Date()) {
-          error = 'Auction start time must be in the future';
-        }
-        break;
+      // case 'delivery_datetime':
+      //   if (!value) {
+      //     error = 'Auction start time is required';
+      //   } else if (new Date(value) <= new Date()) {
+      //     error = 'Auction start time must be in the future';
+      //   }
+      //   break;
       default:
         break;
     }
@@ -390,11 +392,11 @@ const SellerCreateProduct = () => {
       isValid = false;
     }
 
-    if ((formData.handover_type === 'PICKUP' || formData.handover_type === 'BOTH') &&
-      (!formData.pickup_address || formData.pickup_address.trim() === '')) {
-      newErrors.pickup_address = 'Pickup address is required for pickup option';
-      isValid = false;
-    }
+    // if ((formData.handover_type === 'PICKUP' || formData.handover_type === 'BOTH') &&
+    //   (!formData.pickup_address || formData.pickup_address.trim() === '')) {
+    //   newErrors.pickup_address = 'Pickup address is required for pickup option';
+    //   isValid = false;
+    // }
 
     // if (!formData.
     //   seller_expected_price
@@ -409,11 +411,11 @@ const SellerCreateProduct = () => {
     //   isValid = false;
     // }
 
-    if (!formData.delivery_datetime || isNaN(formData.delivery_datetime) ||
-      parseInt(formData.delivery_datetime) < 1 || parseInt(formData.delivery_datetime) > 30) {
-      newErrors.delivery_datetime = 'Duration must be between 1 and 30 days';
-      isValid = false;
-    }
+    // if (!formData.delivery_datetime || isNaN(formData.delivery_datetime) ||
+    //   parseInt(formData.delivery_datetime) < 1 || parseInt(formData.delivery_datetime) > 30) {
+    //   newErrors.delivery_datetime = 'Duration must be between 1 and 30 days';
+    //   isValid = false;
+    // }
 
     // Validate specific data fields
     Object.entries(validationSchema).forEach(([fieldName, fieldConfig]) => {
@@ -793,7 +795,7 @@ const SellerCreateProduct = () => {
         category: parseInt(selectedCategory),
         title: formData.title || 'Draft Listing',
         description: formData.description || '',
-        handover_type: formData.handover_type,
+        // handover_type: formData.handover_type,
         specific_data: specificData,
         status: 'DRAFT',
 
@@ -812,25 +814,25 @@ const SellerCreateProduct = () => {
         //   seller_expected_price: parseFloat(formData.seller_expected_price),
         // }),
 
-        ...(formData.delivery_datetime && {
-          delivery_datetime: new Date(formData.delivery_datetime).toISOString(),
-        }),
+        // ...(formData.delivery_datetime && {
+        //   delivery_datetime: new Date(formData.delivery_datetime).toISOString(),
+        // }),
 
-        ...(formData.pickup_latitude &&
-          isValidLatitude(formData.pickup_latitude) && {
-          pickup_latitude: parseFloat(formData.pickup_latitude),
-        }),
+        // ...(formData.pickup_latitude &&
+        //   isValidLatitude(formData.pickup_latitude) && {
+        //   pickup_latitude: parseFloat(formData.pickup_latitude),
+        // }),
 
-        ...(formData.pickup_longitude &&
-          isValidLongitude(formData.pickup_longitude) && {
-          pickup_longitude: parseFloat(formData.pickup_longitude),
-        }),
+        // ...(formData.pickup_longitude &&
+        //   isValidLongitude(formData.pickup_longitude) && {
+        //   pickup_longitude: parseFloat(formData.pickup_longitude),
+        // }),
       };
 
       // Add conditional fields
-      if (formData.handover_type === 'PICKUP' || formData.handover_type === 'BOTH') {
-        auctionData.pickup_address = formData.pickup_address || '';
-      }
+      // if (formData.handover_type === 'PICKUP' || formData.handover_type === 'BOTH') {
+      //   auctionData.pickup_address = formData.pickup_address || '';
+      // }
 
       // Dispatch create or update action
       if (isUpdating && selectedAuction?.id) {
@@ -849,12 +851,12 @@ const SellerCreateProduct = () => {
       setFormData({
         title: '',
         description: '',
-        handover_type: 'PICKUP',
-        pickup_address: '',
-        pickup_latitude: '',
-        pickup_longitude: '',
-        // seller_expected_price: '',
-        delivery_datetime: "2026-01-10T14:30:00.000Z"
+        // handover_type: 'PICKUP',
+        // pickup_address: '',
+        // pickup_latitude: '',
+        // pickup_longitude: '',
+        // // seller_expected_price: '',
+        // delivery_datetime: "2026-01-10T14:30:00.000Z"
       });
 
       setMediaFiles([]);
@@ -1038,7 +1040,7 @@ const SellerCreateProduct = () => {
 
 
                     {/* Handover Type */}
-                    <div className="create-auction-form-group">
+                    {/* <div className="create-auction-form-group">
                       <label className="create-auction-form-label">
                         Handover Method <span className="create-auction-required-mark">*</span>
                       </label>
@@ -1056,11 +1058,11 @@ const SellerCreateProduct = () => {
                           </option>
                         ))}
                       </select>
-                    </div>
+                    </div> */}
                   </div>
 
-                  <div className="create-auction-form-grid create-auction-form-grid-1">
                     {/* Pickup Address (for DELIVERY) */}
+                  {/* <div className="create-auction-form-grid create-auction-form-grid-1">
                     {(formData.handover_type === 'DELIVERY' && (
                       <>
                         <div className="create-auction-form-group">
@@ -1094,11 +1096,11 @@ const SellerCreateProduct = () => {
                       </>
                     )
                     )}
-                  </div>
+                  </div> */}
 
                   {/* Conditional Fields Based on Handover Type */}
-                  <div className="create-auction-form-grid create-auction-form-grid-1">
                     {/* Pickup Address (for PICKUP) */}
+                  {/* <div className="create-auction-form-grid create-auction-form-grid-1">
                     {(formData.handover_type === 'PICKUP' || formData.handover_type === 'BOTH') && (
                       <>
                         <div className="create-auction-form-group create-auction-form-group-full">
@@ -1193,7 +1195,7 @@ const SellerCreateProduct = () => {
                       </>
                     )}
 
-                  </div>
+                  </div> */}
                 </div>
               )}
 
