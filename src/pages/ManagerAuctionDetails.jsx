@@ -50,7 +50,7 @@ const ManagerAuctionDetails = () => {
         <div className="manager-auction-details-container">
           <div className="manager-auction-details-error">
             <h3>No auction data available</h3>
-            <button onClick={() => navigate('/manager/auctions')} className="manager-auction-details-back-btn">
+            <button onClick={() => navigate('/manager/dashboard')} className="manager-auction-details-back-btn">
               Go Back
             </button>
           </div>
@@ -72,13 +72,13 @@ const ManagerAuctionDetails = () => {
             <p className="manager-auction-details-subtitle">View complete auction information</p>
           </div>
           <button
-            onClick={() => navigate('/manager/auctions')}
+            onClick={() => navigate('/manager/dashboard')}
             className="manager-auction-details-back-btn"
           >
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
               <path d="M19 12H5M12 19l-7-7 7-7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
             </svg>
-            Back to Auctions
+            Back to Dashboard
           </button>
         </div>
 

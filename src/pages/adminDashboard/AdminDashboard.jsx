@@ -3,16 +3,15 @@ import React, {
   useEffect,
   useMemo,
   useCallback,
-  lazy,
-  Suspense
 } from "react";
 import "./AdminDashboard.css";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchUsersList } from "../../store/actions/adminActions";
 import { adminService } from "../../services/interceptors/admin.service";
+import { auctionService } from "../../services/interceptors/auction.service";
 import { toast } from "react-toastify";
-import { API_CONFIG, getMediaUrl } from "../../config/api.config";
+import { API_CONFIG } from "../../config/api.config";
 
 // Lazy load images for better performance
 // const Car1 = lazy(() => import('../../assets/admin-assests/1.png'));
@@ -119,201 +118,78 @@ const ActivityItem = React.memo(({ activity }) => (
   </div>
 ));
 
-// Helper function to check if manager is assigned
-const hasManagerAssigned = (auction) => {
-  return !!(auction.auction_manager_name || auction.manager_details);
+const formatEventDate = (isoStr) => {
+  if (!isoStr) return "-----";
+  try {
+    const d = new Date(isoStr);
+    return d.toLocaleDateString("en-US", {
+      month: "short",
+      day: "numeric",
+      year: "numeric",
+      hour: "2-digit",
+      minute: "2-digit"
+    });
+  } catch {
+    return "-----";
+  }
 };
 
-const AuctionRow = React.memo(({ auction, onViewDetails, onAssignManager }) => {
+const EventRow = React.memo(({ event, onViewDetails }) => {
   const getStatusColor = useCallback((status) => {
-    // Map DRAFT to PENDING for color
-    const displayStatus = status === "DRAFT" ? "PENDING" : status;
-    switch (displayStatus) {
+    const s = (status || "").toUpperCase();
+    switch (s) {
+      case "SCHEDULED":
+        return "admin-dashboard-status-success";
+      case "LIVE":
+        return "admin-dashboard-status-success";
+      case "CLOSING":
+        return "admin-dashboard-status-warning";
+      case "CLOSED":
+        return "admin-dashboard-status-info";
       case "ACTIVE":
-        return "admin-dashboard-status-success";
-      case "APPROVED":
-        return "admin-dashboard-status-success";
       case "PENDING":
         return "admin-dashboard-status-warning";
       case "REJECTED":
         return "admin-dashboard-status-error";
-      case "COMPLETED":
-        return "admin-dashboard-status-info";
-      case "CLOSED":
-        return "admin-dashboard-status-info";
       default:
         return "admin-dashboard-status-default";
     }
   }, []);
 
-  // Map DRAFT to PENDING for display
-  const displayStatus = auction.status === "DRAFT" ? "PENDING" : auction.status;
-
-  // Check if manager is assigned
-  const managerAssigned = hasManagerAssigned(auction);
-
-  // Check if assign button should be shown (only for pending/draft auctions without manager)
-  const showAssignButton = (auction.status === "DRAFT" || auction.status === "PENDING") && !managerAssigned;
-
   return (
-    <tr className="admin-dashboard-auction-row">
-      <td
-        className="admin-dashboard-table-cell admin-dashboard-cell-auction"
-        data-label="Auction"
-      >
-        <div className="admin-dashboard-auction-info">
-          <div className="admin-dashboard-auction-image">
-            <Suspense
-              fallback={
-                <div className="admin-dashboard-image-placeholder">📷</div>
-              }
-            >
-              {auction.media && auction.media.length > 0 ? (
-                <img
-                  src={getMediaUrl(auction.media[0].file)}
-                  alt={auction.title}
-                  loading="lazy"
-                  width="40"
-                  height="40"
-                  onError={(e) => {
-                    e.target.onerror = null;
-                    e.target.src =
-                      "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='40' viewBox='0 0 40 40'%3E%3Crect width='40' height='40' fill='%23222'/%3E%3Ctext x='20' y='22' font-family='Arial' font-size='14' fill='%23fff' text-anchor='middle'%3E📷%3C/text%3E%3C/svg%3E";
-                  }}
-                />
-              ) : (
-                <div className="admin-dashboard-image-placeholder">📷</div>
-              )}
-            </Suspense>
-          </div>
-          <div className="admin-dashboard-auction-details">
-            <div className="admin-dashboard-auction-title">{auction.title}</div>
-            <div className="admin-dashboard-auction-category">
-              {auction.category_name}
-            </div>
-          </div>
+    <tr className="admin-dashboard-event-row">
+      <td className="admin-dashboard-table-cell admin-dashboard-cell-event" data-label="Event">
+        <div className="admin-dashboard-event-info">
+          <div className="admin-dashboard-event-title">{event.title || "Untitled Event"}</div>
+          <div className="admin-dashboard-event-lots">{event.lots_count ?? 0} lots</div>
         </div>
       </td>
-      <td
-        className="admin-dashboard-table-cell admin-dashboard-cell-status"
-        data-label="Status"
-      >
-        <span
-          className={`admin-dashboard-status-badge ${getStatusColor(
-            auction.status
-          )}`}
-        >
-          {displayStatus}
+      <td className="admin-dashboard-table-cell admin-dashboard-cell-status" data-label="Status">
+        <span className={`admin-dashboard-status-badge ${getStatusColor(event.status)}`}>
+          {event.status || "—"}
         </span>
       </td>
-      <td
-        className="admin-dashboard-table-cell admin-dashboard-cell-price"
-        data-label="Price"
-      >
-        <div className="admin-dashboard-auction-price">
-          {auction.currency}{" "}
-          {auction.initial_price || auction.seller_expected_price || "N/A"}
-        </div>
+      <td className="admin-dashboard-table-cell admin-dashboard-cell-start" data-label="Start">
+        {formatEventDate(event.start_time)}
       </td>
-      <td
-        className="admin-dashboard-table-cell admin-dashboard-cell-manager"
-        data-label="Manager"
-      >
-        <div className="admin-dashboard-manager-info">
-          {auction.auction_manager_name ? (
-            <div className="admin-dashboard-manager-name">
-              {auction.auction_manager_name}
-            </div>
-          ) : auction.manager_details ? (
-            <>
-              <div className="admin-dashboard-manager-name">
-                {auction.manager_details.first_name}{" "}
-                {auction.manager_details.last_name}
-              </div>
-              <div className="admin-dashboard-manager-email">
-                {auction.manager_details.email}
-              </div>
-            </>
-          ) : (
-            <span className="admin-dashboard-no-manager">Not assigned</span>
-          )}
-        </div>
+      <td className="admin-dashboard-table-cell admin-dashboard-cell-end" data-label="End">
+        {formatEventDate(event.end_time)}
       </td>
-      <td
-        className="admin-dashboard-table-cell admin-dashboard-cell-actions"
-        data-label="Actions"
-      >
-        <div className="admin-dashboard-auction-actions">
-          <button
-            className="admin-dashboard-icon-btn"
-            onClick={(e) => {
-              e.stopPropagation();
-              onViewDetails(auction.id);
-            }}
-            title="View Details"
-            aria-label={`View details for ${auction.title}`}
-          >
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
-              <path
-                d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"
-                stroke="currentColor"
-                strokeWidth="2"
-              />
-              <circle
-                cx="12"
-                cy="12"
-                r="3"
-                stroke="currentColor"
-                strokeWidth="2"
-              />
-            </svg>
-          </button>
-          {/* Show Assign Manager button only for pending auctions (DRAFT or PENDING) without manager */}
-          {showAssignButton && (
-            <button
-              className="admin-dashboard-icon-btn"
-              onClick={(e) => {
-                e.stopPropagation();
-                onAssignManager(auction.id);
-              }}
-              title="Assign Manager"
-              aria-label={`Assign manager to ${auction.title}`}
-            >
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
-                <path
-                  d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                />
-                <circle
-                  cx="8.5"
-                  cy="7"
-                  r="4"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                />
-                <line
-                  x1="20"
-                  y1="8"
-                  x2="20"
-                  y2="14"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                />
-                <line
-                  x1="23"
-                  y1="11"
-                  x2="17"
-                  y2="11"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                />
-              </svg>
-            </button>
-          )}
-        </div>
+      <td className="admin-dashboard-table-cell admin-dashboard-cell-actions" data-label="Actions">
+        <button
+          className="admin-dashboard-icon-btn"
+          onClick={(e) => {
+            e.stopPropagation();
+            onViewDetails(event.id, event);
+          }}
+          title="View Details"
+          aria-label={`View details for ${event.title}`}
+        >
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" stroke="currentColor" strokeWidth="2" />
+            <circle cx="12" cy="12" r="3" stroke="currentColor" strokeWidth="2" />
+          </svg>
+        </button>
       </td>
     </tr>
   );
@@ -323,38 +199,34 @@ const AdminDashboard = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const { users, isLoading } = useSelector((state) => state.admin);
-  const [auctions, setAuctions] = useState([]);
-  const [filterStatus, setFilterStatus] = useState("All Status");
-  const [isLoadingAuctions, setIsLoadingAuctions] = useState(false);
-  const [auctionCount, setAuctionCount] = useState(0);
-  const [showManagerModal, setShowManagerModal] = useState(false);
-  const [selectedAuction, setSelectedAuction] = useState(null);
-  const [selectedManagerId, setSelectedManagerId] = useState("");
-  const [isAssigning, setIsAssigning] = useState(false);
+  const [events, setEvents] = useState([]);
+  const [filterStatus, setFilterStatus] = useState("ALL");
+  const [isLoadingEvents, setIsLoadingEvents] = useState(false);
+  const [eventCount, setEventCount] = useState(0);
 
   // Fetch users on component mount
   useEffect(() => {
     dispatch(fetchUsersList());
   }, [dispatch]);
 
-  // Fetch auctions on component mount
+  // Fetch events on component mount (admin token attached for auth)
   useEffect(() => {
-    const fetchAuctions = async () => {
-      setIsLoadingAuctions(true);
+    const fetchEventsData = async () => {
+      setIsLoadingEvents(true);
       try {
-        const response = await adminService.getDashboard();
-        setAuctions(response.results || []);
-        setAuctionCount(response.count || 0);
+        const response = await auctionService.getEvents({ page: 1 });
+        setEvents(response.results || []);
+        setEventCount(response.count ?? response.results?.length ?? 0);
       } catch (error) {
-        console.error("Error fetching auctions:", error);
-        toast.error("Failed to load auctions. Please try again.");
-        setAuctions([]);
-        setAuctionCount(0);
+        console.error("Error fetching events:", error);
+        toast.error("Failed to load events. Please try again.");
+        setEvents([]);
+        setEventCount(0);
       } finally {
-        setIsLoadingAuctions(false);
+        setIsLoadingEvents(false);
       }
     };
-    fetchAuctions();
+    fetchEventsData();
   }, []);
 
   // Calculate stats from users data
@@ -362,60 +234,20 @@ const AdminDashboard = () => {
     if (!users?.results) {
       return {
         totalUsers: 0,
-        totalAuctions: auctionCount,
-        activeAuctions: 0,
-        pendingApprovals: 0,
-        totalRevenue: "0",
-        platformFees: "0",
-        disputeCases: 0,
-        completedAuctions: 0,
-        pendingAuctions: 0,
-        rejectedAuctions: 0
+        totalEvents: eventCount,
+        totalRevenue: "0"
       };
     }
 
     const allUsers = users.results;
     const totalUsers = allUsers.length;
 
-    // Count pending approvals (sellers with KYC images but not verified)
-    const pendingApprovals = allUsers.filter((user) => {
-      if (user.role !== "seller" || !user?.seller_details) return false;
-
-      // Check if seller has KYC images
-      const sellerDetails = user.seller_details;
-      const kycImageFields = [
-        "id_front",
-        "id_back",
-        "driving_license_front",
-        "driving_license_back",
-        "passport_front"
-      ];
-      const hasImages = kycImageFields.some((field) => {
-        const value = sellerDetails[field];
-        if (!value) return false;
-        if (typeof value === "string") {
-          return value.trim() !== "";
-        }
-        return value !== null && value !== undefined;
-      });
-
-      // Pending if not verified and has images
-      return !user.seller_details.verified && hasImages;
-    }).length;
-
     return {
       totalUsers,
-      totalAuctions: auctionCount,
-      activeAuctions: 0,
-      pendingApprovals,
-      totalRevenue: "0",
-      platformFees: "0",
-      disputeCases: 0,
-      completedAuctions: 0,
-      pendingAuctions: 0,
-      rejectedAuctions: 0
+      totalEvents: eventCount,
+      totalRevenue: "0"
     };
-  }, [users, auctionCount]);
+  }, [users, eventCount]);
 
   // Memoized data
   const recentActivities = useMemo(
@@ -439,115 +271,24 @@ const AdminDashboard = () => {
     []
   );
 
-  // Filter auctions based on selected status
-  const filteredAuctions = useMemo(() => {
-    if (!auctions || auctions.length === 0) return [];
+  // Filter events based on selected status (ALL, SCHEDULED, LIVE, CLOSING, CLOSED)
+  const filteredEvents = useMemo(() => {
+    if (!events || events.length === 0) return [];
 
-    if (filterStatus === "All Status") {
-      return auctions;
-    }
+    if (filterStatus === "ALL") return events;
 
-    return auctions.filter((auction) => {
-      // Map DRAFT to PENDING for filtering
-      const displayStatus =
-        auction.status === "DRAFT" ? "PENDING" : auction.status;
-      return displayStatus === filterStatus.toUpperCase();
+    return events.filter((event) => {
+      const status = (event.status || "").toUpperCase();
+      return status === filterStatus;
     });
-  }, [auctions, filterStatus]);
-
-  // Filter managers from users list - only show users with role='manager' and is_staff=false
-  const managers = useMemo(() => {
-    if (!users?.results) return [];
-
-    return users.results.filter((user) => {
-      // Must have role='manager'
-      if (user.role !== "manager") return false;
-      // Must have is_staff=false (exclude if is_staff is true, "true", 1, or "1")
-      const isStaffValue = user?.is_staff;
-      const isStaff =
-        isStaffValue === true ||
-        isStaffValue === "true" ||
-        isStaffValue === 1 ||
-        isStaffValue === "1";
-
-      // Only include if is_staff is NOT true (i.e., false, null, undefined, 0, "", etc.)
-      return !isStaff;
-    });
-  }, [users]);
-
-  const handleAssignToManager = useCallback(
-    (auctionId) => {
-      const auction = auctions.find((a) => a.id === auctionId);
-      setSelectedAuction(auction);
-      setSelectedManagerId("");
-      setShowManagerModal(true);
-    },
-    [auctions]
-  );
+  }, [events, filterStatus]);
 
   const handleViewDetails = useCallback(
-    (auctionId) => {
-      const auction = auctions.find((a) => a.id === auctionId);
-      if (!auction) return;
-
-      // Check if manager is assigned
-      const managerAssigned = hasManagerAssigned(auction);
-
-      // For pending auctions without manager, show modal with manager assignment option
-      // For pending auctions with manager, navigate to details page
-      if (
-        (auction.status === "DRAFT" || auction.status === "PENDING") &&
-        !managerAssigned
-      ) {
-        setSelectedAuction(auction);
-        setSelectedManagerId("");
-        setShowManagerModal(true);
-      } else {
-        // For other auctions or pending auctions with manager, navigate to details page
-        navigate(`/admin/auction/${auctionId}`);
-      }
+    (eventId, event) => {
+      navigate(`/admin/event/${eventId}`, { state: { event } });
     },
-    [auctions, navigate]
+    [navigate]
   );
-
-  const handleCloseModal = useCallback(() => {
-    setShowManagerModal(false);
-    setSelectedAuction(null);
-    setSelectedManagerId("");
-  }, []);
-
-  const handleAssignManager = useCallback(async () => {
-    if (!selectedAuction || !selectedManagerId) {
-      toast.error("Please select a manager");
-      return;
-    }
-
-    setIsAssigning(true);
-    try {
-      await adminService.assignAuctionToManager({
-        auction_id: selectedAuction.id,
-        manager_id: parseInt(selectedManagerId)
-      });
-
-      // Refresh auctions list
-      const response = await adminService.getDashboard();
-      setAuctions(response.results || []);
-      setAuctionCount(response.count || 0);
-
-      // Close modal and show success message
-      handleCloseModal();
-      toast.success("Manager assigned successfully!");
-    } catch (error) {
-      console.error("Error assigning manager:", error);
-      toast.error(
-        error.response?.data?.message ||
-        error.message ||
-        "Failed to assign manager. Please try again."
-      );
-    } finally {
-      setIsAssigning(false);
-    }
-  }, [selectedAuction, selectedManagerId, handleCloseModal]);
 
   // Memoized stats cards data
   const statCards = useMemo(
@@ -631,9 +372,9 @@ const AdminDashboard = () => {
             />
           </svg>
         ),
-        value: stats.totalAuctions.toLocaleString(),
-        label: "Total Auctions",
-        colorClass: "admin-dashboard-icon-auctions"
+        value: stats.totalEvents.toLocaleString(),
+        label: "Total Events",
+        colorClass: "admin-dashboard-icon-events"
       },
       {
         icon: () => (
@@ -662,28 +403,6 @@ const AdminDashboard = () => {
         value: stats.totalRevenue,
         label: "Total Revenue",
         colorClass: "admin-dashboard-icon-revenue"
-      },
-      {
-        icon: () => (
-          <svg
-            width="24"
-            height="24"
-            viewBox="0 0 24 24"
-            fill="none"
-            aria-hidden="true"
-          >
-            <path
-              d="M22 12h-4l-3 9L9 3l-3 9H2"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            />
-          </svg>
-        ),
-        value: stats.pendingApprovals,
-        label: "Pending Approvals",
-        colorClass: "admin-dashboard-icon-pending"
       }
     ],
     [stats]
@@ -776,14 +495,14 @@ const AdminDashboard = () => {
         <div className="admin-dashboard-full-width-column">
           <section
             className="admin-dashboard-card"
-            aria-label="Recent auctions"
+            aria-label="Recent events"
           >
             <div className="admin-dashboard-card-header">
               <div className="admin-dashboard-card-title-wrapper">
-                <h2 className="admin-dashboard-card-title">Recent Auctions</h2>
-                {auctionCount > 0 && (
-                  <span className="admin-dashboard-auction-count">
-                    ({auctionCount})
+                <h2 className="admin-dashboard-card-title">Recent Events</h2>
+                {eventCount > 0 && (
+                  <span className="admin-dashboard-event-count">
+                    ({eventCount})
                   </span>
                 )}
               </div>
@@ -794,16 +513,17 @@ const AdminDashboard = () => {
                   value={filterStatus}
                   onChange={(e) => setFilterStatus(e.target.value)}
                 >
-                  <option>All Status</option>
-                  <option>Active</option>
-                  <option>Pending</option>
-                  <option>Closed</option>
+                  <option value="ALL">All</option>
+                  <option value="SCHEDULED">Scheduled</option>
+                  <option value="LIVE">Live</option>
+                  <option value="CLOSING">Closing</option>
+                  <option value="CLOSED">Closed</option>
                 </select>
               </div>
             </div>
 
-            <div className="admin-dashboard-auctions-table-wrapper">
-              {isLoadingAuctions ? (
+            <div className="admin-dashboard-events-table-wrapper">
+              {isLoadingEvents ? (
                 <div
                   style={{
                     padding: "2rem",
@@ -811,9 +531,9 @@ const AdminDashboard = () => {
                     color: "#fff"
                   }}
                 >
-                  Loading auctions...
+                  Loading events...
                 </div>
-              ) : filteredAuctions.length === 0 ? (
+              ) : filteredEvents.length === 0 ? (
                 <div
                   style={{
                     padding: "2rem",
@@ -821,17 +541,17 @@ const AdminDashboard = () => {
                     color: "#fff"
                   }}
                 >
-                  No auctions found
+                  No events found
                 </div>
               ) : (
-                <table className="admin-dashboard-auctions-table">
+                <table className="admin-dashboard-events-table">
                   <thead>
                     <tr>
                       <th
                         scope="col"
-                        className="admin-dashboard-table-header-cell admin-dashboard-th-auction"
+                        className="admin-dashboard-table-header-cell admin-dashboard-th-event"
                       >
-                        Auction
+                        Event
                       </th>
                       <th
                         scope="col"
@@ -841,15 +561,15 @@ const AdminDashboard = () => {
                       </th>
                       <th
                         scope="col"
-                        className="admin-dashboard-table-header-cell admin-dashboard-th-price"
+                        className="admin-dashboard-table-header-cell admin-dashboard-th-start"
                       >
-                        Price
+                        Start
                       </th>
                       <th
                         scope="col"
-                        className="admin-dashboard-table-header-cell admin-dashboard-th-manager"
+                        className="admin-dashboard-table-header-cell admin-dashboard-th-end"
                       >
-                        Manager
+                        End
                       </th>
                       <th
                         scope="col"
@@ -860,12 +580,11 @@ const AdminDashboard = () => {
                     </tr>
                   </thead>
                   <tbody>
-                    {filteredAuctions.map((auction) => (
-                      <AuctionRow
-                        key={auction.id}
-                        auction={auction}
+                    {filteredEvents.map((event) => (
+                      <EventRow
+                        key={event.id}
+                        event={event}
                         onViewDetails={handleViewDetails}
-                        onAssignManager={handleAssignToManager}
                       />
                     ))}
                   </tbody>
@@ -921,135 +640,6 @@ const AdminDashboard = () => {
         </div>
       </div>
 
-      {/* Manager Assignment Modal */}
-      {showManagerModal && selectedAuction && (
-        <div
-          className="admin-dashboard-modal-overlay"
-          onClick={handleCloseModal}
-        >
-          <div
-            className="admin-dashboard-modal-content"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <div className="admin-dashboard-modal-header">
-              <h3 className="admin-dashboard-modal-title">
-                {selectedAuction.status === "DRAFT" ||
-                  selectedAuction.status === "PENDING"
-                  ? "Assign Manager"
-                  : "View Auction Details"}
-              </h3>
-              <button
-                className="admin-dashboard-modal-close"
-                onClick={handleCloseModal}
-                aria-label="Close modal"
-              >
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-                  <line
-                    x1="18"
-                    y1="6"
-                    x2="6"
-                    y2="18"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                  />
-                  <line
-                    x1="6"
-                    y1="6"
-                    x2="18"
-                    y2="18"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                  />
-                </svg>
-              </button>
-            </div>
-
-            <div className="admin-dashboard-modal-body">
-              <div className="admin-dashboard-modal-auction-info">
-                <h4>{selectedAuction.title}</h4>
-                <p className="admin-dashboard-modal-auction-category">
-                  {selectedAuction.category_name}
-                </p>
-                <p className="admin-dashboard-modal-auction-status">
-                  Status:{" "}
-                  <span
-                    className={`admin-dashboard-status-badge ${selectedAuction.status === "DRAFT" ||
-                        selectedAuction.status === "PENDING"
-                        ? "admin-dashboard-status-warning"
-                        : ""
-                      }`}
-                  >
-                    {selectedAuction.status === "DRAFT"
-                      ? "PENDING"
-                      : selectedAuction.status}
-                  </span>
-                </p>
-              </div>
-
-              {(selectedAuction.status === "DRAFT" ||
-                selectedAuction.status === "PENDING") && (
-                  <div className="admin-dashboard-modal-form">
-                    <label className="admin-dashboard-modal-label">
-                      Select Manager
-                      <span className="admin-dashboard-required">*</span>
-                    </label>
-                    <select
-                      className="admin-dashboard-modal-select"
-                      value={selectedManagerId}
-                      onChange={(e) => setSelectedManagerId(e.target.value)}
-                      disabled={isAssigning}
-                    >
-                      <option value="">Choose a manager...</option>
-                      {managers.map((manager) => (
-                        <option key={manager.id} value={manager.id}>
-                          {manager.full_name ||
-                            `${manager.first_name || ""} ${manager.last_name || ""
-                              }`.trim() ||
-                            manager.email}
-                          {manager.email ? ` (${manager.email})` : ""}
-                        </option>
-                      ))}
-                    </select>
-                    {managers.length === 0 && (
-                      <p
-                        className="admin-dashboard-modal-hint"
-                        style={{
-                          color: "rgba(255, 255, 255, 0.6)",
-                          fontSize: "0.875rem",
-                          marginTop: "0.5rem"
-                        }}
-                      >
-                        No managers available. Please add managers first.
-                      </p>
-                    )}
-                  </div>
-                )}
-            </div>
-
-            <div className="admin-dashboard-modal-footer">
-              <button
-                className="admin-dashboard-modal-btn admin-dashboard-modal-btn-cancel"
-                onClick={handleCloseModal}
-                disabled={isAssigning}
-              >
-                Cancel
-              </button>
-              {(selectedAuction.status === "DRAFT" ||
-                selectedAuction.status === "PENDING") && (
-                  <button
-                    className="admin-dashboard-modal-btn admin-dashboard-modal-btn-primary"
-                    onClick={handleAssignManager}
-                    disabled={!selectedManagerId || isAssigning}
-                  >
-                    {isAssigning ? "Assigning..." : "Assign Manager"}
-                  </button>
-                )}
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 };

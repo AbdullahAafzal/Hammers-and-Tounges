@@ -1,9 +1,10 @@
 import React from 'react'
 import './Hero.css'
-import { useNavigate } from 'react-router-dom'
 
 const Hero = () => {
-  const navigate = useNavigate()
+  const scrollToEvents = () => {
+    document.querySelector('.home-events')?.scrollIntoView({ behavior: 'smooth' })
+  }
   return (
     <section className="hero">
       <div className="hero-overlay"></div>
@@ -12,7 +13,7 @@ const Hero = () => {
         <p className="hero-description">
           Discover exclusive deals on vehicles, real estate, art, and more. Your next prized possession awaits.
         </p>
-        <button onClick={()=> navigate('/auctions')} className="hero-button">View All Auctions</button>
+        <button onClick={scrollToEvents} className="hero-button">Browse Events</button>
       </div>
     </section>
   )

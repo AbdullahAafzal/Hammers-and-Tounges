@@ -1,21 +1,27 @@
 import React, { useState, useEffect, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { fetchUsersList } from "../../store/actions/adminActions";
 import "./UserManagement.css";
 
 const UserManagement = () => {
-  const navigate = useNavigate()
+  const navigate = useNavigate();
+  const location = useLocation();
   const dispatch = useDispatch();
   const { users, isLoading } = useSelector(
     (state) => state.admin
   );
 
-  console.log(users, "users");
-
-
   const [search, setSearch] = useState("");
   const [roleFilter, setRoleFilter] = useState("manager");
+
+  // Restore role filter when returning from edit/create (e.g. Edit Seller → seller, Edit Manager → manager)
+  useEffect(() => {
+    const role = location.state?.role;
+    if (role && ["manager", "seller", "buyer"].includes(role)) {
+      setRoleFilter(role);
+    }
+  }, [location.state]);
   const [page, setPage] = useState(1);
   const [localUsers, setLocalUsers] = useState([]);
 
@@ -26,8 +32,10 @@ const UserManagement = () => {
 
   // Update localUsers when users data changes from API
   useEffect(() => {
-    if (users?.results) {
+    if (users?.results && Array.isArray(users.results)) {
       setLocalUsers(users.results);
+    } else {
+      setLocalUsers([]);
     }
   }, [users?.results]);
 
@@ -134,7 +142,6 @@ const filteredUsers = useMemo(() => {
 }, [localUsers, search, roleFilter]);
 
 
-console.log("filteredUsers: ", filteredUsers);
 
 
   // Use API pagination data for "all" filter, show all filtered users for other filters
@@ -194,16 +201,16 @@ console.log("filteredUsers: ", filteredUsers);
           <h1 className="user-management-title">User Management</h1>
           <p className="user-management-subtitle">Manage all users on the Hammer & Tongues platform.</p>
         </div>
-        {roleFilter === 'manager' && (
+        {(roleFilter === 'manager' || roleFilter === 'seller') && (
           <button 
             className="user-management-create-btn"
-            onClick={() => navigate('/admin/manager/create')}
+            onClick={() => navigate(roleFilter === 'manager' ? '/admin/manager/create' : '/admin/seller/create')}
             disabled={isLoading}
           >
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
               <path d="M12 5V19M5 12H19" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
             </svg>
-            Create Manager
+            {roleFilter === 'manager' ? 'Create Manager' : 'Create Seller'}
           </button>
         )}
       </header>
@@ -288,7 +295,7 @@ console.log("filteredUsers: ", filteredUsers);
                   className="user-management-table-row" 
                   onClick={
                     roleFilter === 'seller' && user.role === 'seller' 
-                      ? () => navigate(`/admin/kycverification/${user.id}`)
+                      ? () => navigate(`/admin/seller/edit/${user.id}`, { state: { user } })
                       : roleFilter === 'manager' && user.role === 'manager'
                       ? () => navigate(`/admin/manager/${user.id}`)
                       : undefined
@@ -318,9 +325,20 @@ console.log("filteredUsers: ", filteredUsers);
                     </span>
                   </td>
                   {roleFilter === 'seller' && user.role === 'seller' && (
-                    <td className="user-management-actions-cell">
+                    <td className="user-management-actions-cell" onClick={(e) => e.stopPropagation()}>
                       <div className="user-management-actions-dropdown">
-                        <button className="user-management-actions-trigger">
+                        <button
+                          className="user-management-action-btn user-management-action-edit"
+                          onClick={() => navigate(`/admin/seller/edit/${user.id}`, { state: { user } })}
+                          title="Edit Seller"
+                        >
+                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+                            <path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                            <path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                          </svg>
+                          Edit
+                        </button>
+                        <button className="user-management-actions-trigger" title="More actions">
                           <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
                             <circle cx="12" cy="6" r="1.5" fill="currentColor" />
                             <circle cx="12" cy="12" r="1.5" fill="currentColor" />

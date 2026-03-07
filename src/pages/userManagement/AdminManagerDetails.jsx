@@ -166,8 +166,8 @@ const AdminManagerDetails = () => {
 
       await adminService.updateUser(selectedManager.id, updateData);
       toast.success('Manager details updated successfully!');
-      setIsEditing(false);
-      dispatch(fetchUsersList());
+      await dispatch(fetchUsersList({ page: 1 })).unwrap();
+      navigate("/admin/users", { state: { role: "manager" } });
     } catch (error) {
       const message = error.response?.data?.message ||
         error.response?.data?.error ||
@@ -201,27 +201,31 @@ const AdminManagerDetails = () => {
 
   const handleSuspendManager = async () => {
     if (window.confirm('Are you sure you want to suspend this manager?')) {
-      await dispatch(performUserAction({
-        type: 'SUSPEND_MANAGER',
-        target_id: selectedManager.id,
-      }));
-      // Refresh the page data after action
-      setTimeout(() => {
-        dispatch(fetchUsersList());
-      }, 500);
+      try {
+        await dispatch(performUserAction({
+          type: 'SUSPEND_MANAGER',
+          target_id: selectedManager.id,
+        })).unwrap();
+        await dispatch(fetchUsersList({ page: 1 })).unwrap();
+        navigate("/admin/users", { state: { role: "manager" } });
+      } catch (err) {
+        // Toast already shown by performUserAction
+      }
     }
   };
 
   const handleActivateManager = async () => {
     if (window.confirm('Are you sure you want to activate this manager?')) {
-      await dispatch(performUserAction({
-        type: 'PROMOTE_TO_MANAGER',
-        target_id: selectedManager.id,
-      }));
-      // Refresh the page data after action
-      setTimeout(() => {
-        dispatch(fetchUsersList());
-      }, 500);
+      try {
+        await dispatch(performUserAction({
+          type: 'PROMOTE_TO_MANAGER',
+          target_id: selectedManager.id,
+        })).unwrap();
+        await dispatch(fetchUsersList({ page: 1 })).unwrap();
+        navigate("/admin/users", { state: { role: "manager" } });
+      } catch (err) {
+        // Toast already shown by performUserAction
+      }
     }
   };
 
@@ -250,7 +254,7 @@ const AdminManagerDetails = () => {
           </svg>
           <h3>Manager Not Found</h3>
           <p>The selected manager could not be found. Please return to the user list and try again.</p>
-          <button className="manager-details-btn-primary" onClick={() => navigate("/admin/users")}>
+          <button className="manager-details-btn-primary" onClick={() => navigate("/admin/users", { state: { role: "manager" } })}>
             Back to Users List
           </button>
         </div>
@@ -466,7 +470,7 @@ const AdminManagerDetails = () => {
             )}
             <button
               className="manager-details-btn-secondary"
-              onClick={() => navigate("/admin/users")}
+              onClick={() => navigate("/admin/users", { state: { role: "manager" } })}
               disabled={isPerformingAction || isEditing}
             >
               Go Back

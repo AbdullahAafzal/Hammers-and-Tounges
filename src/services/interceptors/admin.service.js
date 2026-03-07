@@ -51,10 +51,32 @@ export const adminService = {
   // Get List of Users
   getUsersList: async (params = {}) => {
     try {
+      const queryParams = {
+        page: params.page || 1,
+        page_size: params.page_size || 10,
+        ...params,
+      };
       const { data } = await apiClient.get(API_ROUTES.ADMIN_USERS_LIST, {
-        params,
+        params: queryParams,
       });
-      return data;
+      // Normalize response: support both Django-style (count, next, previous, results)
+      // and custom (total_pages, has_next, has_previous, current_page, results)
+      const results = (data && data.results) ? data.results : (Array.isArray(data) ? data : []);
+      const count = (data && data.count != null) ? data.count : results.length;
+      const pageSize = queryParams.page_size || 10;
+      const currentPage = (data && data.current_page != null) ? data.current_page : (queryParams.page || 1);
+      const totalPages = (data && data.total_pages != null) ? data.total_pages : (Math.ceil((count || 1) / pageSize) || 1);
+      const hasNext = (data && data.has_next != null) ? data.has_next : (data && data.next != null && data.next !== '');
+      const hasPrevious = (data && data.has_previous != null) ? data.has_previous : (data && data.previous != null && data.previous !== '');
+
+      return {
+        results,
+        count,
+        total_pages: totalPages,
+        current_page: currentPage,
+        has_next: hasNext,
+        has_previous: hasPrevious,
+      };
     } catch (error) {
       if (error.isNetworkError) {
         throw new Error('Unable to connect to server. Please try again later.');
@@ -187,6 +209,58 @@ export const adminService = {
   createStaff: async (staffData) => {
     try {
       const { data } = await apiClient.post(API_ROUTES.ADMIN_CREATE_STAFF, staffData);
+      return data;
+    } catch (error) {
+      if (error.isNetworkError) {
+        throw new Error('Unable to connect to server. Please try again later.');
+      }
+      throw error;
+    }
+  },
+
+  // Create Seller (POST form-data to user-management)
+  createSeller: async (sellerData) => {
+    try {
+      const formData = new FormData();
+      formData.append('role', 'seller');
+      formData.append('email', sellerData.email?.trim() || '');
+      formData.append('password', sellerData.password?.trim() || '');
+      if (sellerData.first_name) formData.append('first_name', sellerData.first_name.trim());
+      if (sellerData.last_name) formData.append('last_name', sellerData.last_name.trim());
+      if (sellerData.display_name) formData.append('display_name', sellerData.display_name.trim());
+      if (sellerData.phone) formData.append('phone', sellerData.phone.trim());
+      if (sellerData.image instanceof File) formData.append('image', sellerData.image);
+
+      // Use postForm so axios sets multipart/form-data with proper boundary (avoids 415)
+      const { data } = await apiClient.postForm(API_ROUTES.ADMIN_USER_MANAGEMENT, formData);
+      return data;
+    } catch (error) {
+      if (error.isNetworkError) {
+        throw new Error('Unable to connect to server. Please try again later.');
+      }
+      throw error;
+    }
+  },
+
+  // Update Seller (PATCH form-data - API requires multipart for all updates)
+  updateSeller: async (userId, sellerData) => {
+    try {
+      const formData = new FormData();
+      Object.keys(sellerData).forEach((key) => {
+        const value = sellerData[key];
+        if (value !== null && value !== undefined && value !== '') {
+          if (key === 'image' && value instanceof File) {
+            formData.append(key, value);
+          } else {
+            formData.append(key, typeof value === 'string' ? value.trim() : value);
+          }
+        }
+      });
+
+      const { data } = await apiClient.patch(
+        `${API_ROUTES.ADMIN_USER_MANAGEMENT}${userId}/`,
+        formData
+      );
       return data;
     } catch (error) {
       if (error.isNetworkError) {

@@ -7,8 +7,16 @@
 //   APP_ENV: import.meta.env.VITE_APP_ENV || 'development',
 // };
 
+const getBaseUrl = () => {
+  if (import.meta.env.PROD) return '/api';
+  // In dev: use direct backend URL (same as Postman) to avoid proxy/404 issues
+  const envUrl = import.meta.env.VITE_API_BASE_URL || 'http://207.180.233.44:8001';
+  const base = (typeof envUrl === 'string' ? envUrl : '').trim() || 'http://207.180.233.44:8001';
+  return base.endsWith('/api') ? base : `${base.replace(/\/$/, '')}/api`;
+};
+
 export const API_CONFIG = {
-  BASE_URL: import.meta.env.PROD ? '/api' : 'http://207.180.233.44:8001/api',
+  BASE_URL: getBaseUrl(),
   TIMEOUT: 30000,
 
   IS_PRODUCTION: import.meta.env.PROD,
@@ -112,6 +120,7 @@ export const API_ROUTES = {
   ADMIN_USERS_LIST: '/inspections/admin/users/',
   ADMIN_UPDATE_USER: '/users/admin/', // + userId + /update/
   ADMIN_CREATE_STAFF: '/users/admin/create-staff/',
+  ADMIN_USER_MANAGEMENT: '/inspections/admin/user-management/', // POST create seller, PATCH + id + / for edit
   AUCTION_LISTINGS: '/auctions/listings/',
   FETCH_CATEGORIES: '/auctions/categories/',
   CREATE_CATEGORY: '/auctions/categories/',
@@ -130,6 +139,8 @@ export const API_ROUTES = {
   INSPECTION_TEMPLATE_DETAIL: '/inspections/templates/', // + template_id
 
   //// Auction Routes (Common for all)
+  AUCTIONS_EVENTS: '/auctions/events/',
+  AUCTIONS_LOTS: '/auctions/lots/',
   AUCTIONS_LIST: '/auctions/listings/',
   // AUCTION_DETAIL: '/auctions/listings/', // + auction_id
   AUCTION_CATEGORIES: '/auctions/categories/',

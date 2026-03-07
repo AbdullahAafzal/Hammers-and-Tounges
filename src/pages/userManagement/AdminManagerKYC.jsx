@@ -158,22 +158,21 @@ const AdminManagerKYC = () => {
     }
   };
 
-  const downloadImage = async (imageUrl, filename) => {
-    console.log("image url: ", imageUrl);
-    
+  const downloadImage = (imageUrl, filename) => {
+    // In design/demo mode avoid using fetch/XHR.
+    // If a valid URL exists, trigger a direct browser download/navigation.
+    if (!imageUrl) return;
+
     try {
-      const response = await fetch(imageUrl);
-      const blob = await response.blob();
-      const url = window.URL.createObjectURL(blob);
       const link = document.createElement('a');
-      link.href = url;
+      link.href = imageUrl;
       link.download = filename || 'kyc-document.jpg';
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
-      window.URL.revokeObjectURL(url);
     } catch (error) {
-      console.error('Error downloading image:', error);
+      // eslint-disable-next-line no-console
+      console.error('Error triggering image download:', error);
     }
   };
 
@@ -222,7 +221,7 @@ const AdminManagerKYC = () => {
 
     setRejectionError('');
     await handleUserAction(selectedUser.id, 'REJECT_SELLER', rejectionReason.trim());
-    navigate("/admin/users");
+    navigate("/admin/users", { state: { role: "seller" } });
   };
 
   // Get role display name
@@ -312,7 +311,7 @@ const AdminManagerKYC = () => {
           </svg>
           <h3>User Not Found</h3>
           <p>The selected user could not be found. Please return to the user list and try again.</p>
-          <button className="approve" onClick={() => navigate("/admin/users")}>
+          <button className="approve" onClick={() => navigate("/admin/users", { state: { role: "seller" } })}>
             Back to Users List
           </button>
         </div>
@@ -392,14 +391,14 @@ const AdminManagerKYC = () => {
                   )}
                 </div>
                 <div className="action-buttons">
-                  <button className="go-back" onClick={() => navigate("/admin/users")}>
+                  <button className="go-back" onClick={() => navigate("/admin/users", { state: { role: "seller" } })}>
                     Go Back
                   </button>
                 </div>
               </div>
             ) : selectedUser && selectedUser?.seller_details?.verified ? (
               <div className="action-buttons">
-                <button className="go-back" onClick={() => navigate("/admin/users")}>
+                <button className="go-back" onClick={() => navigate("/admin/users", { state: { role: "seller" } })}>
                   Go Back
                 </button>
               </div>
@@ -407,7 +406,7 @@ const AdminManagerKYC = () => {
               <div className="action-buttons">
                 <button className="approve" disabled={isPerformingAction} onClick={() => {
                   handleUserAction(selectedUser.id, 'VERIFY_SELLER')
-                  navigate("/admin/users")
+                  navigate("/admin/users", { state: { role: "seller" } })
                 }
                 }>
                   {isPerformingAction ?
@@ -421,7 +420,7 @@ const AdminManagerKYC = () => {
                 <button className="reject" disabled={isPerformingAction} onClick={handleRejectClick}>
                   Reject
                 </button>
-                <button className="go-back" onClick={() => navigate("/admin/users")}>
+                <button className="go-back" onClick={() => navigate("/admin/users", { state: { role: "seller" } })}>
                   Go Back
                 </button>
               </div>

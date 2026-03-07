@@ -1,62 +1,65 @@
 import React, { useState, useMemo, useEffect } from "react";
 import "./ManagerLiveAuctions.css";
 import { useNavigate } from "react-router-dom";
-import { managerService } from '../services/interceptors/manager.service';
-import { toast } from "react-toastify";
+import { auctionService } from '../services/interceptors/auction.service';
 
 const ROWS_PER_PAGE = 5;
+
+const formatEventDate = (isoStr) => {
+  if (!isoStr) return '—';
+  try {
+    const d = new Date(isoStr);
+    return d.toLocaleDateString('en-US', {
+      month: 'short',
+      day: 'numeric',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+    });
+  } catch {
+    return '—';
+  }
+};
 
 export default function ManagerLiveAuctions() {
   const [search, setSearch] = useState("");
   const [date, setDate] = useState("");
   const [page, setPage] = useState(1);
-  const [tasks, setTasks] = useState([]);
+  const [events, setEvents] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const navigate = useNavigate();
 
-  // Fetch tasks from API
-  useEffect(() => {
-    const fetchTasks = async () => {
-      try {
-        setLoading(true);
-        setError(null);
-        const response = await managerService.getAssignedTasks();
-        // Transform API response and filter for CLOSED status only
-        const transformedData = Array.isArray(response) ? response
-          .filter(item => item.status === 'CLOSED') // Only show CLOSED status items
-          .map((item) => ({
-            id: `#AUC-${item.id}`,
-            name: item.title || 'Untitled Auction',
-            seller: item.seller_details?.name || 'Unknown Seller',
-            category: item.category_name || 'Unknown',
-            status: item.status,
-            created_at: item.created_at,
-            end_date: item.end_date,
-            initial_price: item.initial_price,
-            rawData: item // Keep original data for reference
-          })) : [];
-        setTasks(transformedData);
-      } catch (err) {
-        console.error('Error fetching completed auctions:', err);
-        setError(err.message || 'Failed to load completed auctions. Please try again.');
-        setTasks([]);
-      } finally {
-        setLoading(false);
-      }
-    };
+  const fetchEvents = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      const response = await auctionService.getEvents({ page: 1 });
+      const allEvents = response?.results ?? (Array.isArray(response) ? response : []);
+      const closedEvents = allEvents.filter(
+        (e) => (e.status || '').toUpperCase() === 'CLOSED'
+      );
+      setEvents(closedEvents);
+    } catch (err) {
+      console.error('Error fetching completed auctions:', err);
+      setError(err.message || 'Failed to load completed auctions. Please try again.');
+      setEvents([]);
+    } finally {
+      setLoading(false);
+    }
+  };
 
-    fetchTasks();
+  useEffect(() => {
+    fetchEvents();
   }, []);
 
   const filteredData = useMemo(() => {
-    return tasks.filter((item) => {
-      const matchSearch = (item.name?.toLowerCase().includes(search.toLowerCase()) || '') ||
-        item.id.toLowerCase().includes(search.toLowerCase()) ||
-        (item.seller?.toLowerCase().includes(search.toLowerCase()) || '');
+    return events.filter((item) => {
+      const title = (item.title || '').toLowerCase();
+      const matchSearch = !search || title.includes(search.toLowerCase());
       return matchSearch;
     });
-  }, [tasks, search]);
+  }, [events, search]);
 
   const totalPages = Math.ceil(filteredData.length / ROWS_PER_PAGE);
 
@@ -65,9 +68,6 @@ export default function ManagerLiveAuctions() {
     const startIndex = (page - 1) * ROWS_PER_PAGE;
     return filteredData.slice(startIndex, startIndex + ROWS_PER_PAGE);
   }, [filteredData, page]);
-
-  console.log("paginatedData: ", paginatedData);
-
 
   function generatePageNumbers() {
     const pages = [];
@@ -125,7 +125,7 @@ export default function ManagerLiveAuctions() {
               </button>
               <input
                 type="text"
-                placeholder="Search by Auction Name, ID, or Seller..."
+                placeholder="Search by event name..."
                 value={search}
                 onChange={(e) => { setSearch(e.target.value); setPage(1); }}
                 className="live-auction-search-input"
@@ -158,20 +158,18 @@ export default function ManagerLiveAuctions() {
             <table className="live-auction-data-table">
               <thead>
                 <tr>
-                  <th>Auction ID</th>
-                  <th>Auction Name</th>
-                  <th>Category</th>
-                  <th>Seller</th>
+                  <th>Event</th>
                   <th>Status</th>
-                  <th>End Date</th>
-                  <th>Initial Price</th>
+                  <th>Start</th>
+                  <th>End</th>
+                  <th>Actions</th>
                 </tr>
               </thead>
 
               <tbody>
                 {loading ? (
                   <tr>
-                    <td colSpan="7">
+                    <td colSpan="5">
                       <div className="live-auction-empty-state">
                         <div className="live-auction-empty-icon" style={{ animation: 'spin 1s linear infinite' }}>
                           <svg width="48" height="48" viewBox="0 0 24 24" fill="none">
@@ -186,7 +184,7 @@ export default function ManagerLiveAuctions() {
                   </tr>
                 ) : error ? (
                   <tr>
-                    <td colSpan="7">
+                    <td colSpan="5">
                       <div className="live-auction-empty-state">
                         <div className="live-auction-empty-icon">
                           <svg width="48" height="48" viewBox="0 0 24 24" fill="none">
@@ -198,7 +196,7 @@ export default function ManagerLiveAuctions() {
                         <h3>Error loading completed auctions</h3>
                         <p>{error}</p>
                         <button
-                          onClick={() => window.location.reload()}
+                          onClick={() => fetchEvents()}
                           className="live-auction-export-btn"
                           style={{ marginTop: '1rem' }}
                         >
@@ -208,62 +206,58 @@ export default function ManagerLiveAuctions() {
                     </td>
                   </tr>
                 ) : paginatedData.length > 0 ? (
-                  paginatedData.map((item, index) => (
+                  paginatedData.map((event) => (
                     <tr
-                      key={item.id}
+                      key={event.id}
                       className="live-auction-table-row"
-                      // onClick={() =>
-                      // {
-
-                      //   item?.status === 'CLOSED' ?  '' : navigate('/manager/auction-results', { state: { auctionData: item.rawData } }) }
-                      // }
-                      onClick={(e) => {
-                        if (item?.status === 'CLOSED') {
-                          e.stopPropagation();
-                          toast.info('Auction is closed!')
-                          return;
-                        }
-                        navigate('/manager/auction-results', { state: { auctionData: item.rawData } });
-                      }}
+                      onClick={() => navigate(`/manager/event/${event.id}`, { state: { event } })}
                     >
                       <td>
-                        <span className="live-auction-bid-id">{item.id}</span>
-                      </td>
-                      <td>
-                        <span className="live-auction-user-name">{item.name}</span>
-                      </td>
-                      <td>
-                        <span className="live-auction-user-name">{item.category}</span>
-                      </td>
-                      <td>
-                        <span className="live-auction-user-name">{item.seller}</span>
+                        <div>
+                          <span className="live-auction-user-name">{event.title || 'Untitled Event'}</span>
+                          <span className="live-auction-time" style={{ display: 'block', opacity: 0.8, fontSize: '0.85em' }}>
+                            {event.lots_count ?? 0} lots
+                          </span>
+                        </div>
                       </td>
                       <td>
                         <div className="live-auction-status-cell">
-                          <span className={`live-auction-status-badge ${item.status === "CLOSED" ? "badge-winning" :
-                            item.status === "COMPLETED" ? "badge-winning" :
-                              item.status === "APPROVED" ? "badge-winning" :
-                                "badge-ended"
-                            }`}>
-                            {item.status}
+                          <span className="live-auction-status-badge badge-winning">
+                            {event.status || '—'}
                           </span>
                         </div>
                       </td>
                       <td>
                         <span className="live-auction-time">
-                          {item.end_date ? new Date(item.end_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : '-'}
+                          {formatEventDate(event.start_time)}
                         </span>
                       </td>
                       <td>
-                        <span className="live-auction-amount">
-                          {item.initial_price ? `$${parseFloat(item.initial_price).toLocaleString()}` : '$0.00'}
+                        <span className="live-auction-time">
+                          {formatEventDate(event.end_time)}
                         </span>
+                      </td>
+                      <td>
+                        <button
+                          className="live-auction-icon-btn"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            navigate(`/manager/event/${event.id}`, { state: { event } });
+                          }}
+                          title="View Details"
+                          aria-label={`View details for ${event.title}`}
+                        >
+                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+                            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" stroke="currentColor" strokeWidth="2" />
+                            <circle cx="12" cy="12" r="3" stroke="currentColor" strokeWidth="2" />
+                          </svg>
+                        </button>
                       </td>
                     </tr>
                   ))
                 ) : (
                   <tr>
-                    <td colSpan="7">
+                    <td colSpan="5">
                       <div className="live-auction-empty-state">
                         <div className="live-auction-empty-icon">
                           <svg width="48" height="48" viewBox="0 0 24 24" fill="none">

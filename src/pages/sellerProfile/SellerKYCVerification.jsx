@@ -127,59 +127,20 @@ const SellerKYCVerification = () => {
       return;
     }
 
+    // In design/demo mode we skip real upload and API calls.
+    // Pretend everything went well so the user can continue navigation.
     setIsSubmitting(true);
 
     try {
-      // Check if documents are already in API (already submitted)
-      const sp = profileData?.seller_profile;
-      if (sp && (sp.id_front || sp.id_back || sp.driving_license_front || sp.driving_license_back || sp.passport_front)) {
-        // If we have new files in sessionStorage, upload them
-        if (Object.keys(storedFiles).length > 0) {
-          // Continue with upload below
-        } else {
-          toast.info('KYC documents are already submitted. Your verification is pending review.');
-          await dispatch(fetchProfile());
-          setIsSubmitting(false);
-          return;
-        }
-      }
-      
-      if (Object.keys(storedFiles).length === 0) {
-        toast.error('No documents to upload. Please select documents first.');
-        setIsSubmitting(false);
-        return;
-      }
-
-      // Convert base64 back to File objects and upload
-      const filesToUpload = {};
-      const filePromises = Object.keys(storedFiles).map(async (key) => {
-        const fileData = storedFiles[key];
-        if (fileData && fileData.data) {
-          // Convert base64 to blob then to File
-          const response = await fetch(fileData.data);
-          const blob = await response.blob();
-          const file = new File([blob], fileData.name, { type: fileData.type });
-          filesToUpload[key] = file;
-        }
-      });
-
-      await Promise.all(filePromises);
-
-      if (Object.keys(filesToUpload).length > 0) {
-        await dispatch(updateProfile(filesToUpload));
-      }
-
-      // Clear sessionStorage after successful upload
+      // Clear any locally stored files/previews
       sessionStorage.removeItem('seller_kyc_files');
       sessionStorage.removeItem('seller_kyc_previews');
-      
-      toast.success('KYC documents submitted successfully! Your verification is now pending review.');
-      
-      // Refresh profile to get updated status
-      await dispatch(fetchProfile());
+
+      toast.success('KYC documents submitted successfully! (Design mode - no real upload)');
     } catch (error) {
-      console.error('Error submitting KYC:', error);
-      toast.error('Failed to submit KYC documents. Please try again.');
+      // eslint-disable-next-line no-console
+      console.error('Error in mock KYC submission:', error);
+      toast.error('Something went wrong while submitting in design mode.');
     } finally {
       setIsSubmitting(false);
     }

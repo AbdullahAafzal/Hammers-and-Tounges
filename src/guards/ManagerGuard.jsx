@@ -1,9 +1,9 @@
-import { Navigate, Outlet } from "react-router-dom";
-import { cookieStorage } from "../utils/cookieStorage";
+import { Outlet } from "react-router-dom";
 
+// Design/demo guard: always allow access so routes can be explored
+// without requiring real authentication or API calls.
 const ManagerGuard = () => {
-  const token = cookieStorage.getItem(cookieStorage.AUTH_KEYS.TOKEN) || null
-  return token ? <Outlet /> : <Navigate to="/signin" replace />;
+  return <Outlet />;
 };
 
 export default ManagerGuard;

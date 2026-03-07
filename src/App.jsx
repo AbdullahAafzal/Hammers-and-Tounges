@@ -1,6 +1,5 @@
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import Header from "./components/Header";
-import Footer from "./components/Footer";
+import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
+import GuestLayout from "./layouts/GuestLayout";
 
 import Home from "./pages/Home";
 import Auctions from "./pages/Auctions";
@@ -35,9 +34,9 @@ import SellerKYCDocumentUpload from "./pages/sellerProfile/SellerKYCDocumentUplo
 
 // Manager
 import ManagerDashboard from "./pages/ManagerDashboard";
-import ManagerProfile from "./pages/ManagerProfile";
+import ManagerCreateEvent from "./pages/ManagerCreateEvent";
+import ManagerEventLots from "./pages/ManagerEventLots";
 import ManagerInspection from "./pages/ManagerInspection";
-import ManagerAuctions from './pages/ManagerAuctions'
 import ManagerPublishNew from './pages/ManagerPublishNew'
 import ManagerLiveAuctions from './pages/ManagerLiveAuctions'
 import ManagerAuctionControlPanel from './pages/ManagerAuctionControlPanel'
@@ -49,6 +48,7 @@ import ManagerProductFields from './pages/managerProductFields/ManagerProductFie
 
 // Admin
 import AdminDashboard from "./pages/adminDashboard/AdminDashboard";
+import AdminEventLots from "./pages/adminDashboard/AdminEventLots";
 import AdminAuctionDetails from "./pages/adminDashboard/AdminAuctionDetails";
 import AdminProfile from "./pages/adminProfile/AdminProfile";
 import AdminFinance from './pages/AdminFinance'
@@ -59,6 +59,8 @@ import UserManagement from './pages/userManagement/UserManagement'
 import AdminManagerKYC from './pages/userManagement/AdminManagerKYC'
 import AdminManagerDetails from './pages/userManagement/AdminManagerDetails'
 import AdminCreateManager from './pages/userManagement/AdminCreateManager'
+import AdminCreateSeller from './pages/userManagement/AdminCreateSeller'
+import AdminEditSeller from './pages/userManagement/AdminEditSeller'
 
 // Route Guards
 import BuyerGuard from "./guards/BuyerGuard";
@@ -86,19 +88,16 @@ function App() {
       <Router>
         <div className="app">
           <Routes>
-            {/* Public Routes */}
-            <Route path="/" element={<><Header /><Home /><Footer /></>} />
-            <Route path="/auctions" element={<>
-              <Header />
-              <Auctions />
-              <Footer />
-            </>} />
-            <Route path="/auction/:id" element={<><Header /><AuctionDetails /><Footer /></>} />
-            <Route path="/about" element={<><Header /><About /><Footer /></>} />
-            <Route path="/contact" element={<><Header /><Contact /><Footer /></>} />
-
-            <Route path="/signin" element={<SignIn />} />
-            <Route path="/register" element={<Register />} />
+            {/* Public Routes - Guest flow with side drawer */}
+            <Route element={<GuestLayout />}>
+              <Route path="/" element={<Home />} />
+              <Route path="/auctions" element={<Auctions />} />
+              <Route path="/auction/:id" element={<AuctionDetails />} />
+              <Route path="/about" element={<About />} />
+              <Route path="/contact" element={<Contact />} />
+              <Route path="/signin" element={<SignIn />} />
+              <Route path="/register" element={<Register />} />
+            </Route>
             <Route path="/otp-verification" element={<OTPVerification />} />
             {/* // New // */}
             <Route path="/forgot-password" element={<ForgotPassword />} />
@@ -142,18 +141,15 @@ function App() {
             <Route element={<ManagerGuard />}>
               <Route element={<ManagerLayout />}>
                 <Route path="/manager/dashboard" element={<ManagerDashboard />} />
-                <Route path="/manager/profile" element={<ManagerProfile />} />
+                <Route path="/manager/event/create" element={<ManagerCreateEvent />} />
+                <Route path="/manager/event/:id" element={<ManagerEventLots />} />
                 <Route path="/manager/inspection" element={
                   <>
                     <ManagerInspection />
                   </>
                 } />
 
-                <Route path="/manager/auctions" element={
-                  <>
-                    <ManagerAuctions />
-                  </>
-                } />
+                <Route path="/manager/auctions" element={<Navigate to="/manager/dashboard" replace />} />
 
                 <Route path="/manager/publishnew" element={
                   <>
@@ -204,7 +200,9 @@ function App() {
             {/* Admin Routes */}
             <Route element={<AdminGuard />}>
               <Route element={<AdminLayout />}>
+                <Route path="/admin" element={<Navigate to="/admin/dashboard" replace />} />
                 <Route path="/admin/dashboard" element={<AdminDashboard />} />
+                <Route path="/admin/event/:id" element={<AdminEventLots />} />
                 <Route path="/admin/auction/:id" element={<AdminAuctionDetails />} />
                 <Route path="/admin/profile" element={<AdminProfile />} />
                 <Route path="/admin/finance" element={<AdminFinance />} />
@@ -242,6 +240,16 @@ function App() {
                 <Route path="/admin/manager/create" element={
                   <>
                     <AdminCreateManager />
+                  </>
+                } />
+                <Route path="/admin/seller/create" element={
+                  <>
+                    <AdminCreateSeller />
+                  </>
+                } />
+                <Route path="/admin/seller/edit/:id" element={
+                  <>
+                    <AdminEditSeller />
                   </>
                 } />
                 <Route path="/admin/category" element={

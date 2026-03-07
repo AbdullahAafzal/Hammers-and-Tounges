@@ -102,9 +102,11 @@ const authSlice = createSlice({
         cookieStorage.setItem(cookieStorage.AUTH_KEYS.TOKEN, action.payload.access);
         cookieStorage.setItem(cookieStorage.AUTH_KEYS.REFRESH_TOKEN, action.payload.refresh);
         cookieStorage.setItem(cookieStorage.AUTH_KEYS.TOKEN_TIMESTAMP, Date.now());
-        if (action.payload.user?.role) {
-          cookieStorage.setItem(cookieStorage.AUTH_KEYS.ROLE, action.payload.user.role);
-        }
+        // is_staff=true means admin (store effective role for profile/nav)
+        const u = action.payload.user;
+        const isStaff = u?.is_staff === true || u?.is_staff === 1 || String(u?.is_staff).toLowerCase() === 'true';
+        const effectiveRole = isStaff ? 'admin' : (u?.role || 'buyer');
+        cookieStorage.setItem(cookieStorage.AUTH_KEYS.ROLE, effectiveRole);
       })
       .addCase(loginUser.rejected, (state, action) => {
         state.isLoading = false;

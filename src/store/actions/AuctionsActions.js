@@ -48,6 +48,30 @@ export const fetchCategories = createAsyncThunk(
   }
 );
 
+export const fetchEvents = createAsyncThunk(
+  'events/fetchEvents',
+  async (params, { rejectWithValue }) => {
+    try {
+      const response = await auctionService.getEvents(params);
+      return response;
+    } catch (error) {
+      const message =
+        error.response?.data?.message ||
+        error.response?.data?.detail ||
+        error.message ||
+        'Failed to fetch events';
+      if (error.response?.status !== 401) {
+        toast.error(message);
+      }
+      return rejectWithValue({
+        message,
+        status: error.response?.status,
+        data: error.response?.data,
+      });
+    }
+  }
+);
+
 export const fetchCategoryDetail = createAsyncThunk(
   'all/fetchCategoryDetail',
   async (categoryId, { rejectWithValue }) => {

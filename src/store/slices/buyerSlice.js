@@ -1,6 +1,6 @@
 import { createSlice } from '@reduxjs/toolkit';
 import { browseAuctions, fetchAuctionBids, fetchMyBids, placeBid } from '../actions/buyerActions';
-import { fetchAuctionsList, fetchCategories } from '../actions/AuctionsActions';
+import { fetchAuctionsList, fetchCategories, fetchEvents } from '../actions/AuctionsActions';
 
 const initialState = {
   auctions: null,
@@ -8,6 +8,9 @@ const initialState = {
   auctionBids: [],
   myBids: [],
   categories: [],
+  events: [],
+  eventsLoading: false,
+  eventsError: null,
   isLoading: false,
   isPlacingBid: false,
   error: null,
@@ -137,12 +140,26 @@ const buyerSlice = createSlice({
       })
       .addCase(fetchCategories.fulfilled, (state, action) => {
         state.isLoading = false;
-        // state.categories = action.payload;
         state.categories = action.payload?.filter(g => g?.is_active);
       })
       .addCase(fetchCategories.rejected, (state, action) => {
         state.isLoading = false;
         state.error = action.payload;
+      });
+
+    // Fetch Events
+    builder
+      .addCase(fetchEvents.pending, (state) => {
+        state.eventsLoading = true;
+        state.eventsError = null;
+      })
+      .addCase(fetchEvents.fulfilled, (state, action) => {
+        state.eventsLoading = false;
+        state.events = action.payload?.results || [];
+      })
+      .addCase(fetchEvents.rejected, (state, action) => {
+        state.eventsLoading = false;
+        state.eventsError = action.payload;
       });
   },
 });

@@ -94,7 +94,7 @@ export default function ManagerAuctionControlPanel() {
         });
         toast.success('Auction ended successfully!');
         // Navigate back to auctions list or refresh the page
-        navigate('/manager/auctions');
+        navigate('/manager/dashboard');
       } catch (error) {
         const message = error.response?.data?.message ||
           error.response?.data?.error ||

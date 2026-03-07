@@ -1,0 +1,204 @@
+/* Create Event - Matches Admin creation flow (Create Manager, Create Seller) */
+* {
+  box-sizing: border-box;
+}
+
+.create-event-page {
+  min-height: 100vh;
+  padding: 25px;
+  overflow-x: hidden;
+  width: 100%;
+  box-sizing: border-box;
+  background: #000;
+  color: #fff;
+}
+
+.create-event-header {
+  margin-bottom: 25px;
+  color: white;
+}
+
+.create-event-title {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: #ffffff;
+  margin-bottom: 0.5rem;
+  letter-spacing: -0.5px;
+}
+
+.create-event-subtitle {
+  font-size: 0.9375rem;
+  color: rgba(255, 255, 255, 0.6);
+  margin: 0;
+  line-height: 1.5;
+}
+
+.create-event-content {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.create-event-card {
+  background: #000;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 14px;
+  padding: 30px;
+  color: white;
+}
+
+.create-event-form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.create-event-form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 18px;
+}
+
+.create-event-form-group {
+  display: flex;
+  flex-direction: column;
+}
+
+.create-event-form-group label {
+  font-size: 0.8125rem;
+  color: rgba(255, 255, 255, 0.8);
+  font-weight: 500;
+  margin-bottom: 6px;
+}
+
+.create-event-form-group .required {
+  color: #ef4444;
+  margin-left: 2px;
+}
+
+.create-event-form-group input {
+  background: #0a0a0a;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 8px;
+  color: #fff;
+  padding: 12px;
+  font-size: 0.9rem;
+  font-family: inherit;
+  transition: border-color 0.2s;
+}
+
+.create-event-form-group input:focus {
+  outline: none;
+  border-color: #8cc63f;
+}
+
+.create-event-form-group input:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.create-event-form-group input::placeholder {
+  color: rgba(255, 255, 255, 0.4);
+}
+
+.create-event-form-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 10px;
+  padding-top: 20px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.create-event-btn-primary {
+  background-color: #8cc63f;
+  color: #000000;
+  border: none;
+  padding: 0.75rem 1.75rem;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.create-event-btn-primary:hover:not(:disabled) {
+  background-color: #7bb335;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(140, 198, 63, 0.3);
+}
+
+.create-event-btn-primary:disabled {
+  background-color: rgba(140, 198, 63, 0.5);
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+.create-event-btn-secondary {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: #fff;
+  padding: 0.75rem 1.75rem;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.create-event-btn-secondary:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.15);
+  border-color: rgba(255, 255, 255, 0.3);
+  transform: translateY(-1px);
+}
+
+.create-event-btn-secondary:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.create-event-spinner {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(0, 0, 0, 0.3);
+  border-radius: 50%;
+  border-top-color: #000000;
+  animation: create-event-spin 0.8s linear infinite;
+  vertical-align: middle;
+}
+
+@keyframes create-event-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+  .create-event-form-row {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .create-event-page {
+    padding: 1rem;
+  }
+
+  .create-event-card {
+    padding: 20px;
+  }
+
+  .create-event-form-actions {
+    flex-direction: column;
+  }
+
+  .create-event-btn-primary,
+  .create-event-btn-secondary {
+    width: 100%;
+  }
+}

@@ -396,16 +396,8 @@ const SellerCreateProduct = () => {
       isValid = false;
     }
 
-    if (!formData.
-      seller_expected_price
-      || isNaN(formData.
-        seller_expected_price
-      ) || parseFloat(formData.
-        seller_expected_price
-      ) <= 0) {
-      newErrors.
-        seller_expected_price
-        = 'Starting price must be a positive number';
+    if (!formData.seller_expected_price || isNaN(formData.seller_expected_price) || parseFloat(formData.seller_expected_price) <= 0) {
+      newErrors.seller_expected_price = 'Starting price must be a positive number';
       isValid = false;
     }
 

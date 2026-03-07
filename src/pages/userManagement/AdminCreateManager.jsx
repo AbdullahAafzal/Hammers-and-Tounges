@@ -73,7 +73,7 @@ const AdminCreateManager = () => {
 
       await adminService.createStaff(managerData);
       toast.success('Manager created successfully!');
-      navigate("/admin/users");
+      navigate("/admin/users", { state: { role: "manager" } });
     } catch (error) {
       const message = error.response?.data?.message || 
                      error.response?.data?.error ||
@@ -85,7 +85,7 @@ const AdminCreateManager = () => {
   };
 
   const handleCancel = () => {
-    navigate("/admin/users");
+    navigate("/admin/users", { state: { role: "manager" } });
   };
 
   return (

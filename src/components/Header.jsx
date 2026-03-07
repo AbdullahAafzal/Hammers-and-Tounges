@@ -14,6 +14,9 @@ function Header() {
   //   getLocalStorage('user', { name: '', email: '', isAuth: false, role: 'buyer' })
   // )
   const { token, user } = useSelector(state => state.auth)
+  // is_staff=true means admin (use admin profile, not manager)
+  const isStaff = user?.is_staff === true || user?.is_staff === 1 || String(user?.is_staff).toLowerCase() === 'true'
+  const profileRole = isStaff ? 'admin' : (user?.role || 'buyer')
 
   const toggleMobileMenu = () => {
     setMobileMenuOpen(!mobileMenuOpen)
@@ -74,7 +77,7 @@ function Header() {
             </button>
             {
               token ? (
-                <Link to={`${user?.role}/profile`} className="buyer-header__profile-btn" aria-label="Profile">
+                <Link to={`/${profileRole}/profile`} className="buyer-header__profile-btn" aria-label="Profile">
                   <div className="buyer-header__avatar">
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
                       <path
