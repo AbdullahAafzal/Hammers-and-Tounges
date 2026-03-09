@@ -37,10 +37,11 @@ const FavoriteAuctions = () => {
       let hasMore = true;
 
       while (hasMore) {
-        const response = await dispatch(getMyFavoriteAuctions({ page: nextPage })).unwrap();
-        allResults = [...allResults, ...(response.results || [])];
+        const response = await dispatch(getMyFavoriteAuctions({ page: nextPage, page_size: 10 })).unwrap();
+        const items = response?.results ?? response?.data ?? (Array.isArray(response) ? response : []);
+        allResults = [...allResults, ...items];
 
-        if (response.next) {
+        if (response?.next && items.length > 0) {
           nextPage += 1;
         } else {
           hasMore = false;

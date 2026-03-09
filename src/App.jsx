@@ -3,6 +3,7 @@ import GuestLayout from "./layouts/GuestLayout";
 
 import Home from "./pages/Home";
 import Auctions from "./pages/Auctions";
+import GuestBuy from "./pages/GuestBuy";
 import AuctionDetails from "./pages/AuctionDetails";
 import About from "./pages/About";
 import Contact from "./pages/Contact";
@@ -15,6 +16,7 @@ import KYCVerification from "./pages/KYCVerification";
 import BuyerDashboard from "./pages/BuyerDashboard";
 import BuyerAuctions from "./pages/BuyerAuctions";
 import BuyerEventLots from "./pages/BuyerEventLots";
+import BuyerBuy from "./pages/BuyerBuy";
 import BuyerAuctionDetails from "./pages/BuyerAuctionDetails";
 import BuyerBids from "./pages/BuyerBids";
 import BuyerWonItems from "./pages/BuyerWonItems";
@@ -35,6 +37,7 @@ import SellerKYCDocumentUpload from "./pages/sellerProfile/SellerKYCDocumentUplo
 
 // Manager
 import ManagerDashboard from "./pages/ManagerDashboard";
+import ManagerBuy from "./pages/ManagerBuy";
 import ManagerCreateEvent from "./pages/ManagerCreateEvent";
 import ManagerEventLots from "./pages/ManagerEventLots";
 import ManagerInspection from "./pages/ManagerInspection";
@@ -50,6 +53,7 @@ import ManagerProductFields from './pages/managerProductFields/ManagerProductFie
 
 // Admin
 import AdminDashboard from "./pages/adminDashboard/AdminDashboard";
+import AdminBuy from "./pages/AdminBuy";
 import AdminEventLots from "./pages/adminDashboard/AdminEventLots";
 import AdminAuctionDetails from "./pages/adminDashboard/AdminAuctionDetails";
 import AdminProfile from "./pages/adminProfile/AdminProfile";
@@ -84,6 +88,7 @@ import ResetPassword from "./pages/ResetPassword";
 import ResetVerifyOtp from "./pages/ResetVerifyOTP";
 import SellerSales from "./pages/SellerSales";
 import BuyerBidDetails from "./components/BuyerBidDetails";
+import LotDetailReadOnly from "./components/LotDetailReadOnly";
 function App() {
   return (
     <Provider store={store}>
@@ -94,6 +99,7 @@ function App() {
             <Route element={<GuestLayout />}>
               <Route path="/" element={<Home />} />
               <Route path="/auctions" element={<Auctions />} />
+              <Route path="/buy" element={<GuestBuy />} />
               <Route path="/auction/:id" element={<AuctionDetails />} />
               <Route path="/about" element={<About />} />
               <Route path="/contact" element={<Contact />} />
@@ -110,6 +116,7 @@ function App() {
             <Route element={<BuyerGuard />}>
               <Route element={<BuyerLayout />}>
                 <Route path="/buyer/dashboard" element={<BuyerDashboard />} />
+                <Route path="/buyer/buy" element={<BuyerBuy />} />
                 <Route path="/buyer/event/:eventId" element={<BuyerEventLots />} />
                 <Route path="/buyer/auctions" element={<BuyerAuctions />} />
                 <Route path="/buyer/auction/:id" element={<BuyerAuctionDetails />} />
@@ -144,6 +151,8 @@ function App() {
             <Route element={<ManagerGuard />}>
               <Route element={<ManagerLayout />}>
                 <Route path="/manager/dashboard" element={<ManagerDashboard />} />
+                <Route path="/manager/buy" element={<ManagerBuy />} />
+                <Route path="/manager/buy/lot/:lotId" element={<LotDetailReadOnly backPath="/manager/buy" />} />
                 <Route path="/manager/event/create" element={<ManagerCreateEvent />} />
                 <Route path="/manager/event/:eventId/lot/:lotId" element={<ManagerLotDetail />} />
                 <Route path="/manager/event/:id" element={<ManagerEventLots />} />
@@ -206,6 +215,8 @@ function App() {
               <Route element={<AdminLayout />}>
                 <Route path="/admin" element={<Navigate to="/admin/dashboard" replace />} />
                 <Route path="/admin/dashboard" element={<AdminDashboard />} />
+                <Route path="/admin/buy" element={<AdminBuy />} />
+                <Route path="/admin/buy/lot/:lotId" element={<LotDetailReadOnly backPath="/admin/buy" />} />
                 <Route path="/admin/event/:id" element={<AdminEventLots />} />
                 <Route path="/admin/auction/:id" element={<AdminAuctionDetails />} />
                 <Route path="/admin/profile" element={<AdminProfile />} />

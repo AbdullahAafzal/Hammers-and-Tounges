@@ -3,10 +3,15 @@ import apiClient from '../api.service';
 import { API_ROUTES } from '../../config/api.config';
 
 export const buyerService = {
-  // Place a bid
+  // Place a bid (POST /auctions/bid/ with { lot_id, amount })
   placeBid: async (bidData) => {
     try {
-      const { data } = await apiClient.post(API_ROUTES.PLACE_BID, bidData);
+      const amount = parseFloat(bidData.amount);
+      const payload = {
+        lot_id: Number(bidData.lot_id ?? bidData.auction_id),
+        amount: isNaN(amount) ? 0 : Number(amount.toFixed(2)),
+      };
+      const { data } = await apiClient.post(API_ROUTES.PLACE_BID, payload);
       return data;
     } catch (error) {
       if (error.isNetworkError) {
@@ -16,20 +21,14 @@ export const buyerService = {
     }
   },
 
-  // Get bids for an auction
-  getAuctionBids: async (auctionId) => {
-    console.log(auctionId);
-    
+  // Get bids for a lot (GET /auctions/lots/{id}/bids/)
+  getLotBids: async (lotId) => {
     try {
       const { data } = await apiClient.get(
-        `${API_ROUTES.GET_AUCTION_BIDS}${auctionId}/bids/`
+        `${API_ROUTES.AUCTIONS_LOTS}${lotId}/bids/`
       );
-      console.log(data, "data");
-      
-      return data;
+      return Array.isArray(data) ? data : data?.results ?? data?.bids ?? [];
     } catch (error) {
-      console.log(error);
-      
       if (error.isNetworkError) {
         throw new Error('Unable to connect to server. Please try again later.');
       }
@@ -63,10 +62,12 @@ export const buyerService = {
       throw error;
     }
   },
-  getMyFavoriteAuctions: async () => {
+  // GET /auctions/watchlist/?page=1&page_size=10
+  getMyFavoriteAuctions: async (params = {}) => {
     try {
-      // Assuming there's an endpoint for this, adjust if needed
-      const { data } = await apiClient.get(API_ROUTES.WATCH_LIST);
+      const { data } = await apiClient.get(API_ROUTES.WATCH_LIST, {
+        params: { page: 1, page_size: 10, ...params },
+      });
       return data;
     } catch (error) {
       if (error.isNetworkError) {
@@ -75,32 +76,37 @@ export const buyerService = {
       throw error;
     }
   },
-  addToFavorite: async (auctionId) => {
+  // Add/remove from watchlist - try listings first (API doc), fallback to lots
+  addToFavorite: async (id) => {
+    let err;
     try {
-      // Assuming there's an endpoint for this, adjust if needed
-      const { data } = await apiClient.post(API_ROUTES.FAVORITE_AUCTIONS + `${auctionId}/watchlist/`);
-      console.log(data, 'data');
-      
+      const { data } = await apiClient.post(`${API_ROUTES.AUCTION_LISTINGS}${id}/watchlist/`);
       return data;
-    } catch (error) {
-      console.log(error);
-      
-      if (error.isNetworkError) {
-        throw new Error('Unable to connect to server. Please try again later.');
-      }
-      throw error;
+    } catch (e) {
+      err = e;
+    }
+    if (err?.isNetworkError) throw new Error('Unable to connect to server. Please try again later.');
+    try {
+      const { data } = await apiClient.post(`${API_ROUTES.AUCTIONS_LOTS}${id}/watchlist/`);
+      return data;
+    } catch {
+      throw err;
     }
   },
-  deleteFromFavorite: async (auctionId) => {
+  deleteFromFavorite: async (id) => {
+    let listingsErr;
     try {
-      // Assuming there's an endpoint for this, adjust if needed
-      const { data } = await apiClient.delete(API_ROUTES.FAVORITE_AUCTIONS + `${auctionId}/watchlist/`);
+      const { data } = await apiClient.delete(`${API_ROUTES.AUCTION_LISTINGS}${id}/watchlist/`);
       return data;
-    } catch (error) {
-      if (error.isNetworkError) {
-        throw new Error('Unable to connect to server. Please try again later.');
-      }
-      throw error;
+    } catch (e) {
+      listingsErr = e;
+    }
+    if (listingsErr?.isNetworkError) throw new Error('Unable to connect to server. Please try again later.');
+    try {
+      const { data } = await apiClient.delete(`${API_ROUTES.AUCTIONS_LOTS}${id}/watchlist/`);
+      return data;
+    } catch {
+      throw listingsErr;
     }
   },
 

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo, useRef } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import "./Register.css";
@@ -24,6 +24,18 @@ const Register = () => {
     confirmPassword: "",
   });
   const [formErrors, setFormErrors] = useState({});
+  const fixedSuffixRef = useRef(null);
+
+  const userId = useMemo(() => {
+    const first = (formData.first_name || "").trim().charAt(0).toUpperCase() || "";
+    const last = (formData.last_name || "").trim().charAt(0).toUpperCase() || "";
+    if (!first || !last) return "";
+    if (!fixedSuffixRef.current) {
+      fixedSuffixRef.current =
+        Date.now().toString().slice(-8) + Math.random().toString(36).substring(2, 6);
+    }
+    return first + last + fixedSuffixRef.current;
+  }, [formData.first_name, formData.last_name]);
 
   useEffect(() => {
     if (registrationData) {
@@ -123,6 +135,7 @@ const Register = () => {
       email: formData.email,
       phone: formData.phone ? `+263${formData.phone.replace(/\s/g, "")}` : "",
       password: formData.password,
+      acc_id: userId,
     };
 
     await dispatch(registerUser(registrationPayload));
@@ -192,6 +205,27 @@ const Register = () => {
                   <span className="register-form__field-error">{formErrors.last_name}</span>
                 )}
               </div>
+            </div>
+
+            <div className="register-form__group">
+              <label htmlFor="user_id" className="register-form__label">
+                User ID
+              </label>
+              <input
+                type="text"
+                id="user_id"
+                name="user_id"
+                className="register-form__input register-form__input--readonly"
+                value={userId}
+                placeholder={userId ? "" : "Enter first and last name above"}
+                readOnly
+                disabled={isRegistering}
+                tabIndex={-1}
+                aria-describedby="user-id-hint"
+              />
+              <span id="user-id-hint" className="register-form__hint">
+                System will assign you an ID when name is filled
+              </span>
             </div>
 
             <div className="register-form__group">

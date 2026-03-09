@@ -120,6 +120,16 @@
   background: rgba(239, 68, 68, 0.08);
 }
 
+.register-form__input--readonly {
+  background: var(--color-surface-elevated);
+  cursor: default;
+}
+
+.register-form__hint {
+  font-size: 0.7rem;
+  color: var(--color-text-muted);
+}
+
 .register-form__field-error {
   font-size: 0.7rem;
   color: #fca5a5;

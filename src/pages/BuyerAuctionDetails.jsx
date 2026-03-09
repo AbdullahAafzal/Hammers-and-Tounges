@@ -1,11 +1,10 @@
 import React, { useState, useEffect, useMemo, useCallback, memo } from 'react';
 import { Link, useLocation, useParams, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
-import { placeBid, fetchAuctionBids } from '../store/actions/buyerActions';
+import { placeBid, fetchAuctionBids, addToFavorite, deleteFavorite } from '../store/actions/buyerActions';
 import { auctionService } from '../services/interceptors/auction.service';
 import { getMediaUrl } from '../config/api.config';
 import './BuyerAuctionDetails.css';
-import { fetchProfile } from '../store/actions/profileActions';
 import { toast } from 'react-toastify';
 
 // ==================== MEMOIZED COMPONENTS ====================
@@ -149,10 +148,10 @@ const BidHistoryPanel = memo(({ bids, formatCurrency }) => (
     {bids && bids.length > 0 ? (
       <div className="buyer-details-bid-list">
         {bids.map((bid, index) => (
-          <div key={bid.id} className="buyer-details-bid-item">
+            <div key={bid.id ?? index} className="buyer-details-bid-item">
             <div className="buyer-details-bid-rank">#{index + 1}</div>
             <div className="buyer-details-bid-info">
-              <div className="buyer-details-bid-bidder">{bid.bidder_name}</div>
+              <div className="buyer-details-bid-bidder">{bid.bidder_name ?? bid.user_name ?? bid.bidder ?? 'Bidder'}</div>
               <div className="buyer-details-bid-time">
                 {new Date(bid.created_at).toLocaleString()}
               </div>
@@ -212,8 +211,10 @@ DescriptionTab.displayName = 'DescriptionTab';
 // ==================== UTILITY FUNCTIONS ====================
 
 const calculateTimeRemaining = (endDate) => {
+  if (!endDate) return { hours: 0, minutes: 0, seconds: 0 };
   const now = new Date().getTime();
   const endDateMs = new Date(endDate).getTime();
+  if (isNaN(endDateMs)) return { hours: 0, minutes: 0, seconds: 0 };
   const difference = endDateMs - now;
 
   if (difference > 0) {
@@ -225,29 +226,26 @@ const calculateTimeRemaining = (endDate) => {
   return { hours: 0, minutes: 0, seconds: 0 };
 };
 
+const formatTimelineDate = (dateStr) => {
+  if (!dateStr) return '—';
+  const d = new Date(dateStr);
+  return isNaN(d.getTime()) ? '—' : d.toLocaleString();
+};
+
 // ==================== MAIN COMPONENT ====================
 
 const BuyerAuctionDetails = () => {
   const { id } = useParams();
-  const navigate = useNavigate()
+  const navigate = useNavigate();
   const dispatch = useDispatch();
   const location = useLocation();
-  const { profile } = useSelector(state => state.profile)
   const auctionObj = location.state?.listing;
+  const fromBuyAndSell = location.state?.from === 'buyer-buy';
   const { auctionBids, isPlacingBid, error } = useSelector(state => state.buyer);
-  const buyerProfile = profile?.buyer_profile
-
-
-  console.log(buyerProfile); // this is an object, in this object I am getting points value in points key in numbers
-
 
   useEffect(() => {
-    dispatch(fetchAuctionBids(id));
+    if (id) dispatch(fetchAuctionBids(id));
   }, [id, dispatch]);
-
-  useEffect(() => {
-    dispatch(fetchProfile());
-  }, [dispatch]);
 
   // Fetch lot by id when no listing in state (e.g. direct URL or refresh)
   useEffect(() => {
@@ -285,34 +283,74 @@ const BuyerAuctionDetails = () => {
   const [state, setState] = useState({
     selectedAuction: auctionObj || null,
     activeTab: 'description',
-    customBidAmount: '',
     selectedImage: 0,
     timeRemaining: { hours: 0, minutes: 0, seconds: 0 },
     isLoading: !auctionObj,
     error: null,
-    showPointsWarning: false,
+    categoryDetail: null,
+    isFavorite: auctionObj?.is_favourite ?? false,
   });
 
-  // Calculate required points (50% of bid amount)
-  const requiredPoints = useMemo(() => {
-    const bidAmount = parseFloat(state.customBidAmount) || 0;
-    return Math.ceil(bidAmount * 0.5); // 50% of bid amount
-  }, [state.customBidAmount]);
+  // Fetch category detail for increment rules when we have the lot
+  useEffect(() => {
+    const categoryId = state.selectedAuction?.category ?? state.selectedAuction?.category_id;
+    if (!categoryId) return;
+    let cancelled = false;
+    (async () => {
+      try {
+        const cat = await auctionService.getCategoryDetail(categoryId);
+        if (!cancelled) {
+          setState((prev) => ({ ...prev, categoryDetail: cat }));
+        }
+      } catch {
+        if (!cancelled) setState((prev) => ({ ...prev, categoryDetail: null }));
+      }
+    })();
+    return () => { cancelled = true; };
+  }, [state.selectedAuction?.category, state.selectedAuction?.category_id]);
 
-  console.log("requiredPoints: ", requiredPoints);
+  // Compute next valid bid from increment rules: user can only bid (current + increment), capped by up_to
+  const { nextBidAmount, incrementRules } = useMemo(() => {
+    const ranges = state.categoryDetail?.increment_rules?.ranges;
+    const initialPrice = parseFloat(state.selectedAuction?.initial_price || 0);
+    const highestBid = parseFloat(auctionBids?.[0]?.amount ?? 0);
+    const currentHighest = Math.max(initialPrice, highestBid);
 
+    if (!ranges || !Array.isArray(ranges) || ranges.length === 0) {
+      return { nextBidAmount: currentHighest + 1, incrementRules: null };
+    }
 
-  // Check if user has enough points
-  const hasEnoughPoints = useMemo(() => {
-    const userPoints = parseFloat(buyerProfile?.points) || 0;
-    return userPoints >= requiredPoints;
-  }, [buyerProfile?.points, requiredPoints]);
+    // Find applicable range (ranges are typically ordered by up_to ascending)
+    const sorted = [...ranges].sort((a, b) => (a.up_to ?? 0) - (b.up_to ?? 0));
+    let increment = sorted[0]?.increment ?? 1;
+    let upTo = sorted[0]?.up_to ?? Infinity;
 
-  console.log("hasEnoughPoints: ", hasEnoughPoints);
+    for (const r of sorted) {
+      if (currentHighest < (r.up_to ?? Infinity)) {
+        increment = Number(r.increment) || 1;
+        upTo = Number(r.up_to) ?? Infinity;
+        break;
+      }
+    }
+
+    const nextRaw = currentHighest + increment;
+    const nextBid = Math.min(nextRaw, upTo);
+    return {
+      nextBidAmount: nextBid > currentHighest ? nextBid : null,
+      incrementRules: { increment, upTo },
+    };
+  }, [state.selectedAuction?.initial_price, auctionBids, state.categoryDetail?.increment_rules?.ranges]);
 
 
   // Memoized computed values
   const auction = state.selectedAuction;
+
+  useEffect(() => {
+    if (auction?.is_favourite != null) {
+      setState((prev) => ({ ...prev, isFavorite: !!auction.is_favourite }));
+    }
+  }, [auction?.is_favourite]);
+
   const images = useMemo(() =>
     auction?.media?.filter(m => m.media_type === 'image').map(m => getMediaUrl(m.file)) || [],
     [auction?.media]
@@ -321,9 +359,6 @@ const BuyerAuctionDetails = () => {
   const isUpcoming = useMemo(() => auction?.status === 'APPROVED', [auction?.status]);
   const isClosed = useMemo(() => auction?.status === 'CLOSED', [auction?.status]);
   const isAwaitingPayment = useMemo(() => auction?.status === 'AWAITING_PAYMENT', [auction?.status]);
-
-  console.log("isUpcoming: ", isUpcoming);
-
 
   const formatCurrency = useCallback((amount) => {
     return new Intl.NumberFormat('en-US', {
@@ -343,115 +378,53 @@ const BuyerAuctionDetails = () => {
     setState(prev => ({ ...prev, activeTab: tab }));
   }, []);
 
-  // const handleCustomBidChange = useCallback((e) => {
-  //   setState(prev => ({ ...prev, customBidAmount: e.target.value }));
-  // }, []);
-
-  const handleCustomBidChange = useCallback((e) => {
-    const value = e.target.value;
-    setState(prev => ({
-      ...prev,
-      customBidAmount: value,
-      showPointsWarning: false
-    }));
-  }, []);
-
-  // const handleCustomBidSubmit = useCallback((e) => {
-  //   e.preventDefault();
-  //   if (auction && state.customBidAmount) {
-  //     dispatch(placeBid({
-  //       auction_id: auction.id,
-  //       amount: parseFloat(state.customBidAmount)
-  //     }));
-  //     setState(prev => ({ ...prev, customBidAmount: '' }));
-  //     navigate('/buyer/auctions', { replace: true })
-  //   }
-
-  // }, [auction, state.customBidAmount, dispatch]);
-
-  // Timer effect
-
-  console.log(state, 'state');
-
-
-  const handleCustomBidSubmit = useCallback((e) => {
-    e.preventDefault();
-    // Check if user has enough points
-    if (!hasEnoughPoints) {
-      setState(prev => ({
-        ...prev,
-        showPointsWarning: true
-      }));
-      return;
+  const handleFavoriteToggle = useCallback(async () => {
+    if (!auction?.id) return;
+    try {
+      if (state.isFavorite) {
+        await dispatch(deleteFavorite(auction.id)).unwrap();
+        toast.success('Removed from favorites');
+      } else {
+        await dispatch(addToFavorite(auction.id)).unwrap();
+        toast.success('Added to favorites');
+      }
+      setState((prev) => ({ ...prev, isFavorite: !prev.isFavorite }));
+    } catch {
+      // Error toast shown by buyerActions
     }
+  }, [auction?.id, state.isFavorite, dispatch]);
 
-    if (!auction || !state.customBidAmount) {
-      return;
-    }
-
-
-    const bidAmount = parseFloat(state.customBidAmount);
-    const minBidAmount = parseFloat(auction?.initial_price || 0) + 1;
-    const highBidAmount = parseFloat(auctionBids?.[0]?.amount) + 1;
-
-    // Validate bid amount
-    if (bidAmount < highBidAmount) {
-      setState(prev => ({
-        ...prev,
-        showPointsWarning: false
-      }));
-      toast.info('Bid must be greater than the highest bid')
-
-      return;
-    }
-    // Validate bid amount
-    if (bidAmount < minBidAmount) {
-      setState(prev => ({
-        ...prev,
-        showPointsWarning: false
-      }));
-      toast.info('Bid must be greater than the current price')
-      return;
-    }
-
-    // Place bid if validation passes
+  const handlePlaceIncrementalBid = useCallback(() => {
+    if (!auction || nextBidAmount == null || isPlacingBid) return;
     dispatch(placeBid({
-      auction_id: auction.id,
-      amount: bidAmount
+      lot_id: auction.id,
+      amount: nextBidAmount,
     })).then((result) => {
       if (result.type === 'buyer/placeBid/fulfilled') {
-        setState(prev => ({
-          ...prev,
-          customBidAmount: '',
-          showPointsWarning: false
-        }));
-        // Refresh bids and profile
         dispatch(fetchAuctionBids(id));
-        dispatch(fetchProfile());
       }
     });
-
-    navigate('/buyer/auctions', { replace: true })
-  }, [auction, state.customBidAmount, hasEnoughPoints, dispatch, id]);
+  }, [auction, nextBidAmount, isPlacingBid, dispatch, id]);
 
 
+  const endDate = auction?.end_date ?? auction?.booked_in_date;
   useEffect(() => {
-    if (isLive && auction?.end_date) {
+    if (isLive && endDate) {
       setState(prev => ({
         ...prev,
-        timeRemaining: calculateTimeRemaining(auction.end_date)
+        timeRemaining: calculateTimeRemaining(endDate)
       }));
 
       const interval = setInterval(() => {
         setState(prev => ({
           ...prev,
-          timeRemaining: calculateTimeRemaining(auction.end_date)
+          timeRemaining: calculateTimeRemaining(endDate)
         }));
       }, 1000);
 
       return () => clearInterval(interval);
     }
-  }, [isLive, auction?.end_date]);
+  }, [isLive, endDate]);
 
   // Loading state
   if (state.isLoading && !state.selectedAuction) {
@@ -482,6 +455,24 @@ const BuyerAuctionDetails = () => {
 
         <div className="buyer-details-header-section">
           <h1 className="buyer-details-title">{auction?.title || 'Auction'}</h1>
+          {!fromBuyAndSell && (
+          <button
+            type="button"
+            className="buyer-details-favorite-btn"
+            onClick={handleFavoriteToggle}
+            aria-label={state.isFavorite ? 'Remove from favorites' : 'Add to favorites'}
+          >
+            {state.isFavorite ? (
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M11.645 20.91l-.007-.003-.022-.012a15.247 15.247 0 01-.383-.218 25.18 25.18 0 01-4.244-3.17C4.688 15.36 2.25 12.174 2.25 8.25 2.25 5.322 4.714 3 7.688 3A5.5 5.5 0 0112 5.052 5.5 5.5 0 0116.313 3c2.973 0 5.437 2.322 5.437 5.25 0 3.925-2.438 7.111-4.739 9.256a25.175 25.175 0 01-4.244 3.17 15.247 15.247 0 01-.383.219l-.022.012-.007.004-.003.001a.752.752 0 01-.704 0l-.003-.001z" />
+              </svg>
+            ) : (
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <path d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+              </svg>
+            )}
+          </button>
+          )}
         </div>
 
         <div className="buyer-details-content">
@@ -494,38 +485,43 @@ const BuyerAuctionDetails = () => {
 
           <div className="buyer-details-info">
             <div className="buyer-details-auction-meta">
-              {/* <div className="buyer-details-meta-item">
-                <span className="buyer-details-meta-label">Lot Number</span>
-                <span className="buyer-details-meta-value">#{auction?.id || 'N/A'}</span>
-              </div> */}
               <div className="buyer-details-meta-item">
                 <span className="buyer-details-meta-label">Category</span>
                 <span className="buyer-details-meta-value">{auction?.category_name || 'N/A'}</span>
               </div>
-              <div className="buyer-details-meta-item">
-                <span className="buyer-details-meta-label">Total Bids</span>
-                <span className="buyer-details-meta-value">{auction?.total_bids || 0}</span>
-              </div>
+              {!fromBuyAndSell && (
+                <div className="buyer-details-meta-item">
+                  <span className="buyer-details-meta-label">Total Bids</span>
+                  <span className="buyer-details-meta-value">{auction?.total_bids || 0}</span>
+                </div>
+              )}
             </div>
 
             <div className="buyer-details-price-section">
-              <div className="buyer-details-price-item">
-                <div className='flex justify-between items-center'>
-                  <span className="buyer-details-price-label">Starting Price</span>
-                  <span className="buyer-details-price-value">{formatCurrency(parseFloat(auction?.initial_price || 0))}</span>
-
-                </div>
-                <div className='flex justify-between items-center'>
-
-                  <span className="buyer-details-price-label">Highest Bid</span>
-                  <span className="buyer-details-price-value">{formatCurrency(parseFloat(auctionBids?.[0]?.amount || 0))}</span>
-                </div>
-              </div>
-              {auction?.is_buy_now_enabled && auction?.buy_now_price && (
+              {fromBuyAndSell ? (
                 <div className="buyer-details-price-item">
-                  <span className="buyer-details-price-label">Buy Now</span>
-                  <span className="buyer-details-price-value">{formatCurrency(parseFloat(auction.buy_now_price))}</span>
+                  <span className="buyer-details-price-label">Price</span>
+                  <span className="buyer-details-price-value">{formatCurrency(parseFloat(auction?.reserve_price || auction?.initial_price || 0))}</span>
                 </div>
+              ) : (
+                <>
+                  <div className="buyer-details-price-item">
+                    <div className='flex justify-between items-center'>
+                      <span className="buyer-details-price-label">Starting Price</span>
+                      <span className="buyer-details-price-value">{formatCurrency(parseFloat(auction?.initial_price || 0))}</span>
+                    </div>
+                    <div className='flex justify-between items-center'>
+                      <span className="buyer-details-price-label">Highest Bid</span>
+                      <span className="buyer-details-price-value">{formatCurrency(parseFloat(auctionBids?.[0]?.amount || 0))}</span>
+                    </div>
+                  </div>
+                  {auction?.is_buy_now_enabled && auction?.buy_now_price && (
+                    <div className="buyer-details-price-item">
+                      <span className="buyer-details-price-label">Buy Now</span>
+                      <span className="buyer-details-price-value">{formatCurrency(parseFloat(auction.buy_now_price))}</span>
+                    </div>
+                  )}
+                </>
               )}
             </div>
 
@@ -533,18 +529,18 @@ const BuyerAuctionDetails = () => {
               <div className="buyer-details-timeline-item">
                 <span className="buyer-details-timeline-label">Starts</span>
                 <span className="buyer-details-timeline-value">
-                  {new Date(auction?.start_date).toLocaleString()}
+                  {formatTimelineDate(auction?.start_date ?? auction?.live_date)}
                 </span>
               </div>
               <div className="buyer-details-timeline-item">
                 <span className="buyer-details-timeline-label">Ends</span>
                 <span className="buyer-details-timeline-value">
-                  {new Date(auction?.end_date).toLocaleString()}
+                  {formatTimelineDate(auction?.end_date ?? auction?.booked_in_date)}
                 </span>
               </div>
             </div>
 
-            {isLive && state.timeRemaining.hours + state.timeRemaining.minutes + state.timeRemaining.seconds > 0 && (
+            {isLive && !fromBuyAndSell && state.timeRemaining.hours + state.timeRemaining.minutes + state.timeRemaining.seconds > 0 && (
               <Timer timeRemaining={state.timeRemaining} />
             )}
 
@@ -584,125 +580,39 @@ const BuyerAuctionDetails = () => {
               </div>
             )}
 
-            {/* {isLive && (
-              <form className="buyer-details-bidding-form" onSubmit={handleCustomBidSubmit}>
-                <input
-                  type="number"
-                  className="buyer-details-bid-input"
-                  placeholder="Enter your bid amount"
-                  value={state.customBidAmount}
-                  onChange={handleCustomBidChange}
-                  min={parseFloat(auction?.initial_price || 0) + 1}
-                  step="0.01"
-                />
-                <button type="submit" className="buyer-details-bid-button">Place Bid</button>
-              </form>
-            )} */}
-
-            {isLive && (
-              <>
-                {/* Points Information Notice */}
-                <div className="buyer-details-notice rounded-lg p-4 mb-4">
-                  <div className="flex items-start gap-3">
-                    <svg className="w-5 h-5 flex-shrink-0 mt-0.5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
-                    <div className="flex-1">
-                      <h4 className="text-white font-semibold mb-1">Points Required</h4>
-                      <p className="text-sm ">
-                        You must have at least <strong>50% of your bid amount</strong> in points to place a bid.
-
-                      </p>
-                    </div>
-                  </div>
-                </div>
-
-                <form className="buyer-details-bidding-form" onSubmit={handleCustomBidSubmit}>
-                  <div className="space-y-3 w-full">
-                    <input
-                      type="number"
-                      className="buyer-details-bid-input"
-                      placeholder="Enter your bid amount"
-                      value={state.customBidAmount}
-                      onChange={handleCustomBidChange}
-                      // min={parseFloat(auction?.initial_price || 0) + 1}
-                      // step="0.01"
-                      disabled={isPlacingBid}
-                    />
-
-                    {/* Dynamic Points Calculation */}
-                    {/* {state.customBidAmount && (
-                      <div className={`p-3 mt-2 w-full rounded-lg border ${hasEnoughPoints ? 'bg-green-700/10 border-green-500/30' : 'bg-amber-500/10 border-amber-500/30'}`}>
-                        <div className="flex items-center justify-between text-sm">
-                          <span className={hasEnoughPoints ? 'text-green-300' : 'text-amber-300'}>
-                            Points Required:
-                          </span>
-                          <span className={`font-semibold ${hasEnoughPoints ? 'text-green-200' : 'text-amber-200'}`}>
-                            {requiredPoints}
-                          </span>
-                        </div>
-                        <div className="flex items-center justify-between text-sm mt-1">
-                          <span className={hasEnoughPoints ? 'text-green-300' : 'text-amber-300'}>
-                            Your Points:
-                          </span>
-                          <span className={`font-semibold ${hasEnoughPoints ? 'text-green-200' : 'text-amber-200'}`}>
-                            {buyerProfile?.points || 0}
-                          </span>
-                        </div>
-                        {!hasEnoughPoints && (
-                          <div className="mt-2 pt-2 border-t border-amber-500/20">
-                            <p className="text-amber-200 text-xs">
-                              You need {requiredPoints - (buyerProfile?.points || 0)} more points
-                            </p>
-                          </div>
-                        )}
-                      </div>
-                    )} */}
-
-                    {/* Insufficient Points Warning */}
-                    {state.showPointsWarning || !hasEnoughPoints && (
-                      <div className="bg-red-500/10 border border-red-500/30 rounded-lg p-3 mt-3">
-                        <div className="flex items-start gap-2">
-                          <svg className="w-5 h-5 text-red-400 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-                          </svg>
-                          <div className="flex-1">
-                            <h4 className="text-red-300 font-semibold mb-1">Insufficient Points</h4>
-                            <p className="text-red-200 text-sm mb-2">
-                              You do not have enough points to place this bid. Please try one of the following:
-                            </p>
-                            <ul className="text-red-200 text-sm space-y-1 list-disc list-inside">
-                              {/* <li>Lower your bid amount</li> */}
-                              <li>Purchase more points</li>
-                            </ul>
-                          </div>
-                        </div>
-                      </div>
-                    )}
-
-                    <button
-                      type="submit"
-                      className="buyer-details-bid-button w-full disabled:opacity-50 disabled:cursor-not-allowed"
-                      disabled={isPlacingBid || !state.customBidAmount || !hasEnoughPoints}
-                    >
-                      {isPlacingBid ? 'Placing Bid...' : 'Place Bid'}
-                    </button>
-                  </div>
-                </form>
-              </>
+            {isLive && fromBuyAndSell && (
+              <div className="buyer-details-bidding-form">
+                <button
+                  type="button"
+                  className="buyer-details-buy-now-button buyer-details-bid-button w-full"
+                  onClick={() => {
+                    const price = parseFloat(auction?.reserve_price || auction?.initial_price || 0);
+                    toast.info(`Buy Now at ${formatCurrency(price)} — Contact support to complete purchase.`);
+                  }}
+                >
+                  Buy Now — {formatCurrency(parseFloat(auction?.reserve_price || auction?.initial_price || 0))}
+                </button>
+              </div>
             )}
 
-            <div className="buyer-details-location-info">
-              <h4>Pickup Information</h4>
-              <div className="buyer-details-location-item">
-                <span className="buyer-details-location-label">Handover Type:</span>
-                <span className="buyer-details-location-value">{auction?.handover_type || 'N/A'}</span>
+            {isLive && !fromBuyAndSell && (
+              <div className="buyer-details-bidding-form">
+                <p className="buyer-details-increment-hint">
+                  Bid increment: {formatCurrency(incrementRules?.increment ?? 1)}
+                  {incrementRules?.upTo != null && incrementRules.upTo < Infinity && (
+                    <> (up to {formatCurrency(incrementRules.upTo)})</>
+                  )}
+                </p>
+                <button
+                  type="button"
+                  className="buyer-details-bid-button w-full disabled:opacity-50 disabled:cursor-not-allowed"
+                  onClick={handlePlaceIncrementalBid}
+                  disabled={isPlacingBid || nextBidAmount == null}
+                >
+                  {isPlacingBid ? 'Placing Bid...' : `Place Bid ${nextBidAmount != null ? formatCurrency(nextBidAmount) : ''}`}
+                </button>
               </div>
-              <div className="buyer-details-location-item">
-                <span className="buyer-details-location-label">Location:</span>
-                <span className="buyer-details-location-value">{auction?.pickup_address || 'N/A'}</span>
-              </div>
-            </div>
+            )}
           </div>
         </div>
 
@@ -714,19 +624,21 @@ const BuyerAuctionDetails = () => {
             >
               Description
             </button>
-            <button
-              className={`buyer-details-tab ${state.activeTab === 'bids' ? 'buyer-details-tab-active' : ''}`}
-              onClick={() => handleSetActiveTab('bids')}
-            >
-              Bid History ({auctionBids?.length || 0})
-            </button>
+            {!fromBuyAndSell && (
+              <button
+                className={`buyer-details-tab ${state.activeTab === 'bids' ? 'buyer-details-tab-active' : ''}`}
+                onClick={() => handleSetActiveTab('bids')}
+              >
+                Bid History ({auctionBids?.length || 0})
+              </button>
+            )}
           </div>
 
           <div className="buyer-details-tab-content">
             {state.activeTab === 'description' && (
               <DescriptionTab auction={auction} formatCurrency={formatCurrency} />
             )}
-            {state.activeTab === 'bids' && (
+            {!fromBuyAndSell && state.activeTab === 'bids' && (
               <BidHistoryPanel bids={auctionBids} formatCurrency={formatCurrency} />
             )}
           </div>

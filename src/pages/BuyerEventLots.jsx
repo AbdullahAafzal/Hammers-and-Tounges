@@ -1,6 +1,8 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
+import { useDispatch } from 'react-redux';
 import { auctionService } from '../services/interceptors/auction.service';
+import { addToFavorite, deleteFavorite, getMyFavoriteAuctions } from '../store/actions/buyerActions';
 import { toast } from 'react-toastify';
 import { getMediaUrl } from '../config/api.config';
 import './BuyerEventLots.css';
@@ -29,12 +31,15 @@ const getLotStatusModifier = (status) => {
   return '--active';
 };
 
-const LotCard = ({ lot, onOpenDetail }) => {
+const LotCard = ({ lot, onOpenDetail, onFavoriteToggle, favoriteIds }) => {
+  const dispatch = useDispatch();
   const imageMedia = lot.media?.filter((m) => m.media_type === 'image') || [];
   const imageUrls = imageMedia.map((m) => getMediaUrl(m.file)).filter(Boolean);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [isUpdating, setIsUpdating] = useState(false);
   const intervalRef = useRef(null);
   const lotStatus = lot.status || lot.listing_status;
+  const isFavorite = favoriteIds?.has(lot.id) ?? lot.is_favourite ?? false;
 
   useEffect(() => {
     if (imageUrls.length <= 1) return;
@@ -48,6 +53,28 @@ const LotCard = ({ lot, onOpenDetail }) => {
 
   const displayUrl = imageUrls[currentImageIndex] || imageUrls[0];
   const hasMultipleImages = imageUrls.length > 1;
+
+  const handleFavoriteClick = useCallback(async (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (!lot?.id || isUpdating) return;
+    setIsUpdating(true);
+    const prev = isFavorite;
+    try {
+      if (isFavorite) {
+        await dispatch(deleteFavorite(lot.id)).unwrap();
+        toast.success('Removed from favorites');
+      } else {
+        await dispatch(addToFavorite(lot.id)).unwrap();
+        toast.success('Added to favorites');
+      }
+      onFavoriteToggle?.(lot.id, !isFavorite);
+    } catch {
+      toast.error('Failed to update favorite');
+    } finally {
+      setIsUpdating(false);
+    }
+  }, [lot?.id, isFavorite, isUpdating, dispatch, onFavoriteToggle]);
 
   return (
     <article
@@ -63,6 +90,23 @@ const LotCard = ({ lot, onOpenDetail }) => {
             {lotStatus}
           </span>
         )}
+        <button
+          type="button"
+          className="buyer-event-lots__heart"
+          onClick={handleFavoriteClick}
+          disabled={isUpdating}
+          aria-label={isFavorite ? 'Remove from favorites' : 'Add to favorites'}
+        >
+          {isFavorite ? (
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" className="buyer-event-lots__heart-icon">
+              <path d="M11.645 20.91l-.007-.003-.022-.012a15.247 15.247 0 01-.383-.218 25.18 25.18 0 01-4.244-3.17C4.688 15.36 2.25 12.174 2.25 8.25 2.25 5.322 4.714 3 7.688 3A5.5 5.5 0 0112 5.052 5.5 5.5 0 0116.313 3c2.973 0 5.437 2.322 5.437 5.25 0 3.925-2.438 7.111-4.739 9.256a25.175 25.175 0 01-4.244 3.17 15.247 15.247 0 01-.383.219l-.022.012-.007.004-.003.001a.752.752 0 01-.704 0l-.003-.001z" />
+            </svg>
+          ) : (
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="buyer-event-lots__heart-icon">
+              <path d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+            </svg>
+          )}
+        </button>
         {displayUrl ? (
           <img src={displayUrl} alt={lot.title} loading="lazy" />
         ) : (
@@ -106,6 +150,7 @@ const BuyerEventLots = () => {
   const { eventId } = useParams();
   const navigate = useNavigate();
   const location = useLocation();
+  const dispatch = useDispatch();
   const eventFromState = location.state?.event;
 
   const [lots, setLots] = useState([]);
@@ -115,6 +160,7 @@ const BuyerEventLots = () => {
   const [error, setError] = useState(null);
   const [page, setPage] = useState(1);
   const [totalCount, setTotalCount] = useState(0);
+  const [favoriteIds, setFavoriteIds] = useState(new Set());
 
   const totalPages = Math.ceil(totalCount / PAGE_SIZE) || 1;
 
@@ -180,6 +226,29 @@ const BuyerEventLots = () => {
   useEffect(() => {
     fetchLots(page);
   }, [fetchLots, page]);
+
+  // Fetch favorite IDs for heart state
+  useEffect(() => {
+    let cancelled = false;
+    dispatch(getMyFavoriteAuctions({ page_size: 100 }))
+      .unwrap()
+      .then((res) => {
+        if (cancelled) return;
+        const items = res?.results ?? res ?? [];
+        setFavoriteIds(new Set(items.map((x) => x.id)));
+      })
+      .catch(() => {});
+    return () => { cancelled = true; };
+  }, [dispatch]);
+
+  const handleFavoriteToggle = useCallback((lotId, isFavorite) => {
+    setFavoriteIds((prev) => {
+      const next = new Set(prev);
+      if (isFavorite) next.add(lotId);
+      else next.delete(lotId);
+      return next;
+    });
+  }, []);
 
   useEffect(() => {
     if (!eventId || eventFromState) return;
@@ -259,7 +328,13 @@ const BuyerEventLots = () => {
           <>
             <div className="buyer-event-lots__grid">
               {lots.map((lot) => (
-                <LotCard key={lot.id} lot={lot} onOpenDetail={handleLotClick} />
+                <LotCard
+                  key={lot.id}
+                  lot={lot}
+                  onOpenDetail={handleLotClick}
+                  onFavoriteToggle={handleFavoriteToggle}
+                  favoriteIds={favoriteIds}
+                />
               ))}
             </div>
             {totalPages > 1 && (

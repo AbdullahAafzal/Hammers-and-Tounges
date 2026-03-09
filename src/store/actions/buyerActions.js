@@ -30,11 +30,15 @@ export const placeBid = createAsyncThunk(
       toast.success('Bid placed successfully!');
       return response;
     } catch (error) {
-      console.log(error);
-      
+      const res = error.response?.data;
       const message =
-        error.response?.data?.message ||
-        error.response?.data?.error ||
+        (typeof res?.detail === 'string' ? res.detail : null) ||
+        res?.message ||
+        res?.error ||
+        (Array.isArray(res?.non_field_errors) ? res.non_field_errors.join('. ') : null) ||
+        (res?.amount && Array.isArray(res.amount) ? res.amount.join('. ') : null) ||
+        (res?.lot_id && Array.isArray(res.lot_id) ? res.lot_id.join('. ') : null) ||
+        (typeof res === 'object' ? JSON.stringify(res) : null) ||
         'Failed to place bid';
       toast.error(message);
       return rejectWithValue(error.response?.data || { message });
@@ -44,17 +48,10 @@ export const placeBid = createAsyncThunk(
 
 export const fetchAuctionBids = createAsyncThunk(
   'buyer/fetchAuctionBids',
-  async (auctionId, { rejectWithValue }) => {
-    console.log(auctionId);
-    
+  async (lotId, { rejectWithValue }) => {
     try {
-      const response = await buyerService.getAuctionBids(auctionId);
-      console.log("response: ", response);
-      return response;
-      
+      return await buyerService.getLotBids(lotId);
     } catch (error) {
-      console.log("error:", error);
-      
       const message =
         error.response?.data?.message ||
         error.response?.data?.error ||
@@ -84,9 +81,9 @@ export const fetchMyBids = createAsyncThunk(
 
 export const getMyFavoriteAuctions = createAsyncThunk(
   'buyer/getMyFavoriteAuctions',
-  async (_, { rejectWithValue }) => {
+  async (params = {}, { rejectWithValue }) => {
     try {
-      const response = await buyerService.getMyFavoriteAuctions();
+      const response = await buyerService.getMyFavoriteAuctions(params);
       return response;
     } catch (error) {
       const message =
@@ -109,7 +106,7 @@ export const addToFavorite = createAsyncThunk(
       const message =
         error.response?.data?.message ||
         error.response?.data?.error ||
-        'Failed to fetch your bids';
+        'Failed to add to favorites';
       toast.error(message);
       return rejectWithValue(error.response?.data || { message });
     }
@@ -121,15 +118,12 @@ export const deleteFavorite = createAsyncThunk(
   async (auctionId, { rejectWithValue }) => {
     try {
       const response = await buyerService.deleteFromFavorite(auctionId);
-      console.log(response);
       return response;
     } catch (error) {
-      console.log(error);
-      
       const message =
         error.response?.data?.message ||
         error.response?.data?.error ||
-        'Failed to fetch your bids';
+        'Failed to remove from favorites';
       toast.error(message);
       return rejectWithValue(error.response?.data || { message });
     }

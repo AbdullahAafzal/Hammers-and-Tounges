@@ -8,8 +8,8 @@
   overflow-x: hidden;
   width: 100%;
   box-sizing: border-box;
-  background: #000;
-  color: #fff;
+  background: var(--color-bg);
+  color: var(--color-text);
 }
 
 .edit-seller-loading,
@@ -20,16 +20,16 @@
   justify-content: center;
   min-height: 200px;
   gap: 1rem;
-  color: rgba(255, 255, 255, 0.8);
+  color: var(--color-text-secondary);
 }
 
 .edit-seller-spinner {
   display: inline-block;
   width: 32px;
   height: 32px;
-  border: 3px solid rgba(255, 255, 255, 0.2);
+  border: 3px solid var(--color-border);
   border-radius: 50%;
-  border-top-color: #8cc63f;
+  border-top-color: var(--color-accent);
   animation: editSellerSpin 0.8s linear infinite;
 }
 
@@ -41,20 +41,20 @@
 
 .edit-seller-header {
   margin-bottom: 25px;
-  color: white;
+  color: var(--color-text);
 }
 
 .edit-seller-title {
   font-size: 1.75rem;
   font-weight: 700;
-  color: #ffffff;
+  color: var(--color-text);
   margin-bottom: 0.5rem;
   letter-spacing: -0.5px;
 }
 
 .edit-seller-subtitle {
   font-size: 0.9375rem;
-  color: rgba(255, 255, 255, 0.6);
+  color: var(--color-text-muted);
   margin: 0;
   line-height: 1.5;
 }
@@ -65,11 +65,11 @@
 }
 
 .edit-seller-card {
-  background: #000;
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: var(--color-card-bg);
+  border: 1px solid var(--color-border);
   border-radius: 14px;
   padding: 30px;
-  color: white;
+  color: var(--color-text);
 }
 
 .edit-seller-form {
@@ -91,7 +91,7 @@
 
 .edit-seller-form-group label {
   font-size: 0.8125rem;
-  color: rgba(255, 255, 255, 0.8);
+  color: var(--color-text-secondary);
   font-weight: 500;
   margin-bottom: 6px;
 }
@@ -102,10 +102,10 @@
 }
 
 .edit-seller-form-group input {
-  background: #0a0a0a;
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: var(--color-input-bg);
+  border: 1px solid var(--color-input-border);
   border-radius: 8px;
-  color: #fff;
+  color: var(--color-text);
   padding: 12px;
   font-size: 0.9rem;
   font-family: inherit;
@@ -114,7 +114,7 @@
 
 .edit-seller-form-group input:focus {
   outline: none;
-  border-color: #8cc63f;
+  border-color: var(--color-accent);
 }
 
 .edit-seller-form-group input:disabled {
@@ -123,7 +123,7 @@
 }
 
 .edit-seller-form-group input::placeholder {
-  color: rgba(255, 255, 255, 0.4);
+  color: var(--color-input-placeholder);
 }
 
 .edit-seller-form-group input.error {
@@ -137,7 +137,7 @@
 }
 
 .edit-seller-form-group .form-hint {
-  color: rgba(255, 255, 255, 0.5);
+  color: var(--color-text-muted);
   font-size: 0.75rem;
   margin-top: 4px;
 }
@@ -156,7 +156,7 @@
 
 .edit-seller-current-image span {
   font-size: 0.8rem;
-  color: rgba(255, 255, 255, 0.6);
+  color: var(--color-text-muted);
 }
 
 .edit-seller-file-input {
@@ -169,11 +169,11 @@
   gap: 10px;
   margin-top: 10px;
   padding-top: 20px;
-  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  border-top: 1px solid var(--color-border);
 }
 
 .edit-seller-btn-primary {
-  background-color: #8cc63f;
+  background-color: var(--color-accent);
   color: #000000;
   border: none;
   padding: 0.75rem 1.75rem;
@@ -200,9 +200,9 @@
 }
 
 .edit-seller-btn-secondary {
-  background: rgba(255, 255, 255, 0.1);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  color: #fff;
+  background: var(--color-surface-elevated);
+  border: 1px solid var(--color-border-strong);
+  color: var(--color-text);
   padding: 0.75rem 1.75rem;
   border-radius: 6px;
   font-size: 0.9rem;
@@ -212,8 +212,9 @@
 }
 
 .edit-seller-btn-secondary:hover:not(:disabled) {
-  background: rgba(255, 255, 255, 0.15);
-  border-color: rgba(255, 255, 255, 0.3);
+  background: var(--color-input-bg);
+  border-color: var(--color-accent);
+  color: var(--color-accent);
   transform: translateY(-1px);
 }
 

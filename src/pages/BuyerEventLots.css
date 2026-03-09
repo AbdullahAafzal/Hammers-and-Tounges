@@ -210,6 +210,42 @@
   color: #fff;
 }
 
+.buyer-event-lots__heart {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.5);
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+  color: #fff;
+  transition: all 0.2s;
+  z-index: 2;
+}
+
+.buyer-event-lots__heart:hover:not(:disabled) {
+  background: rgba(0, 0, 0, 0.7);
+  transform: scale(1.05);
+}
+
+.buyer-event-lots__heart:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.buyer-event-lots__heart-icon {
+  display: block;
+}
+
+.buyer-event-lots__heart .buyer-event-lots__heart-icon {
+  color: #f87171;
+}
+
 .buyer-event-lots__card-status--closed {
   background: rgba(59, 130, 246, 0.9);
   color: #fff;

@@ -49,6 +49,30 @@
   min-width: 200px;
 }
 
+.buyer-details-favorite-btn {
+  flex-shrink: 0;
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 50%;
+  color: #f87171;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.buyer-details-favorite-btn:hover {
+  background: rgba(248, 113, 113, 0.15);
+  border-color: rgba(248, 113, 113, 0.4);
+}
+
+.buyer-details-favorite-btn svg {
+  display: block;
+}
+
 .buyer-details-status-badge {
   padding: 0.5rem 1rem;
   border-radius: 20px;
@@ -409,12 +433,18 @@
 /* ==================== BIDDING FORM ==================== */
 .buyer-details-bidding-form {
   display: flex;
+  flex-direction: column;
   gap: 0.75rem;
   padding: 1.5rem;
   background-color: rgba(140, 198, 63, 0.1);
-  /* background: linear-gradient(135deg, rgba(140, 198, 63, 0.15) 0%, rgba(140, 198, 63, 0.08) 100%); */
   border: 1px solid rgba(140, 198, 63, 0.3);
   border-radius: 12px;
+}
+
+.buyer-details-increment-hint {
+  margin: 0;
+  font-size: 0.9rem;
+  opacity: 0.9;
 }
 
 .buyer-details-bid-input {
@@ -455,7 +485,7 @@
 }
 
 .buyer-details-bid-button:hover {
-  background:  '#7AB32';
+  background: #7AB32E;
 }
 
 .buyer-details-bid-button:active {
@@ -463,6 +493,12 @@
 }
 .buyer-details-bid-button:disabled {
   cursor: not-allowed;
+}
+
+.buyer-details-buy-now-button {
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
 }
 
 /* ==================== LOCATION INFO ==================== */
