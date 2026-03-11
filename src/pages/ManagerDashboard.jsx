@@ -41,7 +41,7 @@ const EventRow = React.memo(({ event, onViewDetails, onDeleteEvent }) => {
       case 'LIVE':
         return 'manager-dashboard-status-success';
       case 'CLOSING':
-        return 'manager-dashboard-status-warning';
+        return 'manager-dashboard-status-info'; // Display as COMPLETED
       case 'CLOSED':
         return 'manager-dashboard-status-info';
       case 'ACTIVE':
@@ -64,7 +64,7 @@ const EventRow = React.memo(({ event, onViewDetails, onDeleteEvent }) => {
       </td>
       <td className="manager-dashboard-table-cell manager-dashboard-cell-status" data-label="Status">
         <span className={`manager-dashboard-status-badge ${getStatusColor(event.status)}`}>
-          {event.status || '—'}
+          {(event.status || '').toUpperCase() === 'CLOSING' ? 'COMPLETED' : (event.status || '—')}
         </span>
       </td>
       <td className="manager-dashboard-table-cell manager-dashboard-cell-start" data-label="Start">
@@ -124,11 +124,12 @@ function ManagerDashboard() {
     try {
       const response = await auctionService.getEvents({ page: 1 });
       const allEvents = response.results || [];
-      const nonClosedEvents = allEvents.filter(
-        (e) => (e.status || '').toUpperCase() !== 'CLOSED'
-      );
-      setEvents(nonClosedEvents);
-      setEventCount(nonClosedEvents.length);
+      const nonCompletedEvents = allEvents.filter((e) => {
+        const s = (e.status || '').toUpperCase();
+        return s !== 'CLOSED' && s !== 'CLOSING';
+      });
+      setEvents(nonCompletedEvents);
+      setEventCount(nonCompletedEvents.length);
     } catch (error) {
       console.error('Error fetching events:', error);
       toast.error('Failed to load events. Please try again.');
@@ -239,7 +240,6 @@ function ManagerDashboard() {
                 <option value="ALL">All</option>
                 <option value="SCHEDULED">Scheduled</option>
                 <option value="LIVE">Live</option>
-                <option value="CLOSING">Closing</option>
               </select>
             </div>
           </div>

@@ -269,7 +269,7 @@ const AdminEventLots = () => {
             <h1 className="admin-event-lots__title">{eventTitle}</h1>
             {eventStatus && (
               <span className={`admin-event-lots__header-status admin-event-lots__header-status${getStatusModifier(eventStatus)}`}>
-                {eventStatus}
+                {(eventStatus || '').toUpperCase() === 'CLOSING' ? 'COMPLETED' : eventStatus}
               </span>
             )}
           </div>

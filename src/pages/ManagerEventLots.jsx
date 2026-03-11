@@ -385,7 +385,7 @@ const ManagerEventLots = () => {
             <h1 className="manager-event-lots__title">{eventTitle}</h1>
             {eventStatus && (
               <span className={`manager-event-lots__header-status manager-event-lots__header-status${getStatusModifier(eventStatus)}`}>
-                {eventStatus}
+                {(eventStatus || '').toUpperCase() === 'CLOSING' ? 'COMPLETED' : eventStatus}
               </span>
             )}
           </div>

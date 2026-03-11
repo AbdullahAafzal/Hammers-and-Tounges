@@ -143,7 +143,7 @@ const EventRow = React.memo(({ event, onViewDetails }) => {
       case "LIVE":
         return "admin-dashboard-status-success";
       case "CLOSING":
-        return "admin-dashboard-status-warning";
+        return "admin-dashboard-status-info"; // Display as COMPLETED
       case "CLOSED":
         return "admin-dashboard-status-info";
       case "ACTIVE":
@@ -166,7 +166,7 @@ const EventRow = React.memo(({ event, onViewDetails }) => {
       </td>
       <td className="admin-dashboard-table-cell admin-dashboard-cell-status" data-label="Status">
         <span className={`admin-dashboard-status-badge ${getStatusColor(event.status)}`}>
-          {event.status || "—"}
+          {(event.status || "").toUpperCase() === "CLOSING" ? "COMPLETED" : (event.status || "—")}
         </span>
       </td>
       <td className="admin-dashboard-table-cell admin-dashboard-cell-start" data-label="Start">
@@ -516,7 +516,7 @@ const AdminDashboard = () => {
                   <option value="ALL">All</option>
                   <option value="SCHEDULED">Scheduled</option>
                   <option value="LIVE">Live</option>
-                  <option value="CLOSING">Closing</option>
+                  <option value="CLOSING">Completed</option>
                   <option value="CLOSED">Closed</option>
                 </select>
               </div>

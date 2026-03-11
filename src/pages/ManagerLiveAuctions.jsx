@@ -36,10 +36,11 @@ export default function ManagerLiveAuctions() {
       setError(null);
       const response = await auctionService.getEvents({ page: 1 });
       const allEvents = response?.results ?? (Array.isArray(response) ? response : []);
-      const closedEvents = allEvents.filter(
-        (e) => (e.status || '').toUpperCase() === 'CLOSED'
-      );
-      setEvents(closedEvents);
+      const completedEvents = allEvents.filter((e) => {
+        const s = (e.status || '').toUpperCase();
+        return s === 'CLOSED' || s === 'CLOSING';
+      });
+      setEvents(completedEvents);
     } catch (err) {
       console.error('Error fetching completed auctions:', err);
       setError(err.message || 'Failed to load completed auctions. Please try again.');
@@ -57,9 +58,19 @@ export default function ManagerLiveAuctions() {
     return events.filter((item) => {
       const title = (item.title || '').toLowerCase();
       const matchSearch = !search || title.includes(search.toLowerCase());
-      return matchSearch;
+
+      let matchDate = true;
+      if (date) {
+        const selectedDate = new Date(date);
+        selectedDate.setHours(0, 0, 0, 0);
+        const eventDate = new Date(item.end_time || item.start_time || 0);
+        eventDate.setHours(0, 0, 0, 0);
+        matchDate = eventDate.getTime() === selectedDate.getTime();
+      }
+
+      return matchSearch && matchDate;
     });
-  }, [events, search]);
+  }, [events, search, date]);
 
   const totalPages = Math.ceil(filteredData.length / ROWS_PER_PAGE);
 
@@ -223,7 +234,7 @@ export default function ManagerLiveAuctions() {
                       <td>
                         <div className="live-auction-status-cell">
                           <span className="live-auction-status-badge badge-winning">
-                            {event.status || '—'}
+                            {(event.status || '').toUpperCase() === 'CLOSING' ? 'COMPLETED' : (event.status || '—')}
                           </span>
                         </div>
                       </td>
