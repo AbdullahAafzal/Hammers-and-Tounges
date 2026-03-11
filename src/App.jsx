@@ -29,6 +29,7 @@ import BuyerSell from "./pages/BuyerSell";
 import FavoriteAuctions from "./pages/FavoriteAuctions";
 
 import SellerDashboard from "./pages/SellerDashboard";
+import SellerLotDetail from "./pages/SellerLotDetail";
 import SellerAuctionListings from "./pages/SellerAuctionListings";
 import SellerListingDetails from "./pages/SellerAuctionDetails";
 import SellerAuctions from "./pages/SellerAuctions";
@@ -143,6 +144,7 @@ function App() {
             <Route element={<SellerGuard />}>
               <Route element={<SellerLayout />}>
                 <Route path="/seller/dashboard" element={<SellerDashboard />} />
+                <Route path="/seller/lot/:lotId" element={<SellerLotDetail />} />
                 <Route path="/seller/auction-listings" element={<SellerAuctionListings />} />
                 <Route path="/seller/listing/:id" element={<SellerListingDetails />} />
                 <Route path="/seller/auctions" element={<SellerAuctions />} />

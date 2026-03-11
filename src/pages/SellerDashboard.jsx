@@ -1,48 +1,55 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, useState, useCallback } from 'react'
+import { useSelector } from 'react-redux'
 import { Link } from 'react-router-dom'
 import './SellerDashboard.css'
-import SummaryCard from './SummaryCard'
-import { useSelector, useDispatch } from 'react-redux'
-import { fetchMyAuctions } from '../store/actions/sellerActions'
+import { auctionService } from '../services/interceptors/auction.service'
+import { getMediaUrl } from '../config/api.config'
+import { toast } from 'react-toastify'
+
+const CLOSED_EVENT_STATUSES = ['CLOSING', 'CLOSED', 'COMPLETED'];
+const ALLOWED_EVENT_STATUSES = ['SCHEDULED', ...CLOSED_EVENT_STATUSES];
 
 const SellerDashboard = () => {
-    const dispatch = useDispatch()
-    // Fetch seller data from Redux store
-    const { myAuctions, isLoading } = useSelector(state => state.seller)
-    const allAuctions = myAuctions?.results || []
-    
-    // Calculate metrics from auction data
-    const totalVehicles = allAuctions.length
-    const soldVehicles = allAuctions.filter(auction => auction.status === 'CLOSED' || auction.status === 'COMPLETED').length
-    const unsoldVehicles = allAuctions.filter(auction => auction.status !== 'CLOSED' && auction.status !== 'COMPLETED').length
-    
-    // Calculate total earnings from sold auctions (using currentBid as sold price for closed/completed auctions)
-    const totalEarnings = allAuctions
-        .filter(auction => auction.status === 'CLOSED' || auction.status === 'COMPLETED')
-        .reduce((sum, auction) => sum + (parseFloat(auction.currentBid) || 0), 0)
-    
-    const seller = {
-        name: 'Seller',
-        totalEarnings: totalEarnings,
-        totalVehicles: totalVehicles,
-        soldVehicles: soldVehicles,
-        unsoldVehicles: unsoldVehicles,
-        totalEarningsLabel: 'Total Earnings',
-        totalEarningsSubLabel: 'Lifetime earnings',
-        totalVehiclesLabel: 'Total Vehicles',
-        totalVehiclesSubLabel: 'All vehicles listed',
-        soldVehiclesLabel: 'Sold Vehicles',
-        soldVehiclesSubLabel: 'Successfully sold',
-        unsoldVehiclesLabel: 'Unsold Vehicles',
-        unsoldVehiclesSubLabel: 'Not yet sold',
-    }
+    const { token } = useSelector((state) => state.auth)
+    const [lots, setLots] = useState([])
+    const [loading, setLoading] = useState(true)
+    const [error, setError] = useState(null)
 
-    // For testing empty states, you can set these to empty arrays:
-    const recentSales = [] // Empty array for testing
+    const fetchLots = useCallback(async () => {
+        if (!token) {
+            setLoading(false)
+            setLots([])
+            return
+        }
+        setLoading(true)
+        setError(null)
+        try {
+            const res = await auctionService.getLots({
+                seller: 'me',
+                page: 1,
+                page_size: 50,
+            })
+            const raw = res?.results || res || []
+            const filtered = raw.filter((lot) => {
+                const status = (lot.status || lot.listing_status || '').toUpperCase()
+                const eventStatus = (lot.event_status || lot.event?.status || '').toUpperCase()
+                const isActive = status === 'ACTIVE'
+                const isAllowedEvent = ALLOWED_EVENT_STATUSES.includes(eventStatus)
+                return isActive || isAllowedEvent
+            })
+            setLots(filtered)
+        } catch (err) {
+            setError(err?.message || 'Failed to fetch lots')
+            toast.error(err?.message || 'Failed to fetch lots')
+            setLots([])
+        } finally {
+            setLoading(false)
+        }
+    }, [token])
 
-    useEffect( ()=> {
-        dispatch( fetchMyAuctions() )
-    }, [dispatch] )
+    useEffect(() => {
+        fetchLots()
+    }, [fetchLots])
 
     const formatCurrency = (amount) => {
         return new Intl.NumberFormat('en-US', {
@@ -53,58 +60,71 @@ const SellerDashboard = () => {
         }).format(amount)
     }
 
+    const getLotImage = (lot) => {
+        const media = lot?.media?.filter((m) => m.media_type === 'image') || []
+        const first = media[0]
+        return first ? getMediaUrl(first.file) : null
+    }
+
 
     return (
-        <div className="seller-page">
-
-            <main className="seller-main">
-                <div className="seller-container">
-                    <div className="dashboard-welcome">
-                        <div className="welcome-content">
-                            <h1 className="welcome-title">Welcome back, {seller.name}!</h1>
-                            <p className="welcome-subtitle">Your seller dashboard is updated in real-time</p>
-                        </div>
-                        <div className="welcome-actions">
-                            <Link to="/seller/product" className="action-button primary-button primary">
-                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-                                    <path d="M12 5V19M5 12H19" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-                                </svg>
-                                Create New Product</Link>
-                            {/* <button className="action-button secondary">Request Payout</button> */}
-                        </div>
+        <div className="seller-dashboard-page">
+            <header className="seller-dashboard-header">
+                <div className="seller-dashboard-header-content">
+                    <h1 className="seller-dashboard-title">Seller Dashboard</h1>
+                    <p className="seller-dashboard-subtitle">Your dashboard is updated in real-time</p>
+                </div>
+                {error && (
+                    <div className="seller-dashboard-alert" role="alert">
+                        <span>{error}</span>
                     </div>
+                )}
+            </header>
 
-                    <SummaryCard 
-                        seller={seller} 
-                    />
-
-                    <div className="dashboard-single-column">
-                        <div className="dashboard-column">
-                            <div className="section-header">
-                                <h2 className="section-title">Recent Sales</h2>
-                            </div>
-                            <div className="sales-list">
-                                {recentSales.length > 0 ? (
-                                    recentSales.map((sale) => (
-                                        <Link key={sale.id} className="sale-item">
-                                            <div className="sale-image">
-                                                <img src={sale.image} alt={sale.title} />
-                                            </div>
-                                            <div className="sale-content">
-                                                <div className="sale-header">
-                                                    <h4 className="sale-title">{sale.title}</h4>
-                                                    <span className="sale-price">{formatCurrency(sale.soldPrice)}</span>
+            <main className="seller-dashboard-main">
+                <section className="seller-dashboard-card" aria-label="Recent activity">
+                    <div className="seller-dashboard-card-header">
+                        <h2 className="seller-dashboard-card-title">Recent Activity</h2>
+                    </div>
+                    <div className="sales-list">
+                                {loading ? (
+                                    <div className="empty-state">
+                                        <div className="empty-state-icon">
+                                            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                                <circle cx="12" cy="12" r="10" strokeLinecap="round" />
+                                                <path d="M12 6v6l4 2" strokeLinecap="round" />
+                                            </svg>
+                                        </div>
+                                        <p className="empty-state-description">Loading lots...</p>
+                                    </div>
+                                ) : lots.length > 0 ? (
+                                    lots.map((lot) => {
+                                        const imgSrc = getLotImage(lot)
+                                        const lotStatus = (lot.status || lot.listing_status || '').toUpperCase()
+                                        const eventStatus = (lot.event_status || lot.event?.status || '').toUpperCase()
+                                        return (
+                                            <Link key={lot.id} to={`/seller/lot/${lot.id}`} className="sale-item">
+                                                <div className="sale-image">
+                                                    {imgSrc ? <img src={imgSrc} alt={lot.title} /> : <span className="sale-image-placeholder">📷</span>}
                                                 </div>
-                                                <div className="sale-details">
-                                                    <span className="sale-buyer">Sold to: {sale.buyer}</span>
-                                                    <span className="sale-date">{sale.date}</span>
+                                                <div className="sale-content">
+                                                    <div className="sale-header">
+                                                        <h4 className="sale-title">LOT #{lot.lot_number || lot.id} – {lot.title || 'Untitled'}</h4>
+                                                        <span className="sale-price">{lot.currency || 'USD'} {formatCurrency(lot.initial_price)}</span>
+                                                    </div>
+                                                    <div className="sale-details">
+                                                        <span>{lot.event_title || lot.event?.title || '—'}</span>
+                                                        <span>{lot.total_bids ?? 0} bid(s)</span>
+                                                    </div>
+                                                    <div className="sale-footer">
+                                                        <span className={`status-badge sale-status ${lotStatus === 'ACTIVE' ? 'sale-status--active' : ''}`}>
+                                                            {lotStatus || eventStatus || '—'}
+                                                        </span>
+                                                    </div>
                                                 </div>
-                                                <div className="sale-footer">
-                                                    <span className="sale-status">{sale.status}</span>
-                                                </div>
-                                            </div>
-                                        </Link>
-                                    ))
+                                            </Link>
+                                        )
+                                    })
                                 ) : (
                                     <div className="empty-state">
                                         <div className="empty-state-icon">
@@ -114,17 +134,15 @@ const SellerDashboard = () => {
                                                 <circle cx="18" cy="6" r="2" />
                                             </svg>
                                         </div>
-                                        <h3 className="empty-state-title">No Recent Sales</h3>
-                                        <p className="empty-state-description">Your recent sales will appear here once you make your first sale.</p>
-                                        <Link to="/seller/auction-listings" className="empty-state-action">
-                                            View Your Listings
-                                        </Link>
+                                        <h3 className="empty-state-title">No activity yet</h3>
+                                        <p className="empty-state-description">Your lots will appear here once they are active or from closed events.</p>
+                                        <span className="empty-state-action" style={{ cursor: 'default' }}>
+                                            View lots below
+                                        </span>
                                     </div>
                                 )}
-                            </div>
-                        </div>
                     </div>
-                </div>
+                </section>
             </main>
         </div>
     )

@@ -1,9 +1,78 @@
-.seller-page {
+/* Seller Dashboard - drawer layout (matches Buyer/Manager flow) */
+.seller-dashboard-page {
   min-height: 100vh;
-  background-color: #000000;
-  color: #ffffff;
+  background: var(--color-bg);
+  color: var(--color-text);
   display: flex;
   flex-direction: column;
+}
+
+.seller-dashboard-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 1rem 1.5rem;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.seller-dashboard-header-content {
+  flex: 1;
+}
+
+.seller-dashboard-title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--color-text);
+  margin: 0 0 0.25rem 0;
+}
+
+.seller-dashboard-subtitle {
+  font-size: 0.8rem;
+  color: var(--color-text-muted);
+  margin: 0;
+}
+
+.seller-dashboard-alert {
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  background: rgba(239, 68, 68, 0.15);
+  border: 1px solid rgba(239, 68, 68, 0.4);
+  color: #f87171;
+  font-size: 0.875rem;
+}
+
+.sale-status--active {
+  background: rgba(140, 198, 63, 0.2);
+  color: #8cc63f;
+}
+
+.seller-dashboard-main {
+  flex: 1;
+  padding: 0 1.5rem 1.5rem;
+}
+
+.seller-dashboard-card {
+  background: var(--color-surface-elevated);
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.seller-dashboard-card-header {
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.seller-dashboard-card-title {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--color-text);
+  margin: 0;
+}
+
+.seller-dashboard-card .sales-list {
+  padding: 1rem;
 }
 
 .seller-main {
@@ -236,6 +305,17 @@
   object-fit: cover;
 }
 
+.sale-image .sale-image-placeholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  background: var(--color-input-bg);
+  color: var(--color-text-muted);
+}
+
 .sale-content {
   flex: 1;
   display: flex;
@@ -253,7 +333,7 @@
 .sale-title {
   font-size: 0.875rem !important;
   font-weight: 600;
-  color: #ffffff;
+  color: var(--color-text);
   margin: 0;
   line-height: 1.4;
   flex: 1;
@@ -324,40 +404,44 @@
 
 
 /* Empty State Styles */
-.empty-state {
+.seller-dashboard-page .empty-state {
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
     padding: 3rem 2rem;
     text-align: center;
-    background: #ffffff;
+    background: var(--color-surface-elevated);
     border-radius: 12px;
-    border: 2px dashed #E5E7EB;
+    border: 2px dashed var(--color-border);
     width: 100%;
 }
 
-.empty-state-icon {
+.seller-dashboard-page .empty-state-icon {
     margin-bottom: 1.5rem;
-    color: #9CA3AF;
+    color: var(--color-text-muted);
 }
 
-.empty-state-title {
+.seller-dashboard-page .empty-state-icon svg {
+    stroke: var(--color-text-muted);
+}
+
+.seller-dashboard-page .empty-state-title {
     font-size: 1.25rem;
     font-weight: 600;
-    color: #111827;
+    color: var(--color-text);
     margin-bottom: 0.5rem;
 }
 
-.empty-state-description {
+.seller-dashboard-page .empty-state-description {
     font-size: 0.875rem;
-    color: #6B7280;
+    color: var(--color-text-muted);
     max-width: 300px;
     margin-bottom: 1.5rem;
     line-height: 1.5;
 }
 
-.empty-state-action {
+.seller-dashboard-page .empty-state-action {
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -374,7 +458,7 @@
     color: #000000;
 }
 
-.empty-state-action:hover {
+.seller-dashboard-page .empty-state-action:hover {
     background: #7bb32e;
     box-shadow: 0 4px 12px rgba(140, 198, 63, 0.3);
 }
