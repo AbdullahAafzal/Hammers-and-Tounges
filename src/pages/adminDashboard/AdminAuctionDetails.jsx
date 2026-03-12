@@ -288,13 +288,6 @@ const AdminAuctionDetails = () => {
                 <span>{auction.currency || 'USD'} {formatPrice(auction.initial_price)}</span>
               </div>
 
-              {auction.is_buy_now_enabled && auction.buy_now_price && (
-                <div className="admin-auction-details-info-item">
-                  <label>Buy Now Price</label>
-                  <span>{auction.currency || 'USD'} {formatPrice(auction.buy_now_price)}</span>
-                </div>
-              )}
-
               <div className="admin-auction-details-info-item">
                 <label>Handover Type</label>
                 <span>{auction.handover_type || 'N/A'}</span>

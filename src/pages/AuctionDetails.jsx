@@ -350,11 +350,6 @@ const AuctionDetails = () => {
                     <div className="detail-item">
                       <strong>Initial Price:</strong> {formatCurrency(auction.initial_price)}
                     </div>
-                    {auction.is_buy_now_enabled && (
-                      <div className="detail-item">
-                        <strong>Buy Now Price:</strong> {formatCurrency(auction.buy_now_price)}
-                      </div>
-                    )}
                   </div>
                 </div>
               )}

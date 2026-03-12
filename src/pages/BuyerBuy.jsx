@@ -85,7 +85,7 @@ const LotCard = ({ lot, onLotClick }) => {
           </span>
         </div>
         <div className="guest-buy__card-footer">
-          <span className="guest-buy__card-login-hint">View details & Buy Now</span>
+          <span className="guest-buy__card-login-hint">View details</span>
         </div>
       </div>
     </article>

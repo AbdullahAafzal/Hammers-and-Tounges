@@ -163,18 +163,6 @@ const ManagerAuctionDetails = () => {
                   <span className="manager-auction-details-info-label">Initial Price:</span>
                   <span className="manager-auction-details-info-value">{formatPrice(auctionData.initial_price)}</span>
                 </div>
-                <div className="manager-auction-details-info-item">
-                  <span className="manager-auction-details-info-label">Buy Now Price:</span>
-                  <span className="manager-auction-details-info-value">
-                    {auctionData.is_buy_now_enabled ? formatPrice(auctionData.buy_now_price) : 'Not Enabled'}
-                  </span>
-                </div>
-                <div className="manager-auction-details-info-item">
-                  <span className="manager-auction-details-info-label">Buy Now Enabled:</span>
-                  <span className="manager-auction-details-info-value">
-                    {auctionData.is_buy_now_enabled ? 'Yes' : 'No'}
-                  </span>
-                </div>
               </div>
             </div>
 

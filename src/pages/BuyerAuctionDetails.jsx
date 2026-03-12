@@ -255,12 +255,6 @@ const DescriptionTab = memo(({ auction, formatCurrency }) => (
           {formatCurrency(parseFloat(auction.initial_price))}
         </div>
       )}
-      {auction?.is_buy_now_enabled && auction?.buy_now_price && (
-        <div className="buyer-details-detail-item">
-          <strong>Buy Now Price:</strong>{" "}
-          {formatCurrency(parseFloat(auction.buy_now_price))}
-        </div>
-      )}
     </div>
   </div>
 ));
@@ -724,14 +718,6 @@ const BuyerAuctionDetails = () => {
                       </span>
                     </div>
                   </div>
-                  {auction?.is_buy_now_enabled && auction?.buy_now_price && (
-                    <div className="buyer-details-price-item">
-                      <span className="buyer-details-price-label">Buy Now</span>
-                      <span className="buyer-details-price-value">
-                        {formatCurrency(parseFloat(auction.buy_now_price))}
-                      </span>
-                    </div>
-                  )}
                 </>
               )}
             </div>
@@ -811,32 +797,6 @@ const BuyerAuctionDetails = () => {
                   <strong>Awaiting payment</strong>
                   <p>Complete your payment to finalize this purchase.</p>
                 </div>
-              </div>
-            )}
-
-            {isLive && fromBuyAndSell && (
-              <div className="buyer-details-bidding-form">
-                <button
-                  type="button"
-                  className="buyer-details-buy-now-button buyer-details-bid-button w-full"
-                  onClick={() => {
-                    const price = parseFloat(
-                      auction?.reserve_price || auction?.initial_price || 0
-                    );
-                    toast.info(
-                      `Buy Now at ${formatCurrency(
-                        price
-                      )} — Contact support to complete purchase.`
-                    );
-                  }}
-                >
-                  Buy Now —{" "}
-                  {formatCurrency(
-                    parseFloat(
-                      auction?.reserve_price || auction?.initial_price || 0
-                    )
-                  )}
-                </button>
               </div>
             )}
 

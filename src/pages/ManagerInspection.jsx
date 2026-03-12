@@ -35,8 +35,6 @@ const ManagerInspection = () => {
   const [initialPrice, setInitialPrice] = useState("");
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
-  const [buyNowPrice, setBuyNowPrice] = useState("");
-  const [isBuyNowEnabled, setIsBuyNowEnabled] = useState(false);
 
 
   // Get images from auctionData media - only use real images from API, no static fallbacks
@@ -196,8 +194,8 @@ const ManagerInspection = () => {
         initial_price: parseFloat(initialPrice),
         start_date: new Date(startDate).toISOString(),
         end_date: new Date(endDate).toISOString(),
-        buy_now_price: buyNowPrice ? parseFloat(buyNowPrice) : null,
-        is_buy_now_enabled: isBuyNowEnabled ? "True" : "False",
+        buy_now_price: null,
+        is_buy_now_enabled: "False",
         inspection_images: files
       };
 
@@ -711,33 +709,6 @@ const ManagerInspection = () => {
                         onChange={(e) => setEndDate(e.target.value)}
                         required
                       />
-                    </div>
-
-                    <div className="approval-form-group">
-                      <label className="approval-form-label">
-                        Buy Now Price
-                      </label>
-                      <input
-                        type="number"
-                        className="approval-form-input"
-                        placeholder="e.g., 7500.00"
-                        min="0"
-                        step="0.01"
-                        value={buyNowPrice}
-                        onChange={(e) => setBuyNowPrice(e.target.value)}
-                      />
-                    </div>
-
-                    <div className="approval-form-group checkbox-group">
-                      <label className="approval-checkbox-label">
-                        <input
-                          type="checkbox"
-                          className="approval-checkbox"
-                          checked={isBuyNowEnabled}
-                          onChange={(e) => setIsBuyNowEnabled(e.target.checked)}
-                        />
-                        <span>Enable Buy Now Option</span>
-                      </label>
                     </div>
                   </div>
                 </div>

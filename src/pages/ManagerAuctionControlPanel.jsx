@@ -363,12 +363,6 @@ export default function ManagerAuctionControlPanel() {
                           <span className="control-info-value">{formatPrice(auctionData?.initial_price)}</span>
                         </div>
                         <div className="control-info-item">
-                          <span className="control-info-label">Buy Now Price:</span>
-                          <span className="control-info-value">
-                            {auctionData?.is_buy_now_enabled ? formatPrice(auctionData?.buy_now_price) : 'Not Enabled'}
-                          </span>
-                        </div>
-                        <div className="control-info-item">
                           <span className="control-info-label">Currency:</span>
                           <span className="control-info-value">{auctionData?.currency || 'N/A'}</span>
                         </div>
