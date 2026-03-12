@@ -353,14 +353,15 @@ body {
 /* Events Table */
 .manager-dashboard-events-table-wrapper {
   overflow-x: auto;
-  margin: 0 -0.5rem;
-  padding: 0 0.5rem;
+  margin: 0;
+  padding: 0;
 }
 
 .manager-dashboard-events-table {
   width: 100%;
   min-width: 800px;
   border-collapse: collapse;
+  table-layout: fixed;
 }
 
 .manager-dashboard-table-header-cell {
@@ -392,7 +393,12 @@ body {
 .manager-dashboard-cell-end { font-size: 0.8125rem; color: var(--color-text-secondary); }
 .manager-dashboard-cell-actions {
   text-align: center;
-  display: flex;
+  width: 1%;
+  white-space: nowrap;
+}
+
+.manager-dashboard-cell-actions .manager-dashboard-actions-wrap {
+  display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 0.5rem;

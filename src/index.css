@@ -3,6 +3,7 @@
 /* System theme - auto light/dark via prefers-color-scheme */
 :root {
   /* Dark theme (default) */
+  color-scheme: dark; /* Native select dropdowns use dark background on Windows */
   --color-bg: #000000;
   --color-bg-alt: #0b0b0b;
   --color-text: #ffffff;
@@ -62,7 +63,7 @@
 
 /* Manual theme override - user can force light/dark regardless of system */
 html[data-theme="light"] {
-  color-scheme: light;
+  color-scheme: light; /* Native select dropdowns use light background */
   --color-bg: #ffffff;
   --color-bg-alt: #ffffff;
   --color-text: #1a1a1a;
@@ -265,6 +266,12 @@ html[data-theme="dark"] {
   --color-input-border: rgba(255, 255, 255, 0.12);
   --color-input-placeholder: rgba(255, 255, 255, 0.35);
   --color-shadow: rgba(0, 0, 0, 0.4);
+}
+
+/* Fix: native select/datalist dropdowns show dark background on Windows in dark mode */
+html[data-theme="dark"] select,
+html[data-theme="dark"] input[list] {
+  color-scheme: dark;
 }
 
 * {
