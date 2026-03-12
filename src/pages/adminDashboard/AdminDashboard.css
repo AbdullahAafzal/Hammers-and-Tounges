@@ -641,6 +641,11 @@ background-color: #8CC63F;
   background-size: 16px;
 }
 
+/* Dark mode: native select dropdown (options list) uses dark styling on Windows */
+html[data-theme="dark"] .admin-dashboard-filter-select {
+  color-scheme: dark;
+}
+
 /* Responsive Design */
 @media (max-width: 1024px) {
   .admin-dashboard-stats-overview {
@@ -853,6 +858,11 @@ background-color: #8CC63F;
 .admin-dashboard-modal-select option {
   background: var(--color-surface);
   color: var(--color-text);
+}
+
+/* Dark mode: native select dropdown uses dark styling on Windows */
+html[data-theme="dark"] .admin-dashboard-modal-select {
+  color-scheme: dark;
 }
 
 .admin-dashboard-modal-hint {

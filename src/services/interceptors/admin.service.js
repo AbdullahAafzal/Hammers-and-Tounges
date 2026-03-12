@@ -225,6 +225,28 @@ export const adminService = {
     }
   },
 
+  // Create Manager (POST form-data to user-management)
+  createManager: async (managerData) => {
+    try {
+      const formData = new FormData();
+      formData.append('role', 'manager');
+      formData.append('email', managerData.email?.trim() || '');
+      formData.append('password', managerData.password?.trim() || '');
+      if (managerData.first_name) formData.append('first_name', managerData.first_name.trim());
+      if (managerData.last_name) formData.append('last_name', managerData.last_name.trim());
+      if (managerData.display_name) formData.append('display_name', managerData.display_name.trim());
+      if (managerData.phone) formData.append('phone', managerData.phone.trim());
+
+      const { data } = await apiClient.postForm(API_ROUTES.ADMIN_USER_MANAGEMENT, formData);
+      return data;
+    } catch (error) {
+      if (error.isNetworkError) {
+        throw new Error('Unable to connect to server. Please try again later.');
+      }
+      throw error;
+    }
+  },
+
   // Create Seller (POST form-data to user-management)
   createSeller: async (sellerData) => {
     try {

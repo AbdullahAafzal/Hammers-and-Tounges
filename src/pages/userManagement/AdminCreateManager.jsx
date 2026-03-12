@@ -8,45 +8,47 @@ const AdminCreateManager = () => {
   const navigate = useNavigate();
   const [isCreating, setIsCreating] = useState(false);
   const [formData, setFormData] = useState({
-    email: '',
-    password: '',
-    first_name: '',
-    last_name: '',
+    email: "",
+    password: "",
+    first_name: "",
+    last_name: "",
+    display_name: "",
+    phone: ""
   });
   const [formErrors, setFormErrors] = useState({});
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
       [name]: value
     }));
     // Clear error for this field
     if (formErrors[name]) {
-      setFormErrors(prev => ({
+      setFormErrors((prev) => ({
         ...prev,
-        [name]: ''
+        [name]: ""
       }));
     }
   };
 
   const validateForm = () => {
     const errors = {};
-    
+
     if (!formData.email.trim()) {
-      errors.email = 'Email is required';
+      errors.email = "Email is required";
     } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
-      errors.email = 'Invalid email format';
+      errors.email = "Invalid email format";
     }
-    
+
     if (!formData.password.trim()) {
-      errors.password = 'Password is required';
+      errors.password = "Password is required";
     } else if (formData.password.length < 8) {
-      errors.password = 'Password must be at least 8 characters';
+      errors.password = "Password must be at least 8 characters";
     }
-    
+
     if (!formData.first_name.trim()) {
-      errors.first_name = 'First name is required';
+      errors.first_name = "First name is required";
     }
 
     setFormErrors(errors);
@@ -55,33 +57,29 @@ const AdminCreateManager = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     if (!validateForm()) {
       return;
     }
 
     setIsCreating(true);
     try {
-      const firstName = formData.first_name.trim();
-      const lastName = formData.last_name.trim();
-      const fullName = [firstName, lastName].filter(Boolean).join(' ').trim();
       const managerData = {
         email: formData.email.trim(),
         password: formData.password.trim(),
-        first_name: firstName,
-        last_name: lastName,
-        ...(fullName && { full_name: fullName }), // Some backends expect full_name on create
-        role: 'manager',
-        is_staff: false, // Always false for managers
+        first_name: formData.first_name.trim(),
+        last_name: formData.last_name.trim(),
+        display_name: formData.display_name.trim(),
+        phone: formData.phone.trim()
       };
-
-      await adminService.createStaff(managerData);
-      toast.success('Manager created successfully!');
+      await adminService.createManager(managerData);
+      toast.success("Manager created successfully!");
       navigate("/admin/users", { state: { role: "manager" } });
     } catch (error) {
-      const message = error.response?.data?.message || 
-                     error.response?.data?.error ||
-                     'Failed to create manager';
+      const message =
+        error.response?.data?.message ||
+        error.response?.data?.error ||
+        "Failed to create manager";
       toast.error(message);
     } finally {
       setIsCreating(false);
@@ -98,7 +96,8 @@ const AdminCreateManager = () => {
         <div>
           <h1 className="create-manager-title">Create Manager</h1>
           <p className="create-manager-subtitle">
-            Add a new manager to the platform. All fields marked with * are required.
+            Add a new manager to the platform. All fields marked with * are
+            required.
           </p>
         </div>
       </header>
@@ -108,13 +107,15 @@ const AdminCreateManager = () => {
           <form onSubmit={handleSubmit} className="create-manager-form">
             <div className="create-manager-form-row">
               <div className="create-manager-form-group">
-                <label>First Name <span className="required">*</span></label>
+                <label>
+                  First Name <span className="required">*</span>
+                </label>
                 <input
                   type="text"
                   name="first_name"
                   value={formData.first_name}
                   onChange={handleInputChange}
-                  className={formErrors.first_name ? 'error' : ''}
+                  className={formErrors.first_name ? "error" : ""}
                   disabled={isCreating}
                   placeholder="Enter first name"
                 />
@@ -136,13 +137,27 @@ const AdminCreateManager = () => {
             </div>
 
             <div className="create-manager-form-group">
-              <label>Email Address <span className="required">*</span></label>
+              <label>Display Name</label>
+              <input
+                type="text"
+                name="display_name"
+                value={formData.display_name}
+                onChange={handleInputChange}
+                disabled={isCreating}
+                placeholder="e.g. Hamza Traders"
+              />
+            </div>
+
+            <div className="create-manager-form-group">
+              <label>
+                Email Address <span className="required">*</span>
+              </label>
               <input
                 type="email"
                 name="email"
                 value={formData.email}
                 onChange={handleInputChange}
-                className={formErrors.email ? 'error' : ''}
+                className={formErrors.email ? "error" : ""}
                 disabled={isCreating}
                 placeholder="Enter email address"
               />
@@ -152,20 +167,36 @@ const AdminCreateManager = () => {
             </div>
 
             <div className="create-manager-form-group">
-              <label>Password <span className="required">*</span></label>
+              <label>Phone</label>
+              <input
+                type="tel"
+                name="phone"
+                value={formData.phone}
+                onChange={handleInputChange}
+                disabled={isCreating}
+                placeholder="e.g. +923001234567"
+              />
+            </div>
+
+            <div className="create-manager-form-group">
+              <label>
+                Password <span className="required">*</span>
+              </label>
               <input
                 type="password"
                 name="password"
                 value={formData.password}
                 onChange={handleInputChange}
-                className={formErrors.password ? 'error' : ''}
+                className={formErrors.password ? "error" : ""}
                 disabled={isCreating}
                 placeholder="Enter password (min. 8 characters)"
               />
               {formErrors.password && (
                 <span className="error-message">{formErrors.password}</span>
               )}
-              <small className="form-hint">Password must be at least 8 characters long</small>
+              <small className="form-hint">
+                Password must be at least 8 characters long
+              </small>
             </div>
 
             <div className="create-manager-form-actions">
@@ -182,7 +213,13 @@ const AdminCreateManager = () => {
                 ) : (
                   <>
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-                      <path d="M20 6L9 17L4 12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                      <path
+                        d="M20 6L9 17L4 12"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      />
                     </svg>
                     Create Manager
                   </>
