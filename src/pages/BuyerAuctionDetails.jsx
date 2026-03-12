@@ -9,7 +9,7 @@ import {
 } from "../store/actions/buyerActions";
 import { fetchCategories } from "../store/actions/AuctionsActions";
 import { auctionService } from "../services/interceptors/auction.service";
-import { useAuctionWebSocket } from "../hooks/useAuctionWebSocket";
+// import { useAuctionWebSocket } from "../hooks/useAuctionWebSocket";
 import { getMediaUrl } from "../config/api.config";
 import "./BuyerAuctionDetails.css";
 import { toast } from "react-toastify";
@@ -448,20 +448,8 @@ const BuyerAuctionDetails = () => {
       return false;
     const amt = parseFloat(state.customBidAmount.replace(/[^0-9.-]/g, ""));
     if (isNaN(amt)) return false;
-    if (amt < minBid || amt > maxBid) return false;
-    if (incrementRules?.increment) {
-      const diff = amt - currentHighest;
-      const steps = diff / incrementRules.increment;
-      if (Math.abs(steps - Math.round(steps)) > 0.001) return false;
-    }
-    return true;
-  }, [
-    state.customBidAmount,
-    minBid,
-    maxBid,
-    currentHighest,
-    incrementRules?.increment
-  ]);
+    return amt >= minBid && amt <= maxBid;
+  }, [state.customBidAmount, minBid, maxBid]);
 
   const effectiveBidAmount = isValidCustomBid
     ? parseFloat(state.customBidAmount.replace(/[^0-9.-]/g, ""))
@@ -496,7 +484,7 @@ const BuyerAuctionDetails = () => {
     auction?.event_id ??
     auction?.auction_event ??
     location.state?.eventId;
-  useAuctionWebSocket(eventId, id, null);
+  // useAuctionWebSocket(eventId, id, null);
   const isUpcoming = useMemo(
     () => auction?.status === "APPROVED",
     [auction?.status]
@@ -575,23 +563,10 @@ const BuyerAuctionDetails = () => {
         return;
       }
       const prev = parseFloat(state.customBidAmount) || nextBidAmount || minBid;
-      const next = Math.min(prev + addAmount, maxBid);
-      const stepped = incrementRules?.increment
-        ? Math.round((next - currentHighest) / incrementRules.increment) *
-            incrementRules.increment +
-          currentHighest
-        : next;
-      const clamped = Math.min(Math.max(stepped, minBid), maxBid);
-      setState((prev) => ({ ...prev, customBidAmount: String(clamped) }));
+      const next = Math.min(Math.max(prev + addAmount, minBid), maxBid);
+      setState((prev) => ({ ...prev, customBidAmount: String(next) }));
     },
-    [
-      state.customBidAmount,
-      nextBidAmount,
-      minBid,
-      maxBid,
-      currentHighest,
-      incrementRules?.increment
-    ]
+    [state.customBidAmount, nextBidAmount, minBid, maxBid]
   );
 
   const endDate = auction?.end_date ?? auction?.booked_in_date;
