@@ -62,11 +62,15 @@ const AdminCreateManager = () => {
 
     setIsCreating(true);
     try {
+      const firstName = formData.first_name.trim();
+      const lastName = formData.last_name.trim();
+      const fullName = [firstName, lastName].filter(Boolean).join(' ').trim();
       const managerData = {
         email: formData.email.trim(),
         password: formData.password.trim(),
-        first_name: formData.first_name.trim(),
-        last_name: formData.last_name.trim(),
+        first_name: firstName,
+        last_name: lastName,
+        ...(fullName && { full_name: fullName }), // Some backends expect full_name on create
         role: 'manager',
         is_staff: false, // Always false for managers
       };

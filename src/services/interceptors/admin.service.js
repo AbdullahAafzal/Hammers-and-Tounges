@@ -205,10 +205,17 @@ export const adminService = {
     }
   },
 
-  // Create Manager/Staff
+  // Create Manager/Staff (FormData for consistency with updateUser - backend may expect multipart)
   createStaff: async (staffData) => {
     try {
-      const { data } = await apiClient.post(API_ROUTES.ADMIN_CREATE_STAFF, staffData);
+      const formData = new FormData();
+      Object.keys(staffData).forEach((key) => {
+        const value = staffData[key];
+        if (value !== null && value !== undefined && value !== '') {
+          formData.append(key, typeof value === 'string' ? value.trim() : value);
+        }
+      });
+      const { data } = await apiClient.post(API_ROUTES.ADMIN_CREATE_STAFF, formData);
       return data;
     } catch (error) {
       if (error.isNetworkError) {

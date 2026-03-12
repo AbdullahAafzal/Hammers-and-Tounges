@@ -103,6 +103,8 @@ const filteredUsers = useMemo(() => {
   return localUsers.filter((user) => {
     const searchableText = `
       ${user.full_name || ""}
+      ${user.first_name || ""}
+      ${user.last_name || ""}
       ${user.email || ""}
       ${user.role || ""}
       ${getUserStatus(user) || ""}
@@ -191,6 +193,14 @@ const filteredUsers = useMemo(() => {
       'manager': 'Manager'
     };
     return roleMap[role] || role;
+  };
+
+  // Get display name: full_name, or first_name + last_name (backend may return these when full_name is empty after create)
+  const getDisplayName = (user) => {
+    if (user?.full_name?.trim()) return user.full_name.trim();
+    const first = (user?.first_name || '').trim();
+    const last = (user?.last_name || '').trim();
+    return [first, last].filter(Boolean).join(' ') || 'N/A';
   };
 
   return (
@@ -308,10 +318,12 @@ const filteredUsers = useMemo(() => {
                   }
                 >
                   <td className="user-management-name-cell">
-                    <div className="user-management-avatar">
-                      {user.full_name?.charAt(0) || user.email?.charAt(0) || 'U'}
+                    <div className="user-management-name-cell-inner">
+                      <div className="user-management-avatar">
+                        {getDisplayName(user)?.charAt(0) || user.email?.charAt(0) || 'U'}
+                      </div>
+                      <span>{getDisplayName(user)}</span>
                     </div>
-                    <span>{user.full_name || 'N/A'}</span>
                   </td>
                   <td className="user-management-email-cell">
                     {user.email || 'N/A'}
@@ -337,13 +349,6 @@ const filteredUsers = useMemo(() => {
                             <path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                           </svg>
                           Edit
-                        </button>
-                        <button className="user-management-actions-trigger" title="More actions">
-                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-                            <circle cx="12" cy="6" r="1.5" fill="currentColor" />
-                            <circle cx="12" cy="12" r="1.5" fill="currentColor" />
-                            <circle cx="12" cy="18" r="1.5" fill="currentColor" />
-                          </svg>
                         </button>
                         {/* <div className="user-management-actions-menu">
                           {user.role === 'seller' && !user.is_verified && (

@@ -238,9 +238,10 @@
   border-bottom: 1px solid var(--color-border);
   font-size: 0.8rem;
   color: var(--color-text-secondary);
+  vertical-align: middle;
 }
 
-.user-management-name-cell {
+.user-management-name-cell-inner {
   display: flex;
   align-items: center;
   gap: 0.75rem;
