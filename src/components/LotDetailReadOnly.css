@@ -229,3 +229,66 @@
   color: #8cc63f;
   font-weight: 500;
 }
+
+.lot-detail-ro__bid-history {
+  margin-top: 1.5rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--color-border);
+}
+
+.lot-detail-ro__bids-loading,
+.lot-detail-ro__bids-error,
+.lot-detail-ro__no-bids {
+  font-size: 0.875rem;
+  color: var(--color-text-muted);
+  margin: 0;
+}
+
+.lot-detail-ro__bids-error {
+  color: var(--color-error, #e57373);
+}
+
+.lot-detail-ro__bid-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.lot-detail-ro__bid-item {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.75rem;
+  background: var(--color-input-bg);
+  border-radius: 8px;
+  border: 1px solid var(--color-border);
+}
+
+.lot-detail-ro__bid-rank {
+  flex-shrink: 0;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--color-text-muted);
+}
+
+.lot-detail-ro__bid-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.lot-detail-ro__bid-bidder {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--color-text);
+}
+
+.lot-detail-ro__bid-time {
+  font-size: 0.75rem;
+  color: var(--color-text-muted);
+}
+
+.lot-detail-ro__bid-amount {
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: #8cc63f;
+}

@@ -13,7 +13,7 @@ const ManagerPublishNew = () => {
   const location = useLocation();
   const fileInputRef = useRef(null);
 
-  const { eventId, event, lotId, lot: existingLot, isEdit } = location.state || {};
+  const { eventId, event, lotId, lot: existingLot, isEdit, fromAdmin } = location.state || {};
   const lot = existingLot;
 
   const [sellers, setSellers] = useState([]);
@@ -39,9 +39,9 @@ const ManagerPublishNew = () => {
     const effectiveEventId = eventId || existingLot?.auction_event;
     if (!effectiveEventId) {
       toast.info('Please select an event first.');
-      navigate('/manager/dashboard');
+      navigate(fromAdmin ? '/admin/dashboard' : '/manager/dashboard');
     }
-  }, [eventId, existingLot?.auction_event, navigate]);
+  }, [eventId, existingLot?.auction_event, fromAdmin, navigate]);
 
   // Pre-populate form when editing
   useEffect(() => {
@@ -374,7 +374,7 @@ const ManagerPublishNew = () => {
           await auctionService.createLot(fd);
           toast.success('Lot created successfully.');
         }
-        navigate(`/manager/event/${evId}`, { state: { event, lotCreated: true } });
+        navigate(fromAdmin ? `/admin/event/${evId}` : `/manager/event/${evId}`, { state: { event, lotCreated: true } });
       } catch (err) {
         const msg =
           err?.response?.data?.detail ||
@@ -386,7 +386,7 @@ const ManagerPublishNew = () => {
         setSubmitting(false);
       }
     },
-    [eventId, existingLot?.auction_event, event, formData, buildFormData, navigate, isEdit, lotId]
+    [eventId, existingLot?.auction_event, event, formData, buildFormData, navigate, isEdit, lotId, fromAdmin]
   );
 
   const handleSaveDraft = useCallback(() => handleSubmit('DRAFT'), [handleSubmit]);
@@ -395,11 +395,11 @@ const ManagerPublishNew = () => {
   const handleBack = useCallback(() => {
     const evId = eventId || existingLot?.auction_event;
     if (evId) {
-      navigate(`/manager/event/${evId}`, { state: { event } });
+      navigate(fromAdmin ? `/admin/event/${evId}` : `/manager/event/${evId}`, { state: { event } });
     } else {
-      navigate('/manager/dashboard');
+      navigate(fromAdmin ? '/admin/dashboard' : '/manager/dashboard');
     }
-  }, [eventId, existingLot?.auction_event, event, navigate]);
+  }, [eventId, existingLot?.auction_event, event, fromAdmin, navigate]);
 
   if (!eventId && !existingLot?.auction_event) return null;
 

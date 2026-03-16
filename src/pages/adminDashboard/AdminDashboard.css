@@ -40,6 +40,29 @@
   flex-wrap: wrap;
 }
 
+.admin-dashboard-create-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  background: #8cc63f;
+  border: 1px solid #8cc63f;
+  border-radius: 8px;
+  color: #000;
+  font-size: 0.875rem;
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.admin-dashboard-create-btn:hover {
+  background: #7bb337;
+  border-color: #7bb337;
+  color: #000;
+  box-shadow: 0 4px 12px rgba(140, 198, 63, 0.3);
+}
+
 .admin-dashboard-action-btn {
   padding: 0.625rem 1.25rem;
   border-radius: 0.5rem;

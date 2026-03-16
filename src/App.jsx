@@ -6,6 +6,7 @@ import Auctions from "./pages/Auctions";
 import GuestBuy from "./pages/GuestBuy";
 import GuestSell from "./pages/GuestSell";
 import GuestEventLots from "./pages/GuestEventLots";
+import GuestLotDetail from "./pages/GuestLotDetail";
 import AuctionDetails from "./pages/AuctionDetails";
 import About from "./pages/About";
 import Contact from "./pages/Contact";
@@ -61,6 +62,8 @@ import AdminDashboard from "./pages/adminDashboard/AdminDashboard";
 import AdminBuy from "./pages/AdminBuy";
 import AdminEventLots from "./pages/adminDashboard/AdminEventLots";
 import AdminLotDetail from "./pages/adminDashboard/AdminLotDetail";
+import AdminCreateEvent from "./pages/adminDashboard/AdminCreateEvent";
+import AdminEditEvent from "./pages/adminDashboard/AdminEditEvent";
 import AdminAuctionDetails from "./pages/adminDashboard/AdminAuctionDetails";
 import AdminProfile from "./pages/adminProfile/AdminProfile";
 import AdminSell from "./pages/AdminSell";
@@ -109,6 +112,7 @@ function App() {
               <Route path="/event/:eventId" element={<GuestEventLots />} />
               <Route path="/buy" element={<GuestBuy />} />
               <Route path="/sell" element={<GuestSell />} />
+              <Route path="/lot/:lotId" element={<GuestLotDetail />} />
               <Route path="/auction/:id" element={<AuctionDetails />} />
               <Route path="/about" element={<About />} />
               <Route path="/contact" element={<Contact />} />
@@ -227,6 +231,9 @@ function App() {
               <Route element={<AdminLayout />}>
                 <Route path="/admin" element={<Navigate to="/admin/dashboard" replace />} />
                 <Route path="/admin/dashboard" element={<AdminDashboard />} />
+                <Route path="/admin/event/create" element={<AdminCreateEvent />} />
+                <Route path="/admin/event/:eventId/edit" element={<AdminEditEvent />} />
+                <Route path="/admin/publishnew" element={<ManagerPublishNew />} />
                 <Route path="/admin/buy" element={<AdminBuy />} />
                 <Route path="/admin/sell" element={<AdminSell />} />
                 <Route path="/admin/buy/lot/:lotId" element={<LotDetailReadOnly backPath="/admin/buy" />} />

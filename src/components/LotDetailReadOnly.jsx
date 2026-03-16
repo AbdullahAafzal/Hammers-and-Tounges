@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { auctionService } from '../services/interceptors/auction.service';
+import { buyerService } from '../services/interceptors/buyer.service';
 import { getMediaUrl } from '../config/api.config';
 import { toast } from 'react-toastify';
 import './LotDetailReadOnly.css';
@@ -25,6 +26,9 @@ const LotDetailReadOnly = ({ backPath }) => {
   const [lot, setLot] = useState(lotFromState);
   const [loading, setLoading] = useState(!lotFromState);
   const [selectedImage, setSelectedImage] = useState(0);
+  const [bids, setBids] = useState([]);
+  const [bidsLoading, setBidsLoading] = useState(false);
+  const [bidsError, setBidsError] = useState(null);
 
   const imageMedia = lot?.media?.filter((m) => m.media_type === 'image') || [];
   const imageUrls = imageMedia.map((m) => getMediaUrl(m.file)).filter(Boolean);
@@ -52,6 +56,33 @@ const LotDetailReadOnly = ({ backPath }) => {
     })();
     return () => { cancelled = true; };
   }, [lotId, lotFromState, backPath, navigate]);
+
+  // Fetch bid history when lot is available
+  const effectiveLotId = lot?.id ?? lotId;
+  useEffect(() => {
+    if (!effectiveLotId) return;
+    let cancelled = false;
+    setBidsLoading(true);
+    setBidsError(null);
+    buyerService
+      .getLotBids(effectiveLotId)
+      .then((data) => {
+        if (!cancelled) {
+          const list = Array.isArray(data) ? data : data?.results ?? data?.bids ?? [];
+          setBids(list);
+        }
+      })
+      .catch((err) => {
+        if (!cancelled) {
+          setBidsError(err?.message || 'Unable to load bid history');
+          setBids([]);
+        }
+      })
+      .finally(() => {
+        if (!cancelled) setBidsLoading(false);
+      });
+    return () => { cancelled = true; };
+  }, [effectiveLotId]);
 
   const handleBack = () => {
     navigate(backPath);
@@ -144,6 +175,36 @@ const LotDetailReadOnly = ({ backPath }) => {
 
           <div className="lot-detail-ro__bids">
             {lot.total_bids != null ? `${lot.total_bids} bid(s)` : '0 bid(s)'}
+          </div>
+
+          <div className="lot-detail-ro__bid-history">
+            <h3 className="lot-detail-ro__section-title">Bid History</h3>
+            {bidsLoading ? (
+              <p className="lot-detail-ro__bids-loading">Loading bid history...</p>
+            ) : bidsError ? (
+              <p className="lot-detail-ro__bids-error">{bidsError}</p>
+            ) : bids && bids.length > 0 ? (
+              <div className="lot-detail-ro__bid-list">
+                {bids.map((bid, index) => (
+                  <div key={bid.id ?? index} className="lot-detail-ro__bid-item">
+                    <div className="lot-detail-ro__bid-rank">#{index + 1}</div>
+                    <div className="lot-detail-ro__bid-info">
+                      <div className="lot-detail-ro__bid-bidder">
+                        {bid.bidder_name ?? bid.user_name ?? bid.bidder ?? 'Bidder'}
+                      </div>
+                      <div className="lot-detail-ro__bid-time">
+                        {bid.created_at ? new Date(bid.created_at).toLocaleString() : '—'}
+                      </div>
+                    </div>
+                    <div className="lot-detail-ro__bid-amount">
+                      {lot.currency || 'USD'} {formatPrice(bid.amount)}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p className="lot-detail-ro__no-bids">No bids yet.</p>
+            )}
           </div>
         </div>
       </main>

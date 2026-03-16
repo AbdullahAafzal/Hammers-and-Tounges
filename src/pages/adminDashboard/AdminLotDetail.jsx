@@ -30,6 +30,7 @@ const AdminLotDetail = () => {
   const [loading, setLoading] = useState(!lotFromState);
   const [bidsLoading, setBidsLoading] = useState(true);
   const [selectedImage, setSelectedImage] = useState(0);
+  const [deleting, setDeleting] = useState(false);
 
   const imageMedia = lot?.media?.filter((m) => m.media_type === 'image') || [];
   const imageUrls = imageMedia.map((m) => getMediaUrl(m.file)).filter(Boolean);
@@ -93,6 +94,30 @@ const AdminLotDetail = () => {
     navigate(`/admin/event/${eventId}`, { state: { event: eventFromState || event } });
   };
 
+  const eventStatus = (event?.status ?? eventFromState?.status ?? '').toUpperCase();
+  const isLotActive = (lot?.status ?? lot?.listing_status ?? '').toUpperCase() === 'ACTIVE';
+  const canEditDelete = eventStatus === 'SCHEDULED' && !isLotActive;
+
+  const handleEdit = () => {
+    navigate('/admin/publishnew', {
+      state: { eventId, event: eventFromState || event, lotId: lot.id, lot, isEdit: true, fromAdmin: true },
+    });
+  };
+
+  const handleDelete = async () => {
+    if (!window.confirm('Are you sure you want to delete this lot?')) return;
+    setDeleting(true);
+    try {
+      await auctionService.deleteLot(lot.id);
+      toast.success('Lot deleted successfully.');
+      handleBack();
+    } catch (err) {
+      toast.error(err?.message || 'Failed to delete lot');
+    } finally {
+      setDeleting(false);
+    }
+  };
+
   if (loading && !lot) {
     return (
       <div className="admin-lot-detail">
@@ -127,6 +152,25 @@ const AdminLotDetail = () => {
           <h1 className="admin-lot-detail__title">{event?.title || eventFromState?.title || 'Lot Detail'}</h1>
           <p className="admin-lot-detail__subtitle">LOT #{lot.lot_number || lot.id}</p>
         </div>
+        {canEditDelete && (
+          <div className="admin-lot-detail__actions">
+            <button
+              className="admin-lot-detail__btn admin-lot-detail__btn--edit"
+              onClick={handleEdit}
+              aria-label="Edit lot"
+            >
+              Edit
+            </button>
+            <button
+              className="admin-lot-detail__btn admin-lot-detail__btn--delete"
+              onClick={handleDelete}
+              disabled={deleting}
+              aria-label="Delete lot"
+            >
+              {deleting ? 'Deleting...' : 'Delete'}
+            </button>
+          </div>
+        )}
       </header>
 
       <main className="admin-lot-detail__main">

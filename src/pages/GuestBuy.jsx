@@ -107,8 +107,6 @@ const GuestBuy = () => {
   const [error, setError] = useState(null);
   const [page, setPage] = useState(1);
   const [totalCount, setTotalCount] = useState(0);
-  const [showLoginModal, setShowLoginModal] = useState(false);
-
   const totalPages = Math.ceil(totalCount / PAGE_SIZE) || 1;
 
   const fetchLots = useCallback(async (categoryId, pageNum = 1) => {
@@ -149,18 +147,14 @@ const GuestBuy = () => {
     }
   }, [selectedCategory, page, fetchLots]);
 
-  const handleLotClick = useCallback(() => {
-    setShowLoginModal(true);
-  }, []);
-
-  const handleCloseModal = useCallback(() => {
-    setShowLoginModal(false);
-  }, []);
-
-  const handleGoToSignIn = useCallback(() => {
-    setShowLoginModal(false);
-    navigate('/signin', { state: { from: '/buy' } });
-  }, [navigate]);
+  const handleLotClick = useCallback((lot) => {
+    navigate(`/lot/${lot.id}`, {
+      state: {
+        lot,
+        backPath: `/buy?category=${selectedCategory}`,
+      },
+    });
+  }, [navigate, selectedCategory]);
 
   return (
     <div className="guest-buy">
@@ -225,30 +219,6 @@ const GuestBuy = () => {
           </>
         )}
       </main>
-
-      {/* Login modal */}
-      {showLoginModal && (
-        <div className="guest-buy__modal-overlay" onClick={handleCloseModal} role="dialog" aria-modal="true">
-          <div
-            className="guest-buy__modal"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <div className="guest-buy__modal-icon">🔒</div>
-            <h2 className="guest-buy__modal-title">Login to see further details</h2>
-            <p className="guest-buy__modal-text">
-              Sign in or create an account to view lot details, place bids, and participate in auctions.
-            </p>
-            <div className="guest-buy__modal-actions">
-              <button className="guest-buy__modal-btn guest-buy__modal-btn--outline" onClick={handleCloseModal}>
-                Cancel
-              </button>
-              <button className="guest-buy__modal-btn guest-buy__modal-btn--primary" onClick={handleGoToSignIn}>
-                Sign In
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 };

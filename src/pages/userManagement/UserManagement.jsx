@@ -25,10 +25,10 @@ const UserManagement = () => {
   const [page, setPage] = useState(1);
   const [localUsers, setLocalUsers] = useState([]);
 
-  // Fetch users on component mount and when page changes
+  // Fetch users on component mount, when page or role filter changes
   useEffect(() => {
-    dispatch(fetchUsersList({ page }));
-  }, [dispatch, page]);
+    dispatch(fetchUsersList({ page, role: roleFilter }));
+  }, [dispatch, page, roleFilter]);
 
   // Update localUsers when users data changes from API
   useEffect(() => {

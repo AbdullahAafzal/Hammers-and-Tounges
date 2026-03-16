@@ -66,7 +66,7 @@ const getStatusModifier = (status) => {
   }
 };
 
-const LotCard = ({ lot, onOpenDetail }) => {
+const LotCard = ({ lot, onOpenDetail, onSetActive, isSettingActive }) => {
   const imageMedia = lot.media?.filter((m) => m.media_type === 'image') || [];
   const imageUrls = imageMedia.map((m) => getMediaUrl(m.file)).filter(Boolean);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
@@ -136,6 +136,21 @@ const LotCard = ({ lot, onOpenDetail }) => {
             <span className="admin-event-lots__card-bids">{lot.total_bids} bid(s)</span>
           )}
         </div>
+        {(lotStatus || '').toUpperCase() === 'DRAFT' && onSetActive && (
+          <button
+            type="button"
+            className="admin-event-lots__active-lot-btn"
+            onClick={(e) => {
+              e.stopPropagation();
+              e.preventDefault();
+              onSetActive(lot);
+            }}
+            disabled={isSettingActive}
+            aria-label={`Set lot ${lot.lot_number || lot.id} as active`}
+          >
+            {isSettingActive ? 'Activating...' : 'Active lot'}
+          </button>
+        )}
       </div>
     </article>
   );
@@ -191,6 +206,68 @@ const AdminEventLots = () => {
   useEffect(() => {
     fetchLots(page);
   }, [fetchLots, page]);
+
+  const lotCreated = location.state?.lotCreated;
+  useEffect(() => {
+    if (lotCreated && id) {
+      setPage(1);
+      fetchLots(1);
+      navigate(`/admin/event/${id}`, { state: { event: eventFromState }, replace: true });
+    }
+  }, [lotCreated, id, eventFromState, fetchLots, navigate]);
+
+  const handleCreateLot = useCallback(() => {
+    const eventData = eventFromState || { id, title: eventTitle, status: eventStatus };
+    navigate('/admin/publishnew', { state: { eventId: id, event: eventData, fromAdmin: true } });
+  }, [navigate, id, eventFromState, eventTitle, eventStatus]);
+
+  const [deletingEvent, setDeletingEvent] = useState(false);
+  const handleDeleteEvent = useCallback(async () => {
+    if (!window.confirm(`Are you sure you want to delete the event "${eventTitle}"? This will remove the event and all its lots.`)) return;
+    setDeletingEvent(true);
+    try {
+      await auctionService.deleteEvent(id);
+      toast.success('Event deleted successfully.');
+      navigate('/admin/dashboard');
+    } catch (err) {
+      toast.error(err?.message || 'Failed to delete event');
+    } finally {
+      setDeletingEvent(false);
+    }
+  }, [id, eventTitle, navigate]);
+
+  const showCreateLot = eventStatus === 'SCHEDULED';
+  const showDeleteEvent = eventStatus === 'SCHEDULED';
+  const showEditEvent = eventStatus === 'SCHEDULED';
+  const isEventCompleted = (eventStatus || '').toUpperCase() === 'CLOSING' || (eventStatus || '').toUpperCase() === 'CLOSED';
+
+  const [activatingLotId, setActivatingLotId] = useState(null);
+  const handleSetLotActive = useCallback(async (lot) => {
+    if (!lot?.id) return;
+    setActivatingLotId(lot.id);
+    try {
+      const fullLot = await auctionService.getLot(lot.id);
+      const payload = {
+        seller: Number(fullLot.seller ?? fullLot.seller_id ?? fullLot.seller_details?.id ?? 0),
+        title: fullLot.title ?? '',
+        description: fullLot.description ?? '',
+        category: Number(fullLot.category ?? fullLot.category_id ?? 0),
+        auction_event: Number(fullLot.auction_event ?? fullLot.event_id ?? id),
+        initial_price: String(fullLot.initial_price ?? '0'),
+        reserve_price: String(fullLot.reserve_price ?? '0'),
+        stc_eligible: Boolean(fullLot.stc_eligible),
+        status: 'ACTIVE',
+        specific_data: fullLot.specific_data && typeof fullLot.specific_data === 'object' ? fullLot.specific_data : {},
+      };
+      await auctionService.updateLot(lot.id, payload);
+      toast.success(`Lot #${lot.lot_number || lot.id} set to Active`);
+      fetchLots(page);
+    } catch (err) {
+      toast.error(err?.message || err?.response?.data?.detail || 'Failed to set lot active');
+    } finally {
+      setActivatingLotId(null);
+    }
+  }, [page, fetchLots, id]);
 
   useEffect(() => {
     if (!id || eventFromState) return;
@@ -277,6 +354,36 @@ const AdminEventLots = () => {
             {totalCount} lot{totalCount !== 1 ? 's' : ''} in this event
           </p>
         </div>
+        <div className="admin-event-lots__header-actions">
+          {showEditEvent && (
+            <button
+              className="admin-event-lots__edit-event"
+              onClick={() => navigate(`/admin/event/${id}/edit`)}
+              aria-label="Edit event"
+            >
+              Edit Event
+            </button>
+          )}
+          {showCreateLot && (
+            <button
+              className="admin-event-lots__create-lot"
+              onClick={handleCreateLot}
+              aria-label="Create lot"
+            >
+              Create Lot
+            </button>
+          )}
+          {showDeleteEvent && (
+            <button
+              className="admin-event-lots__delete-event"
+              onClick={handleDeleteEvent}
+              disabled={deletingEvent}
+              aria-label="Delete event"
+            >
+              {deletingEvent ? 'Deleting...' : 'Delete Event'}
+            </button>
+          )}
+        </div>
       </header>
 
       <main className="admin-event-lots__main">
@@ -315,6 +422,8 @@ const AdminEventLots = () => {
                         key={lot.id}
                         lot={lot}
                         onOpenDetail={(l) => navigate(`/admin/event/${id}/lot/${l.id}`, { state: { lot: l, event: eventFromState || { id, title: eventTitle, status: eventStatus } } })}
+                        onSetActive={isEventCompleted ? undefined : handleSetLotActive}
+                        isSettingActive={activatingLotId === lot.id}
                       />
                     ))}
                   </div>

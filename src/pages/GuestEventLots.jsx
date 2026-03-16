@@ -211,12 +211,9 @@ const GuestEventLots = () => {
   }, [eventId, eventFromState]);
 
   const handleLotClick = useCallback((lot) => {
-    toast.info('Please sign in to view lot details');
-    navigate('/signin', {
+    navigate(`/lot/${lot.id}`, {
       state: {
-        from: 'guest-event-lots',
-        returnTo: `/buyer/auction/${lot.id}`,
-        listing: lot,
+        lot,
         eventId,
         event: eventFromState || { id: eventId, title: eventTitle },
       },

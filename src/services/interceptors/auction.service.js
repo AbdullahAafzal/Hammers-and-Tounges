@@ -54,6 +54,21 @@ export const auctionService = {
       throw error;
     }
   },
+  // Update auction event
+  updateEvent: async (eventId, eventData) => {
+    try {
+      const { data } = await apiClient.patch(
+        `${API_ROUTES.AUCTIONS_EVENTS}${eventId}/`,
+        eventData
+      );
+      return data;
+    } catch (error) {
+      if (error.isNetworkError) {
+        throw new Error('Unable to connect to server. Please try again later.');
+      }
+      throw error;
+    }
+  },
   // Delete auction event
   deleteEvent: async (eventId) => {
     try {

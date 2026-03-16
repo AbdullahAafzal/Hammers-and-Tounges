@@ -110,14 +110,12 @@ const FavoriteAuctionCard = ({ auction, onClick, onFavoriteUpdate }) => {
     const timer = targetDate ? useCountdownTimer(targetDate) : { days: 0, hours: 0, minutes: 0, seconds: 0 };
 
     const getAuctionImage = useCallback(() => {
-        if (!auction.media?.length) {
-            return 'https://images.unsplash.com/photo-1549317661-bd32c8ce0db2?w=800&q=80';
-        }
+        if (!auction.media?.length) return null;
         const imageMedia = auction.media.find(m =>
             m.mediatype === 'image' || m.media_type === 'image'
         );
         const rawUrl = imageMedia?.file || auction.media[0]?.file;
-        return rawUrl ? getMediaUrl(rawUrl) : 'https://images.unsplash.com/photo-1549317661-bd32c8ce0db2?w=800&q=80';
+        return rawUrl ? getMediaUrl(rawUrl) : null;
     }, [auction.media]);
 
     const handleCardClick = useCallback((e) => {
@@ -129,7 +127,6 @@ const FavoriteAuctionCard = ({ auction, onClick, onFavoriteUpdate }) => {
     }, [auction, onClick, isClickable]);
 
     const imageUrl = getAuctionImage();
-    const fallbackImage = 'https://images.unsplash.com/photo-1549317661-bd32c8ce0db2?w=800&q=80';
 
     // STATUS BADGE CONFIGURATION
     const statusConfig = {
@@ -198,13 +195,15 @@ const FavoriteAuctionCard = ({ auction, onClick, onFavoriteUpdate }) => {
         >
             {/* Image & Status Badge */}
             <div className="auction-card-image-wrapper">
-                <img
-                    src={imageError ? fallbackImage : imageUrl}
-                    alt={auction.title || 'Auction'}
-                    className="auction-card-image"
-                    loading="lazy"
-                    onError={() => setImageError(true)}
-                />
+                {imageUrl && !imageError && (
+                    <img
+                        src={imageUrl}
+                        alt={auction.title || 'Auction'}
+                        className="auction-card-image"
+                        loading="lazy"
+                        onError={() => setImageError(true)}
+                    />
+                )}
                 {isEventClosed ? (
                     <span className="auction-status-badge status-ended">
                         Event is closed
