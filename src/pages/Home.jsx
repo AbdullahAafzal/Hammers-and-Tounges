@@ -1,26 +1,13 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useSelector, useDispatch } from 'react-redux'
 import { fetchEvents } from '../store/actions/AuctionsActions'
-import { toast } from 'react-toastify'
 import Hero from '../components/Hero'
+import EventListingRow from '../components/EventListingRow'
 import './Home.css'
 
-const formatEventDate = (isoStr) => {
-  if (!isoStr) return '-----'
-  try {
-    const d = new Date(isoStr)
-    return d.toLocaleDateString('en-US', {
-      month: 'short',
-      day: 'numeric',
-      year: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit',
-    })
-  } catch {
-    return '-----'
-  }
-}
+const TAB_UPCOMING = 'upcoming'
+const TAB_PAST = 'past'
 
 const Home = () => {
   const navigate = useNavigate()
@@ -29,8 +16,28 @@ const Home = () => {
   const { events, eventsLoading, eventsError } = useSelector(state => state.buyer)
 
   const [page, setPage] = useState(1)
+  const [activeTab, setActiveTab] = useState(TAB_UPCOMING)
   const [allEvents, setAllEvents] = useState([])
   const [isLoading, setIsLoading] = useState(false)
+
+  const filteredEvents = useMemo(() => {
+    if (!allEvents.length) return []
+    const now = new Date()
+    if (activeTab === TAB_UPCOMING) {
+      return allEvents.filter((e) => {
+        const end = e.end_time ? new Date(e.end_time) : null
+        const status = (e.status || '').toUpperCase()
+        if (status === 'CLOSED' || status === 'CLOSING') return false
+        return !end || end > now
+      })
+    }
+    return allEvents.filter((e) => {
+      const end = e.end_time ? new Date(e.end_time) : null
+      const status = (e.status || '').toUpperCase()
+      if (status === 'CLOSED' || status === 'CLOSING') return true
+      return end && end <= now
+    })
+  }, [allEvents, activeTab])
 
   useEffect(() => {
     const loadEvents = async () => {
@@ -56,11 +63,15 @@ const Home = () => {
   }, [dispatch])
 
   const itemsPerPage = 12
-  const totalPages = Math.ceil((allEvents.length || 0) / itemsPerPage)
-  const paginatedEvents = (allEvents || []).slice(
+  const totalPages = Math.ceil((filteredEvents.length || 0) / itemsPerPage)
+  const paginatedEvents = (filteredEvents || []).slice(
     (page - 1) * itemsPerPage,
     page * itemsPerPage
   )
+
+  useEffect(() => {
+    setPage(1)
+  }, [activeTab])
 
   const handleEventClick = (event) => {
     if (token) {
@@ -76,10 +87,23 @@ const Home = () => {
 
       <section className="home-events">
         <div className="home-events__container">
-          <div className="home-events__top">
-            <h2 className="home-events__title">Upcoming Events</h2>
+          <div className="home-events__tabs-wrap">
+            <div className="home-events__tabs">
+              <button
+                className={`home-events__tab ${activeTab === TAB_UPCOMING ? 'active' : ''}`}
+                onClick={() => setActiveTab(TAB_UPCOMING)}
+              >
+                Upcoming
+              </button>
+              <button
+                className={`home-events__tab ${activeTab === TAB_PAST ? 'active' : ''}`}
+                onClick={() => setActiveTab(TAB_PAST)}
+              >
+                Past
+              </button>
+            </div>
             <span className="home-events__count">
-              {isLoading && allEvents.length === 0 ? '...' : `${allEvents.length} events`}
+              {isLoading && allEvents.length === 0 ? '...' : `${filteredEvents.length} events`}
             </span>
           </div>
 
@@ -99,45 +123,23 @@ const Home = () => {
 
           {!isLoading && !eventsError && paginatedEvents.length === 0 && (
             <div className="home-empty">
-              <p>No upcoming events.</p>
+              <p>{activeTab === TAB_UPCOMING ? 'No upcoming events.' : 'No past events.'}</p>
             </div>
           )}
 
           {!isLoading && !eventsError && paginatedEvents.length > 0 && (
             <>
-              <div className="home-events-grid">
+              <div className="home-events-list">
                 {paginatedEvents.map((event) => (
-                  <article
+                  <EventListingRow
                     key={event.id}
-                    className="home-event-card"
-                    onClick={() => handleEventClick(event)}
-                    role="button"
-                    tabIndex={0}
-                    onKeyDown={(e) => e.key === 'Enter' && handleEventClick(event)}
-                  >
-                    <div className="home-event-card__header">
-                      <span className={`home-event-card__status home-event-card__status--${(event.status || '').toLowerCase()}`}>
-                        {event.status || '—'}
-                      </span>
-                      <span className="home-event-card__lots">{event.lots_count ?? 0} lots</span>
-                    </div>
-                    <h3 className="home-event-card__title">{event.title || 'Untitled Event'}</h3>
-                    <div className="home-event-card__meta">
-                      <div className="home-event-card__meta-row">
-                        <span className="home-event-card__meta-label">Start</span>
-                        <span className="home-event-card__meta-value">{formatEventDate(event.start_time)}</span>
-                      </div>
-                      <div className="home-event-card__meta-row">
-                        <span className="home-event-card__meta-label">End</span>
-                        <span className="home-event-card__meta-value">{formatEventDate(event.end_time)}</span>
-                      </div>
-                    </div>
-                    <span className="home-event-card__cta">View Details →</span>
-                  </article>
+                    event={event}
+                    onClick={handleEventClick}
+                  />
                 ))}
               </div>
 
-              {allEvents.length > itemsPerPage && (
+              {filteredEvents.length > itemsPerPage && (
                 <div className="home-pagination">
                   <button
                     onClick={() => setPage((p) => Math.max(1, p - 1))}

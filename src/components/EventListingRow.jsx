@@ -1,0 +1,140 @@
+import React, { useState, useMemo } from 'react';
+import { getMediaUrl } from '../config/api.config';
+import './EventListingRow.css';
+
+const FALLBACK_IMAGE = 'https://images.unsplash.com/photo-1549317661-bd32c8ce0db2?w=400&q=80';
+
+const CATEGORY_CONFIG = [
+  { keywords: ['farm', 'agriculture', 'farming'], color: '#8cc63f', label: 'Farming & Agriculture' },
+  { keywords: ['goods', 'harare'], color: '#eab308', label: 'Goods' },
+  { keywords: ['machinery', 'tools'], color: '#f97316', label: 'Machinery & Tools' },
+  { keywords: ['building', 'construction'], color: '#3b82f6', label: 'Building & Construction' },
+  { keywords: ['vehicle', 'auto', 'car'], color: '#6366f1', label: 'Vehicles' },
+  { keywords: ['estate', 'property', 'real'], color: '#ec4899', label: 'Real Estate' },
+];
+
+const getCategoryFromEvent = (event) => {
+  const title = (event.title || '').toLowerCase();
+  const categoryName = (event.category_name || '').toLowerCase();
+  const search = `${title} ${categoryName}`;
+  for (const cfg of CATEGORY_CONFIG) {
+    if (cfg.keywords.some((k) => search.includes(k))) return cfg;
+  }
+  return { color: '#8cc63f', label: event.category_name || 'Auction' };
+};
+
+const getDisplayStatus = (status) => {
+  const s = (status || '').toUpperCase();
+  if (s === 'CLOSING') return 'Closed';
+  return status || 'Auction';
+};
+
+const formatDateBlock = (isoStr) => {
+  if (!isoStr) return { month: '—', day: '—' };
+  try {
+    const d = new Date(isoStr);
+    return {
+      month: d.toLocaleDateString('en-US', { month: 'short' }).toUpperCase(),
+      day: String(d.getDate()),
+    };
+  } catch {
+    return { month: '—', day: '—' };
+  }
+};
+
+const EventListingRow = ({ event, onClick }) => {
+  const [imageError, setImageError] = useState(false);
+  const category = useMemo(() => getCategoryFromEvent(event), [event]);
+
+  const getThumbnail = () => {
+    if (imageError) return FALLBACK_IMAGE;
+    const media = event.media || event.image || [];
+    const arr = Array.isArray(media) ? media : [];
+    const img = arr.find((m) => (m.media_type || m.mediatype) === 'image') || arr[0];
+    const raw = img?.file || event.image_url || event.thumbnail;
+    return raw ? getMediaUrl(raw) : FALLBACK_IMAGE;
+  };
+
+  const startDate = formatDateBlock(event.start_time);
+  const endDate = formatDateBlock(event.end_time);
+  const thumbnail = getThumbnail();
+
+  const handleKeyDown = (e) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      onClick?.(event);
+    }
+  };
+
+  return (
+    <article
+      className="event-listing-row"
+      onClick={() => onClick?.(event)}
+      onKeyDown={handleKeyDown}
+      role="button"
+      tabIndex={0}
+    >
+      <div
+        className="event-listing-row__thumb"
+        style={{ '--category-color': category.color }}
+      >
+        <img
+          src={thumbnail}
+          alt=""
+          className="event-listing-row__thumb-img"
+          loading="lazy"
+          onError={() => setImageError(true)}
+        />
+        <div className="event-listing-row__category-badge">
+          <CategoryIcon color={category.color} />
+          <span>{category.label}</span>
+        </div>
+      </div>
+
+      <div className="event-listing-row__dates">
+        <div className="event-listing-row__date-block event-listing-row__date-block--start">
+          <span className="event-listing-row__date-month">{startDate.month}</span>
+          <span className="event-listing-row__date-day">{startDate.day}</span>
+        </div>
+        <div className="event-listing-row__date-block event-listing-row__date-block--end">
+          <span className="event-listing-row__date-month">{endDate.month}</span>
+          <span className="event-listing-row__date-day">{endDate.day}</span>
+        </div>
+      </div>
+
+      <div className="event-listing-row__body">
+        <h3 className="event-listing-row__title">{event.title || 'Untitled Event'}</h3>
+        <p className="event-listing-row__desc">
+          {event.description || event.event_type || getDisplayStatus(event.status)}
+        </p>
+      </div>
+
+      <div className="event-listing-row__lots">
+        <span className="event-listing-row__lots-badge">
+          {event.lots_count ?? 0} lots
+        </span>
+      </div>
+    </article>
+  );
+};
+
+const CategoryIcon = ({ color }) => (
+  <svg
+    width="24"
+    height="24"
+    viewBox="0 0 24 24"
+    fill="none"
+    className="event-listing-row__category-icon"
+    style={{ color }}
+  >
+    <path
+      d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+  </svg>
+);
+
+export default EventListingRow;

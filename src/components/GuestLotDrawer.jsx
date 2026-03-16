@@ -1,0 +1,245 @@
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { auctionService } from '../services/interceptors/auction.service';
+import { buyerService } from '../services/interceptors/buyer.service';
+import { getMediaUrl } from '../config/api.config';
+import { useCountdownTimer } from '../hooks/useCountdownTimer';
+import './GuestLotDrawer.css';
+
+const formatPrice = (price) => {
+  if (!price) return '—';
+  return parseFloat(price).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+};
+
+const formatSpecificKey = (key) =>
+  String(key).replace(/_/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase());
+
+const GuestLotDrawer = ({ lot: initialLot, eventEndTime, eventTitle, onClose }) => {
+  const navigate = useNavigate();
+  const [lot, setLot] = useState(initialLot);
+  const [loading, setLoading] = useState(!initialLot);
+  const [selectedImage, setSelectedImage] = useState(0);
+  const [bids, setBids] = useState([]);
+  const [bidsLoading, setBidsLoading] = useState(false);
+
+  const imageMedia = lot?.media?.filter((m) => m.media_type === 'image') || [];
+  const imageUrls = imageMedia.map((m) => getMediaUrl(m.file)).filter(Boolean);
+  const displayImage = imageUrls[selectedImage] || imageUrls[0];
+
+  const endTime = lot?.end_date || lot?.end_time || eventEndTime;
+  const timerTarget = endTime || new Date(Date.now() + 86400000).toISOString();
+  const timer = useCountdownTimer(timerTarget);
+  const isEnded = !endTime || timer.isFinished || (endTime && new Date(endTime) <= new Date());
+
+  const currentBid = lot?.current_price ?? lot?.highest_bid ?? lot?.initial_price;
+  const currency = lot?.currency || 'USD';
+  const specificData = (() => {
+    let sd = lot?.specific_data;
+    if (typeof sd === 'string') {
+      try {
+        sd = JSON.parse(sd) || {};
+      } catch {
+        sd = {};
+      }
+    }
+    return sd || {};
+  })();
+
+  const formatTimeLeft = () => {
+    if (isEnded) return 'Ended';
+    const { days, hours, minutes, seconds } = timer;
+    if (days > 0) return `${days}d ${hours}h ${minutes}m`;
+    if (hours > 0) return `${hours}h ${minutes}m ${seconds}s`;
+    return `${minutes}m ${seconds}s`;
+  };
+
+  useEffect(() => {
+    if (!initialLot?.id) return;
+    let cancelled = false;
+    (async () => {
+      setLoading(true);
+      try {
+        const data = await auctionService.getLot(initialLot.id);
+        if (!cancelled) setLot(data);
+      } catch {
+        if (!cancelled) setLot(initialLot);
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    })();
+    return () => { cancelled = true; };
+  }, [initialLot?.id]);
+
+  useEffect(() => {
+    if (!lot?.id) return;
+    let cancelled = false;
+    setBidsLoading(true);
+    buyerService
+      .getLotBids(lot.id)
+      .then((data) => {
+        if (!cancelled) {
+          const list = Array.isArray(data) ? data : data?.results ?? data?.bids ?? [];
+          setBids(list);
+        }
+      })
+      .catch(() => {
+        if (!cancelled) setBids([]);
+      })
+      .finally(() => {
+        if (!cancelled) setBidsLoading(false);
+      });
+    return () => { cancelled = true; };
+  }, [lot?.id]);
+
+  const handleSignIn = () => {
+    onClose?.();
+    navigate('/signin', { state: { from: window.location.pathname } });
+  };
+
+  if (!lot && !initialLot) return null;
+
+  const effectiveLot = lot || initialLot;
+
+  return (
+    <>
+      <div className="guest-lot-drawer__backdrop" onClick={onClose} aria-hidden="true" />
+      <aside className="guest-lot-drawer" role="dialog" aria-modal="true" aria-label="Lot details">
+        <div className="guest-lot-drawer__inner">
+          <header className="guest-lot-drawer__header">
+            <button
+              className="guest-lot-drawer__close"
+              onClick={onClose}
+              aria-label="Close"
+            >
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <path d="M19 12H5M12 19l-5-7 5-7" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+              Back
+            </button>
+            <h2 className="guest-lot-drawer__lot-no">
+              Lot #{effectiveLot.lot_number || effectiveLot.id}
+            </h2>
+          </header>
+
+          {loading ? (
+            <div className="guest-lot-drawer__loading">
+              <div className="guest-lot-drawer__spinner" />
+              <p>Loading...</p>
+            </div>
+          ) : (
+            <div className="guest-lot-drawer__scroll">
+              <div className="guest-lot-drawer__main">
+                <div className="guest-lot-drawer__content">
+                  <div className="guest-lot-drawer__media">
+                    {displayImage ? (
+                      <div className="guest-lot-drawer__image-wrap">
+                        <img src={displayImage} alt={effectiveLot.title} />
+                        {imageUrls.length > 1 && (
+                          <div className="guest-lot-drawer__thumbs">
+                            {imageUrls.slice(0, 5).map((url, i) => (
+                              <button
+                                key={i}
+                                type="button"
+                                className={`guest-lot-drawer__thumb ${i === selectedImage ? 'active' : ''}`}
+                                onClick={() => setSelectedImage(i)}
+                              >
+                                <img src={url} alt="" />
+                              </button>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    ) : (
+                      <div className="guest-lot-drawer__placeholder">📷 No image</div>
+                    )}
+                  </div>
+
+                  <div className="guest-lot-drawer__body">
+                    <h3 className="guest-lot-drawer__title">{effectiveLot.title || 'Untitled'}</h3>
+                    <p className="guest-lot-drawer__meta-line">
+                      {effectiveLot.location || effectiveLot.venue || eventTitle || '—'}
+                      {effectiveLot.category_name && ` • ${effectiveLot.category_name}`}
+                    </p>
+                    {effectiveLot.description && (
+                      <p className="guest-lot-drawer__desc">{effectiveLot.description}</p>
+                    )}
+
+                    {Object.keys(specificData).length > 0 && (
+                      <div className="guest-lot-drawer__specs">
+                        <h4 className="guest-lot-drawer__section-title">Details</h4>
+                        <div className="guest-lot-drawer__spec-list">
+                          {Object.entries(specificData).map(([key, value]) => (
+                            <div key={key} className="guest-lot-drawer__spec-row">
+                              <span className="guest-lot-drawer__spec-key">{formatSpecificKey(key)}</span>
+                              <span className="guest-lot-drawer__spec-value">
+                                {typeof value === 'object' ? JSON.stringify(value) : String(value)}
+                              </span>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    <div className="guest-lot-drawer__bid-history">
+                      <h4 className="guest-lot-drawer__section-title">Bid History</h4>
+                      {bidsLoading ? (
+                        <p className="guest-lot-drawer__muted">Loading bid history...</p>
+                      ) : bids?.length > 0 ? (
+                        <div className="guest-lot-drawer__bid-list">
+                          {bids.map((bid, i) => (
+                            <div key={bid.id ?? i} className="guest-lot-drawer__bid-item">
+                              <span>#{i + 1}</span>
+                              <span>{bid.bidder_name ?? bid.user_name ?? 'Bidder'}</span>
+                              <span className="guest-lot-drawer__bid-amt">
+                                {currency} {formatPrice(bid.amount)}
+                              </span>
+                            </div>
+                          ))}
+                        </div>
+                      ) : (
+                        <p className="guest-lot-drawer__muted">No bids yet.</p>
+                      )}
+                    </div>
+                  </div>
+                </div>
+
+                <aside className="guest-lot-drawer__sidebar">
+                  <div className="guest-lot-drawer__bid-card">
+                    <div className="guest-lot-drawer__time">
+                      <span className="guest-lot-drawer__time-label">TIME LEFT</span>
+                      <span className={`guest-lot-drawer__time-value ${isEnded ? 'ended' : ''}`}>
+                        {formatTimeLeft()}
+                      </span>
+                    </div>
+                    <div className="guest-lot-drawer__bid">
+                      <div className="guest-lot-drawer__bid-icon">!</div>
+                      <div>
+                        <span className="guest-lot-drawer__bid-label">CURRENT BID</span>
+                        <span className="guest-lot-drawer__bid-value">
+                          {currency} {formatPrice(currentBid)}
+                        </span>
+                      </div>
+                    </div>
+                    <button
+                      type="button"
+                      className="guest-lot-drawer__signin-btn"
+                      onClick={handleSignIn}
+                    >
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                        <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+                        <path d="M7 11V7a5 5 0 0110 0v4" />
+                      </svg>
+                      Sign in to place a bid
+                    </button>
+                  </div>
+                </aside>
+              </div>
+            </div>
+          )}
+        </div>
+      </aside>
+    </>
+  );
+};
+
+export default GuestLotDrawer;
