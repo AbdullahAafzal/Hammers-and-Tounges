@@ -1,114 +1,53 @@
-import React, { useState, useEffect, useCallback, useRef } from 'react';
-import { useNavigate, useSearchParams, Navigate } from 'react-router-dom';
+import React, { useState, useEffect, useCallback } from 'react';
+import { useSearchParams, Navigate } from 'react-router-dom';
+import { useDispatch } from 'react-redux';
 import { auctionService } from '../services/interceptors/auction.service';
-import { getMediaUrl } from '../config/api.config';
 import { toast } from 'react-toastify';
+import { fetchCategories } from '../store/actions/AuctionsActions';
+import { getMyFavoriteAuctions } from '../store/actions/buyerActions';
+import LotRow from '../components/LotRow';
+import GuestLotDrawer from '../components/GuestLotDrawer';
 import './GuestBuy.css';
+import './GuestEventLots.css';
 
 const PAGE_SIZE = 12;
 
-const formatPrice = (price) => {
-  if (!price) return '—';
-  return parseFloat(price).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-};
-
-const getLotStatusModifier = (status) => {
-  const s = (status || '').toUpperCase();
-  if (s === 'DRAFT') return '--draft';
-  if (s === 'ACTIVE' || s === 'APPROVED' || s === 'LIVE') return '--active';
-  if (s === 'CLOSED' || s === 'COMPLETED') return '--closed';
-  if (s === 'PENDING') return '--pending';
-  return '--active';
-};
-
-const LotCard = ({ lot, onLotClick }) => {
-  const imageMedia = lot.media?.filter((m) => m.media_type === 'image') || [];
-  const imageUrls = imageMedia.map((m) => getMediaUrl(m.file)).filter(Boolean);
-  const [currentImageIndex, setCurrentImageIndex] = useState(0);
-  const intervalRef = useRef(null);
-  const lotStatus = lot.status || lot.listing_status;
-
-  useEffect(() => {
-    if (imageUrls.length <= 1) return;
-    intervalRef.current = setInterval(() => {
-      setCurrentImageIndex((prev) => (prev + 1) % imageUrls.length);
-    }, 3000);
-    return () => {
-      if (intervalRef.current) clearInterval(intervalRef.current);
-    };
-  }, [imageUrls.length]);
-
-  const displayUrl = imageUrls[currentImageIndex] || imageUrls[0];
-  const hasMultipleImages = imageUrls.length > 1;
-
-  return (
-    <article
-      className="guest-buy__card"
-      onClick={() => onLotClick(lot)}
-      role="button"
-      tabIndex={0}
-      onKeyDown={(e) => e.key === 'Enter' && onLotClick(lot)}
-    >
-      <div className="guest-buy__card-media">
-        {lotStatus && (
-          <span className={`guest-buy__card-status guest-buy__card-status${getLotStatusModifier(lotStatus)}`}>
-            {lotStatus}
-          </span>
-        )}
-        {displayUrl ? (
-          <img src={displayUrl} alt={lot.title} loading="lazy" />
-        ) : (
-          <div className="guest-buy__card-placeholder">📷</div>
-        )}
-        {hasMultipleImages && (
-          <div className="guest-buy__card-slider-dots">
-            {imageUrls.map((_, i) => (
-              <span
-                key={i}
-                className={`guest-buy__card-dot ${i === currentImageIndex ? 'active' : ''}`}
-                aria-hidden
-              />
-            ))}
-          </div>
-        )}
-      </div>
-      <div className="guest-buy__card-body">
-        <div className="guest-buy__card-lot-no">Lot #{lot.lot_number || lot.id}</div>
-        <h3 className="guest-buy__card-title">{lot.title || 'Untitled'}</h3>
-        {lot.description && (
-          <p className="guest-buy__card-desc">{lot.description}</p>
-        )}
-        <div className="guest-buy__card-meta">
-          <span className="guest-buy__card-category">{lot.category_name || '—'}</span>
-          <span className="guest-buy__card-price">
-            {lot.currency || 'USD'} {formatPrice(lot.initial_price)}
-          </span>
-        </div>
-        <div className="guest-buy__card-footer">
-          <span className="guest-buy__card-login-hint">View details</span>
-        </div>
-      </div>
-    </article>
-  );
-};
-
 const BuyerBuy = () => {
-  const navigate = useNavigate();
+  const dispatch = useDispatch();
   const [searchParams] = useSearchParams();
   const categoryFromUrl = searchParams.get('category');
   const selectedCategory = categoryFromUrl ? Number(categoryFromUrl) : null;
+  const [favoriteIds, setFavoriteIds] = useState(new Set());
 
   const [lots, setLots] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [page, setPage] = useState(1);
+  const [selectedLot, setSelectedLot] = useState(null);
+  const [totalCount, setTotalCount] = useState(0);
 
   if (!categoryFromUrl) {
     return <Navigate to="/buyer/dashboard" replace />;
   }
-  const [totalCount, setTotalCount] = useState(0);
 
   const totalPages = Math.ceil(totalCount / PAGE_SIZE) || 1;
+
+  useEffect(() => {
+    dispatch(fetchCategories());
+  }, [dispatch]);
+
+  useEffect(() => {
+    let cancelled = false;
+    dispatch(getMyFavoriteAuctions({ page_size: 100 }))
+      .unwrap()
+      .then((res) => {
+        if (cancelled) return;
+        const items = res?.results ?? res ?? [];
+        setFavoriteIds(new Set(items.map((x) => x.id)));
+      })
+      .catch(() => {});
+    return () => { cancelled = true; };
+  }, [dispatch]);
 
   const fetchLots = useCallback(async (categoryId, pageNum = 1) => {
     if (!categoryId) {
@@ -148,17 +87,25 @@ const BuyerBuy = () => {
     }
   }, [selectedCategory, page, fetchLots]);
 
-  const handleLotClick = useCallback(
-    (lot) => {
-      navigate(`/buyer/auction/${lot.id}`, {
-        state: { listing: lot, from: 'buyer-buy' },
-      });
-    },
-    [navigate]
-  );
+  const handleLotClick = useCallback((lot) => {
+    setSelectedLot(lot);
+  }, []);
+
+  const handleCloseDrawer = useCallback(() => {
+    setSelectedLot(null);
+  }, []);
+
+  const handleFavoriteToggle = useCallback((lotId, isFavorite) => {
+    setFavoriteIds((prev) => {
+      const next = new Set(prev);
+      if (isFavorite) next.add(lotId);
+      else next.delete(lotId);
+      return next;
+    });
+  }, []);
 
   return (
-    <div className="guest-buy">
+    <div className={`guest-buy ${selectedLot ? 'guest-buy--drawer-open' : ''}`}>
       <header className="guest-buy__header">
         <h1 className="guest-buy__title">Buy</h1>
         <p className="guest-buy__subtitle">
@@ -183,13 +130,26 @@ const BuyerBuy = () => {
           </div>
         ) : (
           <>
-            <div className="guest-buy__results-count">
-              {totalCount} lot{totalCount !== 1 ? 's' : ''} found
-            </div>
-            <div className="guest-buy__grid">
-              {lots.map((lot) => (
-                <LotCard key={lot.id} lot={lot} onLotClick={handleLotClick} />
-              ))}
+            <div className="guest-buy__list-wrap">
+              <p className="guest-event-lots__results-count">
+                Your search returned {lots.length} result{lots.length !== 1 ? 's' : ''}
+              </p>
+              <div className="guest-event-lots__list">
+                {lots.map((lot) => (
+                  <LotRow
+                    key={lot.id}
+                    lot={lot}
+                    eventEndTime={lot.end_date ?? lot.end_time}
+                    eventTitle={lot.event_title}
+                    eventStatus={lot.event_status}
+                    onOpenDetail={handleLotClick}
+                    showFavorite
+                    isFavorite={favoriteIds?.has(lot.id) ?? lot.is_favourite ?? false}
+                    onFavoriteToggle={handleFavoriteToggle}
+                    statusOnly
+                  />
+                ))}
+              </div>
             </div>
             {totalPages > 1 && (
               <div className="guest-buy__pagination">
@@ -215,6 +175,18 @@ const BuyerBuy = () => {
           </>
         )}
       </main>
+
+      {selectedLot && (
+        <GuestLotDrawer
+          lot={selectedLot}
+          eventEndTime={selectedLot.end_date ?? selectedLot.end_time}
+          eventTitle={selectedLot.event_title}
+          eventId={selectedLot.event_id ?? selectedLot.event}
+          eventStatus={selectedLot.event_status}
+          onClose={handleCloseDrawer}
+          isBuyer
+        />
+      )}
     </div>
   );
 };

@@ -61,7 +61,24 @@
     line-height: 1.4;
 }
 
-/* Auctions Grid Styles */
+/* Favorite list (same layout as Lot list) */
+.favorite-auctions-page--drawer-open .dashboard-container {
+    pointer-events: none;
+    opacity: 0.6;
+}
+
+.favorite-auctions-list-wrap {
+    margin-bottom: 2rem;
+}
+
+.favorite-auctions-list-wrap .guest-event-lots__list {
+    background: var(--color-surface);
+    border-radius: 8px;
+    border: 1px solid var(--color-border);
+    overflow: hidden;
+}
+
+/* Auctions Grid Styles (legacy, kept for fallback) */
 .auctions-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));

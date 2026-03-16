@@ -1,16 +1,28 @@
-import React, { useState } from 'react'
+import React, { useState, useCallback } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
+import LotRow from '../components/LotRow'
+import GuestLotDrawer from '../components/GuestLotDrawer'
 import './BuyerWonItems.css'
+import './GuestEventLots.css'
 
 const BuyerWonItems = () => {
   const navigate = useNavigate()
   const [searchQuery, setSearchQuery] = useState('')
   const [currentPage, setCurrentPage] = useState(1)
   const [activeTab, setActiveTab] = useState('unpaid')
+  const [selectedLot, setSelectedLot] = useState(null)
   const itemsPerPage = 8
 
-  // Empty array - showing no data
+  // Empty array - hook for future API: getWonItems()
   const wonItems = []
+
+  const handleLotClick = useCallback((lot) => {
+    setSelectedLot(lot)
+  }, [])
+
+  const handleCloseDrawer = useCallback(() => {
+    setSelectedLot(null)
+  }, [])
 
   const formatCurrency = (amount) => {
     return new Intl.NumberFormat('en-US', {
@@ -55,13 +67,30 @@ const BuyerWonItems = () => {
     setCurrentPage(1) // Reset to first page when changing tabs
   }
 
+  const wonItemToLot = (item) => ({
+    id: item.id,
+    title: item.title,
+    media: item.image ? [{ file: item.image, media_type: 'image' }] : [],
+    current_price: item.winningPrice,
+    highest_bid: item.winningPrice,
+    initial_price: item.winningPrice,
+    currency: 'USD',
+    lot_number: item.lotId,
+    location: item.location,
+    venue: item.venue,
+    event_title: item.eventTitle,
+    event_status: 'CLOSED',
+    end_date: item.endDate,
+    end_time: item.endTime,
+  })
+
   return (
-    <div className="won-items-page">
+    <div className={`won-items-page ${selectedLot ? 'won-items-page--drawer-open' : ''}`}>
       <div className="won-items-content">
         <div className="won-items-container">
       
           <nav className="breadcrumbs">
-            <Link to="/buyer/dashboard">Dashboard</Link>
+            <Link to="/buyer/dashboard">Live Auction</Link>
             <span>/</span>
             <span>Won Items</span>
           </nav>
@@ -115,92 +144,25 @@ const BuyerWonItems = () => {
             </div>
           ) : (
             <>
-              <div className="items-grid">
-                {currentItems.map(item => (
-                  <div key={item.id} className="won-item-card">
-                    <div className="won-item-image">
-                      <img src={item.image} alt={item.title} />
-                      <div className="won-badge">
-                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none">
-                          <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z" fill="currentColor" />
-                        </svg>
-                        <span>Won</span>
-                      </div>
-                    </div>
-
-                    <div className="item-details">
-                      <div className="item-category">{item.category.toUpperCase()}</div>
-                      <h3 className="item-title">{item.title}</h3>
-                      <div className="item-lot-id">Lot {item.lotId}</div>
-
-                      <div className="winning-price">
-                        {formatCurrency(item.winningPrice)}
-                      </div>
-
-                      <div className="congratulations-msg">
-                        Congratulations! You won this lot.
-                      </div>
-
-                      {item.paymentStatus === 'pending' ? (
-                        <div className="payment-status pending">
-                          <div className="status-header">
-                            <span className="status-label">PAYMENT DEADLINE</span>
-                            <span className="status-timer">{item.paymentDeadline}</span>
-                          </div>
-                          <div className="won-invoice-status">
-                            <span className="invoice-label">Invoice:</span>
-                            <span className="invoice-badge pending-badge">Pending Payment</span>
-                          </div>
-                        </div>
-                      ) : (
-                        <div className="payment-status paid">
-                          <div className="status-header">
-                            <span className="status-label">PAYMENT COMPLETE</span>
-                            <span className="status-date">{item.paymentDate}</span>
-                          </div>
-                          <div className="won-invoice-status">
-                            <span className="invoice-label">Invoice:</span>
-                            <span className="invoice-badge paid-badge">Paid</span>
-                          </div>
-                        </div>
-                      )}
-
-                      <div className="item-actions">
-                        {item.paymentStatus === 'pending' ? (
-                          <>
-                            <button
-                              className="wonItems-action-btn primary"
-                              // onClick={() => navigate(`/payment/${item.id}`)}
-                            >
-                              Proceed to Payment
-                            </button>
-                            <button
-                              className="wonItems-action-btn secondary"
-                              // onClick={() => navigate(`/buyer/invoices`)}
-                            >
-                              View Invoice
-                            </button>
-                          </>
-                        ) : (
-                          <>
-                            <button
-                              className="wonItems-action-btn primary"
-                              // onClick={() => navigate(`/invoice/${item.invoiceNumber}`)}
-                            >
-                              View Invoice
-                            </button>
-                            <button
-                              className="wonItems-action-btn secondary"
-                              onClick={() => navigate(`/buyer/auction/${item.id}`)}
-                            >
-                              View Lot Details
-                            </button>
-                          </>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                ))}
+              <div className="won-items-list-wrap">
+                <p className="guest-event-lots__results-count">
+                  Your search returned {currentItems.length} result{currentItems.length !== 1 ? 's' : ''}
+                </p>
+                <div className="guest-event-lots__list">
+                  {currentItems.map((item) => {
+                    const lot = wonItemToLot(item)
+                    return (
+                      <LotRow
+                        key={item.id}
+                        lot={lot}
+                        eventEndTime={item.endDate ?? item.endTime}
+                        eventTitle={item.eventTitle}
+                        onOpenDetail={handleLotClick}
+                        showFavorite={false}
+                      />
+                    )
+                  })}
+                </div>
               </div>
 
               {totalPages > 1 && (
@@ -246,6 +208,18 @@ const BuyerWonItems = () => {
           )}
         </div>
       </div>
+
+      {selectedLot && (
+        <GuestLotDrawer
+          lot={selectedLot}
+          eventEndTime={selectedLot.end_date ?? selectedLot.end_time}
+          eventTitle={selectedLot.event_title}
+          eventId={selectedLot.event_id}
+          eventStatus={selectedLot.event_status ?? 'CLOSED'}
+          onClose={handleCloseDrawer}
+          isBuyer
+        />
+      )}
     </div>
   )
 }

@@ -69,7 +69,7 @@ const BuyerWallet = () => {
       <div className="wallet-content">
         <div className="wallet-container">
           <nav className="breadcrumbs">
-            <Link to="/buyer/dashboard">Dashboard</Link>
+            <Link to="/buyer/dashboard">Live Auction</Link>
             <span>/</span>
             <span>My Wallet</span>
           </nav>

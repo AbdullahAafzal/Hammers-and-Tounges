@@ -1,12 +1,13 @@
-import React, { useState, useEffect, useMemo, useCallback, lazy, Suspense } from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { clearBuyerError } from '../store/slices/buyerSlice';
-import './FavoriteAuctions.css';
-import { toast } from 'react-toastify';
 import { getMyFavoriteAuctions } from '../store/actions/buyerActions';
-
-const FavoriteAuctionCard = lazy(() => import('../components/FavoriteAuctionCard'));
+import LotRow from '../components/LotRow';
+import GuestLotDrawer from '../components/GuestLotDrawer';
+import './FavoriteAuctions.css';
+import './GuestEventLots.css';
+import { toast } from 'react-toastify';
 
 const FavoriteAuctions = () => {
   const navigate = useNavigate();
@@ -20,6 +21,8 @@ const FavoriteAuctions = () => {
   // Local state for complete dataset
   const [allAuctions, setAllAuctions] = useState([]);
   const [isLoadingAllPages, setIsLoadingAllPages] = useState(false);
+  const [selectedLot, setSelectedLot] = useState(null);
+  const [favoriteIds, setFavoriteIds] = useState(new Set());
 
   const handleCheckAuth = useCallback(() => {
     if (!token) {
@@ -49,6 +52,7 @@ const FavoriteAuctions = () => {
       }
 
       setAllAuctions(allResults);
+      setFavoriteIds(new Set(allResults.map((a) => a.id)));
     } catch (err) {
       console.error('Error fetching all auctions:', err);
       toast.error('Failed to load complete auction list');
@@ -61,7 +65,31 @@ const FavoriteAuctions = () => {
     fetchAllPages();
   }, [fetchAllPages]);
 
-  // Apply filters to show ACTIVE, APPROVED, and COMPLETED auctions (closed ones show with basic details)
+  const handleLotClick = useCallback((lot) => {
+    if (token) {
+      setSelectedLot(lot);
+    } else {
+      handleCheckAuth();
+    }
+  }, [token, handleCheckAuth]);
+
+  const handleCloseDrawer = useCallback(() => {
+    setSelectedLot(null);
+  }, []);
+
+  const handleFavoriteToggle = useCallback((lotId, isFavorite) => {
+    setFavoriteIds((prev) => {
+      const next = new Set(prev);
+      if (isFavorite) next.add(lotId);
+      else next.delete(lotId);
+      return next;
+    });
+    if (!isFavorite) {
+      setAllAuctions((prev) => prev.filter((a) => a.id !== lotId));
+    }
+  }, []);
+
+  // Apply filters to show ACTIVE, APPROVED, and COMPLETED auctions
   const filteredAuctions = useMemo(() => {
     return allAuctions.filter(auction => {
       const status = (auction.status || '').toUpperCase();
@@ -69,12 +97,6 @@ const FavoriteAuctions = () => {
     });
   }, [allAuctions]);
 
-  useEffect(() => {
-    if (allAuctions.length > 0) {
-      console.log('Favorite tab data:', allAuctions);
-      console.log('Filtered auctions:', filteredAuctions);
-    }
-  }, [allAuctions, filteredAuctions]);
 
   // Paginate filtered results (10 per page)
   const itemsPerPage = 10;
@@ -100,33 +122,6 @@ const FavoriteAuctions = () => {
   const hasNextPage = page < totalPages;
   const hasPrevPage = page > 1;
 
-  // Handle favorite update from AuctionCard
-  const handleFavoriteUpdate = useCallback((auctionId, isFavorite) => {
-    if (!isFavorite) {
-      // Remove the auction from the list when unfavorited
-      setAllAuctions(prevAuctions => 
-        prevAuctions.filter(auction => auction.id !== auctionId)
-      );
-
-      // If current page becomes empty after removal, go to previous page
-      const remainingCount = allAuctions.length - 1;
-      const remainingPages = Math.ceil(remainingCount / itemsPerPage);
-      
-      if (page > remainingPages && remainingPages > 0) {
-        setPage(remainingPages);
-      }
-    } else {
-      // Update the auction's favorite status (in case it's re-added)
-      setAllAuctions(prevAuctions =>
-        prevAuctions.map(auction =>
-          auction.id === auctionId
-            ? { ...auction, is_favourite: isFavorite }
-            : auction
-        )
-      );
-    }
-  }, [allAuctions.length, itemsPerPage, page]);
-
   // Cleanup
   useEffect(() => {
     return () => {
@@ -135,7 +130,7 @@ const FavoriteAuctions = () => {
   }, [dispatch]);
 
   return (
-    <div className="buyer-dashboard-page">
+    <div className={`buyer-dashboard-page favorite-auctions-page ${selectedLot ? 'favorite-auctions-page--drawer-open' : ''}`}>
       <main className="buyer-dashboard-main">
         <div className="dashboard-container">
           <div className="dashboard-welcome">
@@ -187,43 +182,27 @@ const FavoriteAuctions = () => {
             </div>
           )}
 
-          {/* Auctions Grid */}
+          {/* Lot list (same layout as Live Auction / Event Lots) */}
           {!isLoadingAllPages && !error && paginatedAuctions.length > 0 && (
             <>
-              <div className="auctions-grid">
-                <Suspense fallback={
-                  <div className="auctions-loading">
-                    <div className="auctions-spinner"></div>
-                  </div>
-                }>
-                  {paginatedAuctions.map(auction => (
-                    <FavoriteAuctionCard
+              <div className="favorite-auctions-list-wrap">
+                <p className="guest-event-lots__results-count">
+                  Your search returned {paginatedAuctions.length} result{paginatedAuctions.length !== 1 ? 's' : ''}
+                </p>
+                <div className="guest-event-lots__list">
+                  {paginatedAuctions.map((auction) => (
+                    <LotRow
                       key={auction.id}
-                      auction={{
-                        ...auction,
-                        categoryname: auction.category_name,
-                        initialprice: auction.initial_price,
-                        startdate: auction.start_date,
-                        enddate: auction.end_date,
-                        totalbids: auction.total_bids,
-                        status: auction.status
-                      }}
-                      onClick={() => {
-                        if (token) {
-                          navigate(`/buyer/auction/${auction.id}`, { 
-                            state: { 
-                              from: 'favorite-auctions', 
-                              listing: auction 
-                            } 
-                          });
-                        } else {
-                          handleCheckAuth();
-                        }
-                      }}
-                      onFavoriteUpdate={handleFavoriteUpdate}
+                      lot={auction}
+                      eventEndTime={auction.end_date ?? auction.end_time}
+                      eventTitle={auction.event_title}
+                      onOpenDetail={handleLotClick}
+                      showFavorite
+                      isFavorite={favoriteIds.has(auction.id) ?? auction.is_favourite ?? true}
+                      onFavoriteToggle={handleFavoriteToggle}
                     />
                   ))}
-                </Suspense>
+                </div>
               </div>
 
               {/* Pagination Controls */}
@@ -258,6 +237,18 @@ const FavoriteAuctions = () => {
           )}
         </div>
       </main>
+
+      {selectedLot && (
+        <GuestLotDrawer
+          lot={selectedLot}
+          eventEndTime={selectedLot.end_date ?? selectedLot.end_time}
+          eventTitle={selectedLot.event_title}
+          eventId={selectedLot.event_id ?? selectedLot.event}
+          eventStatus={selectedLot.event_status}
+          onClose={handleCloseDrawer}
+          isBuyer
+        />
+      )}
     </div>
   );
 };

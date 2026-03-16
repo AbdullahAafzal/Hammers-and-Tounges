@@ -41,6 +41,18 @@
   filter: brightness(0.85);
 }
 
+.event-listing-row__thumb-placeholder {
+  width: 100%;
+  min-height: 72px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--color-input-bg);
+  color: var(--color-text-muted);
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
 .event-listing-row__category-badge {
   position: absolute;
   left: 0;

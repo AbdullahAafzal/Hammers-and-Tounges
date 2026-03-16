@@ -1,9 +1,12 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
 import { auctionService } from '../services/interceptors/auction.service';
 import { buyerService } from '../services/interceptors/buyer.service';
 import { getMediaUrl } from '../config/api.config';
 import { useCountdownTimer } from '../hooks/useCountdownTimer';
+import { placeBid } from '../store/actions/buyerActions';
+import { fetchCategories } from '../store/actions/AuctionsActions';
 import './GuestLotDrawer.css';
 
 const formatPrice = (price) => {
@@ -14,13 +17,18 @@ const formatPrice = (price) => {
 const formatSpecificKey = (key) =>
   String(key).replace(/_/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase());
 
-const GuestLotDrawer = ({ lot: initialLot, eventEndTime, eventTitle, onClose }) => {
+const GuestLotDrawer = ({ lot: initialLot, eventEndTime, eventTitle, eventId, eventStatus, onClose, isBuyer = false }) => {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const categories = useSelector((state) => state.buyer?.categories ?? state.seller?.categories ?? []);
+  const isPlacingBid = useSelector((state) => state.buyer?.isPlacingBid ?? false);
+
   const [lot, setLot] = useState(initialLot);
   const [loading, setLoading] = useState(!initialLot);
   const [selectedImage, setSelectedImage] = useState(0);
   const [bids, setBids] = useState([]);
   const [bidsLoading, setBidsLoading] = useState(false);
+  const [customBidAmount, setCustomBidAmount] = useState('');
 
   const imageMedia = lot?.media?.filter((m) => m.media_type === 'image') || [];
   const imageUrls = imageMedia.map((m) => getMediaUrl(m.file)).filter(Boolean);
@@ -29,10 +37,28 @@ const GuestLotDrawer = ({ lot: initialLot, eventEndTime, eventTitle, onClose }) 
   const endTime = lot?.end_date || lot?.end_time || eventEndTime;
   const timerTarget = endTime || new Date(Date.now() + 86400000).toISOString();
   const timer = useCountdownTimer(timerTarget);
-  const isEnded = !endTime || timer.isFinished || (endTime && new Date(endTime) <= new Date());
+  const timerSaysEnded = !endTime || timer.isFinished || (endTime && new Date(endTime) <= new Date());
 
-  const currentBid = lot?.current_price ?? lot?.highest_bid ?? lot?.initial_price;
-  const currency = lot?.currency || 'USD';
+  // Event status from API is authoritative: when LIVE/ACTIVE, treat as live even if lot end_time suggests otherwise
+  const effectiveEventStatus = eventStatus ?? lot?.event_status ?? initialLot?.event_status;
+  const isEventLiveFromApi = useMemo(() => {
+    const s = (effectiveEventStatus || '').toUpperCase();
+    return s === 'LIVE' || s === 'ACTIVE';
+  }, [effectiveEventStatus]);
+  const isEnded = isEventLiveFromApi ? false : timerSaysEnded;
+
+  const effectiveLotForBid = lot || initialLot;
+  const initialPrice = parseFloat(effectiveLotForBid?.initial_price || 0);
+  const highestBidAmount = bids?.length
+    ? Math.max(initialPrice, ...bids.map((b) => parseFloat(b.amount) || 0))
+    : null;
+  const currentBid =
+    highestBidAmount != null
+      ? highestBidAmount
+      : (lot?.current_price ?? lot?.highest_bid ?? lot?.initial_price);
+  const currency = lot?.currency || effectiveLotForBid?.currency || 'USD';
+
+  const isEventLive = isEventLiveFromApi;
   const specificData = (() => {
     let sd = lot?.specific_data;
     if (typeof sd === 'string') {
@@ -46,12 +72,127 @@ const GuestLotDrawer = ({ lot: initialLot, eventEndTime, eventTitle, onClose }) 
   })();
 
   const formatTimeLeft = () => {
+    // When we have time left, always show the countdown
+    if (!timer.isFinished && endTime && new Date(endTime) > new Date()) {
+      const { days, hours, minutes, seconds } = timer;
+      if (days > 0) return `${days}d ${hours}h ${minutes}m`;
+      if (hours > 0) return `${hours}h ${minutes}m ${seconds}s`;
+      return `${minutes}m ${seconds}s`;
+    }
+    if (isEventLive && timerSaysEnded) return 'Live';
     if (isEnded) return 'Ended';
     const { days, hours, minutes, seconds } = timer;
     if (days > 0) return `${days}d ${hours}h ${minutes}m`;
     if (hours > 0) return `${hours}h ${minutes}m ${seconds}s`;
     return `${minutes}m ${seconds}s`;
   };
+
+  useEffect(() => {
+    dispatch(fetchCategories());
+  }, [dispatch]);
+
+  const categoryDetail = useMemo(() => {
+    const categoryId = effectiveLotForBid?.category ?? effectiveLotForBid?.category_id;
+    if (!categoryId) return null;
+    const list = Array.isArray(categories) ? categories : categories?.results ?? [];
+    if (!list.length) return null;
+    const id = Number(categoryId);
+    return list.find((c) => c.id === id || Number(c.id) === id) ?? null;
+  }, [effectiveLotForBid?.category, effectiveLotForBid?.category_id, categories]);
+
+  const { nextBidAmount, incrementRules, minBid, maxBid } = useMemo(() => {
+    const ranges = categoryDetail?.increment_rules?.ranges;
+    const current = highestBidAmount != null ? highestBidAmount : initialPrice;
+
+    if (!ranges || !Array.isArray(ranges) || ranges.length === 0) {
+      return {
+        nextBidAmount: current + 1,
+        incrementRules: null,
+        minBid: current + 1,
+        maxBid: current + 1000,
+      };
+    }
+
+    const sorted = [...ranges].sort((a, b) => (a.up_to ?? 0) - (b.up_to ?? 0));
+    let increment = sorted[0]?.increment ?? 1;
+    let upTo = sorted[0]?.up_to ?? Infinity;
+
+    for (const r of sorted) {
+      if (current < (r.up_to ?? Infinity)) {
+        increment = Number(r.increment) || 1;
+        upTo = Number(r.up_to) ?? Infinity;
+        break;
+      }
+    }
+
+    const nextRaw = current + increment;
+    const nextBid = Math.min(nextRaw, current + upTo);
+    const min = nextBid > current ? nextBid : current + increment;
+    const maxAdd = upTo < Infinity ? upTo : 20 * increment;
+    const max = current + Math.floor(maxAdd / increment) * increment;
+    return {
+      nextBidAmount: nextBid > current ? nextBid : null,
+      incrementRules: { increment, upTo },
+      minBid: min,
+      maxBid: max,
+    };
+  }, [initialPrice, highestBidAmount, categoryDetail?.increment_rules?.ranges]);
+
+  const isValidCustomBid = useMemo(() => {
+    if (!customBidAmount || customBidAmount.trim() === '') return false;
+    const amt = parseFloat(customBidAmount.replace(/[^0-9.-]/g, ''));
+    if (isNaN(amt)) return false;
+    return amt >= minBid && amt <= maxBid;
+  }, [customBidAmount, minBid, maxBid]);
+
+  const effectiveBidAmount = isValidCustomBid
+    ? parseFloat(customBidAmount.replace(/[^0-9.-]/g, ''))
+    : nextBidAmount;
+
+  const formatCurrency = useCallback(
+    (amount) => {
+      return new Intl.NumberFormat('en-US', {
+        style: 'currency',
+        currency: currency,
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 0,
+      }).format(amount);
+    },
+    [currency]
+  );
+
+  const handleQuickBidAdd = useCallback(
+    (addAmount) => {
+      if (addAmount === 'max') {
+        setCustomBidAmount(String(maxBid));
+        return;
+      }
+      const prev = parseFloat(customBidAmount) || nextBidAmount || minBid;
+      const next = Math.min(Math.max(prev + addAmount, minBid), maxBid);
+      setCustomBidAmount(String(next));
+    },
+    [customBidAmount, nextBidAmount, minBid, maxBid]
+  );
+
+  const handlePlaceBidSubmit = useCallback(() => {
+    const amount = effectiveBidAmount;
+    const lotId = effectiveLotForBid?.id;
+    if (!lotId || amount == null || isPlacingBid) return;
+    dispatch(
+      placeBid({
+        lot_id: lotId,
+        amount,
+      })
+    ).then((result) => {
+      if (result.type === 'buyer/placeBid/fulfilled') {
+        setCustomBidAmount('');
+        buyerService.getLotBids(lotId).then((data) => {
+          const list = Array.isArray(data) ? data : data?.results ?? data?.bids ?? [];
+          setBids(list);
+        });
+      }
+    });
+  }, [effectiveLotForBid?.id, effectiveBidAmount, isPlacingBid, dispatch]);
 
   useEffect(() => {
     if (!initialLot?.id) return;
@@ -220,17 +361,94 @@ const GuestLotDrawer = ({ lot: initialLot, eventEndTime, eventTitle, onClose }) 
                         </span>
                       </div>
                     </div>
-                    <button
-                      type="button"
-                      className="guest-lot-drawer__signin-btn"
-                      onClick={handleSignIn}
-                    >
-                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                        <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
-                        <path d="M7 11V7a5 5 0 0110 0v4" />
-                      </svg>
-                      Sign in to place a bid
-                    </button>
+                    {isBuyer ? (
+                      isEventLive && !isEnded ? (
+                        <div className="guest-lot-drawer__bid-form">
+                          <p className="guest-lot-drawer__increment-hint">
+                            Min bid: {formatCurrency(minBid)}
+                            {incrementRules?.increment != null && (
+                              <> · Increment: {formatCurrency(incrementRules.increment)}</>
+                            )}
+                          </p>
+                          <div className="guest-lot-drawer__custom-bid-row">
+                            <label className="guest-lot-drawer__custom-bid-label">Bid amount</label>
+                            <input
+                              type="number"
+                              className="guest-lot-drawer__bid-input"
+                              min={minBid}
+                              max={maxBid}
+                              step={incrementRules?.increment ?? 1}
+                              placeholder={`Min ${formatCurrency(minBid)} – Max ${formatCurrency(maxBid)}`}
+                              value={customBidAmount}
+                              onChange={(e) => setCustomBidAmount(e.target.value)}
+                            />
+                          </div>
+                          <div className="guest-lot-drawer__quick-bid-buttons">
+                            <button
+                              type="button"
+                              className="guest-lot-drawer__quick-bid-btn"
+                              onClick={() => handleQuickBidAdd(incrementRules?.increment ?? 50)}
+                            >
+                              +{incrementRules?.increment ?? 50}
+                            </button>
+                            <button
+                              type="button"
+                              className="guest-lot-drawer__quick-bid-btn"
+                              onClick={() => handleQuickBidAdd(100)}
+                            >
+                              +100
+                            </button>
+                            <button
+                              type="button"
+                              className="guest-lot-drawer__quick-bid-btn"
+                              onClick={() => handleQuickBidAdd(500)}
+                            >
+                              +500
+                            </button>
+                            {maxBid < Infinity && (
+                              <button
+                                type="button"
+                                className="guest-lot-drawer__quick-bid-btn guest-lot-drawer__quick-bid-max"
+                                onClick={() => handleQuickBidAdd('max')}
+                              >
+                                Max
+                              </button>
+                            )}
+                          </div>
+                          {customBidAmount && !isValidCustomBid && (
+                            <p className="guest-lot-drawer__bid-error">
+                              Enter {formatCurrency(minBid)} – {formatCurrency(maxBid)}.
+                            </p>
+                          )}
+                          <button
+                            type="button"
+                            className="guest-lot-drawer__signin-btn"
+                            onClick={handlePlaceBidSubmit}
+                            disabled={isPlacingBid || effectiveBidAmount == null}
+                          >
+                            {isPlacingBid
+                              ? 'Placing bid...'
+                              : `Place bid ${effectiveBidAmount != null ? formatCurrency(effectiveBidAmount) : ''}`}
+                          </button>
+                        </div>
+                      ) : (
+                        <div className="guest-lot-drawer__bid-not-available">
+                          {isEnded ? 'Bidding has ended.' : eventStatus ? 'Bidding opens when the event is live.' : 'Bidding is not available.'}
+                        </div>
+                      )
+                    ) : (
+                      <button
+                        type="button"
+                        className="guest-lot-drawer__signin-btn"
+                        onClick={handleSignIn}
+                      >
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                          <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+                          <path d="M7 11V7a5 5 0 0110 0v4" />
+                        </svg>
+                        Sign in to place a bid
+                      </button>
+                    )}
                   </div>
                 </aside>
               </div>

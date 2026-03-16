@@ -1,22 +1,27 @@
-import React, { useState, useEffect, useCallback } from 'react'
-import { useNavigate, Link } from 'react-router-dom'
+import React, { useState, useEffect, useCallback, useMemo } from 'react'
+import { Link, useNavigate } from 'react-router-dom'
 import './BuyerBids.css'
+import './GuestEventLots.css'
 import { useSelector, useDispatch } from 'react-redux'
 import { fetchMyBids } from '../store/actions/buyerActions'
 import { getMediaUrl } from '../config/api.config'
 import { auctionService } from '../services/interceptors/auction.service'
+import LotRow from '../components/LotRow'
+import GuestLotDrawer from '../components/GuestLotDrawer'
 
 const BuyerBids = () => {
   const navigate = useNavigate()
   const dispatch = useDispatch()
-  const { myBids, isLoading, error, nextPage, prevPage } = useSelector(state => state.buyer)
+  const { myBids, isLoading, error, nextPage, prevPage, totalCount } = useSelector(state => state.buyer)
   const [searchQuery, setSearchQuery] = useState('')
-  const [currentPageUrl, setCurrentPageUrl] = useState(null)
+  const [currentPage, setCurrentPage] = useState(1)
   const [lotCache, setLotCache] = useState({})
   const [lotsFetching, setLotsFetching] = useState(false)
   const [lotsFetchComplete, setLotsFetchComplete] = useState(false)
+  const [selectedLot, setSelectedLot] = useState(null)
 
   useEffect(() => {
+    setCurrentPage(1)
     dispatch(fetchMyBids())
   }, [dispatch])
 
@@ -157,9 +162,47 @@ const BuyerBids = () => {
       (lotNum != null && lotNum.toLowerCase().includes(q))
   })
 
-  const handlePageChange = (url) => {
-    if (url) {
-      setCurrentPageUrl(url)
+  const bidToLot = useCallback((bid) => {
+    const itemId = getBidItemId(bid)
+    const lotNumber = getBidLotNumber(bid)
+    const cachedLot = (itemId ? lotCache[itemId] : null) ?? (lotNumber ? lotCache[lotNumber] : null)
+    const lot = bid.lot ?? bid.lot_details ?? bid.item ?? cachedLot
+    const media = getBidMedia(bid, cachedLot)
+    return {
+      ...(cachedLot || {}),
+      id: cachedLot?.id ?? itemId,
+      lot_number: cachedLot?.lot_number ?? lotNumber ?? itemId,
+      title: cachedLot?.title ?? getBidItemTitle(bid),
+      media: Array.isArray(media) ? media : [],
+      current_price: cachedLot?.current_price ?? bid.amount,
+      highest_bid: cachedLot?.highest_bid ?? bid.amount,
+      initial_price: cachedLot?.initial_price ?? bid.amount,
+      currency: cachedLot?.currency ?? 'USD',
+      end_date: cachedLot?.end_date ?? bid.event_end_time,
+      end_time: cachedLot?.end_time,
+      location: cachedLot?.location,
+      venue: cachedLot?.venue,
+      event_title: bid.event_title,
+      event_status: bid.event_status ?? cachedLot?.event_status,
+      event_id: bid.event_id ?? bid.event,
+    }
+  }, [lotCache])
+
+  const handleLotClick = useCallback((lot) => {
+    setSelectedLot(lot)
+  }, [])
+
+  const handleCloseDrawer = useCallback(() => {
+    setSelectedLot(null)
+  }, [])
+
+  const handlePageChange = (url, direction) => {
+    if (!url) return
+    if (direction === 'next') {
+      setCurrentPage((p) => p + 1)
+      dispatch(fetchMyBids(url))
+    } else if (direction === 'prev') {
+      setCurrentPage((p) => Math.max(1, p - 1))
       dispatch(fetchMyBids(url))
     }
   }
@@ -195,7 +238,13 @@ const BuyerBids = () => {
           <div className="my-bids-container">
             <div className="error-state">
               <p>Unable to load your bids. Please try again later.</p>
-              <button onClick={() => dispatch(fetchMyBids())} className="retry-btn">
+              <button
+                onClick={() => {
+                  setCurrentPage(1)
+                  dispatch(fetchMyBids())
+                }}
+                className="retry-btn"
+              >
                 Retry
               </button>
             </div>
@@ -206,13 +255,13 @@ const BuyerBids = () => {
   }
 
   return (
-    <div className="my-bids-page">
+    <div className={`my-bids-page ${selectedLot ? 'my-bids-page--drawer-open' : ''}`}>
       <div className="my-bids-content">
         <div className="my-bids-container">
           <nav className="breadcrumbs">
-            <Link to="/buyer/dashboard">Dashboard</Link>
+            <Link to="/buyer/dashboard">Live Auction</Link>
             <span>/</span>
-            <span>Bids</span>
+            <span>My Bids</span>
           </nav>
 
           <div className="page-header">
@@ -243,120 +292,28 @@ const BuyerBids = () => {
             </div>
           </div>
 
-          <div className="bids-grid">
+          <div className="my-bids-list-wrap">
+            <p className="guest-event-lots__results-count">
+              Your search returned {filteredBids?.length ?? 0} result{(filteredBids?.length ?? 0) !== 1 ? 's' : ''}
+            </p>
             {filteredBids?.length > 0 ? (
-              filteredBids?.map(bid => {
-                const statusDisplay = getStatusDisplay(bid.status)
-                const itemTitle = getBidItemTitle(bid)
-                const itemId = getBidItemId(bid)
-                const lotNumber = getBidLotNumber(bid)
-                const cachedLot = (itemId ? lotCache[itemId] : null) ?? (lotNumber ? lotCache[lotNumber] : null)
-                const media = getBidMedia(bid, cachedLot)
-                const imageUrl = getFirstImage(media)
-                const lotIdForNav = cachedLot?.id ?? itemId
-                const lotDisplayNumber = cachedLot?.lot_number ?? lotNumber ?? itemId
-                const isEventLive = (bid.event_status || '').toUpperCase() === 'LIVE'
-
-                return (
-                  <div
-                    key={bid.id}
-                    className={`bid-card ${statusDisplay}`}
-                  >
-                    <div className="bid-image">
-                      <img src={imageUrl} alt={itemTitle} onError={(e) => e.target.src = 'https://images.unsplash.com/photo-1578301978018-3005759f48f7?w=800&q=80'} />
-                      {/* {isLive && (
-                        <div className="live-badge">
-                          <span className="live-dot">•</span>
-                          <span>Live</span>
-                        </div>
-                      )} */}
-                      <div className={`status-badge ${statusDisplay}`}>
-                        {bid.status === 'AWAITING_PAYMENT' ? 'Awaiting Payment' : bid.status}
-                      </div>
-                    </div>
-
-                    <div className="mybid-details">
-                      <div className="bid-lot-id">Lot #{lotDisplayNumber}</div>
-                      <h3 className="bid-title">{itemTitle}</h3>
-                      {cachedLot?.description && (
-                        <p className="bid-description">{cachedLot.description}</p>
-                      )}
-                      <div className="bid-date">{new Date(bid.created_at).toLocaleDateString()}</div>
-                      {cachedLot?.category_name && (
-                        <div className="bid-category">{cachedLot.category_name}</div>
-                      )}
-
-                      <div className="mybidding-info">
-                        <div className="bid-row">
-                          <span className="bid-label">Your Bid</span>
-                          <span className="bid-value">{formatCurrency(bid.amount ?? 0)}</span>
-                        </div>
-                        {cachedLot?.initial_price != null && (
-                          <div className="bid-row">
-                            <span className="bid-label">Start Price</span>
-                            <span className="bid-value bid-value--muted">{formatCurrency(cachedLot.initial_price)}</span>
-                          </div>
-                        )}
-                        <div className="bid-row">
-                          <span className="bid-label">Status</span>
-                          <span className={`bid-status ${statusDisplay}`}>
-                            {bid.status === 'AWAITING_PAYMENT' ? 'Awaiting Payment' : bid.status}
-                          </span>
-                        </div>
-                      </div>
-
-                      {/* <div className="status-message"> */}
-                      {/* {bid.status === 'ACTIVE' && (
-                          <div className="status-banner active-banner">
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-                              <path d="M20 6L9 17L4 12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                            </svg>
-                            <span>Bid is active</span>
-                          </div>
-                        )} */}
-                      {/* {bid.status === 'CLOSED' && (
-                          <div className="status-banner closed-banner">
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-                              <path d="M12 8V12M12 16H12.01M21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3C16.9706 3 21 7.02944 21 12Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                            </svg>
-                            <span>Auction closed</span>
-                          </div>
-                        )} */}
-                      {/* {bid.status === 'AWAITING_PAYMENT' && (
-                          <div className="status-banner payment-banner">
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-                              <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm3.5-9c.83 0 1.5-.67 1.5-1.5S16.33 8 15.5 8 14 8.67 14 9.5s.67 1.5 1.5 1.5zm-7 0c.83 0 1.5-.67 1.5-1.5S9.33 8 8.5 8 7 8.67 7 9.5 7.67 11 8.5 11zm3.5 6.5c2.33 0 4.31-1.46 5.11-3.5H6.89c.8 2.04 2.78 3.5 5.11 3.5z" stroke="currentColor" strokeWidth="2" />
-                            </svg>
-                            <span>Action required: Complete payment</span>
-                          </div>
-                        )} */}
-                      {/* </div> */}
-                    </div>
-
-                    <div className="mybid-actions">
-                      {!isEventLive ? (
-                        <div className="event-closed-message">
-                          <p className="event-closed-title">Event is closed</p>
-                          <p className="event-closed-email">Please wait for email from Hammer & Tongues</p>
-                        </div>
-                      ) : lotIdForNav ? (
-                        <Link
-                          to={`/buyer/auction/${lotIdForNav}`}
-                          state={{ listing: cachedLot ?? bid }}
-                          className="bids-action-btn secondary"
-                          style={{ textDecoration: 'none', display: 'block', textAlign: 'center' }}
-                        >
-                          View Lot
-                        </Link>
-                      ) : (
-                        <span className="bids-action-btn secondary" style={{ opacity: 0.6, cursor: 'not-allowed' }}>
-                          View Lot
-                        </span>
-                      )}
-                    </div>
-                  </div>
-                )
-              })
+              <div className="guest-event-lots__list">
+                {filteredBids.map((bid) => {
+                  const lot = bidToLot(bid)
+                  return (
+                    <LotRow
+                      key={bid.id}
+                      lot={lot}
+                      eventEndTime={lot.end_date ?? lot.end_time}
+                      eventTitle={lot.event_title}
+                      eventStatus={lot.event_status}
+                      onOpenDetail={handleLotClick}
+                      showFavorite
+                      isFavorite={lot.is_favourite ?? false}
+                    />
+                  )
+                })}
+              </div>
             ) : (
               <div className="empty-state">
                 <svg width="48" height="48" viewBox="0 0 24 24" fill="none">
@@ -371,7 +328,7 @@ const BuyerBids = () => {
             <div className="mybids-pagination">
               <button
                 className="mybids-pagination-btn mybids-prev-btn"
-                onClick={() => handlePageChange(prevPage)}
+                onClick={() => handlePageChange(prevPage, 'prev')}
                 disabled={!prevPage}
                 aria-label="Previous page"
               >
@@ -382,12 +339,14 @@ const BuyerBids = () => {
               </button>
 
               <div className="mybids-page-info">
-                <span>Page {myBids?.length > 0 ? '1' : '0'}</span>
+                <span>
+                  Page {currentPage} of {totalCount ? Math.ceil(totalCount / 10) : (nextPage ? currentPage + 1 : currentPage)}
+                </span>
               </div>
 
               <button
                 className="mybids-pagination-btn mybids-next-btn"
-                onClick={() => handlePageChange(nextPage)}
+                onClick={() => handlePageChange(nextPage, 'next')}
                 disabled={!nextPage}
                 aria-label="Next page"
               >
@@ -400,6 +359,18 @@ const BuyerBids = () => {
           )}
         </div>
       </div>
+
+      {selectedLot && (
+        <GuestLotDrawer
+          lot={selectedLot}
+          eventEndTime={selectedLot.end_date ?? selectedLot.end_time}
+          eventTitle={selectedLot.event_title}
+          eventId={selectedLot.event_id}
+          eventStatus={selectedLot.event_status}
+          onClose={handleCloseDrawer}
+          isBuyer
+        />
+      )}
     </div>
   )
 }

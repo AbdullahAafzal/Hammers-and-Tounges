@@ -5,6 +5,11 @@
   color: var(--color-text);
 }
 
+.buyer-event-lots--drawer-open .buyer-event-lots__body {
+  pointer-events: none;
+  opacity: 0.6;
+}
+
 .buyer-event-lots__header {
   display: flex;
   align-items: flex-start;

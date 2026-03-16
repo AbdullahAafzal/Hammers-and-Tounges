@@ -102,7 +102,7 @@ const BuyerBidDetails = () => {
       <div className="bid-details-container">
         {/* Breadcrumbs */}
         <nav className="bid-details-breadcrumbs">
-          <Link to="/buyer/dashboard">Home</Link>
+          <Link to="/buyer/dashboard">Live Auction</Link>
           <span>/</span>
           <Link to="/buyer/bids">My Bids</Link>
           <span>/</span>

@@ -3,24 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchEvents } from '../store/actions/AuctionsActions';
 import { clearBuyerError } from '../store/slices/buyerSlice';
+import EventListingRow from '../components/EventListingRow';
 import './BuyerDashboard.css';
-import { toast } from 'react-toastify';
-
-const formatEventDate = (isoStr) => {
-  if (!isoStr) return '—';
-  try {
-    const d = new Date(isoStr);
-    return d.toLocaleDateString('en-US', {
-      month: 'short',
-      day: 'numeric',
-      year: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit',
-    });
-  } catch {
-    return '—';
-  }
-};
 
 const StatCard = React.memo(({ icon: Icon, value, label, colorClass }) => (
   <div className="buyer-dashboard-stat-card" role="article" aria-label={`${label}: ${value}`}>
@@ -34,34 +18,10 @@ const StatCard = React.memo(({ icon: Icon, value, label, colorClass }) => (
   </div>
 ));
 
-const EventRow = React.memo(({ event, onClick, formatEventDate }) => (
-  <tr
-    className="buyer-dashboard-event-row"
-    onClick={() => onClick(event)}
-    role="button"
-    tabIndex={0}
-    onKeyDown={(e) => e.key === 'Enter' && onClick(event)}
-  >
-    <td className="buyer-dashboard-event-cell buyer-dashboard-event-cell--title">
-      <div className="buyer-dashboard-event-cell__title">{event.title || 'Untitled Event'}</div>
-      <div className="buyer-dashboard-event-cell__lots">{event.lots_count ?? 0} lots</div>
-    </td>
-    <td className="buyer-dashboard-event-cell buyer-dashboard-event-cell--date">
-      {formatEventDate(event.start_time)} – {formatEventDate(event.end_time)}
-    </td>
-    <td className="buyer-dashboard-event-cell buyer-dashboard-event-cell--status">
-      <span className="buyer-dashboard-status-badge buyer-dashboard-status-badge--live">
-        {event.status || 'Live'}
-      </span>
-    </td>
-    <td className="buyer-dashboard-event-cell buyer-dashboard-event-cell--action">
-      <span className="buyer-dashboard-event-arrow">View lots →</span>
-    </td>
-  </tr>
-));
+StatCard.displayName = 'StatCard';
 
-EventRow.displayName = 'EventRow';
-
+const TAB_UPCOMING = 'upcoming';
+const TAB_PAST = 'past';
 const ITEMS_PER_PAGE = 15;
 
 const BuyerDashboard = () => {
@@ -69,24 +29,39 @@ const BuyerDashboard = () => {
   const dispatch = useDispatch();
   const [searchQuery, setSearchQuery] = useState('');
   const [page, setPage] = useState(1);
+  const [activeTab, setActiveTab] = useState(TAB_UPCOMING);
 
   const { events, eventsLoading, eventsError } = useSelector(state => state.buyer);
 
-  // Filter events: show only LIVE (currently running)
-  const liveEvents = useMemo(() => {
+  // Filter by tab (Upcoming vs Past) - same logic as guest Home
+  const tabFilteredEvents = useMemo(() => {
     if (!events?.length) return [];
-    return events.filter((e) => (e.status || '').toUpperCase() === 'LIVE');
-  }, [events]);
+    const now = new Date();
+    if (activeTab === TAB_UPCOMING) {
+      return events.filter((e) => {
+        const end = e.end_time ? new Date(e.end_time) : null;
+        const status = (e.status || '').toUpperCase();
+        if (status === 'CLOSED' || status === 'CLOSING') return false;
+        return !end || end > now;
+      });
+    }
+    return events.filter((e) => {
+      const end = e.end_time ? new Date(e.end_time) : null;
+      const status = (e.status || '').toUpperCase();
+      if (status === 'CLOSED' || status === 'CLOSING') return true;
+      return end && end <= now;
+    });
+  }, [events, activeTab]);
 
   // Search filter
   const filteredEvents = useMemo(() => {
-    if (!searchQuery.trim()) return liveEvents;
+    if (!searchQuery.trim()) return tabFilteredEvents;
     const q = searchQuery.toLowerCase().trim();
-    return liveEvents.filter(
+    return tabFilteredEvents.filter(
       (e) =>
         (e.title || '').toLowerCase().includes(q)
     );
-  }, [liveEvents, searchQuery]);
+  }, [tabFilteredEvents, searchQuery]);
 
   const totalPages = Math.max(1, Math.ceil(filteredEvents.length / ITEMS_PER_PAGE));
   const startIdx = (page - 1) * ITEMS_PER_PAGE;
@@ -98,7 +73,7 @@ const BuyerDashboard = () => {
 
   useEffect(() => {
     setPage(1);
-  }, [searchQuery]);
+  }, [searchQuery, activeTab]);
 
   useEffect(() => {
     dispatch(fetchEvents({}));
@@ -119,18 +94,18 @@ const BuyerDashboard = () => {
           </svg>
         ),
         value: filteredEvents.length.toLocaleString(),
-        label: 'Live Events',
+        label: activeTab === TAB_UPCOMING ? 'Upcoming Events' : 'Past Events',
         colorClass: 'buyer-dashboard-icon-auctions',
       },
     ],
-    [filteredEvents.length],
+    [filteredEvents.length, activeTab],
   );
 
   return (
     <div className="buyer-dashboard-container" role="main">
       <header className="buyer-dashboard-header">
         <div className="buyer-dashboard-header-content">
-          <h1 className="buyer-dashboard-title">Buyer Dashboard</h1>
+          <h1 className="buyer-dashboard-title">Live Auction</h1>
           <p className="buyer-dashboard-subtitle">
             Browse events and bid on lots
           </p>
@@ -146,42 +121,67 @@ const BuyerDashboard = () => {
       <div className="buyer-dashboard-main">
         <section className="buyer-dashboard-card" aria-label="Available events">
           <div className="buyer-dashboard-card-header">
-            <h2 className="buyer-dashboard-card-title">Live Events</h2>
-            {liveEvents.length > 0 && (
-              <span className="buyer-dashboard-auction-count">({searchQuery.trim() ? filteredEvents.length : liveEvents.length})</span>
-            )}
-            {liveEvents.length > 0 && (
-              <div className="buyer-dashboard-search-wrap">
-                <input
-                  type="search"
-                  placeholder="Search events..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="buyer-dashboard-search"
-                  aria-label="Search events"
-                />
-                {searchQuery.trim() && (
-                  <button
-                    type="button"
-                    className="buyer-dashboard-search-clear"
-                    onClick={() => setSearchQuery('')}
-                    aria-label="Clear search"
-                  >
-                    Clear
-                  </button>
-                )}
+            <div className="buyer-dashboard-tabs-wrap">
+              <div className="buyer-dashboard-tabs">
+                <button
+                  type="button"
+                  className={`buyer-dashboard-tab ${activeTab === TAB_UPCOMING ? 'active' : ''}`}
+                  onClick={() => setActiveTab(TAB_UPCOMING)}
+                >
+                  Upcoming
+                </button>
+                <button
+                  type="button"
+                  className={`buyer-dashboard-tab ${activeTab === TAB_PAST ? 'active' : ''}`}
+                  onClick={() => setActiveTab(TAB_PAST)}
+                >
+                  Past
+                </button>
               </div>
-            )}
+              <span className="buyer-dashboard-tabs-count">
+                {eventsLoading && !events?.length ? '...' : `${filteredEvents.length} events`}
+              </span>
+            </div>
+            <div className="buyer-dashboard-card-header-row">
+              <h2 className="buyer-dashboard-card-title">
+                {activeTab === TAB_UPCOMING ? 'Upcoming Events' : 'Past Events'}
+              </h2>
+              {tabFilteredEvents.length > 0 && (
+                <span className="buyer-dashboard-auction-count">({searchQuery.trim() ? filteredEvents.length : tabFilteredEvents.length})</span>
+              )}
+              {tabFilteredEvents.length > 0 && (
+                <div className="buyer-dashboard-search-wrap">
+                  <input
+                    type="search"
+                    placeholder="Search events..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="buyer-dashboard-search"
+                    aria-label="Search events"
+                  />
+                  {searchQuery.trim() && (
+                    <button
+                      type="button"
+                      className="buyer-dashboard-search-clear"
+                      onClick={() => setSearchQuery('')}
+                      aria-label="Clear search"
+                    >
+                      Clear
+                    </button>
+                  )}
+                </div>
+              )}
+            </div>
           </div>
 
-          {eventsLoading && liveEvents.length === 0 && (
+          {eventsLoading && !events?.length && (
             <div className="auctions-loading">
               <div className="auctions-spinner"></div>
               <p>Loading events...</p>
             </div>
           )}
 
-          {eventsError && !eventsLoading && liveEvents.length === 0 && (
+          {eventsError && !eventsLoading && !events?.length && (
             <div className="auctions-error">
               <svg width="48" height="48" viewBox="0 0 24 24" fill="none">
                 <circle cx="12" cy="12" r="10" stroke="#fca5a5" strokeWidth="2" />
@@ -199,17 +199,21 @@ const BuyerDashboard = () => {
             </div>
           )}
 
-          {!eventsLoading && !eventsError && liveEvents.length === 0 && (
+          {!eventsLoading && !eventsError && tabFilteredEvents.length === 0 && (
             <div className="auctions-empty">
               <svg width="64" height="64" viewBox="0 0 24 24" fill="none">
                 <path d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" stroke="#d1d5db" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
               </svg>
-              <h2>No live events</h2>
-              <p>There are no live events right now. Check back when auctions are running.</p>
+              <h2>{activeTab === TAB_UPCOMING ? 'No upcoming events' : 'No past events'}</h2>
+              <p>
+                {activeTab === TAB_UPCOMING
+                  ? 'There are no upcoming events at the moment. Check back later.'
+                  : 'No past events to display.'}
+              </p>
             </div>
           )}
 
-          {!eventsLoading && !eventsError && liveEvents.length > 0 && filteredEvents.length === 0 && (
+          {!eventsLoading && !eventsError && tabFilteredEvents.length > 0 && filteredEvents.length === 0 && (
             <div className="auctions-empty">
               <h2>No matching events</h2>
               <p>Try a different search term or clear your search.</p>
@@ -224,27 +228,14 @@ const BuyerDashboard = () => {
 
           {!eventsLoading && !eventsError && filteredEvents.length > 0 && (
             <>
-              <div className="buyer-dashboard-events-table-wrap">
-                <table className="buyer-dashboard-events-table">
-                  <thead>
-                    <tr>
-                      <th>Event</th>
-                      <th>Date & Time</th>
-                      <th>Status</th>
-                      <th></th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {paginatedEvents.map((event) => (
-                      <EventRow
-                        key={event.id}
-                        event={event}
-                        onClick={handleEventClick}
-                        formatEventDate={formatEventDate}
-                      />
-                    ))}
-                  </tbody>
-                </table>
+              <div className="buyer-dashboard-events-list">
+                {paginatedEvents.map((event) => (
+                  <EventListingRow
+                    key={event.id}
+                    event={event}
+                    onClick={handleEventClick}
+                  />
+                ))}
               </div>
               {totalPages > 1 && (
                 <div className="buyer-dashboard-pagination">

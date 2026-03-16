@@ -2,7 +2,6 @@ import React, { useState, useMemo } from 'react';
 import { getMediaUrl } from '../config/api.config';
 import './EventListingRow.css';
 
-const FALLBACK_IMAGE = 'https://images.unsplash.com/photo-1549317661-bd32c8ce0db2?w=400&q=80';
 
 const CATEGORY_CONFIG = [
   { keywords: ['farm', 'agriculture', 'farming'], color: '#8cc63f', label: 'Farming & Agriculture' },
@@ -47,12 +46,12 @@ const EventListingRow = ({ event, onClick }) => {
   const category = useMemo(() => getCategoryFromEvent(event), [event]);
 
   const getThumbnail = () => {
-    if (imageError) return FALLBACK_IMAGE;
+    if (imageError) return null;
     const media = event.media || event.image || [];
     const arr = Array.isArray(media) ? media : [];
     const img = arr.find((m) => (m.media_type || m.mediatype) === 'image') || arr[0];
     const raw = img?.file || event.image_url || event.thumbnail;
-    return raw ? getMediaUrl(raw) : FALLBACK_IMAGE;
+    return raw ? getMediaUrl(raw) : null;
   };
 
   const startDate = formatDateBlock(event.start_time);
@@ -78,13 +77,17 @@ const EventListingRow = ({ event, onClick }) => {
         className="event-listing-row__thumb"
         style={{ '--category-color': category.color }}
       >
-        <img
-          src={thumbnail}
-          alt=""
-          className="event-listing-row__thumb-img"
-          loading="lazy"
-          onError={() => setImageError(true)}
-        />
+        {thumbnail ? (
+          <img
+            src={thumbnail}
+            alt=""
+            className="event-listing-row__thumb-img"
+            loading="lazy"
+            onError={() => setImageError(true)}
+          />
+        ) : (
+          <div className="event-listing-row__thumb-placeholder">No image</div>
+        )}
         <div className="event-listing-row__category-badge">
           <CategoryIcon color={category.color} />
           <span>{category.label}</span>

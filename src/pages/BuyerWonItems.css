@@ -1,3 +1,19 @@
+.won-items-page--drawer-open .won-items-container {
+  pointer-events: none;
+  opacity: 0.6;
+}
+
+.won-items-list-wrap {
+  margin-bottom: 2rem;
+}
+
+.won-items-list-wrap .guest-event-lots__list {
+  background: var(--color-surface);
+  border-radius: 8px;
+  border: 1px solid var(--color-border);
+  overflow: hidden;
+}
+
 .won-items-page {
   min-height: 100vh;
   background-color: var(--color-bg);

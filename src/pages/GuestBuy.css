@@ -5,6 +5,22 @@
   color: var(--color-text);
 }
 
+.guest-buy--drawer-open .guest-buy__main {
+  pointer-events: none;
+  opacity: 0.6;
+}
+
+.guest-buy__list-wrap {
+  margin-bottom: 2rem;
+}
+
+.guest-buy__list-wrap .guest-event-lots__list {
+  background: var(--color-surface);
+  border-radius: 8px;
+  border: 1px solid var(--color-border);
+  overflow: hidden;
+}
+
 .guest-buy__header {
   margin-bottom: 1.5rem;
   padding-bottom: 1.5rem;

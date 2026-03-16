@@ -1,11 +1,10 @@
-import React, { useState, useEffect, useCallback, useRef, useMemo } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import { auctionService } from '../services/interceptors/auction.service';
 import { fetchCategories } from '../store/actions/AuctionsActions';
 import { toast } from 'react-toastify';
-import { getMediaUrl } from '../config/api.config';
-import { useCountdownTimer } from '../hooks/useCountdownTimer';
+import LotRow from '../components/LotRow';
 import BuyerEventLotsFilterBar from '../components/BuyerEventLotsFilterBar';
 import GuestLotDrawer from '../components/GuestLotDrawer';
 import './GuestEventLots.css';
@@ -24,87 +23,6 @@ const getStatusModifier = (status) => {
   if (s === 'CLOSING') return '--closing';
   if (s === 'CLOSED') return '--closed';
   return '--live';
-};
-
-const formatPrice = (price) => {
-  if (!price) return '—';
-  return parseFloat(price).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-};
-
-const getLotStatusModifier = (status) => {
-  const s = (status || '').toUpperCase();
-  if (s === 'DRAFT') return '--draft';
-  if (s === 'ACTIVE' || s === 'APPROVED' || s === 'LIVE') return '--active';
-  if (s === 'CLOSED' || s === 'COMPLETED') return '--closed';
-  if (s === 'PENDING') return '--pending';
-  return '--active';
-};
-
-const GuestLotRow = ({ lot, eventEndTime, eventTitle, onOpenDetail }) => {
-  const imageMedia = lot.media?.filter((m) => m.media_type === 'image') || [];
-  const imageUrls = imageMedia.map((m) => getMediaUrl(m.file)).filter(Boolean);
-  const displayUrl = imageUrls[0];
-
-  const endTime = lot.end_date || lot.end_time || eventEndTime;
-  const timerTarget = endTime || new Date(Date.now() + 86400000).toISOString();
-  const timer = useCountdownTimer(timerTarget);
-  const isEnded = !endTime || timer.isFinished || new Date(endTime) <= new Date();
-
-  const currentBid = lot.current_price ?? lot.highest_bid ?? lot.initial_price;
-  const currency = lot.currency || 'USD';
-
-  const formatTimeLeft = () => {
-    if (isEnded) return 'Ended';
-    const { days, hours, minutes, seconds } = timer;
-    if (days > 0) return `${days}d ${hours}h`;
-    if (hours > 0) return `${hours}h ${minutes}m`;
-    return `${minutes}m ${seconds}s`;
-  };
-
-  return (
-    <article
-      className="guest-lot-row"
-      onClick={() => onOpenDetail?.(lot)}
-      role="button"
-      tabIndex={0}
-      onKeyDown={(e) => e.key === 'Enter' && onOpenDetail?.(lot)}
-    >
-      <div className="guest-lot-row__thumb">
-        {displayUrl ? (
-          <img src={displayUrl} alt={lot.title} loading="lazy" />
-        ) : (
-          <div className="guest-lot-row__thumb-placeholder">📷</div>
-        )}
-      </div>
-      <div className="guest-lot-row__info">
-        <h3 className="guest-lot-row__title">{lot.title || 'Untitled'}</h3>
-        <p className="guest-lot-row__location">
-          {lot.location || lot.venue || eventTitle || '—'}
-        </p>
-        <div className="guest-lot-row__bid">
-          <div className="guest-lot-row__bid-icon">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
-              <path d="M12 8v4M12 16h.01" />
-            </svg>
-          </div>
-          <div className="guest-lot-row__bid-content">
-            <span className="guest-lot-row__bid-label">CURRENT BID</span>
-            <span className="guest-lot-row__bid-value">
-              {currency} {formatPrice(currentBid)}
-            </span>
-          </div>
-        </div>
-      </div>
-      <div className="guest-lot-row__right">
-        <div className="guest-lot-row__time">
-          <span className="guest-lot-row__time-label">TIME LEFT</span>
-          <span className={`guest-lot-row__time-value ${isEnded ? 'ended' : ''}`}>
-            {formatTimeLeft()}
-          </span>
-        </div>
-      </div>
-    </article>
-  );
 };
 
 const GuestEventLots = () => {
@@ -331,7 +249,7 @@ const GuestEventLots = () => {
                 <>
                   <div className="guest-event-lots__list">
                     {filteredLots.map((lot) => (
-                      <GuestLotRow
+                      <LotRow
                         key={lot.id}
                         lot={lot}
                         eventEndTime={eventEndTime ?? eventFromState?.end_time}

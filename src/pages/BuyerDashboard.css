@@ -126,9 +126,59 @@
 
 .buyer-dashboard-card-header {
   display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.buyer-dashboard-tabs-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.buyer-dashboard-tabs {
+  display: flex;
+  gap: 0;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 8px;
+  padding: 0.25rem;
+  border: 1px solid var(--color-border-strong);
+}
+
+.buyer-dashboard-tab {
+  padding: 0.5rem 1.25rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--color-text-muted);
+  background: transparent;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.buyer-dashboard-tab:hover {
+  color: var(--color-text);
+}
+
+.buyer-dashboard-tab.active {
+  background: #8cc63f;
+  color: #000;
+}
+
+.buyer-dashboard-tabs-count {
+  font-size: 0.75rem;
+  color: var(--color-text-muted);
+}
+
+.buyer-dashboard-card-header-row {
+  display: flex;
   align-items: center;
   gap: 0.5rem;
-  margin-bottom: 1rem;
+  flex-wrap: wrap;
 }
 
 .buyer-dashboard-card-title {
@@ -141,11 +191,6 @@
 .buyer-dashboard-auction-count {
   font-size: 0.875rem;
   color: var(--color-text-muted);
-}
-
-.buyer-dashboard-card-header {
-  flex-wrap: wrap;
-  gap: 0.75rem;
 }
 
 .buyer-dashboard-search-wrap {
@@ -222,7 +267,14 @@
   border-color: #8cc63f;
 }
 
-/* Events table - scalable for 100+ events */
+/* Events list - row design (guest flow style) */
+.buyer-dashboard-events-list {
+  display: flex;
+  flex-direction: column;
+  border-top: 1px solid var(--color-border-strong);
+}
+
+/* Events table - scalable for 100+ events (legacy) */
 .buyer-dashboard-events-table-wrap {
   overflow-x: auto;
   border: 1px solid var(--color-border);

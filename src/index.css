@@ -245,6 +245,163 @@ html[data-theme="light"] .won-items-page .breadcrumbs a {
   color: rgba(0, 0, 0, 0.7) !important;
 }
 
+/* Light mode: Event listing row & Lot row - fix dark placeholders */
+html[data-theme="light"] .event-listing-row__thumb,
+html[data-theme="light"] .event-listing-row__thumb-placeholder {
+  background: rgba(0, 0, 0, 0.06) !important;
+  color: rgba(0, 0, 0, 0.6) !important;
+}
+
+html[data-theme="light"] .event-listing-row__date-block {
+  background: rgba(0, 0, 0, 0.06) !important;
+}
+
+html[data-theme="light"] .event-listing-row__lots-badge {
+  background: rgba(0, 0, 0, 0.06) !important;
+  border-color: rgba(0, 0, 0, 0.12) !important;
+  color: #1a1a1a !important;
+}
+
+html[data-theme="light"] .event-listing-row:hover {
+  background: rgba(0, 0, 0, 0.02) !important;
+}
+
+html[data-theme="light"] .lot-row {
+  background: #ffffff !important;
+  border-bottom-color: rgba(0, 0, 0, 0.1) !important;
+}
+
+html[data-theme="light"] .lot-row:hover {
+  background: rgba(0, 0, 0, 0.02) !important;
+}
+
+html[data-theme="light"] .lot-row__thumb,
+html[data-theme="light"] .lot-row__thumb-placeholder {
+  background: rgba(0, 0, 0, 0.06) !important;
+  color: rgba(0, 0, 0, 0.5) !important;
+}
+
+/* Light mode: Guest & Buyer list containers */
+html[data-theme="light"] .guest-event-lots,
+html[data-theme="light"] .guest-buy {
+  background: #ffffff !important;
+}
+
+html[data-theme="light"] .home-page {
+  background: #ffffff !important;
+}
+
+html[data-theme="light"] .home-events__tab,
+html[data-theme="light"] .home-events-list {
+  color: #1a1a1a !important;
+}
+
+html[data-theme="light"] .home-events__tabs {
+  background: rgba(0, 0, 0, 0.06) !important;
+  border-color: rgba(0, 0, 0, 0.12) !important;
+}
+
+html[data-theme="light"] .home-events__tab {
+  color: rgba(0, 0, 0, 0.65) !important;
+}
+
+html[data-theme="light"] .home-events__tab:hover {
+  color: #1a1a1a !important;
+}
+
+html[data-theme="light"] .home-events__tab.active {
+  background: #8cc63f !important;
+  color: #000 !important;
+}
+
+html[data-theme="light"] .home-events__count {
+  color: rgba(0, 0, 0, 0.6) !important;
+}
+
+html[data-theme="light"] .home-events-list {
+  border-top-color: rgba(0, 0, 0, 0.1) !important;
+}
+
+html[data-theme="light"] .buyer-event-lots,
+html[data-theme="light"] .buyer-dashboard-container {
+  background: #ffffff !important;
+}
+
+html[data-theme="light"] .guest-event-lots__list,
+html[data-theme="light"] .guest-buy__list-wrap .guest-event-lots__list,
+html[data-theme="light"] .buyer-event-lots__content .guest-event-lots__list,
+html[data-theme="light"] .my-bids-list-wrap .guest-event-lots__list,
+html[data-theme="light"] .favorite-auctions-list-wrap .guest-event-lots__list,
+html[data-theme="light"] .won-items-list-wrap .guest-event-lots__list {
+  background: #ffffff !important;
+  border-color: rgba(0, 0, 0, 0.1) !important;
+}
+
+html[data-theme="light"] .guest-lot-drawer {
+  background: #ffffff !important;
+  box-shadow: -4px 0 24px rgba(0, 0, 0, 0.12) !important;
+}
+
+html[data-theme="light"] .guest-lot-drawer__bid-card {
+  background: rgba(0, 0, 0, 0.03) !important;
+  border-color: rgba(0, 0, 0, 0.1) !important;
+}
+
+html[data-theme="light"] .guest-lot-drawer__close {
+  color: #1a1a1a !important;
+  border-color: rgba(0, 0, 0, 0.15) !important;
+}
+
+html[data-theme="light"] .guest-lot-drawer__close:hover {
+  background: rgba(74, 124, 35, 0.1) !important;
+  border-color: rgba(74, 124, 35, 0.3) !important;
+  color: #4a7c23 !important;
+}
+
+html[data-theme="light"] .guest-lot-drawer__lot-no,
+html[data-theme="light"] .guest-lot-drawer__title,
+html[data-theme="light"] .guest-lot-drawer__bid-value {
+  color: #1a1a1a !important;
+}
+
+html[data-theme="light"] .guest-lot-drawer__image-wrap,
+html[data-theme="light"] .guest-lot-drawer__placeholder,
+html[data-theme="light"] .guest-lot-drawer__thumb {
+  background: rgba(0, 0, 0, 0.06) !important;
+  color: rgba(0, 0, 0, 0.5) !important;
+}
+
+/* Light mode: buyer dashboard card */
+html[data-theme="light"] .buyer-dashboard-card {
+  background: #ffffff !important;
+  border-color: rgba(0, 0, 0, 0.1) !important;
+}
+
+html[data-theme="light"] .buyer-dashboard-tabs {
+  background: rgba(0, 0, 0, 0.05) !important;
+  border-color: rgba(0, 0, 0, 0.12) !important;
+}
+
+html[data-theme="light"] .buyer-dashboard-tab {
+  color: rgba(0, 0, 0, 0.65) !important;
+}
+
+html[data-theme="light"] .buyer-dashboard-tab:hover {
+  color: #1a1a1a !important;
+}
+
+html[data-theme="light"] .buyer-dashboard-search {
+  background: #ffffff !important;
+  border-color: rgba(0, 0, 0, 0.15) !important;
+  color: #1a1a1a !important;
+}
+
+/* Light mode: stat card */
+html[data-theme="light"] .buyer-dashboard-stat-card {
+  background: #ffffff !important;
+  border-color: rgba(0, 0, 0, 0.1) !important;
+}
+
 html[data-theme="dark"] {
   color-scheme: dark;
   --color-bg: #000000;
