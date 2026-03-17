@@ -43,6 +43,10 @@ const SignIn = () => {
         navigate('/manager/dashboard', { replace: true })
         return
       }
+      if (role === 'clerk') {
+        navigate('/clerk/dashboard', { replace: true })
+        return
+      }
       navigate('/', { replace: true })
     }
   }, [isAuthenticated, user, navigate])

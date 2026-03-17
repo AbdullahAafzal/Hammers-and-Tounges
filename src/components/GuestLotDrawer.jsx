@@ -18,7 +18,7 @@ const formatPrice = (price) => {
 const formatSpecificKey = (key) =>
   String(key).replace(/_/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase());
 
-const GuestLotDrawer = ({ lot: initialLot, eventEndTime, eventTitle, eventId, eventStatus, onClose, isBuyer = false, isAdmin = false, isManager = false, event, onLotUpdated }) => {
+const GuestLotDrawer = ({ lot: initialLot, eventEndTime, eventTitle, eventId, eventStatus, onClose, isBuyer = false, isAdmin = false, isManager = false, isClerk = false, event, onLotUpdated }) => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const categories = useSelector((state) => state.buyer?.categories ?? state.seller?.categories ?? []);
@@ -241,7 +241,7 @@ const GuestLotDrawer = ({ lot: initialLot, eventEndTime, eventTitle, eventId, ev
   if (!lot && !initialLot) return null;
 
   const effectiveLot = lot || initialLot;
-  const isStaff = isAdmin || isManager;
+  const isStaffView = isAdmin || isManager || isClerk;
   const eventData = event || { id: eventId, title: eventTitle, status: eventStatus };
   const lotStatus = (effectiveLot?.status ?? effectiveLot?.listing_status ?? '').toUpperCase();
   const isLotActive = lotStatus === 'ACTIVE';
@@ -322,7 +322,7 @@ const GuestLotDrawer = ({ lot: initialLot, eventEndTime, eventTitle, eventId, ev
             <h2 className="guest-lot-drawer__lot-no">
               Lot #{effectiveLot.lot_number || effectiveLot.id}
             </h2>
-            {isStaff && (
+            {(isAdmin || isManager) && (
               <div className="guest-lot-drawer__staff-actions">
                 {canEditDelete && (
                   <>
@@ -459,9 +459,9 @@ const GuestLotDrawer = ({ lot: initialLot, eventEndTime, eventTitle, eventId, ev
                         </span>
                       </div>
                     </div>
-                    {isStaff ? (
+                    {isStaffView ? (
                       <div className="guest-lot-drawer__bid-not-available">
-                        {canEditDelete ? 'View-only mode. Use Edit to modify this lot.' : 'View-only mode.'}
+                        {(isAdmin || isManager) && canEditDelete ? 'View-only mode. Use Edit to modify this lot.' : 'View-only mode.'}
                       </div>
                     ) : isBuyer ? (
                       isEventLive && !isEnded ? (

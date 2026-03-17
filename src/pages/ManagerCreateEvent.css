@@ -100,6 +100,108 @@
   color: var(--color-input-placeholder);
 }
 
+/* Date "textbox" that opens native picker */
+.create-event-datebox {
+  width: 100%;
+  background: var(--color-input-bg);
+  border: 1px solid var(--color-border-strong);
+  border-radius: 8px;
+  color: var(--color-text);
+  padding: 12px;
+  font-size: 0.9rem;
+  font-family: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition: border-color 0.2s;
+}
+
+.create-event-datebox:focus {
+  outline: none;
+  border-color: #8cc63f;
+}
+
+.create-event-datebox:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.create-event-datebox-placeholder {
+  color: var(--color-input-placeholder);
+}
+
+.create-event-hidden-datetime {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: 0;
+  border: 0;
+}
+
+/* Datetime picker icon (browser-native) - keep visible in dark mode */
+html[data-theme="dark"] .create-event-form-group input[type="datetime-local"] {
+  color-scheme: dark;
+}
+
+html[data-theme="dark"] .create-event-form-group input[type="datetime-local"]::-webkit-calendar-picker-indicator {
+  filter: invert(1);
+  opacity: 0.9;
+  cursor: pointer;
+}
+
+html[data-theme="light"] .create-event-form-group input[type="datetime-local"] {
+  color-scheme: light;
+}
+
+html[data-theme="light"] .create-event-form-group input[type="datetime-local"]::-webkit-calendar-picker-indicator {
+  filter: invert(0);
+  opacity: 0.9;
+  cursor: pointer;
+}
+
+/* Image preview */
+.event-image-preview {
+  margin-top: 10px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.event-image-preview img {
+  width: 120px;
+  height: 80px;
+  object-fit: cover;
+  border-radius: 10px;
+  border: 1px solid var(--color-border-strong);
+  background: var(--color-surface-elevated);
+}
+
+.event-image-remove {
+  background: transparent;
+  border: 1px solid var(--color-border-strong);
+  color: var(--color-text);
+  padding: 8px 12px;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: border-color 0.2s, transform 0.2s, color 0.2s;
+}
+
+.event-image-remove:hover:not(:disabled) {
+  border-color: #ef4444;
+  color: #ef4444;
+  transform: translateY(-1px);
+}
+
+.event-image-remove:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
 .create-event-form-group select.create-event-select {
   background: var(--color-input-bg);
   border: 1px solid var(--color-border-strong);

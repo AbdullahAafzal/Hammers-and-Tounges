@@ -13,17 +13,28 @@ const UserManagement = () => {
   );
 
   const [search, setSearch] = useState("");
-  const [roleFilter, setRoleFilter] = useState("manager");
+  const [roleFilter, setRoleFilter] = useState(() => {
+    const role = location.state?.role;
+    return role && ["manager", "seller", "buyer", "clerk"].includes(role) ? role : "manager";
+  });
 
   // Restore role filter when returning from edit/create (e.g. Edit Seller → seller, Edit Manager → manager)
   useEffect(() => {
     const role = location.state?.role;
-    if (role && ["manager", "seller", "buyer"].includes(role)) {
+    if (role && ["manager", "seller", "buyer", "clerk"].includes(role)) {
       setRoleFilter(role);
+      setPage(1);
+      setSearch("");
     }
   }, [location.state]);
   const [page, setPage] = useState(1);
   const [localUsers, setLocalUsers] = useState([]);
+
+  // When switching roles, always start at page 1 to avoid "empty page" scenarios
+  useEffect(() => {
+    setPage(1);
+    setLocalUsers([]);
+  }, [roleFilter]);
 
   // Fetch users on component mount, when page or role filter changes
   useEffect(() => {
@@ -34,6 +45,13 @@ const UserManagement = () => {
   useEffect(() => {
     if (users?.results && Array.isArray(users.results)) {
       setLocalUsers(users.results);
+      if (roleFilter === "clerk") {
+        // Debug: inspect backend payload for clerk fields (name, first_name, last_name, etc.)
+        // eslint-disable-next-line no-console
+        console.log("[UserManagement] clerk users response:", users);
+        // eslint-disable-next-line no-console
+        console.log("[UserManagement] clerk users sample:", users.results.slice(0, 3));
+      }
     } else {
       setLocalUsers([]);
     }
@@ -190,17 +208,38 @@ const filteredUsers = useMemo(() => {
       'admin': 'Administrator',
       'seller': 'Seller',
       'buyer': 'Buyer',
-      'manager': 'Manager'
+      'manager': 'Manager',
+      'clerk': 'Clerk',
     };
     return roleMap[role] || role;
   };
 
   // Get display name: full_name, or first_name + last_name (backend may return these when full_name is empty after create)
   const getDisplayName = (user) => {
-    if (user?.full_name?.trim()) return user.full_name.trim();
-    const first = (user?.first_name || '').trim();
-    const last = (user?.last_name || '').trim();
-    return [first, last].filter(Boolean).join(' ') || 'N/A';
+    const safeTrim = (v) => (typeof v === "string" ? v.trim() : "");
+
+    const full =
+      safeTrim(user?.full_name) ||
+      safeTrim(user?.fullName) ||
+      safeTrim(user?.display_name) ||
+      safeTrim(user?.displayName) ||
+      safeTrim(user?.name);
+    if (full) return full;
+
+    // Some APIs may nest staff/clerk details
+    const first =
+      safeTrim(user?.first_name) ||
+      safeTrim(user?.firstName) ||
+      safeTrim(user?.staff_details?.first_name) ||
+      safeTrim(user?.staff_details?.firstName);
+    const last =
+      safeTrim(user?.last_name) ||
+      safeTrim(user?.lastName) ||
+      safeTrim(user?.staff_details?.last_name) ||
+      safeTrim(user?.staff_details?.lastName);
+
+    const combined = [first, last].filter(Boolean).join(" ");
+    return combined || safeTrim(user?.email) || "N/A";
   };
 
   return (
@@ -211,16 +250,24 @@ const filteredUsers = useMemo(() => {
           <h1 className="user-management-title">User Management</h1>
           <p className="user-management-subtitle">Manage all users on the Hammer & Tongues platform.</p>
         </div>
-        {(roleFilter === 'manager' || roleFilter === 'seller') && (
+        {(roleFilter === 'manager' || roleFilter === 'seller' || roleFilter === 'clerk') && (
           <button 
             className="user-management-create-btn"
-            onClick={() => navigate(roleFilter === 'manager' ? '/admin/manager/create' : '/admin/seller/create')}
+            onClick={() =>
+              navigate(
+                roleFilter === 'manager'
+                  ? '/admin/manager/create'
+                  : roleFilter === 'seller'
+                  ? '/admin/seller/create'
+                  : '/admin/clerk/create'
+              )
+            }
             disabled={isLoading}
           >
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
               <path d="M12 5V19M5 12H19" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
             </svg>
-            {roleFilter === 'manager' ? 'Create Manager' : 'Create Seller'}
+            {roleFilter === 'manager' ? 'Create Manager' : roleFilter === 'seller' ? 'Create Seller' : 'Create Clerk'}
           </button>
         )}
       </header>
@@ -274,6 +321,7 @@ const filteredUsers = useMemo(() => {
           <option value="manager">Manager</option>
           <option value="seller">Seller</option>
           <option value="buyer">Buyer</option>
+          <option value="clerk">Clerk</option>
         </select>
       </div>
 

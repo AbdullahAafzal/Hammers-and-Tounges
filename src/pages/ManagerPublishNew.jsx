@@ -4,6 +4,7 @@ import { adminService } from '../services/interceptors/admin.service';
 import { auctionService } from '../services/interceptors/auction.service';
 import { getMediaUrl } from '../config/api.config';
 import { toast } from 'react-toastify';
+import { useSelector } from 'react-redux';
 import './ManagerPublishNew.css';
 
 const MAX_IMAGES = 8;
@@ -12,8 +13,10 @@ const ManagerPublishNew = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const fileInputRef = useRef(null);
+  const authUserRole = useSelector((state) => (state.auth?.user?.role || '').toLowerCase());
 
   const { eventId, event, lotId, lot: existingLot, isEdit, fromAdmin } = location.state || {};
+  const fromClerk = location.state?.fromClerk;
   const lot = existingLot;
 
   const [sellers, setSellers] = useState([]);
@@ -39,9 +42,22 @@ const ManagerPublishNew = () => {
     const effectiveEventId = eventId || existingLot?.auction_event;
     if (!effectiveEventId) {
       toast.info('Please select an event first.');
-      navigate(fromAdmin ? '/admin/dashboard' : '/manager/dashboard');
+      navigate(fromAdmin ? '/admin/dashboard' : fromClerk ? '/clerk/dashboard' : '/manager/dashboard');
     }
-  }, [eventId, existingLot?.auction_event, fromAdmin, navigate]);
+  }, [eventId, existingLot?.auction_event, fromAdmin, fromClerk, navigate]);
+
+  // Clerks can only create draft lots (no edit flow)
+  useEffect(() => {
+    if (authUserRole === 'clerk' && isEdit) {
+      toast.info('Clerks can only create draft lots.');
+      const effectiveEventId = eventId || existingLot?.auction_event;
+      if (effectiveEventId) {
+        navigate(`/clerk/event/${effectiveEventId}`, { state: { event }, replace: true });
+      } else {
+        navigate('/clerk/dashboard', { replace: true });
+      }
+    }
+  }, [authUserRole, isEdit, eventId, existingLot?.auction_event, event, navigate]);
 
   // Pre-populate form when editing
   useEffect(() => {
@@ -340,6 +356,10 @@ const ManagerPublishNew = () => {
     async (status = 'DRAFT') => {
       const evId = eventId || existingLot?.auction_event;
       if (!evId) return;
+      if (authUserRole === 'clerk' && isEdit) {
+        toast.info('Clerks cannot edit lots.');
+        return;
+      }
       if (!formData.seller || !formData.title || !formData.description || !formData.category) {
         toast.error('Please fill in required fields: Seller, Title, Description, Category.');
         return;
@@ -351,6 +371,7 @@ const ManagerPublishNew = () => {
       }
       setSubmitting(true);
       try {
+        const effectiveStatus = authUserRole === 'clerk' ? 'DRAFT' : status;
         if (isEdit && lotId) {
           const evId = eventId || existingLot?.auction_event;
           const payload = {
@@ -362,7 +383,7 @@ const ManagerPublishNew = () => {
             initial_price: String(formData.initial_price || '0'),
             reserve_price: String(formData.reserve_price || '0'),
             stc_eligible: Boolean(formData.stc_eligible),
-            status: status,
+            status: effectiveStatus,
             specific_data: formData.specific_data && Object.keys(formData.specific_data).length > 0
               ? formData.specific_data
               : {},
@@ -370,11 +391,17 @@ const ManagerPublishNew = () => {
           await auctionService.updateLot(lotId, payload);
           toast.success('Lot updated successfully.');
         } else {
-          const fd = buildFormData(status);
+          const fd = buildFormData(effectiveStatus);
           await auctionService.createLot(fd);
           toast.success('Lot created successfully.');
         }
-        navigate(fromAdmin ? `/admin/event/${evId}` : `/manager/event/${evId}`, { state: { event, lotCreated: true } });
+        if (fromAdmin) {
+          navigate(`/admin/event/${evId}`, { state: { event, lotCreated: true } });
+        } else if (fromClerk || authUserRole === 'clerk') {
+          navigate(`/clerk/event/${evId}`, { state: { event, lotCreated: true } });
+        } else {
+          navigate(`/manager/event/${evId}`, { state: { event, lotCreated: true } });
+        }
       } catch (err) {
         const msg =
           err?.response?.data?.detail ||
@@ -386,7 +413,7 @@ const ManagerPublishNew = () => {
         setSubmitting(false);
       }
     },
-    [eventId, existingLot?.auction_event, event, formData, buildFormData, navigate, isEdit, lotId, fromAdmin]
+    [eventId, existingLot?.auction_event, event, formData, buildFormData, navigate, isEdit, lotId, fromAdmin, fromClerk, authUserRole]
   );
 
   const handleSaveDraft = useCallback(() => handleSubmit('DRAFT'), [handleSubmit]);
@@ -395,11 +422,17 @@ const ManagerPublishNew = () => {
   const handleBack = useCallback(() => {
     const evId = eventId || existingLot?.auction_event;
     if (evId) {
-      navigate(fromAdmin ? `/admin/event/${evId}` : `/manager/event/${evId}`, { state: { event } });
+      if (fromAdmin) {
+        navigate(`/admin/event/${evId}`, { state: { event } });
+      } else if (fromClerk || authUserRole === 'clerk') {
+        navigate(`/clerk/event/${evId}`, { state: { event } });
+      } else {
+        navigate(`/manager/event/${evId}`, { state: { event } });
+      }
     } else {
-      navigate(fromAdmin ? '/admin/dashboard' : '/manager/dashboard');
+      navigate(fromAdmin ? '/admin/dashboard' : fromClerk ? '/clerk/dashboard' : '/manager/dashboard');
     }
-  }, [eventId, existingLot?.auction_event, event, fromAdmin, navigate]);
+  }, [eventId, existingLot?.auction_event, event, fromAdmin, fromClerk, authUserRole, navigate]);
 
   if (!eventId && !existingLot?.auction_event) return null;
 

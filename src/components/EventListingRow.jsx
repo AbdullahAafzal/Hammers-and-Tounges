@@ -47,12 +47,23 @@ const EventListingRow = ({ event, onClick, renderActions }) => {
 
   const getThumbnail = () => {
     if (imageError) return null;
-    const media = event.media || event.image || [];
+    const media = event.media ?? event.images ?? [];
     const arr = Array.isArray(media) ? media : [];
     const img = arr.find((m) => (m.media_type || m.mediatype) === 'image') || arr[0];
-    const raw = img?.file || event.image_url || event.thumbnail;
+    const raw =
+      img?.file ||
+      event.image_url ||
+      event.thumbnail ||
+      (typeof event.image === 'string' ? event.image : null);
     return raw ? getMediaUrl(raw) : null;
   };
+
+  const displayEventId =
+    event.event_id ??
+    event.event_code ??
+    event.code ??
+    event.eventId ??
+    '';
 
   const startDate = formatDateBlock(event.start_time);
   const endDate = formatDateBlock(event.end_time);
@@ -107,6 +118,13 @@ const EventListingRow = ({ event, onClick, renderActions }) => {
 
       <div className="event-listing-row__body">
         <h3 className="event-listing-row__title">{event.title || 'Untitled Event'}</h3>
+        {displayEventId ? (
+          <div className="event-listing-row__meta">
+            <span className="event-listing-row__event-id" title="Event ID">
+              {displayEventId}
+            </span>
+          </div>
+        ) : null}
         <p className="event-listing-row__desc">
           {event.description || event.event_type || getDisplayStatus(event.status)}
         </p>

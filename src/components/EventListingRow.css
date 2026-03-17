@@ -28,7 +28,7 @@
   position: relative;
   flex-shrink: 0;
   width: 120px;
-  min-height: 72px;
+  height: 72px;
   border-radius: 8px;
   overflow: hidden;
   background: var(--color-surface-elevated);
@@ -43,7 +43,7 @@
 
 .event-listing-row__thumb-placeholder {
   width: 100%;
-  min-height: 72px;
+  height: 72px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -142,6 +142,30 @@
   line-height: 1.3;
 }
 
+.event-listing-row__meta {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.35rem;
+}
+
+.event-listing-row__event-id {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.2rem 0.5rem;
+  border-radius: 999px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: var(--color-text);
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 /* Lots badge */
 .event-listing-row__lots {
   flex-shrink: 0;
@@ -175,7 +199,7 @@
 
   .event-listing-row__thumb {
     width: 80px;
-    min-height: 56px;
+    height: 56px;
   }
 
   .event-listing-row__dates {

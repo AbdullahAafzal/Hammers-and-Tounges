@@ -247,6 +247,28 @@ export const adminService = {
     }
   },
 
+  // Create Clerk (same API as manager creation; role differs)
+  createClerk: async (clerkData) => {
+    try {
+      const formData = new FormData();
+      formData.append('role', 'clerk');
+      formData.append('email', clerkData.email?.trim() || '');
+      formData.append('password', clerkData.password?.trim() || '');
+      if (clerkData.first_name) formData.append('first_name', clerkData.first_name.trim());
+      if (clerkData.last_name) formData.append('last_name', clerkData.last_name.trim());
+      if (clerkData.display_name) formData.append('display_name', clerkData.display_name.trim());
+      if (clerkData.phone) formData.append('phone', clerkData.phone.trim());
+
+      const { data } = await apiClient.postForm(API_ROUTES.ADMIN_USER_MANAGEMENT, formData);
+      return data;
+    } catch (error) {
+      if (error.isNetworkError) {
+        throw new Error('Unable to connect to server. Please try again later.');
+      }
+      throw error;
+    }
+  },
+
   // Create Seller (POST form-data to user-management)
   createSeller: async (sellerData) => {
     try {

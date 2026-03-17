@@ -1,45 +1,69 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useEffect, useMemo, useRef, useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { adminService } from '../../services/interceptors/admin.service';
 import { auctionService } from '../../services/interceptors/auction.service';
 import { toast } from 'react-toastify';
+import { generateEventId } from '../../utils/eventId';
 import '../ManagerCreateEvent.css';
+
+const formatDateTimeForDisplay = (datetimeLocalValue) => {
+  if (!datetimeLocalValue) return '';
+  const d = new Date(datetimeLocalValue);
+  if (isNaN(d.getTime())) return '';
+  return d.toLocaleString();
+};
 
 export default function AdminCreateEvent() {
   const navigate = useNavigate();
-  const [managers, setManagers] = useState([]);
-  const [loadingManagers, setLoadingManagers] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [formData, setFormData] = useState({
+  const [imageFile, setImageFile] = useState(null);
+  const [imagePreviewUrl, setImagePreviewUrl] = useState('');
+  const startInputRef = useRef(null);
+  const endInputRef = useRef(null);
+  const [formData, setFormData] = useState(() => ({
+    event_id: generateEventId(),
     title: '',
-    manager: '',
     start_time: '',
     end_time: '',
-  });
+  }));
+
+  const openPicker = useCallback((ref) => {
+    const el = ref?.current;
+    if (!el) return;
+    if (typeof el.showPicker === 'function') {
+      el.showPicker();
+      return;
+    }
+    el.focus();
+    el.click();
+  }, []);
+
+  const startDisplay = useMemo(
+    () => formatDateTimeForDisplay(formData.start_time),
+    [formData.start_time]
+  );
+  const endDisplay = useMemo(
+    () => formatDateTimeForDisplay(formData.end_time),
+    [formData.end_time]
+  );
 
   useEffect(() => {
-    let cancelled = false;
-    (async () => {
-      setLoadingManagers(true);
-      try {
-        const res = await adminService.getUsersList({ role: 'manager', page_size: 200 });
-        const rawList = res?.results || [];
-        const list = rawList.filter((u) => (u.role || '').toLowerCase() === 'manager');
-        if (!cancelled) setManagers(list.length ? list : rawList);
-      } catch (err) {
-        if (!cancelled) {
-          toast.error(err?.message || 'Failed to load managers');
-        }
-      } finally {
-        if (!cancelled) setLoadingManagers(false);
-      }
-    })();
-    return () => { cancelled = true; };
-  }, []);
+    if (!imageFile) {
+      setImagePreviewUrl('');
+      return undefined;
+    }
+    const url = URL.createObjectURL(imageFile);
+    setImagePreviewUrl(url);
+    return () => URL.revokeObjectURL(url);
+  }, [imageFile]);
 
   const handleFormChange = useCallback((e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
+  }, []);
+
+  const handleImageChange = useCallback((e) => {
+    const file = e.target.files?.[0] || null;
+    setImageFile(file);
   }, []);
 
   const handleSubmit = useCallback(
@@ -49,24 +73,20 @@ export default function AdminCreateEvent() {
         toast.error('Please enter an event name.');
         return;
       }
-      if (!formData.manager) {
-        toast.error('Please select a manager for this event.');
-        return;
-      }
       if (!formData.start_time || !formData.end_time) {
         toast.error('Please set start and end date/time.');
         return;
       }
       setIsSubmitting(true);
       try {
-        const managerId = formData.manager;
-        const payload = {
-          title: formData.title.trim(),
-          manager: Number(managerId),
-          start_time: new Date(formData.start_time).toISOString(),
-          end_time: new Date(formData.end_time).toISOString(),
-          status: 'SCHEDULED',
-        };
+        const payload = new FormData();
+        payload.append('event_id', String(formData.event_id));
+        payload.append('title', formData.title.trim());
+        payload.append('start_time', new Date(formData.start_time).toISOString());
+        payload.append('end_time', new Date(formData.end_time).toISOString());
+        payload.append('status', 'SCHEDULED');
+        if (imageFile) payload.append('image', imageFile);
+
         await auctionService.createEvent(payload);
         toast.success('Event created successfully!');
         navigate('/admin/dashboard');
@@ -77,7 +97,7 @@ export default function AdminCreateEvent() {
         setIsSubmitting(false);
       }
     },
-    [formData, navigate]
+    [formData, imageFile, navigate]
   );
 
   const handleCancel = () => {
@@ -99,6 +119,16 @@ export default function AdminCreateEvent() {
         <div className="create-event-card">
           <form onSubmit={handleSubmit} className="create-event-form">
             <div className="create-event-form-group">
+              <label>Event ID <span className="required">*</span></label>
+              <input
+                type="text"
+                name="event_id"
+                value={formData.event_id}
+                disabled
+              />
+            </div>
+
+            <div className="create-event-form-group">
               <label>Event Name <span className="required">*</span></label>
               <input
                 type="text"
@@ -111,45 +141,75 @@ export default function AdminCreateEvent() {
             </div>
 
             <div className="create-event-form-group">
-              <label>Manager <span className="required">*</span></label>
-              <select
-                name="manager"
-                value={formData.manager}
-                onChange={handleFormChange}
-                disabled={isSubmitting || loadingManagers}
-                required
-                className="create-event-select"
-              >
-                <option value="">Select a manager</option>
-                {managers.map((m) => (
-                  <option key={m.id} value={m.id}>
-                    {m.email || m.display_name || `${m.first_name || ''} ${m.last_name || ''}`.trim() || `Manager #${m.id}`}
-                  </option>
-                ))}
-              </select>
+              <label>Event Image</label>
+              <input
+                type="file"
+                accept="image/*"
+                onChange={handleImageChange}
+                disabled={isSubmitting}
+              />
+              {imagePreviewUrl ? (
+                <div className="event-image-preview">
+                  <img src={imagePreviewUrl} alt="Selected event" />
+                  <button
+                    type="button"
+                    className="event-image-remove"
+                    onClick={() => setImageFile(null)}
+                    disabled={isSubmitting}
+                  >
+                    Remove
+                  </button>
+                </div>
+              ) : null}
             </div>
 
             <div className="create-event-form-row">
               <div className="create-event-form-group">
                 <label>Start Date & Time <span className="required">*</span></label>
+                <button
+                  type="button"
+                  className="create-event-datebox"
+                  onClick={() => openPicker(startInputRef)}
+                  disabled={isSubmitting}
+                >
+                  <span className={startDisplay ? 'create-event-datebox-value' : 'create-event-datebox-placeholder'}>
+                    {startDisplay || 'Select start date & time'}
+                  </span>
+                </button>
                 <input
+                  ref={startInputRef}
                   type="datetime-local"
                   name="start_time"
                   value={formData.start_time}
                   onChange={handleFormChange}
                   required
                   disabled={isSubmitting}
+                  className="create-event-hidden-datetime"
+                  tabIndex={-1}
                 />
               </div>
               <div className="create-event-form-group">
                 <label>End Date & Time <span className="required">*</span></label>
+                <button
+                  type="button"
+                  className="create-event-datebox"
+                  onClick={() => openPicker(endInputRef)}
+                  disabled={isSubmitting}
+                >
+                  <span className={endDisplay ? 'create-event-datebox-value' : 'create-event-datebox-placeholder'}>
+                    {endDisplay || 'Select end date & time'}
+                  </span>
+                </button>
                 <input
+                  ref={endInputRef}
                   type="datetime-local"
                   name="end_time"
                   value={formData.end_time}
                   onChange={handleFormChange}
                   required
                   disabled={isSubmitting}
+                  className="create-event-hidden-datetime"
+                  tabIndex={-1}
                 />
               </div>
             </div>
@@ -158,7 +218,7 @@ export default function AdminCreateEvent() {
               <button
                 type="submit"
                 className="create-event-btn-primary"
-                disabled={isSubmitting || loadingManagers}
+                disabled={isSubmitting}
               >
                 {isSubmitting ? (
                   <>

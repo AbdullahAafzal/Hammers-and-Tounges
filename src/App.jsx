@@ -77,18 +77,21 @@ import AdminManagerDetails from './pages/userManagement/AdminManagerDetails'
 import AdminCreateManager from './pages/userManagement/AdminCreateManager'
 import AdminCreateSeller from './pages/userManagement/AdminCreateSeller'
 import AdminEditSeller from './pages/userManagement/AdminEditSeller'
+import AdminCreateClerk from './pages/userManagement/AdminCreateClerk'
 
 // Route Guards
 import BuyerGuard from "./guards/BuyerGuard";
 import SellerGuard from "./guards/SellerGuard";
 import ManagerGuard from "./guards/ManagerGuard";
 import AdminGuard from "./guards/AdminGuard";
+import ClerkGuard from "./guards/ClerkGuard";
 
 // All Role's Layouts
 import BuyerLayout from "./layouts/BuyerLayout";
 import SellerLayout from "./layouts/SellerLayout";
 import ManagerLayout from "./layouts/ManagerLayout";
 import AdminLayout from "./layouts/AdminLayout";
+import ClerkLayout from "./layouts/ClerkLayout";
 import { Provider } from "react-redux";
 import store from './store/store'
 
@@ -99,6 +102,8 @@ import ResetVerifyOtp from "./pages/ResetVerifyOTP";
 import SellerSales from "./pages/SellerSales";
 import BuyerBidDetails from "./components/BuyerBidDetails";
 import LotDetailReadOnly from "./components/LotDetailReadOnly";
+import ClerkDashboard from "./pages/ClerkDashboard";
+import ClerkEventLots from "./pages/ClerkEventLots";
 function App() {
   return (
     <Provider store={store}>
@@ -226,6 +231,16 @@ function App() {
               </Route>
             </Route>
 
+            {/* Clerk Routes */}
+            <Route element={<ClerkGuard />}>
+              <Route element={<ClerkLayout />}>
+                <Route path="/clerk/dashboard" element={<ClerkDashboard />} />
+                <Route path="/clerk/event/:id" element={<ClerkEventLots />} />
+                {/* Reuse lot creation screen, but it enforces clerk restrictions */}
+                <Route path="/clerk/publishnew" element={<ManagerPublishNew />} />
+              </Route>
+            </Route>
+
             {/* Admin Routes */}
             <Route element={<AdminGuard />}>
               <Route element={<AdminLayout />}>
@@ -276,6 +291,11 @@ function App() {
                 <Route path="/admin/manager/create" element={
                   <>
                     <AdminCreateManager />
+                  </>
+                } />
+                <Route path="/admin/clerk/create" element={
+                  <>
+                    <AdminCreateClerk />
                   </>
                 } />
                 <Route path="/admin/seller/create" element={

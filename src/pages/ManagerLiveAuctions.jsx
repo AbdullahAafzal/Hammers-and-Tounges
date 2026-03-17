@@ -2,6 +2,7 @@ import React, { useState, useMemo, useEffect } from "react";
 import "./ManagerLiveAuctions.css";
 import { useNavigate } from "react-router-dom";
 import { auctionService } from '../services/interceptors/auction.service';
+import { getMediaUrl } from '../config/api.config';
 
 const ROWS_PER_PAGE = 5;
 
@@ -224,11 +225,28 @@ export default function ManagerLiveAuctions() {
                       onClick={() => navigate(`/manager/event/${event.id}`, { state: { event } })}
                     >
                       <td>
-                        <div>
-                          <span className="live-auction-user-name">{event.title || 'Untitled Event'}</span>
+                        <div className="live-auction-event-cell">
+                          <div className="live-auction-event-thumb" aria-hidden="true">
+                            {(() => {
+                              const media = event.media ?? event.images ?? [];
+                              const arr = Array.isArray(media) ? media : [];
+                              const img = arr.find((m) => (m.media_type || m.mediatype) === 'image') || arr[0];
+                              const raw = img?.file || event.image_url || event.thumbnail || (typeof event.image === 'string' ? event.image : null);
+                              const src = raw ? getMediaUrl(raw) : '';
+                              return src ? <img src={src} alt="" /> : <div className="live-auction-event-thumb-placeholder" />;
+                            })()}
+                          </div>
+                          <div>
+                            <span className="live-auction-user-name">{event.title || 'Untitled Event'}</span>
+                            {(event.event_id || event.event_code || event.code) ? (
+                              <span className="live-auction-event-id">
+                                {event.event_id || event.event_code || event.code}
+                              </span>
+                            ) : null}
                           <span className="live-auction-time" style={{ display: 'block', opacity: 0.8, fontSize: '0.85em' }}>
                             {event.lots_count ?? 0} lots
                           </span>
+                          </div>
                         </div>
                       </td>
                       <td>

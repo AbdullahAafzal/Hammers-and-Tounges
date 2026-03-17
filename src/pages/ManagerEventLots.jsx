@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { auctionService } from '../services/interceptors/auction.service';
 import { toast } from 'react-toastify';
 import { fetchCategories } from '../store/actions/AuctionsActions';
@@ -30,6 +30,7 @@ const ManagerEventLots = () => {
   const location = useLocation();
   const dispatch = useDispatch();
   const eventFromState = location.state?.event;
+  const authUserRole = useSelector((state) => (state.auth?.user?.role || '').toLowerCase());
 
   const [lots, setLots] = useState([]);
   const [eventTitle, setEventTitle] = useState(eventFromState?.title || 'Event Lots');
@@ -144,7 +145,11 @@ const ManagerEventLots = () => {
 
   const handleCreateLot = () => {
     const eventData = eventFromState || { id, title: eventTitle, status: eventStatus };
-    navigate('/manager/publishnew', { state: { eventId: id, event: eventData } });
+    if (authUserRole === 'clerk') {
+      navigate('/clerk/publishnew', { state: { eventId: id, event: eventData, fromClerk: true } });
+    } else {
+      navigate('/manager/publishnew', { state: { eventId: id, event: eventData } });
+    }
   };
 
   const [deletingEvent, setDeletingEvent] = useState(false);
@@ -162,8 +167,8 @@ const ManagerEventLots = () => {
     }
   };
 
-  const showCreateLot = eventStatus === 'SCHEDULED';
-  const showDeleteEvent = eventStatus === 'SCHEDULED';
+  const showCreateLot = eventStatus === 'SCHEDULED' && authUserRole !== 'clerk';
+  const showDeleteEvent = eventStatus === 'SCHEDULED' && authUserRole !== 'clerk';
 
   const handleLotUpdated = useCallback(() => {
     fetchLots(page);

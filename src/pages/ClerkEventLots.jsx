@@ -1,0 +1,304 @@
+import React, { useState, useEffect, useCallback, useMemo } from "react";
+import { useParams, useNavigate, useLocation } from "react-router-dom";
+import { useDispatch } from "react-redux";
+import { auctionService } from "../services/interceptors/auction.service";
+import { toast } from "react-toastify";
+import { fetchCategories } from "../store/actions/AuctionsActions";
+import BuyerEventLotsFilterBar from "../components/BuyerEventLotsFilterBar";
+import LotRow from "../components/LotRow";
+import GuestLotDrawer from "../components/GuestLotDrawer";
+import "./ManagerEventLots.css";
+import "./GuestEventLots.css";
+
+const PAGE_SIZE = 12;
+
+const getStatusModifier = (status) => {
+  const s = (status || "").toUpperCase();
+  switch (s) {
+    case "DRAFT":
+      return "--draft";
+    case "SCHEDULED":
+    case "LIVE":
+    case "ACTIVE":
+    case "APPROVED":
+      return "--active";
+    case "CLOSING":
+    case "CLOSED":
+    case "COMPLETED":
+      return "--closed";
+    case "PENDING":
+      return "--pending";
+    case "REJECTED":
+      return "--rejected";
+    default:
+      return "--active";
+  }
+};
+
+export default function ClerkEventLots() {
+  const { id } = useParams();
+  const navigate = useNavigate();
+  const location = useLocation();
+  const dispatch = useDispatch();
+  const eventFromState = location.state?.event;
+
+  const [lots, setLots] = useState([]);
+  const [eventTitle, setEventTitle] = useState(eventFromState?.title || "Event Lots");
+  const [eventStatus, setEventStatus] = useState(eventFromState?.status ?? null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [page, setPage] = useState(1);
+  const [totalCount, setTotalCount] = useState(0);
+  const [selectedFilters, setSelectedFilters] = useState({});
+  const [selectedLot, setSelectedLot] = useState(null);
+
+  const totalPages = Math.ceil(totalCount / PAGE_SIZE) || 1;
+
+  useEffect(() => {
+    dispatch(fetchCategories());
+  }, [dispatch]);
+
+  const fetchLots = useCallback(
+    async (pageNum = 1) => {
+      if (!id) return;
+      setLoading(true);
+      setError(null);
+      try {
+        let items = [];
+        let total = 0;
+        let lotsSucceeded = false;
+
+        try {
+          const res = await auctionService.getLots({
+            event: id,
+            page: pageNum,
+            page_size: PAGE_SIZE,
+          });
+          lotsSucceeded = true;
+          items = res.results || [];
+          total = res.count ?? items.length;
+        } catch (lotsErr) {
+          console.warn("Lots endpoint failed, trying listings fallback:", lotsErr);
+        }
+
+        if (!lotsSucceeded) {
+          const listingsRes = await auctionService.getAuctions({
+            event: id,
+            event_id: id,
+            page: pageNum,
+            page_size: PAGE_SIZE,
+          });
+          const rawItems = listingsRes.results || [];
+          items = rawItems.map((l) => ({
+            ...l,
+            seller_name: l.seller_name ?? l.seller_details?.name ?? "—",
+            category_name: l.category_name ?? l.category?.name ?? "—",
+          }));
+          total = listingsRes.count ?? rawItems.length;
+        }
+
+        setLots(items);
+        setTotalCount(total);
+        if (items[0]?.event_title && !eventFromState?.title) {
+          setEventTitle(items[0].event_title);
+        }
+      } catch (err) {
+        console.error("Error fetching lots:", err);
+        setError(err?.message || err?.response?.data?.detail || "Failed to load lots");
+        toast.error("Failed to load lots");
+        setLots([]);
+      } finally {
+        setLoading(false);
+      }
+    },
+    [id, eventFromState?.title]
+  );
+
+  useEffect(() => {
+    fetchLots(page);
+  }, [fetchLots, page]);
+
+  const lotCreated = location.state?.lotCreated;
+  useEffect(() => {
+    if (lotCreated && id) {
+      setPage(1);
+      fetchLots(1);
+      navigate(`/clerk/event/${id}`, { state: { event: eventFromState }, replace: true });
+    }
+  }, [lotCreated, id, eventFromState, fetchLots, navigate]);
+
+  useEffect(() => {
+    if (!id || eventFromState) return;
+    let cancelled = false;
+    (async () => {
+      try {
+        const ev = await auctionService.getEvent(id);
+        if (!cancelled) {
+          setEventTitle(ev.title || eventTitle);
+          setEventStatus(ev.status ?? null);
+        }
+      } catch {
+        if (!cancelled) setEventStatus(null);
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [id, eventFromState]);
+
+  const handleCreateLot = () => {
+    const eventData = eventFromState || { id, title: eventTitle, status: eventStatus };
+    navigate("/clerk/publishnew", { state: { eventId: id, event: eventData, fromClerk: true } });
+  };
+
+  const showCreateLot = (eventStatus || "").toUpperCase() === "SCHEDULED";
+
+  const filteredLots = useMemo(() => {
+    const filters = selectedFilters;
+    const hasAnyFilter = Object.keys(filters).some((k) => filters[k] && filters[k].size > 0);
+    if (!hasAnyFilter) return lots;
+
+    return lots.filter((lot) => {
+      let sd = lot.specific_data;
+      if (typeof sd === "string") {
+        try {
+          sd = JSON.parse(sd) || {};
+        } catch {
+          sd = {};
+        }
+      }
+      sd = sd || {};
+      const catName = lot.category_name ?? lot.category?.name ?? "";
+
+      for (const [sectionKey, selected] of Object.entries(filters)) {
+        if (!selected || selected.size === 0) continue;
+
+        if (sectionKey === "category") {
+          if (!selected.has(catName)) return false;
+          continue;
+        }
+
+        if (sectionKey === "make") {
+          const lotMake = sd.make ?? sd.Make ?? "";
+          const makeStr = String(lotMake).trim();
+          if (!selected.has(makeStr)) return false;
+          continue;
+        }
+
+        const lotVal = sd[sectionKey] ?? sd[sectionKey.replace(/_/g, " ")];
+        const lotValStr = lotVal != null ? String(lotVal) : "";
+        if (!selected.has(lotValStr)) return false;
+      }
+      return true;
+    });
+  }, [lots, selectedFilters]);
+
+  const eventData = eventFromState || { id, title: eventTitle, status: eventStatus };
+
+  return (
+    <div className={`manager-event-lots ${selectedLot ? "manager-event-lots--drawer-open" : ""}`}>
+      <header className="manager-event-lots__header">
+        <button className="manager-event-lots__back" onClick={() => navigate("/clerk/dashboard")} aria-label="Back to dashboard">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <path d="M19 12H5M12 19l-5-7 5-7" strokeLinecap="round" strokeLinejoin="round" />
+          </svg>
+          Back
+        </button>
+        <div className="manager-event-lots__header-content">
+          <div className="manager-event-lots__header-title-row">
+            <h1 className="manager-event-lots__title">{eventTitle}</h1>
+            {eventStatus && (
+              <span className={`manager-event-lots__header-status manager-event-lots__header-status${getStatusModifier(eventStatus)}`}>
+                {(eventStatus || "").toUpperCase() === "CLOSING" ? "COMPLETED" : eventStatus}
+              </span>
+            )}
+          </div>
+          <p className="manager-event-lots__subtitle">
+            {totalCount} lot{totalCount !== 1 ? "s" : ""} in this event
+          </p>
+        </div>
+        <div className="manager-event-lots__header-actions">
+          {showCreateLot && (
+            <button className="manager-event-lots__create-lot" onClick={handleCreateLot} aria-label="Create lot">
+              Create Draft Lot
+            </button>
+          )}
+        </div>
+      </header>
+
+      <main className="manager-event-lots__main">
+        {loading && lots.length === 0 ? (
+          <div className="manager-event-lots__loading">
+            <div className="manager-event-lots__spinner" />
+            <p>Loading lots...</p>
+          </div>
+        ) : error ? (
+          <div className="manager-event-lots__error">
+            <p>{error}</p>
+            <button onClick={() => fetchLots(page)}>Retry</button>
+          </div>
+        ) : lots.length === 0 ? (
+          <div className="manager-event-lots__empty">
+            <p>No lots found for this event.</p>
+          </div>
+        ) : (
+          <div className="manager-event-lots__body">
+            <div className="manager-event-lots__content">
+              {filteredLots.length === 0 ? (
+                <div className="manager-event-lots__empty">
+                  <p>No lots match your filters.</p>
+                  <button onClick={() => setSelectedFilters({})} className="manager-event-lots__clear-filters">
+                    Clear filters
+                  </button>
+                </div>
+              ) : (
+                <>
+                  <div className="guest-event-lots__list">
+                    {filteredLots.map((lot) => (
+                      <LotRow
+                        key={lot.id}
+                        lot={lot}
+                        eventEndTime={lot.end_date ?? lot.end_time ?? eventFromState?.end_time}
+                        eventTitle={eventTitle}
+                        eventStatus={lot.event_status ?? eventStatus}
+                        onOpenDetail={setSelectedLot}
+                      />
+                    ))}
+                  </div>
+                  {totalPages > 1 && (
+                    <div className="manager-event-lots__pagination">
+                      <button onClick={() => setPage((p) => Math.max(1, p - 1))} disabled={page <= 1} aria-label="Previous page">
+                        Previous
+                      </button>
+                      <span className="manager-event-lots__page-info">
+                        Page {page} of {totalPages}
+                      </span>
+                      <button onClick={() => setPage((p) => Math.min(totalPages, p + 1))} disabled={page >= totalPages} aria-label="Next page">
+                        Next
+                      </button>
+                    </div>
+                  )}
+                </>
+              )}
+            </div>
+            <BuyerEventLotsFilterBar eventId={id} lots={lots} onFiltersChange={setSelectedFilters} />
+          </div>
+        )}
+      </main>
+
+      {selectedLot && (
+        <GuestLotDrawer
+          lot={selectedLot}
+          eventEndTime={selectedLot.end_date ?? selectedLot.end_time ?? eventFromState?.end_time}
+          eventTitle={eventTitle}
+          eventId={id}
+          eventStatus={selectedLot.event_status ?? eventStatus}
+          event={eventData}
+          onClose={() => setSelectedLot(null)}
+          isClerk
+        />
+      )}
+    </div>
+  );
+}
+
