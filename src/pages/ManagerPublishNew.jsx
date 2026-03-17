@@ -392,8 +392,19 @@ const ManagerPublishNew = () => {
           toast.success('Lot updated successfully.');
         } else {
           const fd = buildFormData(effectiveStatus);
-          await auctionService.createLot(fd);
+          const createdLot = await auctionService.createLot(fd);
           toast.success('Lot created successfully.');
+          // Pass created lot back so clerk can see it even if list API omits drafts
+          if (fromAdmin) {
+            navigate(`/admin/event/${evId}`, { state: { event, lotCreated: true, createdLot } });
+            return;
+          }
+          if (fromClerk || authUserRole === 'clerk') {
+            navigate(`/clerk/event/${evId}`, { state: { event, lotCreated: true, createdLot } });
+            return;
+          }
+          navigate(`/manager/event/${evId}`, { state: { event, lotCreated: true, createdLot } });
+          return;
         }
         if (fromAdmin) {
           navigate(`/admin/event/${evId}`, { state: { event, lotCreated: true } });

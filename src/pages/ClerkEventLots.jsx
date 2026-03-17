@@ -119,13 +119,24 @@ export default function ClerkEventLots() {
   }, [fetchLots, page]);
 
   const lotCreated = location.state?.lotCreated;
+  const createdLot = location.state?.createdLot;
   useEffect(() => {
     if (lotCreated && id) {
+      // Ensure the newly created draft appears even if list API omits drafts
+      if (createdLot?.id) {
+        setLots((prev) => {
+          const exists = prev.some((l) => String(l.id) === String(createdLot.id));
+          if (exists) return prev;
+          return [createdLot, ...prev];
+        });
+        setTotalCount((c) => (typeof c === "number" ? c + 1 : c));
+        setSelectedLot(createdLot);
+      }
       setPage(1);
       fetchLots(1);
       navigate(`/clerk/event/${id}`, { state: { event: eventFromState }, replace: true });
     }
-  }, [lotCreated, id, eventFromState, fetchLots, navigate]);
+  }, [lotCreated, createdLot, id, eventFromState, fetchLots, navigate]);
 
   useEffect(() => {
     if (!id || eventFromState) return;
