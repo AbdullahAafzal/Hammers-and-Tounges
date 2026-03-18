@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback, useMemo } from "react";
 import { useParams, useNavigate, useLocation } from "react-router-dom";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { auctionService } from "../services/interceptors/auction.service";
 import { toast } from "react-toastify";
 import { fetchCategories } from "../store/actions/AuctionsActions";
@@ -41,6 +41,12 @@ export default function ClerkEventLots() {
   const location = useLocation();
   const dispatch = useDispatch();
   const eventFromState = location.state?.event;
+  const features = useSelector((state) => state.permissions?.features);
+  const permissionsLoading = useSelector((state) => state.permissions?.isLoading);
+  // For clerk flow we only care about manage_events permissions.
+  const manageEventsPerm = features?.manage_events || {};
+  const canCreateEvents = manageEventsPerm?.create === true;
+  const canDeleteEvents = manageEventsPerm?.delete === true;
 
   const [lots, setLots] = useState([]);
   const [eventTitle, setEventTitle] = useState(eventFromState?.title || "Event Lots");
@@ -51,6 +57,9 @@ export default function ClerkEventLots() {
   const [totalCount, setTotalCount] = useState(0);
   const [selectedFilters, setSelectedFilters] = useState({});
   const [selectedLot, setSelectedLot] = useState(null);
+
+  const [deletingEvent, setDeletingEvent] = useState(false);
+  const [canDeleteEvent, setCanDeleteEvent] = useState(false);
 
   const totalPages = Math.ceil(totalCount / PAGE_SIZE) || 1;
 
@@ -118,6 +127,42 @@ export default function ClerkEventLots() {
     fetchLots(page);
   }, [fetchLots, page]);
 
+  const checkCanDeleteEvent = useCallback(async () => {
+    if (!id) return false;
+    try {
+      const res = await auctionService.getLots({ event: id, page: 1, page_size: 200 });
+      const items = res?.results || [];
+      const total = res?.count ?? items.length;
+      if (total === 0) return true;
+      const hasNonDraft = items.some((l) => String(l?.status || l?.listing_status || '').toUpperCase() !== 'DRAFT');
+      if (hasNonDraft) return false;
+      if (total > items.length) return false;
+      return true;
+    } catch {
+      return false;
+    }
+  }, [id]);
+
+  useEffect(() => {
+    const eventStatusUpper = (eventStatus || '').toUpperCase();
+    if (!canDeleteEvents || permissionsLoading) {
+      setCanDeleteEvent(false);
+      return;
+    }
+    if (eventStatusUpper !== 'SCHEDULED') {
+      setCanDeleteEvent(false);
+      return;
+    }
+    let cancelled = false;
+    (async () => {
+      const ok = await checkCanDeleteEvent();
+      if (!cancelled) setCanDeleteEvent(ok);
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [eventStatus, canDeleteEvents, permissionsLoading, checkCanDeleteEvent]);
+
   const lotCreated = location.state?.lotCreated;
   const createdLot = location.state?.createdLot;
   useEffect(() => {
@@ -158,11 +203,23 @@ export default function ClerkEventLots() {
   }, [id, eventFromState]);
 
   const handleCreateLot = () => {
+    if (permissionsLoading || !features) {
+      toast.info("Loading permissions...");
+      return;
+    }
+    if (!canCreateEvents) {
+      toast.error("You do not have permission to create lots/events.");
+      return;
+    }
     const eventData = eventFromState || { id, title: eventTitle, status: eventStatus };
     navigate("/clerk/publishnew", { state: { eventId: id, event: eventData, fromClerk: true } });
   };
 
   const showCreateLot = (eventStatus || "").toUpperCase() === "SCHEDULED";
+  const shouldShowCreateDraftButton = showCreateLot && canCreateEvents && !permissionsLoading && !!features;
+
+  const showDeleteEvent =
+    (eventStatus || '').toUpperCase() === 'SCHEDULED' && canDeleteEvents && canDeleteEvent;
 
   const filteredLots = useMemo(() => {
     const filters = selectedFilters;
@@ -229,9 +286,35 @@ export default function ClerkEventLots() {
           </p>
         </div>
         <div className="manager-event-lots__header-actions">
-          {showCreateLot && (
+          {shouldShowCreateDraftButton && (
             <button className="manager-event-lots__create-lot" onClick={handleCreateLot} aria-label="Create lot">
               Create Draft Lot
+            </button>
+          )}
+          {showDeleteEvent && (
+            <button
+              className="manager-event-lots__delete-event"
+              onClick={async () => {
+                if (!canDeleteEvent) {
+                  toast.error('Event cannot be deleted because it has active (or non-draft) lots.');
+                  return;
+                }
+                if (!window.confirm('Are you sure you want to delete this event? This will remove the event and all its lots.')) return;
+                try {
+                  setDeletingEvent(true);
+                  await auctionService.deleteEvent(id);
+                  toast.success('Event deleted successfully.');
+                  navigate('/clerk/dashboard');
+                } catch (err) {
+                  toast.error(err?.message || 'Failed to delete event');
+                } finally {
+                  setDeletingEvent(false);
+                }
+              }}
+              disabled={deletingEvent}
+              aria-label="Delete event"
+            >
+              {deletingEvent ? 'Deleting...' : 'Delete Event'}
             </button>
           )}
         </div>

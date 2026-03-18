@@ -17,6 +17,7 @@ const UserManagement = () => {
 
   const basePath = location.pathname.startsWith("/manager") ? "/manager" : "/admin";
   const isManagerFlow = location.pathname.startsWith("/manager");
+  const isAdminFlow = !isManagerFlow;
 
   // Permissions are ONLY enforced in manager flow.
   // Admin flow should behave as before (role management available based on admin capabilities).
@@ -293,9 +294,14 @@ const filteredUsers = useMemo(() => {
   };
 
   const shouldShowActionsColumn =
-    (roleFilter === 'manager' && canUpdateUsers) ||
+    // Only admin shows "Role Management". For manager flow, avoid showing an empty column.
+    (roleFilter === 'manager' && isAdminFlow && canUpdateUsers) ||
+    // Seller: edit + delete permissions can exist in both admin/manager flows.
     (roleFilter === 'seller' && (canUpdateUsers || canDeleteUsers)) ||
-    (roleFilter === 'clerk' && canDeleteUsers);
+    // Clerk:
+    // - Admin: role management + delete
+    // - Manager: only delete (role management hidden)
+    (roleFilter === 'clerk' && (isAdminFlow ? (canUpdateUsers || canDeleteUsers) : canDeleteUsers));
 
   return (
     <div className="user-management-container">
@@ -445,7 +451,7 @@ const filteredUsers = useMemo(() => {
                   ) && shouldShowActionsColumn && (
                     <td className="user-management-actions-cell" onClick={(e) => e.stopPropagation()}>
                       <div className="user-management-actions-dropdown">
-                        {(roleFilter === 'manager' || roleFilter === 'clerk') && canUpdateUsers && (
+                        {isAdminFlow && (roleFilter === 'manager' || roleFilter === 'clerk') && canUpdateUsers && (
                           <button
                             className="user-management-action-btn user-management-action-roles"
                             onClick={() => handleOpenRoleManagement(user)}

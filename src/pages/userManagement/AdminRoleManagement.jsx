@@ -133,6 +133,9 @@ const AdminRoleManagement = () => {
           ? {
               feature_permissions: {
                 manage_events: featurePermissions.manage_events || makeDefaultFeaturePermissions(),
+                // Force other features off for clerk users.
+                manage_users: makeDefaultFeaturePermissions(),
+                manage_categories: makeDefaultFeaturePermissions(),
               },
             }
           : {

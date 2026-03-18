@@ -289,6 +289,7 @@ function App() {
               <Route element={<ClerkLayout />}>
                 <Route path="/clerk/dashboard" element={<ClerkDashboard />} />
                 <Route path="/clerk/event/:id" element={<ClerkEventLots />} />
+                <Route path="/clerk/event/create" element={<ManagerCreateEvent />} />
                 {/* Reuse lot creation screen, but it enforces clerk restrictions */}
                 <Route path="/clerk/publishnew" element={<ManagerPublishNew />} />
               </Route>

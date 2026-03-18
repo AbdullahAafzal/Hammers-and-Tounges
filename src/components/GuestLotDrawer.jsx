@@ -22,6 +22,10 @@ const GuestLotDrawer = ({ lot: initialLot, eventEndTime, eventTitle, eventId, ev
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const categories = useSelector((state) => state.buyer?.categories ?? state.seller?.categories ?? []);
+  const features = useSelector((state) => state.permissions?.features);
+  const manageEventsPerm = features?.manage_events || {};
+  const canUpdateEvents = manageEventsPerm?.update === true;
+  const canDeleteEvents = manageEventsPerm?.delete === true;
   const isPlacingBid = useSelector((state) => state.buyer?.isPlacingBid ?? false);
 
   const [lot, setLot] = useState(initialLot);
@@ -254,11 +258,23 @@ const GuestLotDrawer = ({ lot: initialLot, eventEndTime, eventTitle, eventId, ev
 
   const handleEdit = useCallback(() => {
     onClose?.();
-    const path = isAdmin ? '/admin/publishnew' : '/manager/publishnew';
+    const path = isAdmin
+      ? '/admin/publishnew'
+      : isManager
+        ? '/manager/publishnew'
+        : '/clerk/publishnew';
     navigate(path, {
-      state: { eventId: eventId || event?.id, event: eventData, lotId: effectiveLot?.id, lot: effectiveLot, isEdit: true, fromAdmin: isAdmin },
+      state: {
+        eventId: eventId || event?.id,
+        event: eventData,
+        lotId: effectiveLot?.id,
+        lot: effectiveLot,
+        isEdit: true,
+        fromAdmin: isAdmin,
+        fromClerk: isClerk,
+      },
     });
-  }, [navigate, eventId, event, eventData, effectiveLot, isAdmin, onClose]);
+  }, [navigate, eventId, event, eventData, effectiveLot, isAdmin, isManager, isClerk, onClose]);
 
   const handleDelete = useCallback(async () => {
     if (!window.confirm('Are you sure you want to delete this lot?')) return;
@@ -322,30 +338,37 @@ const GuestLotDrawer = ({ lot: initialLot, eventEndTime, eventTitle, eventId, ev
             <h2 className="guest-lot-drawer__lot-no">
               Lot #{effectiveLot.lot_number || effectiveLot.id}
             </h2>
-            {(isAdmin || isManager) && (
+            {(isAdmin || isManager || isClerk) && (
               <div className="guest-lot-drawer__staff-actions">
                 {canEditDelete && (
                   <>
-                    <button
-                      type="button"
-                      className="guest-lot-drawer__staff-btn guest-lot-drawer__staff-btn--edit"
-                      onClick={handleEdit}
-                      aria-label="Edit lot"
-                    >
-                      Edit
-                    </button>
-                    <button
-                      type="button"
-                      className="guest-lot-drawer__staff-btn guest-lot-drawer__staff-btn--delete"
-                      onClick={handleDelete}
-                      disabled={deleting}
-                      aria-label="Delete lot"
-                    >
-                      {deleting ? 'Deleting...' : 'Delete'}
-                    </button>
+                    {/* Admin is unrestricted; managers/clerk follow manage_events.update */}
+                    {(isAdmin || canUpdateEvents) && (
+                      <button
+                        type="button"
+                        className="guest-lot-drawer__staff-btn guest-lot-drawer__staff-btn--edit"
+                        onClick={handleEdit}
+                        aria-label="Edit lot"
+                      >
+                        Edit
+                      </button>
+                    )}
+                    {/* Admin is unrestricted; managers/clerk follow manage_events.delete */}
+                    {(isAdmin || canDeleteEvents) && (
+                      <button
+                        type="button"
+                        className="guest-lot-drawer__staff-btn guest-lot-drawer__staff-btn--delete"
+                        onClick={handleDelete}
+                        disabled={deleting}
+                        aria-label="Delete lot"
+                      >
+                        {deleting ? 'Deleting...' : 'Delete'}
+                      </button>
+                    )}
                   </>
                 )}
-                {isLotDraft && !isEventCompleted && (
+                {/* Activate (draft -> active) should also require update access for managers/clerks */}
+                {isLotDraft && !isEventCompleted && (isAdmin || canUpdateEvents) && (
                   <button
                     type="button"
                     className="guest-lot-drawer__staff-btn guest-lot-drawer__staff-btn--active"

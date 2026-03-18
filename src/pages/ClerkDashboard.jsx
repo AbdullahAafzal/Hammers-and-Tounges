@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useCallback, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useSelector } from "react-redux";
 import { auctionService } from "../services/interceptors/auction.service";
 import { toast } from "react-toastify";
 import EventListingRow from "../components/EventListingRow";
@@ -9,37 +10,111 @@ const TAB_UPCOMING = "upcoming";
 const TAB_PAST = "past";
 const ITEMS_PER_PAGE = 15;
 
+const canDeleteEventByLots = async (eventId) => {
+  try {
+    const res = await auctionService.getLots({ event: eventId, page: 1, page_size: 200 });
+    const items = res?.results || [];
+    const total = res?.count ?? items.length;
+    if (total === 0) return true;
+    const hasNonDraft = items.some((l) => String(l?.status || l?.listing_status || '').toUpperCase() !== 'DRAFT');
+    if (hasNonDraft) return false;
+    // If there are more lots than we fetched, we can't prove they're all draft → disallow (safe)
+    if (total > items.length) return false;
+    return true;
+  } catch {
+    return false;
+  }
+};
+
 export default function ClerkDashboard() {
   const navigate = useNavigate();
+  const features = useSelector((state) => state.permissions?.features);
+  const permissionsLoading = useSelector((state) => state.permissions?.isLoading);
+  const manageEventsPerm = features?.manage_events || {};
+  const canCreateEvents = manageEventsPerm?.create === true;
+  const canDeleteEvents = manageEventsPerm?.delete === true;
   const [events, setEvents] = useState([]);
   const [eventsLoading, setEventsLoading] = useState(false);
   const [eventsError, setEventsError] = useState(null);
+  const [deletableEventIds, setDeletableEventIds] = useState({});
   const [activeTab, setActiveTab] = useState(TAB_UPCOMING);
   const [page, setPage] = useState(1);
 
-  useEffect(() => {
-    let cancelled = false;
-    (async () => {
-      setEventsLoading(true);
-      setEventsError(null);
-      try {
-        const res = await auctionService.getEvents({ page: 1 });
-        const list = res?.results ?? (Array.isArray(res) ? res : []);
-        if (!cancelled) setEvents(list);
-      } catch (err) {
-        if (!cancelled) {
-          setEvents([]);
-          setEventsError(err);
-          toast.error("Failed to load events");
-        }
-      } finally {
-        if (!cancelled) setEventsLoading(false);
-      }
-    })();
-    return () => {
-      cancelled = true;
-    };
+  const fetchEventsData = useCallback(async () => {
+    setEventsLoading(true);
+    setEventsError(null);
+    try {
+      const res = await auctionService.getEvents({ page: 1 });
+      const list = res?.results ?? (Array.isArray(res) ? res : []);
+      setEvents(list);
+    } catch (err) {
+      setEvents([]);
+      setEventsError(err);
+      toast.error("Failed to load events");
+    } finally {
+      setEventsLoading(false);
+    }
   }, []);
+
+  useEffect(() => {
+    fetchEventsData();
+  }, [fetchEventsData]);
+
+  useEffect(() => {
+    if (!canDeleteEvents || permissionsLoading || !events?.length) {
+      setDeletableEventIds({});
+      return;
+    }
+
+    const run = async () => {
+      const nonCompletedEvents = (events || []).filter((e) => {
+        const s = (e.status || '').toUpperCase();
+        return s !== 'CLOSED' && s !== 'CLOSING';
+      });
+      const scheduled = nonCompletedEvents.filter((e) => (e.status || '').toUpperCase() === 'SCHEDULED');
+      const checks = await Promise.all(
+        scheduled.map(async (e) => [String(e.id), await canDeleteEventByLots(e.id)])
+      );
+      const map = {};
+      checks.forEach(([id, ok]) => {
+        map[id] = ok;
+      });
+      setDeletableEventIds(map);
+    };
+
+    run();
+  }, [events, canDeleteEvents, permissionsLoading]);
+
+  const handleDeleteEvent = useCallback(
+    async (event) => {
+      if (!canDeleteEvents) {
+        toast.error("You do not have permission to delete events.");
+        return;
+      }
+      const eventId = event?.id;
+      if (!eventId) return;
+      const ok = await canDeleteEventByLots(eventId);
+      if (!ok) {
+        toast.error("Event cannot be deleted because it has active (or non-draft) lots.");
+        return;
+      }
+      if (
+        !window.confirm(
+          `Are you sure you want to delete "${event?.title || "this event"}"? This will remove the event and all its lots.`
+        )
+      ) {
+        return;
+      }
+      try {
+        await auctionService.deleteEvent(eventId);
+        toast.success("Event deleted successfully.");
+        await fetchEventsData();
+      } catch (err) {
+        toast.error(err?.message || "Failed to delete event");
+      }
+    },
+    [canDeleteEvents, fetchEventsData]
+  );
 
   const filteredEvents = useMemo(() => {
     if (!events?.length) return [];
@@ -79,6 +154,20 @@ export default function ClerkDashboard() {
           <h1 className="manager-dashboard-title">Clerk Dashboard</h1>
           <p className="manager-dashboard-subtitle">View events and lots</p>
         </div>
+        {canCreateEvents && (
+          <button
+            type="button"
+            className="manager-dashboard-create-btn"
+            onClick={() => navigate("/clerk/event/create")}
+            aria-label="Create event"
+          >
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <line x1="12" y1="5" x2="12" y2="19" strokeLinecap="round" />
+              <line x1="5" y1="12" x2="19" y2="12" strokeLinecap="round" />
+            </svg>
+            Create Event
+          </button>
+        )}
       </header>
 
       <div className="manager-dashboard-main">
@@ -116,7 +205,46 @@ export default function ClerkDashboard() {
             <>
               <div className="manager-dashboard-events-list">
                 {paginatedEvents.map((event) => (
-                  <EventListingRow key={event.id} event={event} onClick={handleEventClick} />
+                  <EventListingRow
+                    key={event.id}
+                    event={event}
+                    onClick={handleEventClick}
+                    renderActions={(ev) => (
+                      <>
+                        <button
+                          type="button"
+                          className="manager-dashboard-event-action-btn"
+                          onClick={() => handleEventClick(ev)}
+                          title="View Details"
+                          aria-label={`View details for ${ev.title}`}
+                        >
+                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" stroke="currentColor" strokeWidth="2" />
+                            <circle cx="12" cy="12" r="3" stroke="currentColor" strokeWidth="2" />
+                          </svg>
+                          View
+                        </button>
+                        {canDeleteEvents &&
+                          (ev.status || '').toUpperCase() === 'SCHEDULED' &&
+                          deletableEventIds[String(ev.id)] === true && (
+                            <button
+                              type="button"
+                              className="manager-dashboard-event-action-btn manager-dashboard-event-action-btn--delete"
+                              onClick={() => handleDeleteEvent(ev)}
+                              title="Delete Event"
+                              aria-label={`Delete event ${ev.title}`}
+                            >
+                              <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                                <path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                                <line x1="10" y1="11" x2="10" y2="17" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+                                <line x1="14" y1="11" x2="14" y2="17" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+                              </svg>
+                              Delete
+                            </button>
+                          )}
+                      </>
+                    )}
+                  />
                 ))}
               </div>
               {filteredEvents.length > ITEMS_PER_PAGE && (

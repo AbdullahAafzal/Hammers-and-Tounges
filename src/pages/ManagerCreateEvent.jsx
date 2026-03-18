@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useRef, useState, useCallback } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import { auctionService } from '../services/interceptors/auction.service';
 import { toast } from 'react-toastify';
@@ -15,6 +15,12 @@ const formatDateTimeForDisplay = (datetimeLocalValue) => {
 
 export default function ManagerCreateEvent() {
   const navigate = useNavigate();
+  const location = useLocation();
+  const basePath = location.pathname.startsWith('/clerk')
+    ? '/clerk'
+    : location.pathname.startsWith('/admin')
+      ? '/admin'
+      : '/manager';
   const features = useSelector((state) => state.permissions?.features);
   const permissionsLoading = useSelector((state) => state.permissions?.isLoading);
   const canCreateEvents = features?.manage_events?.create === true;
@@ -93,7 +99,7 @@ export default function ManagerCreateEvent() {
 
         await auctionService.createEvent(payload);
         toast.success('Event created successfully!');
-        navigate('/manager/dashboard');
+        navigate(`${basePath}/dashboard`);
       } catch (err) {
         const msg = err?.response?.data?.message || err?.response?.data?.detail || err?.message;
         toast.error(msg || 'Failed to create event. Please try again.');
@@ -105,7 +111,7 @@ export default function ManagerCreateEvent() {
   );
 
   const handleCancel = () => {
-    navigate('/manager/dashboard');
+    navigate(`${basePath}/dashboard`);
   };
 
   if (permissionsLoading || !features) {

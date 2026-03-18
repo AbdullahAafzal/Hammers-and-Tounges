@@ -19,6 +19,7 @@ const ManagerPublishNew = () => {
   const canCreateEvents = manageEventsPerm?.create === true;
   const canUpdateEvents = manageEventsPerm?.update === true;
   const isManagerFlow = location?.pathname?.startsWith('/manager') === true;
+  const isClerkFlow = location?.pathname?.startsWith('/clerk') === true;
 
   const { eventId, event, lotId, lot: existingLot, isEdit, fromAdmin } = location.state || {};
   const fromClerk = location.state?.fromClerk;
@@ -385,6 +386,19 @@ const ManagerPublishNew = () => {
           }
           if (!isEdit && !canCreateEvents) {
             toast.error('You do not have permission to create lots.');
+            setSubmitting(false);
+            return;
+          }
+        }
+        if (isClerkFlow) {
+          // Clerks can only create draft lots; still gate by manage_events.create/update
+          if (!isEdit && !canCreateEvents) {
+            toast.error('You do not have permission to create lots/events.');
+            setSubmitting(false);
+            return;
+          }
+          if (isEdit && lotId && !canUpdateEvents) {
+            toast.error('You do not have permission to update lots.');
             setSubmitting(false);
             return;
           }
