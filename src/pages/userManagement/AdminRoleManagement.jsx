@@ -58,6 +58,7 @@ const AdminRoleManagement = () => {
   const roleType = location.state?.role || "manager"; // "manager" | "clerk"
   const user = location.state?.user;
   const basePath = location.pathname.startsWith("/manager") ? "/manager" : "/admin";
+  const targetUserId = id ?? user?.id ?? user?.user_id ?? user?.userId ?? null;
 
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
@@ -72,7 +73,7 @@ const AdminRoleManagement = () => {
     const fetchPermissions = async () => {
       setIsLoading(true);
       try {
-        const data = await adminService.getUserPermissions(id);
+        const data = await adminService.getUserPermissions(targetUserId);
         const incoming = data?.feature_permissions || {};
 
         // Normalize to ensure all 4 keys exist per feature.
@@ -111,8 +112,8 @@ const AdminRoleManagement = () => {
       }
     };
 
-    if (id) fetchPermissions();
-  }, [id]);
+    if (targetUserId != null) fetchPermissions();
+  }, [targetUserId]);
 
   const headerSubtitle = useMemo(() => {
     const name = user?.full_name || user?.display_name || user?.email || "Selected user";
@@ -133,6 +134,11 @@ const AdminRoleManagement = () => {
   };
 
   const handleSave = async () => {
+    if (targetUserId == null) {
+      toast.error("Cannot update permissions: target user ID is missing.");
+      return;
+    }
+
     setIsSaving(true);
     try {
       const payload =
@@ -154,12 +160,12 @@ const AdminRoleManagement = () => {
               },
             };
 
-      await adminService.updateUserPermissions(id, payload);
+      await adminService.updateUserPermissions(targetUserId, payload);
       toast.success("Permissions updated successfully!");
 
       // If the currently logged-in user updated their own permissions,
       // refresh Redux so tabs/actions reflect the new access immediately.
-      if (authUserId != null && String(authUserId) === String(id)) {
+      if (authUserId != null && String(authUserId) === String(targetUserId)) {
         dispatch(fetchUserPermissions(authUserId));
       }
 

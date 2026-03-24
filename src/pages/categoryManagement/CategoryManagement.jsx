@@ -12,16 +12,19 @@ export default function CategoryManagement() {
   const { categories: categoriesFromStore, isLoading } = useSelector((state) => state.admin);
   const features = useSelector((state) => state.permissions?.features);
   const manageCategoriesPerm = features?.manage_categories || {};
+  const location = useLocation();
+  const isManagerFlow = location.pathname.startsWith('/manager');
 
-  const canCreateCategories = manageCategoriesPerm?.create === true;
-  const canUpdateCategories = manageCategoriesPerm?.update === true;
-  const canDeleteCategories = manageCategoriesPerm?.delete === true;
+  // Admin should always retain full category access.
+  // Permission gating applies only in manager flow.
+  const canCreateCategories = isManagerFlow ? manageCategoriesPerm?.create === true : true;
+  const canUpdateCategories = isManagerFlow ? manageCategoriesPerm?.update === true : true;
+  const canDeleteCategories = isManagerFlow ? manageCategoriesPerm?.delete === true : true;
   const canToggleCategoryStatus = canCreateCategories;
 
   const shouldShowActionsColumn = canUpdateCategories || canDeleteCategories;
   const [searchQuery, setSearchQuery] = useState('');
   const navigate = useNavigate();
-  const location = useLocation();
   const basePath = location.pathname.startsWith('/manager') ? '/manager' : '/admin';
 
   // Fetch categories on component mount

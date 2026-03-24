@@ -288,7 +288,10 @@ const filteredUsers = useMemo(() => {
 
   const handleOpenRoleManagement = (user) => {
     if (!canUpdateUsers) return;
-    navigate(`${basePath}/role-management/${user.id}`, {
+    const targetUserId = user?.id ?? user?.user_id ?? user?.userId ?? null;
+    if (targetUserId == null) return;
+
+    navigate(`${basePath}/role-management/${targetUserId}`, {
       state: { role: user.role, user },
     });
   };
