@@ -4,6 +4,7 @@ import { useSelector } from 'react-redux';
 import { auctionService } from '../services/interceptors/auction.service';
 import { toast } from 'react-toastify';
 import { generateEventId } from '../utils/eventId';
+import { toDateTimeLocalString, validateEventSchedule } from '../utils/eventDateTimeLocal';
 import './ManagerCreateEvent.css';
 
 const formatDateTimeForDisplay = (datetimeLocalValue) => {
@@ -68,6 +69,36 @@ export default function ManagerCreateEvent() {
 
   const handleFormChange = useCallback((e) => {
     const { name, value } = e.target;
+    const minNowStr = toDateTimeLocalString(new Date());
+
+    if (name === 'start_time') {
+      let v = value;
+      if (v && v < minNowStr) v = minNowStr;
+      setFormData((prev) => {
+        const next = { ...prev, start_time: v };
+        if (v && prev.end_time && prev.end_time <= v) {
+          const sd = new Date(v);
+          if (!Number.isNaN(sd.getTime())) {
+            sd.setMinutes(sd.getMinutes() + 1);
+            next.end_time = toDateTimeLocalString(sd);
+          }
+        }
+        return next;
+      });
+      return;
+    }
+
+    if (name === 'end_time') {
+      setFormData((prev) => {
+        const endMin =
+          prev.start_time && prev.start_time > minNowStr ? prev.start_time : minNowStr;
+        let v = value;
+        if (v && v < endMin) v = endMin;
+        return { ...prev, end_time: v };
+      });
+      return;
+    }
+
     setFormData((prev) => ({ ...prev, [name]: value }));
   }, []);
 
@@ -83,8 +114,9 @@ export default function ManagerCreateEvent() {
         toast.error('Please enter an event name.');
         return;
       }
-      if (!formData.start_time || !formData.end_time) {
-        toast.error('Please set start and end date/time.');
+      const schedule = validateEventSchedule(formData.start_time, formData.end_time);
+      if (!schedule.ok) {
+        toast.error(schedule.message);
         return;
       }
       setIsSubmitting(true);
@@ -107,7 +139,7 @@ export default function ManagerCreateEvent() {
         setIsSubmitting(false);
       }
     },
-    [formData, imageFile, navigate]
+    [formData, imageFile, navigate, basePath]
   );
 
   const handleCancel = () => {
@@ -123,6 +155,10 @@ export default function ManagerCreateEvent() {
       </div>
     );
   }
+
+  const minNowStr = toDateTimeLocalString(new Date());
+  const endMinStr =
+    formData.start_time && formData.start_time > minNowStr ? formData.start_time : minNowStr;
 
   if (!canCreateEvents) {
     return (
@@ -217,6 +253,7 @@ export default function ManagerCreateEvent() {
                   type="datetime-local"
                   name="start_time"
                   value={formData.start_time}
+                  min={minNowStr}
                   onChange={handleFormChange}
                   required
                   disabled={isSubmitting}
@@ -241,6 +278,7 @@ export default function ManagerCreateEvent() {
                   type="datetime-local"
                   name="end_time"
                   value={formData.end_time}
+                  min={endMinStr}
                   onChange={handleFormChange}
                   required
                   disabled={isSubmitting}

@@ -19,8 +19,7 @@ export default function ManagerLiveAuctions() {
     try {
       setLoading(true);
       setError(null);
-      const response = await auctionService.getEvents({ page: 1 });
-      const allEvents = response?.results ?? (Array.isArray(response) ? response : []);
+      const allEvents = await auctionService.fetchAllEvents();
       const completedEvents = allEvents.filter((e) => {
         const s = (e.status || '').toUpperCase();
         return s === 'CLOSED' || s === 'CLOSING';

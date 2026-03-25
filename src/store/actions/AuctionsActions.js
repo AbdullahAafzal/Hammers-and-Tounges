@@ -50,10 +50,24 @@ export const fetchCategories = createAsyncThunk(
 
 export const fetchEvents = createAsyncThunk(
   'events/fetchEvents',
-  async (params, { rejectWithValue }) => {
+  async (params = {}, { rejectWithValue }) => {
     try {
-      const response = await auctionService.getEvents(params);
-      return response;
+      // Guest Home loops with { page: n } — keep single-page responses.
+      // Buyer dashboard uses {} — load every page (matches mobile app).
+      const hasExplicitPage =
+        params != null && Object.prototype.hasOwnProperty.call(params, 'page');
+      if (hasExplicitPage) {
+        const response = await auctionService.getEvents(params);
+        return response;
+      }
+      const { page: _omit, ...rest } = params;
+      const results = await auctionService.fetchAllEvents(rest);
+      return {
+        results,
+        count: results.length,
+        next: null,
+        previous: null,
+      };
     } catch (error) {
       const message =
         error.response?.data?.message ||

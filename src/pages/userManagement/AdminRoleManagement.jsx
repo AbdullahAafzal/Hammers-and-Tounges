@@ -6,13 +6,19 @@ import { useDispatch, useSelector } from "react-redux";
 import { fetchUserPermissions } from "../../store/actions/permissionsActions";
 import "./AdminRoleManagement.css";
 
-const PERMISSION_KEYS = ["read", "create", "update", "delete"];
+/** Read is always true (not shown as a toggle). */
+const TOGGLE_PERMISSION_KEYS = ["create", "update", "delete"];
 
 const makeDefaultFeaturePermissions = () => ({
-  read: false,
+  read: true,
   create: false,
   update: false,
   delete: false,
+});
+
+const withReadAlwaysTrue = (perms) => ({
+  ...(perms || makeDefaultFeaturePermissions()),
+  read: true,
 });
 
 const makeReadOnlyFeaturePermissions = () => ({
@@ -29,7 +35,6 @@ const FEATURE_LABELS = {
 };
 
 const PERMISSION_DESCRIPTIONS = {
-  read: "View access",
   create: "Create access",
   update: "Update access",
   delete: "Delete access",
@@ -76,12 +81,12 @@ const AdminRoleManagement = () => {
         const data = await adminService.getUserPermissions(targetUserId);
         const incoming = data?.feature_permissions || {};
 
-        // Normalize to ensure all 4 keys exist per feature.
+        // Normalize per feature; read is always true (not user-toggleable).
         const normalized = {};
         for (const featureKey of Object.keys(incoming)) {
           const src = incoming?.[featureKey] || {};
           normalized[featureKey] = {
-            read: !!src.read,
+            read: true,
             create: !!src.create,
             update: !!src.update,
             delete: !!src.delete,
@@ -145,7 +150,7 @@ const AdminRoleManagement = () => {
         roleType === "clerk"
           ? {
               feature_permissions: {
-                manage_events: featurePermissions.manage_events || makeDefaultFeaturePermissions(),
+                manage_events: withReadAlwaysTrue(featurePermissions.manage_events),
                 // Keep users/categories read-only for clerk users.
                 manage_users: makeReadOnlyFeaturePermissions(),
                 manage_categories: makeReadOnlyFeaturePermissions(),
@@ -153,10 +158,9 @@ const AdminRoleManagement = () => {
             }
           : {
               feature_permissions: {
-                manage_users: featurePermissions.manage_users || makeDefaultFeaturePermissions(),
-                manage_events: featurePermissions.manage_events || makeDefaultFeaturePermissions(),
-                manage_categories:
-                  featurePermissions.manage_categories || makeDefaultFeaturePermissions(),
+                manage_users: withReadAlwaysTrue(featurePermissions.manage_users),
+                manage_events: withReadAlwaysTrue(featurePermissions.manage_events),
+                manage_categories: withReadAlwaysTrue(featurePermissions.manage_categories),
               },
             };
 
@@ -224,7 +228,7 @@ const AdminRoleManagement = () => {
               <section key={featureKey} className="rm-feature-card">
                 <div className="rm-feature-title">{FEATURE_LABELS[featureKey] || featureKey}</div>
                 <div className="rm-permission-list">
-                  {PERMISSION_KEYS.map((permissionKey) => (
+                  {TOGGLE_PERMISSION_KEYS.map((permissionKey) => (
                     <div key={permissionKey} className="rm-permission-row">
                       <div className="rm-permission-meta">
                         <div className="rm-permission-name">

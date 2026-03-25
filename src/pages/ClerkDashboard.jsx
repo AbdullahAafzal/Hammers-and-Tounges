@@ -44,8 +44,7 @@ export default function ClerkDashboard() {
     setEventsLoading(true);
     setEventsError(null);
     try {
-      const res = await auctionService.getEvents({ page: 1 });
-      const list = res?.results ?? (Array.isArray(res) ? res : []);
+      const list = await auctionService.fetchAllEvents();
       setEvents(list);
     } catch (err) {
       setEvents([]);

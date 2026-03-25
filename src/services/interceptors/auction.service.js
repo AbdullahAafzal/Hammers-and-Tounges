@@ -16,7 +16,7 @@ export const auctionService = {
       throw error;
     }
   },
-  // Get all auction events
+  // Get all auction events (single page — see fetchAllEvents for full list)
   getEvents: async (params) => {
     try {
       const { data } = await apiClient.get(API_ROUTES.AUCTIONS_EVENTS, {
@@ -29,6 +29,24 @@ export const auctionService = {
       }
       throw error;
     }
+  },
+  /**
+   * Load every page of events (same behavior as the mobile staff dashboard).
+   * Using only page 1 omits events when the API paginates.
+   */
+  fetchAllEvents: async (extraParams = {}) => {
+    let results = [];
+    let nextPage = 1;
+    let hasMore = true;
+    while (hasMore) {
+      const { data } = await apiClient.get(API_ROUTES.AUCTIONS_EVENTS, {
+        params: { ...extraParams, page: nextPage },
+      });
+      results = [...results, ...(data.results || [])];
+      hasMore = !!data.next;
+      nextPage += 1;
+    }
+    return results;
   },
   // Get single event by ID
   getEvent: async (eventId) => {

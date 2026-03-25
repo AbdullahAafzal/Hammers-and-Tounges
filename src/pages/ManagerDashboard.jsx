@@ -66,8 +66,7 @@ function ManagerDashboard() {
   const fetchEventsData = useCallback(async () => {
     setIsLoadingEvents(true);
     try {
-      const response = await auctionService.getEvents({ page: 1 });
-      const allEvents = response.results || [];
+      const allEvents = await auctionService.fetchAllEvents();
       const nonCompletedEvents = allEvents.filter((e) => {
         const s = (e.status || '').toUpperCase();
         return s !== 'CLOSED' && s !== 'CLOSING';

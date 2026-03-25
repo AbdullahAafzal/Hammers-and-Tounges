@@ -154,9 +154,9 @@ const AdminDashboard = () => {
     const fetchEventsData = async () => {
       setIsLoadingEvents(true);
       try {
-        const response = await auctionService.getEvents({ page: 1 });
-        setEvents(response.results || []);
-        setEventCount(response.count ?? response.results?.length ?? 0);
+        const allResults = await auctionService.fetchAllEvents();
+        setEvents(allResults);
+        setEventCount(allResults.length);
       } catch (error) {
         console.error("Error fetching events:", error);
         toast.error("Failed to load events. Please try again.");

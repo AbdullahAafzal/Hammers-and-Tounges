@@ -14,6 +14,7 @@ const AdminCreateClerk = () => {
     first_name: "",
     last_name: "",
     display_name: "",
+    phone: "",
   });
   const [formErrors, setFormErrors] = useState({});
 
@@ -47,6 +48,18 @@ const AdminCreateClerk = () => {
       errors.first_name = "First name is required";
     }
 
+    if (!formData.last_name.trim()) {
+      errors.last_name = "Last name is required";
+    }
+
+    if (!formData.display_name.trim()) {
+      errors.display_name = "Display name is required";
+    }
+
+    if (!formData.phone.trim()) {
+      errors.phone = "Phone is required";
+    }
+
     setFormErrors(errors);
     return Object.keys(errors).length === 0;
   };
@@ -57,16 +70,13 @@ const AdminCreateClerk = () => {
 
     setIsCreating(true);
     try {
-      const first = formData.first_name.trim();
-      const last = formData.last_name.trim();
-      const displayName = formData.display_name.trim() || [first, last].filter(Boolean).join(" ");
-
       await adminService.createClerk({
         email: formData.email.trim(),
         password: formData.password.trim(),
-        first_name: first,
-        last_name: last,
-        display_name: displayName,
+        first_name: formData.first_name.trim(),
+        last_name: formData.last_name.trim(),
+        display_name: formData.display_name.trim(),
+        phone: formData.phone.trim(),
       });
 
       toast.success("Clerk created successfully!");
@@ -80,6 +90,14 @@ const AdminCreateClerk = () => {
           message = Array.isArray(data.email) ? data.email[0] : data.email;
         } else if (data.password) {
           message = Array.isArray(data.password) ? data.password[0] : data.password;
+        } else if (data.first_name) {
+          message = Array.isArray(data.first_name) ? data.first_name[0] : data.first_name;
+        } else if (data.last_name) {
+          message = Array.isArray(data.last_name) ? data.last_name[0] : data.last_name;
+        } else if (data.display_name) {
+          message = Array.isArray(data.display_name) ? data.display_name[0] : data.display_name;
+        } else if (data.phone) {
+          message = Array.isArray(data.phone) ? data.phone[0] : data.phone;
         } else if (data.detail) {
           message = typeof data.detail === "string" ? data.detail : JSON.stringify(data.detail);
         } else if (data.message) {
@@ -105,7 +123,7 @@ const AdminCreateClerk = () => {
         <div>
           <h1 className="create-manager-title">Create Clerk</h1>
           <p className="create-manager-subtitle">
-            Add a new clerk to the platform. All fields marked with * are required.
+            Add a new clerk to the platform. All fields are required.
           </p>
         </div>
       </header>
@@ -132,28 +150,58 @@ const AdminCreateClerk = () => {
                 )}
               </div>
               <div className="create-manager-form-group">
-                <label>Last Name</label>
+                <label>
+                  Last Name <span className="required">*</span>
+                </label>
                 <input
                   type="text"
                   name="last_name"
                   value={formData.last_name}
                   onChange={handleInputChange}
+                  className={formErrors.last_name ? "error" : ""}
                   disabled={isCreating}
                   placeholder="Enter last name"
                 />
+                {formErrors.last_name && (
+                  <span className="error-message">{formErrors.last_name}</span>
+                )}
               </div>
             </div>
 
             <div className="create-manager-form-group">
-              <label>Display Name</label>
+              <label>
+                Display Name <span className="required">*</span>
+              </label>
               <input
                 type="text"
                 name="display_name"
                 value={formData.display_name}
                 onChange={handleInputChange}
+                className={formErrors.display_name ? "error" : ""}
                 disabled={isCreating}
                 placeholder="e.g. John Clerk"
               />
+              {formErrors.display_name && (
+                <span className="error-message">{formErrors.display_name}</span>
+              )}
+            </div>
+
+            <div className="create-manager-form-group">
+              <label>
+                Phone <span className="required">*</span>
+              </label>
+              <input
+                type="tel"
+                name="phone"
+                value={formData.phone}
+                onChange={handleInputChange}
+                className={formErrors.phone ? "error" : ""}
+                disabled={isCreating}
+                placeholder="Enter phone number"
+              />
+              {formErrors.phone && (
+                <span className="error-message">{formErrors.phone}</span>
+              )}
             </div>
 
             <div className="create-manager-form-group">
