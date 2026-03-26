@@ -301,27 +301,6 @@ html[data-theme="light"] .create-event-form-group input[type="datetime-local"]::
   }
 }
 
-/* Explicit light theme - ensure Create Event respects theme toggle */
-@media (prefers-color-scheme: light) {
-  .create-event-page {
-    background: #f5f5f5;
-    color: #1a1a1a;
-  }
-  .create-event-card {
-    background: #ffffff;
-    border-color: #d1d5db;
-    color: #1a1a1a;
-  }
-  .create-event-form-group input {
-    background: #ffffff;
-    border-color: #d1d5db;
-    color: #1a1a1a;
-  }
-  .create-event-form-group input::placeholder {
-    color: #6b7280;
-  }
-}
-
 html[data-theme="light"] .create-event-page {
   background: #f5f5f5 !important;
   color: #1a1a1a !important;
@@ -347,46 +326,6 @@ html[data-theme="light"] .create-event-title,
 html[data-theme="light"] .create-event-subtitle,
 html[data-theme="light"] .create-event-form-group label {
   color: #1a1a1a !important;
-}
-
-/* Explicit light theme - ensure Create Event respects theme toggle */
-@media (prefers-color-scheme: light) {
-  .create-event-page {
-    background: #f5f5f5;
-    color: #1a1a1a;
-  }
-  .create-event-card {
-    background: #ffffff;
-    border-color: #d1d5db;
-  }
-  .create-event-form-group input {
-    background: #ffffff;
-    border-color: #d1d5db;
-    color: #1a1a1a;
-  }
-  .create-event-form-group input::placeholder {
-    color: #6b7280;
-  }
-}
-
-html[data-theme="light"] .create-event-page {
-  background: #f5f5f5;
-  color: #1a1a1a;
-}
-
-html[data-theme="light"] .create-event-card {
-  background: #ffffff;
-  border-color: #d1d5db;
-}
-
-html[data-theme="light"] .create-event-form-group input {
-  background: #ffffff;
-  border-color: #d1d5db;
-  color: #1a1a1a;
-}
-
-html[data-theme="light"] .create-event-form-group input::placeholder {
-  color: #6b7280;
 }
 
 /* Responsive */
