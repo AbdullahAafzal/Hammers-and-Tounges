@@ -47,18 +47,6 @@
     --color-input-placeholder: rgba(0, 0, 0, 0.65);
     --color-shadow: rgba(0, 0, 0, 0.08);
   }
-
-  /* Force input text visible when system is light (no theme toggle override) */
-  input, textarea, select {
-    color: #1a1a1a !important;
-    -webkit-text-fill-color: #1a1a1a !important;
-  }
-
-  input::placeholder,
-  textarea::placeholder {
-    color: rgba(0, 0, 0, 0.65) !important;
-    -webkit-text-fill-color: rgba(0, 0, 0, 0.65) !important;
-  }
 }
 
 /* Manual theme override - user can force light/dark regardless of system */
@@ -97,6 +85,20 @@ html[data-theme="light"] input::placeholder,
 html[data-theme="light"] textarea::placeholder {
   color: rgba(0, 0, 0, 0.65) !important;
   -webkit-text-fill-color: rgba(0, 0, 0, 0.65) !important;
+}
+
+/* Keep autofill/value backgrounds aligned with selected app theme */
+html[data-theme="light"] input:-webkit-autofill,
+html[data-theme="light"] input:-webkit-autofill:hover,
+html[data-theme="light"] input:-webkit-autofill:focus,
+html[data-theme="light"] textarea:-webkit-autofill,
+html[data-theme="light"] textarea:-webkit-autofill:hover,
+html[data-theme="light"] textarea:-webkit-autofill:focus,
+html[data-theme="light"] select:-webkit-autofill {
+  -webkit-text-fill-color: #1a1a1a !important;
+  box-shadow: 0 0 0 1000px #ffffff inset !important;
+  -webkit-box-shadow: 0 0 0 1000px #ffffff inset !important;
+  caret-color: #1a1a1a;
 }
 
 /* Force light headers when light theme - fixes buyer dashboard/drawer */
@@ -459,6 +461,8 @@ html[data-theme="dark"] textarea:-webkit-autofill,
 html[data-theme="dark"] textarea:-webkit-autofill:hover,
 html[data-theme="dark"] textarea:-webkit-autofill:focus {
   -webkit-text-fill-color: #f3f4f6 !important;
+  box-shadow: 0 0 0 1000px #0a0a0a inset !important;
+  -webkit-box-shadow: 0 0 0 1000px #0a0a0a inset !important;
   caret-color: #f3f4f6;
   transition: background-color 9999s ease-in-out 0s;
 }
