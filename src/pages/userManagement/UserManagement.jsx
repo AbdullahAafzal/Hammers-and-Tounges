@@ -108,20 +108,6 @@ const filteredUsers = useMemo(() => {
   if (!localUsers || localUsers.length === 0) return [];
 
   return localUsers.filter((user) => {
-    // Soft-deleted users are removed from the list (backend sets is_active=false).
-    // We only hide them for seller/clerk screens to avoid interfering with manager status logic.
-    const isSoftDeleted =
-      user?.is_active === false ||
-      user?.is_active === "false" ||
-      user?.is_active === 0;
-
-    if (
-      (roleFilter === "seller" || roleFilter === "clerk") &&
-      isSoftDeleted
-    ) {
-      return false;
-    }
-
     const searchableText = `
       ${user.full_name || ""}
       ${user.first_name || ""}
