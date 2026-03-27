@@ -56,11 +56,15 @@ export const fetchEvents = createAsyncThunk(
       // Buyer dashboard uses {} — load every page (matches mobile app).
       const hasExplicitPage =
         params != null && Object.prototype.hasOwnProperty.call(params, 'page');
+      
+      // Force cache-busting to bypass Vercel Edge / Chrome stale 304 cache
+      const noCacheParams = { ...params, _t: Date.now() };
+
       if (hasExplicitPage) {
-        const response = await auctionService.getEvents(params);
+        const response = await auctionService.getEvents(noCacheParams);
         return response;
       }
-      const { page: _omit, ...rest } = params;
+      const { page: _omit, ...rest } = noCacheParams;
       const results = await auctionService.fetchAllEvents(rest);
       return {
         results,

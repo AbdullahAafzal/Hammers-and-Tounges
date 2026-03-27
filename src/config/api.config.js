@@ -8,7 +8,10 @@
 // };
 
 const getBaseUrl = () => {
-  // If someone explicitly configured the env var, prefer it (supports both absolute URLs and '/api' style paths).
+  // Enforce relative paths in production to leverage Netlify/Vercel proxies
+  if (import.meta.env.PROD) return '/api';
+
+  // If someone explicitly configured the env var, prefer it
   const envUrlRaw = import.meta.env.VITE_API_BASE_URL;
   const envUrl = typeof envUrlRaw === 'string' ? envUrlRaw.trim() : '';
 
@@ -21,8 +24,7 @@ const getBaseUrl = () => {
     return base.endsWith('/api') ? base : `${base.replace(/\/$/, '')}/api`;
   }
 
-  // Defaults
-  if (import.meta.env.PROD) return '/api';
+  // Defaults fallback
   return 'https://developer.hashverx.com/api';
 };
 

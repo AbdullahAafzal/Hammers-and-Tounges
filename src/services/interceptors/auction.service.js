@@ -115,7 +115,7 @@ export const auctionService = {
   // Get all categories
   getCategories: async () => {
     try {
-      const { data } = await apiClient.get(API_ROUTES.AUCTION_CATEGORIES);
+      const { data } = await apiClient.get(`${API_ROUTES.AUCTION_CATEGORIES}?_t=${Date.now()}`);
       return data;
     } catch (error) {
       if (error.isNetworkError) {
