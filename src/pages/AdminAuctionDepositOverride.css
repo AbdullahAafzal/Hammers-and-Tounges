@@ -25,6 +25,11 @@
   font-size: 0.85rem;
 }
 
+.ado-input[readonly] {
+  opacity: 0.92;
+  cursor: default;
+}
+
 .ado-toolbar {
   margin-bottom: 1rem;
 }

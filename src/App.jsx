@@ -262,6 +262,7 @@ function App() {
                 } />
                 <Route path="/manager/unsold-inventory" element={<AdminUnsoldInventory />} />
                 <Route path="/manager/deposit-exemption" element={<AdminDepositExemption />} />
+                <Route path="/manager/auction-deposit-override" element={<AdminAuctionDepositOverride />} />
                 <Route path="/manager/role-management/:id" element={
                   <>
                     <AdminRoleManagement />

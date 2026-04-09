@@ -1,4 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
+import { useLocation } from "react-router-dom";
+import { useSelector } from "react-redux";
 import { auctionService } from "../services/interceptors/auction.service";
 import { toast } from "react-toastify";
 import "./AdminAuctionDepositOverride.css";
@@ -55,6 +57,19 @@ const getLotAnchorName = (lot) => {
  * anchorLotTitle: any lot title — required by API when PATCHing deposit_multiplier_override.
  */
 const AdminAuctionDepositOverride = () => {
+  const location = useLocation();
+  const features = useSelector((state) => state.permissions?.features);
+  const permissionsLoading = useSelector((state) => state.permissions?.isLoading);
+  const lastFetchedUserId = useSelector((state) => state.permissions?.lastFetchedUserId);
+  const authUserId = useSelector((state) => state.auth?.user?.id);
+  const isManagerFlow = location.pathname.startsWith("/manager");
+  const permissionsReady =
+    !permissionsLoading &&
+    lastFetchedUserId != null &&
+    String(lastFetchedUserId) === String(authUserId);
+  const canUpdateEvents = features?.manage_events?.update === true;
+  const inputsLocked = isManagerFlow && (!permissionsReady || !canUpdateEvents);
+
   const [loading, setLoading] = useState(true);
   const [rows, setRows] = useState([]);
   const [search, setSearch] = useState("");
@@ -142,6 +157,10 @@ const AdminAuctionDepositOverride = () => {
   }, [rows, search]);
 
   const handleSave = async (row) => {
+    if (inputsLocked) {
+      toast.info("You need event update access to change deposit multiplier overrides.");
+      return;
+    }
     const eventId = row?.id;
     if (eventId == null) return;
     const lotName = String(row?.anchorLotTitle || "").trim();
@@ -227,7 +246,7 @@ const AdminAuctionDepositOverride = () => {
                 <th>Status</th>
                 <th>Lots</th>
                 <th>Deposit multiplier override</th>
-                <th>Action</th>
+                {!inputsLocked && <th>Action</th>}
               </tr>
             </thead>
             <tbody>
@@ -246,6 +265,7 @@ const AdminAuctionDepositOverride = () => {
                       <input
                         type="text"
                         className="ado-input"
+                        readOnly={inputsLocked}
                         value={draftMap[eventId] ?? DEFAULT_DEPOSIT_MULTIPLIER_DISPLAY}
                         onChange={(e) =>
                           setDraftMap((prev) => ({ ...prev, [eventId]: e.target.value }))
@@ -255,16 +275,18 @@ const AdminAuctionDepositOverride = () => {
                         aria-label={`Deposit multiplier override for ${row.title}`}
                       />
                     </td>
-                    <td>
-                      <button
-                        type="button"
-                        className="ado-save-btn"
-                        onClick={() => handleSave(row)}
-                        disabled={saving}
-                      >
-                        {saving ? "Saving..." : "Save"}
-                      </button>
-                    </td>
+                    {!inputsLocked && (
+                      <td>
+                        <button
+                          type="button"
+                          className="ado-save-btn"
+                          onClick={() => handleSave(row)}
+                          disabled={saving}
+                        >
+                          {saving ? "Saving..." : "Save"}
+                        </button>
+                      </td>
+                    )}
                   </tr>
                 );
               })}
