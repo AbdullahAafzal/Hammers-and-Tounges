@@ -16,6 +16,30 @@ export const adminService = {
     }
   },
 
+  /** GET — unsold inventory / long-stay aging breakdown (Admin/Manager/Clerk on backend; exposed in admin app only) */
+  getAgingDashboard: async (options = {}) => {
+    try {
+      const forceRefresh = !!options.forceRefresh;
+      const requestConfig = forceRefresh
+        ? {
+            params: { _ts: Date.now() },
+            skipDedupe: true,
+            headers: {
+              'Cache-Control': 'no-cache',
+              Pragma: 'no-cache',
+            },
+          }
+        : undefined;
+      const { data } = await apiClient.get(API_ROUTES.ADMIN_AGING_DASHBOARD, requestConfig);
+      return data;
+    } catch (error) {
+      if (error.isNetworkError) {
+        throw new Error('Unable to connect to server. Please try again later.');
+      }
+      throw error;
+    }
+  },
+
   // User Actions (Verify Seller, Promote to Manager, etc.)
   performUserAction: async (actionData) => {
     try {

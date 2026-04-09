@@ -149,6 +149,8 @@ export const API_ROUTES = {
 
   // Admin Routes
   ADMIN_DASHBOARD: '/inspections/admin/dashboard/',
+  /** GET — Admin aging / unsold inventory dashboard */
+  ADMIN_AGING_DASHBOARD: '/auctions/dashboard/aging/',
   ADMIN_USER_ACTION: '/inspections/admin/user-action/',
   ADMIN_ASSIGN_AUCTION: '/inspections/admin/assign/',
   ADMIN_USERS_LIST: '/inspections/admin/users/',
