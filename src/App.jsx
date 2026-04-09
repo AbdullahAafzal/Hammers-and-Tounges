@@ -69,6 +69,7 @@ import AdminAuctionDetails from "./pages/adminDashboard/AdminAuctionDetails";
 import AdminProfile from "./pages/adminProfile/AdminProfile";
 import AdminSell from "./pages/AdminSell";
 import AdminFinance from './pages/AdminFinance'
+import AdminUnsoldInventory from './pages/AdminUnsoldInventory'
 import ManualPaymentEntry from './components/ManualPayment'
 import ManualPaymentAuthorization from './pages/ManualPaymentAuthorization'
 import PaymentVerification from './pages/paymentVerification/PaymentVerification'
@@ -317,6 +318,7 @@ function App() {
                 <Route path="/admin/event/:eventId/lot/:lotId" element={<AdminLotDetail />} />
                 <Route path="/admin/auction/:id" element={<AdminAuctionDetails />} />
                 <Route path="/admin/profile" element={<AdminProfile />} />
+                <Route path="/admin/unsold-inventory" element={<AdminUnsoldInventory />} />
                 <Route path="/admin/finance" element={<AdminFinance />} />
                 <Route path="/admin/finance/manual-payments" element={
                   <>

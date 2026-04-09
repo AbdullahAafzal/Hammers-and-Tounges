@@ -13,31 +13,31 @@ const makeDefaultFeaturePermissions = () => ({
   read: true,
   create: false,
   update: false,
-  delete: false,
+  delete: false
 });
 
 const withReadAlwaysTrue = (perms) => ({
   ...(perms || makeDefaultFeaturePermissions()),
-  read: true,
+  read: true
 });
 
 const makeReadOnlyFeaturePermissions = () => ({
   read: true,
   create: false,
   update: false,
-  delete: false,
+  delete: false
 });
 
 const FEATURE_LABELS = {
   manage_users: "User management",
   manage_events: "Event management",
-  manage_categories: "Category management",
+  manage_categories: "Category management"
 };
 
 const PERMISSION_DESCRIPTIONS = {
   create: "Create access",
   update: "Update access",
-  delete: "Delete access",
+  delete: "Delete access"
 };
 
 const PermissionSwitch = ({ checked, onChange, label }) => {
@@ -62,7 +62,9 @@ const AdminRoleManagement = () => {
 
   const roleType = location.state?.role || "manager"; // "manager" | "clerk"
   const user = location.state?.user;
-  const basePath = location.pathname.startsWith("/manager") ? "/manager" : "/admin";
+  const basePath = location.pathname.startsWith("/manager")
+    ? "/manager"
+    : "/admin";
   const targetUserId = id ?? user?.id ?? user?.user_id ?? user?.userId ?? null;
 
   const [isLoading, setIsLoading] = useState(true);
@@ -89,17 +91,22 @@ const AdminRoleManagement = () => {
             read: true,
             create: !!src.create,
             update: !!src.update,
-            delete: !!src.delete,
+            delete: !!src.delete
           };
         }
 
         // Ensure expected keys exist (important for UI toggles).
-        for (const featureKey of ["manage_users", "manage_events", "manage_categories"]) {
-          if (!normalized[featureKey]) normalized[featureKey] = makeDefaultFeaturePermissions();
+        for (const featureKey of [
+          "manage_users",
+          "manage_events",
+          "manage_categories"
+        ]) {
+          if (!normalized[featureKey])
+            normalized[featureKey] = makeDefaultFeaturePermissions();
           else {
             normalized[featureKey] = {
               ...makeDefaultFeaturePermissions(),
-              ...normalized[featureKey],
+              ...normalized[featureKey]
             };
           }
         }
@@ -121,19 +128,21 @@ const AdminRoleManagement = () => {
   }, [targetUserId]);
 
   const headerSubtitle = useMemo(() => {
-    const name = user?.full_name || user?.display_name || user?.email || "Selected user";
+    const name =
+      user?.full_name || user?.display_name || user?.email || "Selected user";
     return `${roleType.toUpperCase()} • ${name}`;
   }, [roleType, user]);
 
   const handleToggle = (featureKey, permissionKey, value) => {
     setFeaturePermissions((prev) => {
-      const currentFeature = prev?.[featureKey] || makeDefaultFeaturePermissions();
+      const currentFeature =
+        prev?.[featureKey] || makeDefaultFeaturePermissions();
       return {
         ...prev,
         [featureKey]: {
           ...currentFeature,
-          [permissionKey]: value,
-        },
+          [permissionKey]: value
+        }
       };
     });
   };
@@ -150,18 +159,26 @@ const AdminRoleManagement = () => {
         roleType === "clerk"
           ? {
               feature_permissions: {
-                manage_events: withReadAlwaysTrue(featurePermissions.manage_events),
+                manage_events: withReadAlwaysTrue(
+                  featurePermissions.manage_events
+                ),
                 // Keep users/categories read-only for clerk users.
                 manage_users: makeReadOnlyFeaturePermissions(),
-                manage_categories: makeReadOnlyFeaturePermissions(),
-              },
+                manage_categories: makeReadOnlyFeaturePermissions()
+              }
             }
           : {
               feature_permissions: {
-                manage_users: withReadAlwaysTrue(featurePermissions.manage_users),
-                manage_events: withReadAlwaysTrue(featurePermissions.manage_events),
-                manage_categories: withReadAlwaysTrue(featurePermissions.manage_categories),
-              },
+                manage_users: withReadAlwaysTrue(
+                  featurePermissions.manage_users
+                ),
+                manage_events: withReadAlwaysTrue(
+                  featurePermissions.manage_events
+                ),
+                manage_categories: withReadAlwaysTrue(
+                  featurePermissions.manage_categories
+                )
+              }
             };
 
       await adminService.updateUserPermissions(targetUserId, payload);
@@ -212,10 +229,18 @@ const AdminRoleManagement = () => {
             <p className="rm-subtitle">{headerSubtitle}</p>
           </div>
           <div className="rm-header-actions">
-            <button className="rm-btn rm-btn-secondary" onClick={handleBack} disabled={isSaving}>
+            <button
+              className="rm-btn rm-btn-secondary"
+              onClick={handleBack}
+              disabled={isSaving}
+            >
               Back
             </button>
-            <button className="rm-btn rm-btn-primary" onClick={handleSave} disabled={isSaving}>
+            <button
+              className="rm-btn rm-btn-primary"
+              onClick={handleSave}
+              disabled={isSaving}
+            >
               {isSaving ? "Saving..." : "Save Changes"}
             </button>
           </div>
@@ -223,16 +248,21 @@ const AdminRoleManagement = () => {
 
         <div className="rm-grid">
           {featuresToShow.map((featureKey) => {
-            const featureValue = featurePermissions?.[featureKey] || makeDefaultFeaturePermissions();
+            const featureValue =
+              featurePermissions?.[featureKey] ||
+              makeDefaultFeaturePermissions();
             return (
               <section key={featureKey} className="rm-feature-card">
-                <div className="rm-feature-title">{FEATURE_LABELS[featureKey] || featureKey}</div>
+                <div className="rm-feature-title">
+                  {FEATURE_LABELS[featureKey] || featureKey}
+                </div>
                 <div className="rm-permission-list">
                   {TOGGLE_PERMISSION_KEYS.map((permissionKey) => (
                     <div key={permissionKey} className="rm-permission-row">
                       <div className="rm-permission-meta">
                         <div className="rm-permission-name">
-                          {permissionKey.charAt(0).toUpperCase() + permissionKey.slice(1)}
+                          {permissionKey.charAt(0).toUpperCase() +
+                            permissionKey.slice(1)}
                         </div>
                         <div className="rm-permission-desc">
                           {PERMISSION_DESCRIPTIONS[permissionKey] || ""}
@@ -240,8 +270,12 @@ const AdminRoleManagement = () => {
                       </div>
                       <PermissionSwitch
                         checked={featureValue[permissionKey]}
-                        onChange={(v) => handleToggle(featureKey, permissionKey, v)}
-                        label={`${FEATURE_LABELS[featureKey] || featureKey} - ${permissionKey}`}
+                        onChange={(v) =>
+                          handleToggle(featureKey, permissionKey, v)
+                        }
+                        label={`${
+                          FEATURE_LABELS[featureKey] || featureKey
+                        } - ${permissionKey}`}
                       />
                     </div>
                   ))}
@@ -256,4 +290,3 @@ const AdminRoleManagement = () => {
 };
 
 export default AdminRoleManagement;
-
