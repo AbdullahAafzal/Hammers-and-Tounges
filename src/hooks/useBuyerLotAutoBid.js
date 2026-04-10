@@ -2,7 +2,6 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import { toast } from 'react-toastify';
 import { buyerService } from '../services/interceptors/buyer.service';
 import { getAutoBidSaveErrorMessage } from '../utils/autoBidErrorMessage';
-import { messageFromAxiosError } from '../utils/apiErrorMessage';
 
 const POLL_MS = 3000;
 
@@ -103,7 +102,12 @@ export function useBuyerLotAutoBid({
             setAutobidToggleOn(false);
             setAutobidMaxInput('');
           } catch (err) {
-            toast.error(messageFromAxiosError(err, 'Could not stop auto-bid'));
+            toast.error(
+              err?.response?.data?.detail ||
+                err?.response?.data?.message ||
+                err?.message ||
+                'Could not stop auto-bid'
+            );
           } finally {
             setAutobidSaving(false);
           }
