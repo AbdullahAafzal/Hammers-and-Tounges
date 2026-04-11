@@ -2,8 +2,8 @@ import React, { useEffect } from 'react';
 import { useBuyerLotAutoBid } from '../hooks/useBuyerLotAutoBid';
 
 /**
- * Buyer-only: auto-bid UI + polling. Mount only when `isBuyer` (parent), so guest/staff/seller
- * flows never run auto-bid hooks or API calls.
+ * Buyer-only: auto-bid UI + bid-history polling (every 3s while mounted). Mount only when `isBuyer`
+ * (parent), so guest/staff/seller flows never run these hooks or API calls.
  */
 export default function BuyerLotAutoBidPanel({
   lotId,

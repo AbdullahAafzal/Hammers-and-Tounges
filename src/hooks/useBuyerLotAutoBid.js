@@ -9,8 +9,8 @@ import {
 const POLL_MS = 3000;
 
 /**
- * Auto-bid state + API for a single lot. Polls bid history every POLL_MS while auto-bid is active
- * for this lot and ceiling_reached is false (via onRefreshBids).
+ * Auto-bid state + API for a single lot. Polls bid history every POLL_MS whenever `lotId` is set
+ * (via onRefreshBids), independent of auto-bid, ceiling, or `enabled`. `enabled` only gates auto-bid fetch/UI.
  * Intended for buyer-only surfaces: mount only when the current user is a buyer (see BuyerLotAutoBidPanel).
  */
 export function useBuyerLotAutoBid({
@@ -75,22 +75,18 @@ export function useBuyerLotAutoBid({
   }, [enabled, lotId, refreshAutoBidForLot]);
 
   useEffect(() => {
-    if (!enabled || !lotId || !autoBidRecord?.id) return undefined;
-    const lid = autoBidRecord.lot?.id ?? autoBidRecord.lot;
-    if (Number(lid) !== Number(lotId)) return undefined;
-    if (autoBidRecord.ceiling_reached === true) return undefined;
+    if (!lotId) return undefined;
 
     const poll = () => {
       try {
-        const fn = refreshRef.current;
-        if (typeof fn === 'function') fn();
+        refreshRef.current?.();
       } catch {
         /* ignore */
       }
     };
     const t = setInterval(poll, POLL_MS);
     return () => clearInterval(t);
-  }, [enabled, lotId, autoBidRecord?.id, autoBidRecord?.lot, autoBidRecord?.ceiling_reached]);
+  }, [lotId]);
 
   const handleAutobidToggle = useCallback(
     async (nextOn) => {
