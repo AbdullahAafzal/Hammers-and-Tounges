@@ -24,6 +24,31 @@ const TAB_UPCOMING = 'upcoming';
 const TAB_PAST = 'past';
 const ITEMS_PER_PAGE = 15;
 
+const EventsSkeleton = ({ rows = 10 }) => (
+  <div className="events-skeleton-list" aria-hidden="true">
+    {Array.from({ length: rows }).map((_, idx) => (
+      <div key={idx} className="events-skeleton-row">
+        <div className="events-skeleton-thumb">
+          <div className="events-skeleton-shimmer events-skeleton-shape-thumb" />
+          <div className="events-skeleton-shimmer events-skeleton-shape-badge" />
+        </div>
+        <div className="events-skeleton-dates">
+          <div className="events-skeleton-shimmer events-skeleton-shape-date" />
+          <div className="events-skeleton-shimmer events-skeleton-shape-date" />
+        </div>
+        <div className="events-skeleton-body">
+          <div className="events-skeleton-shimmer events-skeleton-line events-skeleton-line--title" />
+          <div className="events-skeleton-shimmer events-skeleton-line events-skeleton-line--chip" />
+          <div className="events-skeleton-shimmer events-skeleton-line events-skeleton-line--meta" />
+        </div>
+        <div className="events-skeleton-lots">
+          <div className="events-skeleton-shimmer events-skeleton-shape-lots" />
+        </div>
+      </div>
+    ))}
+  </div>
+);
+
 const BuyerDashboard = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -31,7 +56,7 @@ const BuyerDashboard = () => {
   const [page, setPage] = useState(1);
   const [activeTab, setActiveTab] = useState(TAB_UPCOMING);
 
-  const { events, eventsLoading, eventsError } = useSelector(state => state.buyer);
+  const { events, eventsLoading, eventsError, eventsLoaded } = useSelector(state => state.buyer);
 
   // Filter by tab (Upcoming vs Past) - same logic as guest Home
   const tabFilteredEvents = useMemo(() => {
@@ -174,10 +199,9 @@ const BuyerDashboard = () => {
             </div>
           </div>
 
-          {eventsLoading && !events?.length && (
+          {eventsLoading && !eventsLoaded && (
             <div className="auctions-loading">
-              <div className="auctions-spinner"></div>
-              <p>Loading events...</p>
+              <EventsSkeleton />
             </div>
           )}
 
@@ -192,7 +216,7 @@ const BuyerDashboard = () => {
               </p>
               <button
                 className="auctions-retry-btn"
-                onClick={() => dispatch(fetchEvents({}))}
+                onClick={() => dispatch(fetchEvents({ forceRefresh: true }))}
               >
                 Retry
               </button>

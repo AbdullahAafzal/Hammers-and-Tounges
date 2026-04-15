@@ -10,6 +10,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { fetchUsersList } from "../../store/actions/adminActions";
 import { adminService } from "../../services/interceptors/admin.service";
 import { auctionService } from "../../services/interceptors/auction.service";
+import { fetchEvents } from "../../store/actions/AuctionsActions";
 import { toast } from "react-toastify";
 import { API_CONFIG } from "../../config/api.config";
 import EventListingRow from "../../components/EventListingRow";
@@ -135,46 +136,54 @@ const formatEventDate = (isoStr) => {
   }
 };
 
+const EventsSkeleton = ({ rows = 10 }) => (
+  <div className="events-skeleton-list" aria-hidden="true">
+    {Array.from({ length: rows }).map((_, idx) => (
+      <div key={idx} className="events-skeleton-row">
+        <div className="events-skeleton-thumb">
+          <div className="events-skeleton-shimmer events-skeleton-shape-thumb" />
+          <div className="events-skeleton-shimmer events-skeleton-shape-badge" />
+        </div>
+        <div className="events-skeleton-dates">
+          <div className="events-skeleton-shimmer events-skeleton-shape-date" />
+          <div className="events-skeleton-shimmer events-skeleton-shape-date" />
+        </div>
+        <div className="events-skeleton-body">
+          <div className="events-skeleton-shimmer events-skeleton-line events-skeleton-line--title" />
+          <div className="events-skeleton-shimmer events-skeleton-line events-skeleton-line--chip" />
+          <div className="events-skeleton-shimmer events-skeleton-line events-skeleton-line--meta" />
+        </div>
+        <div className="events-skeleton-lots">
+          <div className="events-skeleton-shimmer events-skeleton-shape-lots" />
+        </div>
+      </div>
+    ))}
+  </div>
+);
+
 const AdminDashboard = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const { users, isLoading } = useSelector((state) => state.admin);
-  const [events, setEvents] = useState([]);
+  const { events, eventsLoading, eventsLoaded } = useSelector((state) => state.buyer);
   const [filterStatus, setFilterStatus] = useState("ALL");
-  const [isLoadingEvents, setIsLoadingEvents] = useState(false);
-  const [eventCount, setEventCount] = useState(0);
 
   // Fetch users on component mount
   useEffect(() => {
     dispatch(fetchUsersList());
   }, [dispatch]);
 
-  // Fetch events on component mount (admin token attached for auth)
+  // Fetch events on component mount (cached in redux unless stale)
   useEffect(() => {
-    const fetchEventsData = async () => {
-      setIsLoadingEvents(true);
-      try {
-        const allResults = await auctionService.fetchAllEvents();
-        setEvents(allResults);
-        setEventCount(allResults.length);
-      } catch (error) {
-        console.error("Error fetching events:", error);
-        toast.error("Failed to load events. Please try again.");
-        setEvents([]);
-        setEventCount(0);
-      } finally {
-        setIsLoadingEvents(false);
-      }
-    };
-    fetchEventsData();
-  }, []);
+    dispatch(fetchEvents({}));
+  }, [dispatch]);
 
   // Calculate stats from users data
   const stats = useMemo(() => {
     if (!users?.results) {
       return {
         totalUsers: 0,
-        totalEvents: eventCount,
+        totalEvents: events.length,
         totalRevenue: "0"
       };
     }
@@ -184,10 +193,10 @@ const AdminDashboard = () => {
 
     return {
       totalUsers,
-      totalEvents: eventCount,
+      totalEvents: events.length,
       totalRevenue: "0"
     };
-  }, [users, eventCount]);
+  }, [users, events.length]);
 
   // Memoized data
   const recentActivities = useMemo(
@@ -458,9 +467,9 @@ const AdminDashboard = () => {
             <div className="admin-dashboard-card-header">
               <div className="admin-dashboard-card-title-wrapper">
                 <h2 className="admin-dashboard-card-title">Recent Events</h2>
-                {eventCount > 0 && (
+              {events.length > 0 && (
                   <span className="admin-dashboard-event-count">
-                    ({eventCount})
+                    ({events.length})
                   </span>
                 )}
               </div>
@@ -481,9 +490,9 @@ const AdminDashboard = () => {
             </div>
 
             <div className="admin-dashboard-events-list-wrapper">
-              {isLoadingEvents ? (
+              {eventsLoading && !eventsLoaded ? (
                 <div className="admin-dashboard-events-loading">
-                  Loading events...
+                  <EventsSkeleton />
                 </div>
               ) : filteredEvents.length === 0 ? (
                 <div className="admin-dashboard-events-empty">
