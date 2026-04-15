@@ -40,6 +40,13 @@ const formatEventDate = (isoStr) => {
   }
 };
 
+const normalizeEventStatus = (status) => {
+  const raw = String(status || '').toUpperCase();
+  if (raw === 'APPROVED' || raw === 'UPCOMING') return 'SCHEDULED';
+  if (raw === 'COMPLETED') return 'CLOSING';
+  return raw;
+};
+
 const StatCard = React.memo(({ icon: Icon, value, label, colorClass }) => (
   <div className="manager-dashboard-stat-card" role="article" aria-label={`${label}: ${value}`}>
     <div className={`manager-dashboard-stat-icon ${colorClass}`}>
@@ -99,7 +106,7 @@ function ManagerDashboard() {
         return;
       }
       try {
-        const scheduled = events.filter((e) => String(e?.status || '').toUpperCase() === 'SCHEDULED');
+        const scheduled = events.filter((e) => normalizeEventStatus(e?.status) === 'SCHEDULED');
         const checks = await Promise.all(
           scheduled.map(async (e) => [String(e.id), await canDeleteEventByLots(e.id)])
         );
@@ -117,7 +124,7 @@ function ManagerDashboard() {
     if (!events || events.length === 0) return [];
     if (filterStatus === 'ALL') return events;
     return events.filter((event) => {
-      const status = (event.status || '').toUpperCase();
+      const status = normalizeEventStatus(event.status);
       if (filterStatus === 'COMPLETED') {
         return status === 'CLOSING' || status === 'CLOSED' || status === 'COMPLETED';
       }
@@ -261,7 +268,7 @@ function ManagerDashboard() {
                           View
                         </button>
                         {canDeleteEvents &&
-                          (ev.status || '').toUpperCase() === 'SCHEDULED' &&
+                          normalizeEventStatus(ev.status) === 'SCHEDULED' &&
                           deletableEventIds[String(ev.id)] === true && (
                           <button
                             type="button"

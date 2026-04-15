@@ -136,6 +136,13 @@ const formatEventDate = (isoStr) => {
   }
 };
 
+const normalizeEventStatus = (status) => {
+  const raw = String(status || "").toUpperCase();
+  if (raw === "APPROVED" || raw === "UPCOMING") return "SCHEDULED";
+  if (raw === "COMPLETED") return "CLOSING";
+  return raw;
+};
+
 const EventsSkeleton = ({ rows = 10 }) => (
   <div className="events-skeleton-list" aria-hidden="true">
     {Array.from({ length: rows }).map((_, idx) => (
@@ -227,7 +234,7 @@ const AdminDashboard = () => {
     if (filterStatus === "ALL") return events;
 
     return events.filter((event) => {
-      const status = (event.status || "").toUpperCase();
+      const status = normalizeEventStatus(event.status);
       return status === filterStatus;
     });
   }, [events, filterStatus]);
