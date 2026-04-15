@@ -12,6 +12,8 @@ import { fetchCategories } from '../store/actions/AuctionsActions';
 import { toast } from 'react-toastify';
 import InsufficientBalanceBidModal from './InsufficientBalanceBidModal';
 import { flattenApiDetail, humanizeErrorDetailString } from '../utils/apiErrorMessage';
+import { formatBidDateTime } from '../utils/formatBidDateTime';
+import { maskBidderName } from '../utils/maskBidderName';
 import './GuestLotDrawer.css';
 
 const formatPrice = (price) => {
@@ -620,13 +622,14 @@ const GuestLotDrawer = ({ lot: initialLot, eventEndTime, eventTitle, eventId, ev
                         <p className="guest-lot-drawer__muted">Loading bid history...</p>
                       ) : bids?.length > 0 ? (
                         <div className="guest-lot-drawer__bid-list">
-                          {bids.map((bid, i) => (
+                          {bids.slice(0, 15).map((bid, i) => (
                             <div key={bid.id ?? i} className="guest-lot-drawer__bid-item">
                               <span>#{i + 1}</span>
-                              <span>{bid.bidder_name ?? bid.user_name ?? 'Bidder'}</span>
+                              <span>{maskBidderName(bid.bidder_name ?? bid.user_name ?? 'Bidder')}</span>
                               <span className="guest-lot-drawer__bid-amt">
                                 {currency} {formatPrice(bid.amount)}
                               </span>
+                              <span>{formatBidDateTime(bid.created_at)}</span>
                             </div>
                           ))}
                         </div>

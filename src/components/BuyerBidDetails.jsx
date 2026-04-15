@@ -4,6 +4,8 @@ import './BuyerBidDetails.css';
 import { useSelector, useDispatch } from 'react-redux';
 import { fetchAuctionBids } from '../store/actions/buyerActions';
 import { getMediaUrl } from '../config/api.config';
+import { formatBidDateTime } from '../utils/formatBidDateTime';
+import { maskBidderName } from '../utils/maskBidderName';
 
 const BuyerBidDetails = () => {
   const { id } = useParams()
@@ -31,14 +33,7 @@ const BuyerBidDetails = () => {
   };
 
   const formatDate = (dateString) => {
-    if (!dateString) return 'N/A';
-    return new Date(dateString).toLocaleString('en-US', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
-    });
+    return formatBidDateTime(dateString);
   };
 
   useEffect(() => {
@@ -316,14 +311,14 @@ const BuyerBidDetails = () => {
                 <h3 className="bid-history-title">All Bids for This Auction</h3>
                 {bidHistory.length > 0 ? (
                   <div className="bid-history-list">
-                    {bidHistory.map((bid, index) => (
+                    {bidHistory.slice(0, 15).map((bid, index) => (
                       <div key={bid.id} className="bid-history-item">
                         <div className="bid-history-rank">
                           <span className="rank-number">#{index + 1}</span>
                         </div>
                         <div className="bid-history-content">
                           <div className="bid-history-info">
-                            <span className="bid-history-bidder">{bid.bidder_name || 'Anonymous'}</span>
+                            <span className="bid-history-bidder">{maskBidderName(bid.bidder_name || 'Anonymous')}</span>
                           </div>
                           {/* <span className="bid-history-relative">{formatRelativeTime(bid.created_at)}</span> */}
                           <span className="bid-history-time">{formatDate(bid.created_at)}</span>

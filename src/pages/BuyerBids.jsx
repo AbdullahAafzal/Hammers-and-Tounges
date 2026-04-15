@@ -8,6 +8,7 @@ import { getMediaUrl } from '../config/api.config'
 import { auctionService } from '../services/interceptors/auction.service'
 import LotRow from '../components/LotRow'
 import GuestLotDrawer from '../components/GuestLotDrawer'
+import { formatBidDateTime } from '../utils/formatBidDateTime'
 
 const BuyerBids = () => {
   const navigate = useNavigate()
@@ -301,16 +302,20 @@ const BuyerBids = () => {
                 {filteredBids.map((bid) => {
                   const lot = bidToLot(bid)
                   return (
-                    <LotRow
-                      key={bid.id}
-                      lot={lot}
-                      eventEndTime={lot.end_date ?? lot.end_time}
-                      eventTitle={lot.event_title}
-                      eventStatus={lot.event_status}
-                      onOpenDetail={handleLotClick}
-                      showFavorite
-                      isFavorite={lot.is_favourite ?? false}
-                    />
+                    <div key={bid.id}>
+                      <p className="guest-event-lots__results-count" style={{ margin: '0 0 6px 4px' }}>
+                        Bid: {formatBidDateTime(bid.created_at)}
+                      </p>
+                      <LotRow
+                        lot={lot}
+                        eventEndTime={lot.end_date ?? lot.end_time}
+                        eventTitle={lot.event_title}
+                        eventStatus={lot.event_status}
+                        onOpenDetail={handleLotClick}
+                        showFavorite
+                        isFavorite={lot.is_favourite ?? false}
+                      />
+                    </div>
                   )
                 })}
               </div>

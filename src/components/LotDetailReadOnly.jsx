@@ -4,6 +4,8 @@ import { auctionService } from '../services/interceptors/auction.service';
 import { buyerService } from '../services/interceptors/buyer.service';
 import { getMediaUrl } from '../config/api.config';
 import { toast } from 'react-toastify';
+import { formatBidDateTime } from '../utils/formatBidDateTime';
+import { maskBidderName } from '../utils/maskBidderName';
 import './LotDetailReadOnly.css';
 
 const formatPrice = (price) => {
@@ -185,15 +187,15 @@ const LotDetailReadOnly = ({ backPath }) => {
               <p className="lot-detail-ro__bids-error">{bidsError}</p>
             ) : bids && bids.length > 0 ? (
               <div className="lot-detail-ro__bid-list">
-                {bids.map((bid, index) => (
+                {bids.slice(0, 15).map((bid, index) => (
                   <div key={bid.id ?? index} className="lot-detail-ro__bid-item">
                     <div className="lot-detail-ro__bid-rank">#{index + 1}</div>
                     <div className="lot-detail-ro__bid-info">
                       <div className="lot-detail-ro__bid-bidder">
-                        {bid.bidder_name ?? bid.user_name ?? bid.bidder ?? 'Bidder'}
+                        {maskBidderName(bid.bidder_name ?? bid.user_name ?? bid.bidder ?? 'Bidder')}
                       </div>
                       <div className="lot-detail-ro__bid-time">
-                        {bid.created_at ? new Date(bid.created_at).toLocaleString() : '—'}
+                        {formatBidDateTime(bid.created_at)}
                       </div>
                     </div>
                     <div className="lot-detail-ro__bid-amount">

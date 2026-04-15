@@ -4,6 +4,8 @@ import { auctionService } from '../../services/interceptors/auction.service';
 import { buyerService } from '../../services/interceptors/buyer.service';
 import { getMediaUrl } from '../../config/api.config';
 import { toast } from 'react-toastify';
+import { formatBidDateTime } from '../../utils/formatBidDateTime';
+import { maskBidderName } from '../../utils/maskBidderName';
 import './AdminLotDetail.css';
 
 const formatPrice = (price) => {
@@ -231,15 +233,15 @@ const AdminLotDetail = () => {
               <p className="admin-lot-detail__bids-loading">Loading bids...</p>
             ) : bids.length > 0 ? (
               <div className="admin-lot-detail__bids-list">
-                {bids.map((bid, index) => (
+                {bids.slice(0, 15).map((bid, index) => (
                   <div key={bid.id ?? index} className="admin-lot-detail__bid-item">
                     <div className="admin-lot-detail__bid-rank">#{index + 1}</div>
                     <div className="admin-lot-detail__bid-info">
                       <span className="admin-lot-detail__bid-bidder">
-                        {bid.bidder_name ?? bid.user_name ?? bid.bidder ?? 'Bidder'}
+                        {maskBidderName(bid.bidder_name ?? bid.user_name ?? bid.bidder ?? 'Bidder')}
                       </span>
                       <span className="admin-lot-detail__bid-time">
-                        {bid.created_at ? new Date(bid.created_at).toLocaleString() : '—'}
+                        {formatBidDateTime(bid.created_at)}
                       </span>
                     </div>
                     <div className="admin-lot-detail__bid-amount">

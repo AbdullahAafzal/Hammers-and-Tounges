@@ -14,6 +14,8 @@ import { useAuctionWebSocket } from "../hooks/useAuctionWebSocket";
 import { useBuyerLotAutoBid } from "../hooks/useBuyerLotAutoBid";
 import { getMediaUrl } from "../config/api.config";
 import InsufficientBalanceBidModal from "../components/InsufficientBalanceBidModal";
+import { formatBidDateTime } from "../utils/formatBidDateTime";
+import { maskBidderName } from "../utils/maskBidderName";
 import "./BuyerAuctionDetails.css";
 import { toast } from "react-toastify";
 
@@ -200,15 +202,15 @@ const BidHistoryPanel = memo(({ bids, formatCurrency }) => (
     <h3 className="buyer-details-panel-title">Bid History</h3>
     {bids && bids.length > 0 ? (
       <div className="buyer-details-bid-list">
-        {bids.map((bid, index) => (
+        {bids.slice(0, 15).map((bid, index) => (
           <div key={bid.id ?? index} className="buyer-details-bid-item">
             <div className="buyer-details-bid-rank">#{index + 1}</div>
             <div className="buyer-details-bid-info">
               <div className="buyer-details-bid-bidder">
-                {bid.bidder_name ?? bid.user_name ?? bid.bidder ?? "Bidder"}
+                {maskBidderName(bid.bidder_name ?? bid.user_name ?? bid.bidder ?? "Bidder")}
               </div>
               <div className="buyer-details-bid-time">
-                {new Date(bid.created_at).toLocaleString()}
+                {formatBidDateTime(bid.created_at)}
               </div>
             </div>
             <div className="buyer-details-bid-amount">
