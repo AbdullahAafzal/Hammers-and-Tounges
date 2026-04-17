@@ -2,12 +2,12 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { auctionService } from '../services/interceptors/auction.service';
 import { buyerService } from '../services/interceptors/buyer.service';
-import { getMediaUrl } from '../config/api.config';
 import { toast } from 'react-toastify';
 import { useSelector } from 'react-redux';
 import { formatBidDateTime } from '../utils/formatBidDateTime';
 import { maskBidderName } from '../utils/maskBidderName';
 import { logLotMediaFromApi } from '../utils/logLotMediaDebug';
+import { getLotImageUrls } from '../utils/lotMedia';
 import './ManagerLotDetail.css';
 
 const formatPrice = (price) => {
@@ -56,8 +56,7 @@ const ManagerLotDetail = () => {
   const canEdit = eventStatus === 'SCHEDULED' && !isLotActive && canUpdateEvents;
   const canDelete = eventStatus === 'SCHEDULED' && !isLotActive && canDeleteEvents;
 
-  const imageMedia = lot?.media?.filter((m) => m.media_type === 'image') || [];
-  const imageUrls = imageMedia.map((m) => getMediaUrl(m.file)).filter(Boolean);
+  const imageUrls = getLotImageUrls(lot);
 
   // Fetch lot when not in state (e.g. direct URL)
   // Fetch lot when no state (e.g. direct URL)

@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useCallback, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { auctionService } from "../services/interceptors/auction.service";
 import { toast } from "react-toastify";
@@ -55,6 +55,7 @@ const canDeleteEventByLots = async (eventId) => {
 
 export default function ClerkDashboard() {
   const navigate = useNavigate();
+  const location = useLocation();
   const dispatch = useDispatch();
   const features = useSelector((state) => state.permissions?.features);
   const permissionsLoading = useSelector((state) => state.permissions?.isLoading);
@@ -65,10 +66,60 @@ export default function ClerkDashboard() {
   const [deletableEventIds, setDeletableEventIds] = useState({});
   const [activeTab, setActiveTab] = useState(TAB_UPCOMING);
   const [page, setPage] = useState(1);
+  const [syncingCreatedEvent, setSyncingCreatedEvent] = useState(false);
+  const eventCreated = location.state?.eventCreated === true;
+  const createdEventId = location.state?.createdEventId ?? null;
+  const createdEventCode = location.state?.createdEventCode ?? null;
 
   useEffect(() => {
     dispatch(fetchEvents({}));
   }, [dispatch]);
+
+  useEffect(() => {
+    if (!eventCreated) return;
+
+    let cancelled = false;
+    setSyncingCreatedEvent(true);
+
+    const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+    const isCreatedEvent = (event) => {
+      if (!event || typeof event !== "object") return false;
+      if (createdEventId != null && String(event.id) === String(createdEventId)) return true;
+      if (createdEventCode && String(event.event_id) === String(createdEventCode)) return true;
+      return false;
+    };
+
+    (async () => {
+      const maxAttempts = 8;
+      const pollDelayMs = 1200;
+
+      for (let attempt = 1; attempt <= maxAttempts; attempt += 1) {
+        try {
+          const payload = await dispatch(fetchEvents({ forceRefresh: true })).unwrap();
+          const list = payload?.results || [];
+          if ((!createdEventId && !createdEventCode) || list.some(isCreatedEvent)) {
+            break;
+          }
+        } catch {
+          // Continue polling on transient fetch failures.
+        }
+
+        if (attempt < maxAttempts) {
+          await wait(pollDelayMs);
+          if (cancelled) return;
+        }
+      }
+
+      if (!cancelled) {
+        setSyncingCreatedEvent(false);
+        navigate("/clerk/dashboard", { replace: true });
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [eventCreated, createdEventId, createdEventCode, dispatch, navigate]);
 
   useEffect(() => {
     if (!canDeleteEvents || permissionsLoading || !events?.length) {
@@ -205,6 +256,13 @@ export default function ClerkDashboard() {
               </button>
             </div>
           </div>
+
+          {syncingCreatedEvent && (
+            <div className="manager-dashboard-events-sync-banner" role="status" aria-live="polite">
+              <span className="manager-dashboard-events-sync-dot" />
+              Fetching newly created event...
+            </div>
+          )}
 
           {eventsLoading && !eventsLoaded ? (
             <div className="manager-dashboard-loading"><EventsSkeleton /></div>

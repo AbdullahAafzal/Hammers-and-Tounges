@@ -4,7 +4,6 @@ import { useDispatch, useSelector } from 'react-redux';
 import { auctionService } from '../services/interceptors/auction.service';
 import { buyerService } from '../services/interceptors/buyer.service';
 import { profileService } from '../services/interceptors/profile.service';
-import { getMediaUrl } from '../config/api.config';
 import { useCountdownTimer } from '../hooks/useCountdownTimer';
 import BuyerLotAutoBidPanel from './BuyerLotAutoBidPanel';
 import { placeBid } from '../store/actions/buyerActions';
@@ -15,6 +14,7 @@ import { flattenApiDetail, humanizeErrorDetailString } from '../utils/apiErrorMe
 import { formatBidDateTime } from '../utils/formatBidDateTime';
 import { maskBidderName } from '../utils/maskBidderName';
 import { logLotMediaFromApi } from '../utils/logLotMediaDebug';
+import { getLotImageUrls } from '../utils/lotMedia';
 import './GuestLotDrawer.css';
 
 const formatPrice = (price) => {
@@ -79,8 +79,7 @@ const GuestLotDrawer = ({ lot: initialLot, eventEndTime, eventTitle, eventId, ev
     [event, eventId, eventTitle, eventStatus]
   );
 
-  const imageMedia = effectiveLot?.media?.filter((m) => m.media_type === 'image') || [];
-  const imageUrls = imageMedia.map((m) => getMediaUrl(m.file)).filter(Boolean);
+  const imageUrls = getLotImageUrls(effectiveLot);
   const displayImage = imageUrls[selectedImage] || imageUrls[0];
 
   const endTime = lot?.end_date || lot?.end_time || eventEndTime;

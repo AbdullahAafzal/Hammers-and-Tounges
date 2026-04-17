@@ -61,8 +61,8 @@ export const fetchEvents = createAsyncThunk(
         const response = await auctionService.getEvents(params);
         return { ...response, fetchedAt: Date.now() };
       }
-      const { page: _omit, forceRefresh: _force, ...rest } = params || {};
-      const results = await auctionService.fetchAllEvents(rest);
+      const { page: _omit, forceRefresh = false, ...rest } = params || {};
+      const results = await auctionService.fetchAllEvents(rest, { forceRefresh });
       return {
         results,
         count: results.length,

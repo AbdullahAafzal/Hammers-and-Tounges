@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate, Link, useLocation } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { auctionService } from '../services/interceptors/auction.service';
 import { toast } from 'react-toastify';
@@ -80,6 +80,7 @@ const EventsSkeleton = ({ rows = 10 }) => (
 
 function ManagerDashboard() {
   const navigate = useNavigate();
+  const location = useLocation();
   const dispatch = useDispatch();
   const features = useSelector((state) => state.permissions?.features);
   const { events, eventsLoading, eventsLoaded } = useSelector((state) => state.buyer);
@@ -88,10 +89,60 @@ function ManagerDashboard() {
   const canDeleteEvents = manageEventsPerm?.delete === true;
   const [filterStatus, setFilterStatus] = useState('ALL');
   const [deletableEventIds, setDeletableEventIds] = useState({});
+  const [syncingCreatedEvent, setSyncingCreatedEvent] = useState(false);
+  const eventCreated = location.state?.eventCreated === true;
+  const createdEventId = location.state?.createdEventId ?? null;
+  const createdEventCode = location.state?.createdEventCode ?? null;
 
   useEffect(() => {
     dispatch(fetchEvents({}));
   }, [dispatch]);
+
+  useEffect(() => {
+    if (!eventCreated) return;
+
+    let cancelled = false;
+    setSyncingCreatedEvent(true);
+
+    const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+    const isCreatedEvent = (event) => {
+      if (!event || typeof event !== 'object') return false;
+      if (createdEventId != null && String(event.id) === String(createdEventId)) return true;
+      if (createdEventCode && String(event.event_id) === String(createdEventCode)) return true;
+      return false;
+    };
+
+    (async () => {
+      const maxAttempts = 8;
+      const pollDelayMs = 1200;
+
+      for (let attempt = 1; attempt <= maxAttempts; attempt += 1) {
+        try {
+          const payload = await dispatch(fetchEvents({ forceRefresh: true })).unwrap();
+          const list = payload?.results || [];
+          if ((!createdEventId && !createdEventCode) || list.some(isCreatedEvent)) {
+            break;
+          }
+        } catch {
+          // Continue polling on transient fetch failures.
+        }
+
+        if (attempt < maxAttempts) {
+          await wait(pollDelayMs);
+          if (cancelled) return;
+        }
+      }
+
+      if (!cancelled) {
+        setSyncingCreatedEvent(false);
+        navigate('/manager/dashboard', { replace: true });
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [eventCreated, createdEventId, createdEventCode, dispatch, navigate]);
 
   useEffect(() => {
     const hydrateDeleteEligibility = async () => {
@@ -230,6 +281,13 @@ function ManagerDashboard() {
               </select>
             </div>
           </div>
+
+          {syncingCreatedEvent && (
+            <div className="manager-dashboard-events-sync-banner" role="status" aria-live="polite">
+              <span className="manager-dashboard-events-sync-dot" />
+              Fetching newly created event...
+            </div>
+          )}
 
           <div className="manager-dashboard-events-list-wrapper">
             {eventsLoading && !eventsLoaded ? (

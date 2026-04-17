@@ -2,11 +2,11 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { auctionService } from '../../services/interceptors/auction.service';
 import { buyerService } from '../../services/interceptors/buyer.service';
-import { getMediaUrl } from '../../config/api.config';
 import { toast } from 'react-toastify';
 import { formatBidDateTime } from '../../utils/formatBidDateTime';
 import { maskBidderName } from '../../utils/maskBidderName';
 import { logLotMediaFromApi } from '../../utils/logLotMediaDebug';
+import { getLotImageUrls } from '../../utils/lotMedia';
 import './AdminLotDetail.css';
 
 const formatPrice = (price) => {
@@ -35,8 +35,7 @@ const AdminLotDetail = () => {
   const [selectedImage, setSelectedImage] = useState(0);
   const [deleting, setDeleting] = useState(false);
 
-  const imageMedia = lot?.media?.filter((m) => m.media_type === 'image') || [];
-  const imageUrls = imageMedia.map((m) => getMediaUrl(m.file)).filter(Boolean);
+  const imageUrls = getLotImageUrls(lot);
 
   useEffect(() => {
     if (lotFromState) return;

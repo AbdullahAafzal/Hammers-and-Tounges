@@ -5,7 +5,7 @@ import React, {
   useCallback,
 } from "react";
 import "./AdminDashboard.css";
-import { useNavigate, Link } from "react-router-dom";
+import { useNavigate, Link, useLocation } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchUsersList } from "../../store/actions/adminActions";
 import { adminService } from "../../services/interceptors/admin.service";
@@ -164,10 +164,15 @@ const EventsSkeleton = ({ rows = 10 }) => (
 
 const AdminDashboard = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const dispatch = useDispatch();
   const { users, isLoading } = useSelector((state) => state.admin);
   const { events, eventsLoading, eventsLoaded } = useSelector((state) => state.buyer);
   const [filterStatus, setFilterStatus] = useState("ALL");
+  const [syncingCreatedEvent, setSyncingCreatedEvent] = useState(false);
+  const eventCreated = location.state?.eventCreated === true;
+  const createdEventId = location.state?.createdEventId ?? null;
+  const createdEventCode = location.state?.createdEventCode ?? null;
 
   // Fetch users on component mount
   useEffect(() => {
@@ -178,6 +183,52 @@ const AdminDashboard = () => {
   useEffect(() => {
     dispatch(fetchEvents({}));
   }, [dispatch]);
+
+  useEffect(() => {
+    if (!eventCreated) return;
+
+    let cancelled = false;
+    setSyncingCreatedEvent(true);
+
+    const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+    const isCreatedEvent = (event) => {
+      if (!event || typeof event !== 'object') return false;
+      if (createdEventId != null && String(event.id) === String(createdEventId)) return true;
+      if (createdEventCode && String(event.event_id) === String(createdEventCode)) return true;
+      return false;
+    };
+
+    (async () => {
+      const maxAttempts = 8;
+      const pollDelayMs = 1200;
+
+      for (let attempt = 1; attempt <= maxAttempts; attempt += 1) {
+        try {
+          const payload = await dispatch(fetchEvents({ forceRefresh: true })).unwrap();
+          const list = payload?.results || [];
+          if ((!createdEventId && !createdEventCode) || list.some(isCreatedEvent)) {
+            break;
+          }
+        } catch {
+          // Continue polling; transient errors can resolve on the next tick.
+        }
+
+        if (attempt < maxAttempts) {
+          await wait(pollDelayMs);
+          if (cancelled) return;
+        }
+      }
+
+      if (!cancelled) {
+        setSyncingCreatedEvent(false);
+        navigate('/admin/dashboard', { replace: true });
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [eventCreated, createdEventId, createdEventCode, dispatch, navigate]);
 
   // Calculate stats from users data
   const stats = useMemo(() => {
@@ -529,6 +580,13 @@ const AdminDashboard = () => {
                 </select>
               </div>
             </div>
+
+            {syncingCreatedEvent && (
+              <div className="admin-dashboard-events-sync-banner" role="status" aria-live="polite">
+                <span className="admin-dashboard-events-sync-dot" />
+                Fetching newly created event...
+              </div>
+            )}
 
             <div className="admin-dashboard-events-list-wrapper">
               {eventsLoading && !eventsLoaded ? (
