@@ -37,8 +37,16 @@ export default function InsufficientBalanceBidModal({
 
   const isWalletUnavailable = variant === "wallet_unavailable";
   const dash = "—";
+  const isUnlimitedBiddingPower = (v) => {
+    const n = Number(v);
+    return Number.isFinite(n) && n >= 999999999;
+  };
   const fmt = (v) =>
-    isWalletUnavailable ? dash : formatWalletCurrency(v ?? 0);
+    isWalletUnavailable
+      ? dash
+      : isUnlimitedBiddingPower(v)
+        ? "Unlimited"
+        : formatWalletCurrency(v ?? 0);
 
   return createPortal(
     <div

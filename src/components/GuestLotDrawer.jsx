@@ -27,6 +27,11 @@ const formatPrice = (price) => {
 const formatSpecificKey = (key) =>
   String(key).replace(/_/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase());
 
+const isUnlimitedBiddingPower = (value) => {
+  const n = Number(value);
+  return Number.isFinite(n) && n >= 999999999;
+};
+
 /** Shown when activate fails (e.g. backend 500) because GRV is not satisfied. */
 const ACTIVATE_REQUIRES_GRV_TOAST =
   'Lot cannot be activated. Please complete GRV first.';
@@ -627,7 +632,9 @@ const GuestLotDrawer = ({
                       <div className="guest-lot-drawer__wallet-top-item">
                         <span className="guest-lot-drawer__wallet-top-label">Bidding power</span>
                         <span className="guest-lot-drawer__wallet-top-value">
-                          {formatWalletCurrency(walletSummary.biddingPower)}
+                          {isUnlimitedBiddingPower(walletSummary.biddingPower)
+                            ? 'Unlimited'
+                            : formatWalletCurrency(walletSummary.biddingPower)}
                         </span>
                       </div>
                       <div className="guest-lot-drawer__wallet-top-item">

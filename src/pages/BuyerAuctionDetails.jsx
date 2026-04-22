@@ -291,6 +291,11 @@ const formatTimelineDate = (dateStr) => {
   return isNaN(d.getTime()) ? "—" : d.toLocaleString();
 };
 
+const isUnlimitedBiddingPower = (value) => {
+  const n = Number(value);
+  return Number.isFinite(n) && n >= 999999999;
+};
+
 // ==================== MAIN COMPONENT ====================
 
 const BuyerAuctionDetails = () => {
@@ -938,7 +943,9 @@ const BuyerAuctionDetails = () => {
                       <div className="buyer-details-wallet-summary__item">
                         <span className="buyer-details-wallet-summary__label">Bidding power</span>
                         <span className="buyer-details-wallet-summary__value">
-                          {formatWalletCurrency(walletSummary.biddingPower)}
+                          {isUnlimitedBiddingPower(walletSummary.biddingPower)
+                            ? "Unlimited"
+                            : formatWalletCurrency(walletSummary.biddingPower)}
                         </span>
                       </div>
                       <div className="buyer-details-wallet-summary__item">

@@ -72,6 +72,11 @@ function formatWalletCurrency(n) {
   return `$${v.toFixed(2)}`;
 }
 
+function isUnlimitedBiddingPower(n) {
+  const v = Number(n);
+  return Number.isFinite(v) && v >= 999999999;
+}
+
 function formatPaymentWhen(isoOrStr) {
   if (isoOrStr == null || isoOrStr === "") return "—";
   const d = new Date(isoOrStr);
@@ -359,7 +364,9 @@ const BuyerWallet = () => {
                       </svg>
                       <span>Bidding Power</span>
                     </div>
-                    <div className="reserved-amount">{formatWalletCurrency(biddingPower)}</div>
+                    <div className="reserved-amount">
+                      {isUnlimitedBiddingPower(biddingPower) ? "Unlimited" : formatWalletCurrency(biddingPower)}
+                    </div>
                     <p className="reserved-description">Total limit you can use for bidding.</p>
                   </div>
                 )}
