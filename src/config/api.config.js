@@ -70,13 +70,7 @@ export const API_CONFIG = {
 export const getApiUrl = (endpoint) => {
   // Remove leading slash if present to avoid double slashes
   const cleanEndpoint = endpoint.startsWith('/') ? endpoint.slice(1) : endpoint;
-
-  if (API_CONFIG.IS_PRODUCTION) {
-    // In production, use relative URLs that will be proxied by Netlify
-    return `/${cleanEndpoint}`;
-  }
-
-  // In development, use full URL
+  // BASE_URL is '/api' in production (relative, proxied by Vercel) or full URL in dev
   return `${API_CONFIG.BASE_URL}/${cleanEndpoint}`;
 };
 
@@ -107,15 +101,12 @@ export const getMediaUrl = (mediaPath) => {
     path = path.slice(1);
   }
 
-  // 4. Use MEDIA_BASE_URL env var (set to full URL in production, relative in dev)
-  const mediaBase = (API_CONFIG.MEDIA_BASE_URL || 'https://developer.hashverx.com/media').replace(/\/$/, '');
+  // 4. Use MEDIA_BASE_URL env var ('/media' relative in production, full URL in dev)
+  const mediaBase = (API_CONFIG.MEDIA_BASE_URL || '/media').replace(/\/$/, '');
 
   if (path.startsWith('media/')) {
-    // path already has 'media/' prefix — use base origin only
-    const origin = mediaBase.endsWith('/media')
-      ? mediaBase.slice(0, -6)
-      : mediaBase;
-    return `${origin}/${path}`;
+    // path already has 'media/' prefix — strip it so we don't double up
+    path = path.slice('media/'.length);
   }
 
   return `${mediaBase}/${path}`;
