@@ -174,6 +174,7 @@ const LotRow = ({
       </div>
       <div className="lot-row__info">
         <h3 className="lot-row__title">{lot.title || 'Untitled'}</h3>
+        <p className="lot-row__lot-no">Lot #{lot.lot_number || lot.id}</p>
         <p className="lot-row__location">
           {lot.location || lot.venue || eventTitle || '—'}
         </p>
