@@ -5,7 +5,6 @@ import { useDispatch, useSelector } from "react-redux";
 import { fetchUsersList, performUserAction } from "../../store/actions/adminActions";
 import { clearActionSuccess } from "../../store/slices/adminSlice";
 import { getMediaUrl } from "../../config/api.config";
-import KYCDocumentPreview from "./KYCDocumentPreview";
 
 const AdminManagerKYC = () => {
   const [comparison, setComparison] = useState(false);
@@ -463,12 +462,6 @@ const AdminManagerKYC = () => {
             )}
           </div>
         </div>
-
-        <KYCDocumentPreview
-          documents={documentTypes}
-          onPreviewImage={openFullscreen}
-          onDownloadImage={downloadImage}
-        />
       </div>
 
       {fullscreenImage && (

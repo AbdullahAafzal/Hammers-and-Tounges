@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom'
-import logo from '../assets/logo.png'
 import ThemeToggle from '../components/ThemeToggle'
 import './OTPVerification.css'
 import { useSelector, useDispatch } from 'react-redux'
@@ -124,7 +123,6 @@ const OTPVerification = () => {
             </svg>
           </button>
           <a href="/" className="otp-logo">
-            <img src={logo} alt="Hammers & Tongues Logo" />
             <span>Hammer & Tongues</span>
           </a>
         </div>
