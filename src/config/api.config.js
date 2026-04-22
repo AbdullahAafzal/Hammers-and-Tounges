@@ -159,6 +159,7 @@ export const API_ROUTES = {
   ADMIN_ASSIGN_AUCTION: '/inspections/admin/assign/',
   ADMIN_USERS_LIST: '/inspections/admin/users/',
   ADMIN_UPDATE_USER: '/users/admin/', // + userId + /update/
+  ADMIN_ADD_FUNDS: '/users/admin/add-funds/',
   ADMIN_CREATE_STAFF: '/users/admin/create-staff/',
   ADMIN_USER_MANAGEMENT: '/inspections/admin/user-management/', // POST create seller, PATCH + id + / for edit
   ADMIN_USER_PERMISSIONS: '/inspections/admin/user-permissions/', // GET/PATCH user feature permissions

@@ -129,9 +129,9 @@ const ManualPaymentAuthorization = () => {
       {/* Header */}
       <div className="manual-auth-header">
         <div>
-          <h1 className="manual-auth-title">Cash Deposit Authorization</h1>
+          <h1 className="manual-auth-title">Bank Transfer Authorization</h1>
           <p className="manual-auth-subtitle">
-            Review and authorize cash deposit requests
+            Review and authorize bank transfer requests
           </p>
         </div>
         <div className="welcome-actions">
@@ -141,7 +141,7 @@ const ManualPaymentAuthorization = () => {
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
               <path d="M12 5V19M5 12H19" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
             </svg>
-            New Cash Deposit Entry
+            New Bank Transfer Entry
           </button>
 
         </div>
@@ -205,7 +205,7 @@ const ManualPaymentAuthorization = () => {
                         <path d="M12 8v4l3 3" />
                         <circle cx="12" cy="12" r="10" />
                       </svg>
-                      <h3>No Cash Deposit Requests Found</h3>
+                      <h3>No Bank Transfer Requests Found</h3>
                       <p>Try adjusting your filters or search criteria.</p>
                     </div>
                   </td>
