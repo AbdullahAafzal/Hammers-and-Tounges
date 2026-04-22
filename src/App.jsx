@@ -33,6 +33,7 @@ import SellerLotDetail from "./pages/SellerLotDetail";
 import SellerAuctionListings from "./pages/SellerAuctionListings";
 import SellerListingDetails from "./pages/SellerAuctionDetails";
 import SellerAnalytics from "./pages/SellerAnalytics";
+import SellerProductCreate from "./pages/SellerCreateProduct";
 import SellerProfile from "./pages/sellerProfile/SellerProfile";
 import SellerKYCVerification from "./pages/sellerProfile/SellerKYCVerification";
 
@@ -154,7 +155,7 @@ function App() {
                 <Route path="/seller/lot/:lotId" element={<SellerLotDetail />} />
                 <Route path="/seller/auction-listings" element={<SellerAuctionListings />} />
                 <Route path="/seller/listing/:id" element={<SellerListingDetails />} />
-                <Route path="/seller/product" element={<SellerCreateProduct />} />
+                <Route path="/seller/product" element={<SellerProductCreate />} />
                 <Route path="/seller/analytics" element={<SellerAnalytics />} />
                 <Route path="/seller/profile" element={<SellerProfile />} />
                 <Route path="/seller/kyc-verification" element={<SellerKYCVerification />} />
