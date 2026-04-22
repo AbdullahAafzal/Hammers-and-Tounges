@@ -12,6 +12,9 @@ const STATUS_OPTIONS = [
   { value: 'REJECTED', label: 'Rejected' },
 ]
 
+const TAB_BANK_TRANSFERS = 'bank_transfers'
+const TAB_CASH_DEPOSIT = 'cash_deposit'
+
 function normalizeManualDepositsList(data) {
   if (Array.isArray(data)) return data
   if (data?.results && Array.isArray(data.results)) return data.results
@@ -55,7 +58,9 @@ const AdminFinance = () => {
   const financeBase = routeLocation.pathname.startsWith('/manager/') ? '/manager/finance' : '/admin/finance'
 
   const [statusFilter, setStatusFilter] = useState('PENDING')
+  const [activeTab, setActiveTab] = useState(TAB_BANK_TRANSFERS)
   const [items, setItems] = useState([])
+  const [depositHistory, setDepositHistory] = useState([])
   const [loading, setLoading] = useState(true)
   const [actionId, setActionId] = useState(null)
   const [rejectTarget, setRejectTarget] = useState(null)
@@ -69,7 +74,7 @@ const AdminFinance = () => {
   const [cashDepositAmount, setCashDepositAmount] = useState('')
   const [cashDepositSubmitting, setCashDepositSubmitting] = useState(false)
 
-  const load = useCallback(async () => {
+  const loadBankTransfers = useCallback(async () => {
     setLoading(true)
     try {
       const params = statusFilter ? { status: statusFilter } : {}
@@ -90,9 +95,33 @@ const AdminFinance = () => {
     }
   }, [statusFilter])
 
+  const loadCashDepositHistory = useCallback(async () => {
+    setLoading(true)
+    try {
+      const data = await adminService.getDepositHistory()
+      setDepositHistory(normalizeManualDepositsList(data))
+    } catch (err) {
+      const raw =
+        err?.response?.data?.detail ||
+        err?.response?.data?.message ||
+        err?.response?.data?.error ||
+        err?.message ||
+        'Failed to load cash deposit history'
+      const msg = typeof raw === 'string' ? raw : Array.isArray(raw) ? raw.map((e) => e?.message || e).join(' ') : 'Failed to load cash deposit history'
+      toast.error(msg)
+      setDepositHistory([])
+    } finally {
+      setLoading(false)
+    }
+  }, [])
+
   useEffect(() => {
-    load()
-  }, [load])
+    if (activeTab === TAB_CASH_DEPOSIT) {
+      loadCashDepositHistory()
+      return
+    }
+    loadBankTransfers()
+  }, [activeTab, loadBankTransfers, loadCashDepositHistory])
 
   const openReject = (row) => {
     setRejectTarget(row)
@@ -169,7 +198,7 @@ const AdminFinance = () => {
     try {
       await adminService.reviewAdminManualDeposit(id, { decision: 'APPROVED' })
       toast.success('Deposit approved.')
-      await load()
+      await loadBankTransfers()
     } catch (err) {
       const raw =
         err?.response?.data?.detail ||
@@ -198,7 +227,7 @@ const AdminFinance = () => {
       })
       toast.success('Deposit rejected.')
       closeReject()
-      await load()
+      await loadBankTransfers()
     } catch (err) {
       const raw =
         err?.response?.data?.detail ||
@@ -248,7 +277,7 @@ const AdminFinance = () => {
       })
       toast.success('Cash deposit added successfully.')
       closeCashDepositModal(true)
-      await load()
+      await loadCashDepositHistory()
     } catch (err) {
       const raw =
         err?.response?.data?.detail ||
@@ -286,22 +315,24 @@ const AdminFinance = () => {
             <div className="finance-header-content">
               <h1 className="finance-title">Finance</h1>
               <p className="finance-subtitle">
-                Review buyer bank transfer requests. Approve or reject pending proofs of payment.
+                Manage bank transfer requests and cash deposit transactions.
               </p>
             </div>
             <div className="finance-header-actions">
-              <button
-                type="button"
-                className="finance-primary-btn finance-primary-btn--compact finance-primary-btn--cash-deposit"
-                onClick={openCashDepositModal}
-                disabled={cashDepositSubmitting}
-              >
-                Cash Deposit
-              </button>
+              {activeTab === TAB_CASH_DEPOSIT ? (
+                <button
+                  type="button"
+                  className="finance-primary-btn finance-primary-btn--compact finance-primary-btn--cash-deposit"
+                  onClick={openCashDepositModal}
+                  disabled={cashDepositSubmitting}
+                >
+                  Cash Deposit
+                </button>
+              ) : null}
               <button
                 type="button"
                 className="finance-primary-btn finance-primary-btn--compact"
-                onClick={load}
+                onClick={activeTab === TAB_CASH_DEPOSIT ? loadCashDepositHistory : loadBankTransfers}
                 disabled={loading}
               >
                 Refresh
@@ -309,6 +340,24 @@ const AdminFinance = () => {
             </div>
           </header>
 
+          <section className="finance-tabs" aria-label="Finance tabs">
+            <button
+              type="button"
+              className={`finance-tab ${activeTab === TAB_BANK_TRANSFERS ? 'is-active' : ''}`}
+              onClick={() => setActiveTab(TAB_BANK_TRANSFERS)}
+            >
+              Bank transfers
+            </button>
+            <button
+              type="button"
+              className={`finance-tab ${activeTab === TAB_CASH_DEPOSIT ? 'is-active' : ''}`}
+              onClick={() => setActiveTab(TAB_CASH_DEPOSIT)}
+            >
+              Cash deposit
+            </button>
+          </section>
+
+          {activeTab === TAB_BANK_TRANSFERS ? (
           <section className="finance-filters-section-1">
             <div className="finance-filters-container">
               <div className="finance-filter-controls finance-filter-controls--single">
@@ -334,18 +383,25 @@ const AdminFinance = () => {
               </div>
             </div>
           </section>
+          ) : null}
 
           <section className="finance-logs-section" aria-live="polite">
             <div className="finance-section-header">
-              <h2 className="finance-section-title">Bank transfer</h2>
+              <h2 className="finance-section-title">
+                {activeTab === TAB_CASH_DEPOSIT ? 'Cash deposit history' : 'Bank transfer'}
+              </h2>
               <span className="finance-results-info">
-                {loading ? 'Loading…' : `${items.length} request${items.length !== 1 ? 's' : ''}`}
-                {statusFilter === 'PENDING' && !loading && pendingCount > 0 ? ` · ${pendingCount} pending` : ''}
-                {!loading && items.length > 0 ? ' · Tap a row to open details' : ''}
+                {loading
+                  ? 'Loading…'
+                  : activeTab === TAB_CASH_DEPOSIT
+                    ? `${depositHistory.length} transaction${depositHistory.length !== 1 ? 's' : ''}`
+                    : `${items.length} request${items.length !== 1 ? 's' : ''}`}
+                {activeTab === TAB_BANK_TRANSFERS && statusFilter === 'PENDING' && !loading && pendingCount > 0 ? ` · ${pendingCount} pending` : ''}
+                {activeTab === TAB_BANK_TRANSFERS && !loading && items.length > 0 ? ' · Tap a row to open details' : ''}
               </span>
             </div>
 
-            {!loading && items.length === 0 ? (
+            {!loading && (activeTab === TAB_CASH_DEPOSIT ? depositHistory.length === 0 : items.length === 0) ? (
               <div className="finance-empty-state">
                 <svg width="48" height="48" viewBox="0 0 24 24" fill="none" aria-hidden>
                   <path
@@ -363,18 +419,21 @@ const AdminFinance = () => {
                     strokeLinejoin="round"
                   />
                 </svg>
-                <h3>No bank transfer requests</h3>
-                <p>Nothing matches this filter.</p>
+                <h3>
+                  {activeTab === TAB_CASH_DEPOSIT ? 'No cash deposit history' : 'No bank transfer requests'}
+                </h3>
+                <p>{activeTab === TAB_CASH_DEPOSIT ? 'No transactions found.' : 'Nothing matches this filter.'}</p>
               </div>
             ) : (
               <div
                 className="finance-table-container finance-md-table-scroll"
                 role="region"
-                aria-label="Bank transfer table"
+                aria-label={activeTab === TAB_CASH_DEPOSIT ? 'Cash deposit history table' : 'Bank transfer table'}
                 tabIndex={0}
               >
                 <div className="finance-table-wrapper">
                   <table className="finance-table finance-md-table">
+                    {activeTab === TAB_BANK_TRANSFERS ? (
                     <thead>
                       <tr>
                         <th>Proof</th>
@@ -388,13 +447,46 @@ const AdminFinance = () => {
                         <th>Actions</th>
                       </tr>
                     </thead>
+                    ) : (
+                    <thead>
+                      <tr>
+                        <th>User</th>
+                        <th>Email</th>
+                        <th>Amount</th>
+                        <th>Type</th>
+                        <th>Description</th>
+                        <th>Created</th>
+                      </tr>
+                    </thead>
+                    )}
                     <tbody>
                       {loading ? (
                         <tr>
-                          <td colSpan={9} className="finance-md-loading-cell">
+                          <td colSpan={activeTab === TAB_CASH_DEPOSIT ? 6 : 9} className="finance-md-loading-cell">
                             Loading…
                           </td>
                         </tr>
+                      ) : activeTab === TAB_CASH_DEPOSIT ? (
+                        depositHistory.map((row) => (
+                          <tr key={row.id} className="finance-table-row">
+                            <td>{row.user_name || '—'}</td>
+                            <td>
+                              <span className="finance-details-text" title={row.user_email}>
+                                {row.user_email || '—'}
+                              </span>
+                            </td>
+                            <td>${parseFloat(row.amount ?? 0).toFixed(2)}</td>
+                            <td>{row.transaction_type_display || row.transaction_type || '—'}</td>
+                            <td>
+                              <span className="finance-details-text" title={row.description}>
+                                {row.description || '—'}
+                              </span>
+                            </td>
+                            <td>
+                              <span className="finance-date-text">{formatDateTime(row.created_at)}</span>
+                            </td>
+                          </tr>
+                        ))
                       ) : (
                         items.map((row) => {
                           const proofUrl = getMediaUrl(row.proof_of_payment)
@@ -560,7 +652,7 @@ const AdminFinance = () => {
         </div>
       ) : null}
 
-      {isCashDepositModalOpen ? (
+      {isCashDepositModalOpen && activeTab === TAB_CASH_DEPOSIT ? (
         <div className="finance-md-modal-overlay" role="presentation" onClick={closeCashDepositModal}>
           <div
             className="finance-md-modal finance-md-modal--cash-deposit"

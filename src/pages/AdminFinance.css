@@ -83,6 +83,29 @@
   gap: 0.5rem;
 }
 
+.finance-tabs {
+  display: inline-flex;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.finance-tab {
+  border: 1px solid var(--color-input-border);
+  background: var(--color-input-bg);
+  color: var(--color-text-secondary);
+  border-radius: 999px;
+  padding: 0.5rem 1rem;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.finance-tab.is-active {
+  border-color: rgba(140, 198, 63, 0.7);
+  color: #39AE47;
+  background: rgba(140, 198, 63, 0.14);
+}
+
 .finance-primary-btn {
   padding: 0.75rem 1.5rem;
   background-color: #39AE47;
