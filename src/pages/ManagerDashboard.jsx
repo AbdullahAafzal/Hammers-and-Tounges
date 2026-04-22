@@ -8,6 +8,12 @@ import { fetchEvents } from '../store/actions/AuctionsActions';
 import { normalizeEventStatusForFilter } from '../utils/eventStatus';
 import './ManagerDashboard.css';
 
+const TAB_UPCOMMING = 'upcomming';
+const TAB_CURRENT = 'current';
+const TAB_PAST = 'past';
+const TAB_ALL = 'all';
+const ITEMS_PER_PAGE = 15;
+
 const canDeleteEventByLots = async (eventId) => {
   try {
     const res = await auctionService.getLots({ event: eventId, page: 1, page_size: 200 });
@@ -84,19 +90,42 @@ function ManagerDashboard() {
   const dispatch = useDispatch();
   const features = useSelector((state) => state.permissions?.features);
   const { events, eventsLoading, eventsLoaded } = useSelector((state) => state.buyer);
+  const { eventsCount, eventsError } = useSelector((state) => state.buyer);
   const manageEventsPerm = features?.manage_events || {};
   const canCreateEvents = manageEventsPerm?.create === true;
   const canDeleteEvents = manageEventsPerm?.delete === true;
-  const [filterStatus, setFilterStatus] = useState('ALL');
+  const [activeTab, setActiveTab] = useState(TAB_CURRENT);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [page, setPage] = useState(1);
   const [deletableEventIds, setDeletableEventIds] = useState({});
   const [syncingCreatedEvent, setSyncingCreatedEvent] = useState(false);
   const eventCreated = location.state?.eventCreated === true;
   const createdEventId = location.state?.createdEventId ?? null;
   const createdEventCode = location.state?.createdEventCode ?? null;
 
+  const timeframe =
+    activeTab === TAB_ALL
+      ? undefined
+      : activeTab === TAB_UPCOMMING
+        ? 'upcomming'
+        : activeTab === TAB_CURRENT
+          ? 'current'
+          : 'past';
+
   useEffect(() => {
-    dispatch(fetchEvents({}));
-  }, [dispatch]);
+    dispatch(
+      fetchEvents({
+        ...(timeframe ? { timeframe } : {}),
+        search: searchQuery.trim() || undefined,
+        page,
+        page_size: ITEMS_PER_PAGE,
+      })
+    );
+  }, [dispatch, timeframe, searchQuery, page]);
+
+  useEffect(() => {
+    setPage(1);
+  }, [activeTab, searchQuery]);
 
   useEffect(() => {
     if (!eventCreated) return;
@@ -118,7 +147,15 @@ function ManagerDashboard() {
 
       for (let attempt = 1; attempt <= maxAttempts; attempt += 1) {
         try {
-          const payload = await dispatch(fetchEvents({ forceRefresh: true })).unwrap();
+          const payload = await dispatch(
+            fetchEvents({
+              forceRefresh: true,
+              ...(timeframe ? { timeframe } : {}),
+              search: searchQuery.trim() || undefined,
+              page,
+              page_size: ITEMS_PER_PAGE,
+            })
+          ).unwrap();
           const list = payload?.results || [];
           if ((!createdEventId && !createdEventCode) || list.some(isCreatedEvent)) {
             break;
@@ -142,7 +179,7 @@ function ManagerDashboard() {
     return () => {
       cancelled = true;
     };
-  }, [eventCreated, createdEventId, createdEventCode, dispatch, navigate]);
+  }, [eventCreated, createdEventId, createdEventCode, dispatch, navigate, timeframe, searchQuery, page]);
 
   useEffect(() => {
     const hydrateDeleteEligibility = async () => {
@@ -165,18 +202,9 @@ function ManagerDashboard() {
     hydrateDeleteEligibility();
   }, [events]);
 
-  const getFilteredEvents = () => {
-    if (!events || events.length === 0) return [];
-    if (filterStatus === 'ALL') return events;
-    return events.filter((event) => {
-      const status = normalizeEventStatusForFilter(event);
-      if (filterStatus === 'COMPLETED') {
-        return status === 'CLOSING' || status === 'CLOSED' || status === 'COMPLETED';
-      }
-      return status === filterStatus;
-    });
-  };
-  const filteredEvents = getFilteredEvents();
+  const filteredEvents = events || [];
+  const totalPages = Math.max(1, Math.ceil((eventsCount || 0) / ITEMS_PER_PAGE));
+  const paginatedEvents = filteredEvents;
 
   const handleViewDetails = useCallback(
     (eventId, event) => {
@@ -194,19 +222,35 @@ function ManagerDashboard() {
       const ok = await canDeleteEventByLots(eventId);
       if (!ok) {
         toast.error('Event cannot be deleted because it has active (or non-draft) lots.');
-        dispatch(fetchEvents({ forceRefresh: true }));
+        dispatch(
+          fetchEvents({
+            forceRefresh: true,
+            ...(timeframe ? { timeframe } : {}),
+            search: searchQuery.trim() || undefined,
+            page,
+            page_size: ITEMS_PER_PAGE,
+          })
+        );
         return;
       }
       if (!window.confirm(`Are you sure you want to delete "${event?.title || 'this event'}"? This will remove the event and all its lots.`)) return;
       try {
         await auctionService.deleteEvent(eventId);
         toast.success('Event deleted successfully.');
-        dispatch(fetchEvents({ forceRefresh: true }));
+        dispatch(
+          fetchEvents({
+            forceRefresh: true,
+            ...(timeframe ? { timeframe } : {}),
+            search: searchQuery.trim() || undefined,
+            page,
+            page_size: ITEMS_PER_PAGE,
+          })
+        );
       } catch (err) {
         toast.error(err?.message || 'Failed to delete event');
       }
     },
-    [canDeleteEvents, dispatch],
+    [canDeleteEvents, dispatch, timeframe, searchQuery, page],
   );
 
   const statCards = useMemo(
@@ -221,12 +265,12 @@ function ManagerDashboard() {
             <polyline points="10 9 9 9 8 9" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
           </svg>
         ),
-        value: events.length.toLocaleString(),
+        value: (eventsCount || 0).toLocaleString(),
         label: 'Total Events',
         colorClass: 'manager-dashboard-icon-events',
       },
     ],
-    [events.length],
+    [eventsCount],
   );
 
   return (
@@ -263,22 +307,63 @@ function ManagerDashboard() {
           <div className="manager-dashboard-card-header">
             <div className="manager-dashboard-card-title-wrapper">
               <h2 className="manager-dashboard-card-title">Recent Events</h2>
-              {events.length > 0 && (
-                <span className="manager-dashboard-event-count">({events.length})</span>
+              {(eventsCount || 0) > 0 && (
+                <span className="manager-dashboard-event-count">({eventsCount || 0})</span>
               )}
             </div>
             <div className="manager-dashboard-card-actions">
-              <select
-                className="manager-dashboard-filter-select"
-                aria-label="Filter by status"
-                value={filterStatus}
-                onChange={(e) => setFilterStatus(e.target.value)}
-              >
-                <option value="ALL">All</option>
-                <option value="SCHEDULED">Scheduled</option>
-                <option value="LIVE">Live</option>
-                <option value="COMPLETED">Completed/Closing</option>
-              </select>
+              <div className="buyer-dashboard-tabs">
+                <button
+                  type="button"
+                  className={`buyer-dashboard-tab ${activeTab === TAB_ALL ? 'active' : ''}`}
+                  onClick={() => setActiveTab(TAB_ALL)}
+                >
+                  All
+                </button>
+                <button
+                  type="button"
+                  className={`buyer-dashboard-tab ${activeTab === TAB_UPCOMMING ? 'active' : ''}`}
+                  onClick={() => setActiveTab(TAB_UPCOMMING)}
+                >
+                  Upcomming
+                </button>
+                <button
+                  type="button"
+                  className={`buyer-dashboard-tab ${activeTab === TAB_CURRENT ? 'active' : ''}`}
+                  onClick={() => setActiveTab(TAB_CURRENT)}
+                >
+                  Current
+                </button>
+                <button
+                  type="button"
+                  className={`buyer-dashboard-tab ${activeTab === TAB_PAST ? 'active' : ''}`}
+                  onClick={() => setActiveTab(TAB_PAST)}
+                >
+                  Past
+                </button>
+              </div>
+            </div>
+          </div>
+          <div className="manager-search-container" style={{ marginBottom: '0.75rem' }}>
+            <div className="manager-search-input-wrapper">
+              <input
+                type="search"
+                className="manager-search-input"
+                placeholder="Search events..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                aria-label="Search events"
+              />
+              {searchQuery ? (
+                <button
+                  type="button"
+                  className="manager-clear-search"
+                  onClick={() => setSearchQuery('')}
+                  aria-label="Clear search"
+                >
+                  ✕
+                </button>
+              ) : null}
             </div>
           </div>
 
@@ -294,13 +379,15 @@ function ManagerDashboard() {
               <div className="manager-dashboard-loading">
                 <EventsSkeleton />
               </div>
+            ) : eventsError && !filteredEvents.length ? (
+              <div className="manager-dashboard-empty">Failed to load events</div>
             ) : filteredEvents.length === 0 ? (
               <div className="manager-dashboard-empty">
                 No events found
               </div>
             ) : (
               <div className="manager-dashboard-events-list">
-                {filteredEvents.map((event) => (
+                {paginatedEvents.map((event) => (
                   <EventListingRow
                     key={event.id}
                     event={event}
@@ -342,6 +429,27 @@ function ManagerDashboard() {
                     )}
                   />
                 ))}
+              </div>
+            )}
+            {totalPages > 1 && !eventsLoading && (
+              <div className="buyer-dashboard-pagination" style={{ marginTop: '1rem' }}>
+                <button
+                  onClick={() => setPage((p) => Math.max(1, p - 1))}
+                  disabled={page <= 1}
+                  aria-label="Previous page"
+                >
+                  Previous
+                </button>
+                <span className="buyer-dashboard-pagination-info">
+                  Page {page} of {totalPages}
+                </span>
+                <button
+                  onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+                  disabled={page >= totalPages}
+                  aria-label="Next page"
+                >
+                  Next
+                </button>
               </div>
             )}
           </div>

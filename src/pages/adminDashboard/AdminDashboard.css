@@ -821,6 +821,60 @@ background-color: #39AE47;
   background-size: 16px;
 }
 
+.buyer-dashboard-tabs {
+  display: flex;
+  gap: 0.25rem;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 10px;
+  padding: 0.25rem;
+  border: 1px solid var(--color-border-strong);
+}
+
+.buyer-dashboard-tab {
+  padding: 0.45rem 0.9rem;
+  font-size: 0.86rem;
+  font-weight: 600;
+  color: var(--color-text-muted);
+  background: transparent;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.buyer-dashboard-tab.active {
+  background: #39AE47;
+  color: #000;
+}
+
+.manager-search-container {
+  width: 100%;
+}
+
+.manager-search-input-wrapper {
+  position: relative;
+  max-width: 340px;
+}
+
+.manager-search-input {
+  width: 100%;
+  padding: 0.55rem 2rem 0.55rem 0.7rem;
+  border-radius: 8px;
+  border: 1px solid var(--color-border-strong);
+  background: var(--color-surface-elevated);
+  color: var(--color-text);
+}
+
+.manager-clear-search {
+  position: absolute;
+  top: 50%;
+  right: 0.45rem;
+  transform: translateY(-50%);
+  border: none;
+  background: transparent;
+  color: var(--color-text-muted);
+  cursor: pointer;
+}
+
 /* Dark mode: native select dropdown (options list) uses dark styling on Windows */
 html[data-theme="dark"] .admin-dashboard-filter-select {
   color-scheme: dark;

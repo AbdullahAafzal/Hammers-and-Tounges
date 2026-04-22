@@ -8,8 +8,10 @@ import { fetchEvents } from "../store/actions/AuctionsActions";
 import { normalizeEventStatusForFilter } from "../utils/eventStatus";
 import "./ManagerDashboard.css";
 
-const TAB_UPCOMING = "upcoming";
+const TAB_UPCOMMING = "upcomming";
+const TAB_CURRENT = "current";
 const TAB_PAST = "past";
+const TAB_ALL = "all";
 const ITEMS_PER_PAGE = 15;
 
 const EventsSkeleton = ({ rows = 10 }) => (
@@ -59,21 +61,38 @@ export default function ClerkDashboard() {
   const dispatch = useDispatch();
   const features = useSelector((state) => state.permissions?.features);
   const permissionsLoading = useSelector((state) => state.permissions?.isLoading);
-  const { events, eventsLoading, eventsLoaded, eventsError } = useSelector((state) => state.buyer);
+  const { events, eventsLoading, eventsLoaded, eventsError, eventsCount } = useSelector((state) => state.buyer);
   const manageEventsPerm = features?.manage_events || {};
   const canCreateEvents = manageEventsPerm?.create === true;
   const canDeleteEvents = manageEventsPerm?.delete === true;
   const [deletableEventIds, setDeletableEventIds] = useState({});
-  const [activeTab, setActiveTab] = useState(TAB_UPCOMING);
+  const [activeTab, setActiveTab] = useState(TAB_CURRENT);
+  const [searchQuery, setSearchQuery] = useState("");
   const [page, setPage] = useState(1);
   const [syncingCreatedEvent, setSyncingCreatedEvent] = useState(false);
   const eventCreated = location.state?.eventCreated === true;
   const createdEventId = location.state?.createdEventId ?? null;
   const createdEventCode = location.state?.createdEventCode ?? null;
 
+  const timeframe =
+    activeTab === TAB_ALL
+      ? undefined
+      : activeTab === TAB_UPCOMMING
+        ? "upcomming"
+        : activeTab === TAB_CURRENT
+          ? "current"
+          : "past";
+
   useEffect(() => {
-    dispatch(fetchEvents({}));
-  }, [dispatch]);
+    dispatch(
+      fetchEvents({
+        ...(timeframe ? { timeframe } : {}),
+        search: searchQuery.trim() || undefined,
+        page,
+        page_size: ITEMS_PER_PAGE,
+      })
+    );
+  }, [dispatch, timeframe, searchQuery, page]);
 
   useEffect(() => {
     if (!eventCreated) return;
@@ -95,7 +114,15 @@ export default function ClerkDashboard() {
 
       for (let attempt = 1; attempt <= maxAttempts; attempt += 1) {
         try {
-          const payload = await dispatch(fetchEvents({ forceRefresh: true })).unwrap();
+          const payload = await dispatch(
+            fetchEvents({
+              forceRefresh: true,
+              ...(timeframe ? { timeframe } : {}),
+              search: searchQuery.trim() || undefined,
+              page,
+              page_size: ITEMS_PER_PAGE,
+            })
+          ).unwrap();
           const list = payload?.results || [];
           if ((!createdEventId && !createdEventCode) || list.some(isCreatedEvent)) {
             break;
@@ -119,7 +146,7 @@ export default function ClerkDashboard() {
     return () => {
       cancelled = true;
     };
-  }, [eventCreated, createdEventId, createdEventCode, dispatch, navigate]);
+  }, [eventCreated, createdEventId, createdEventCode, dispatch, navigate, timeframe, searchQuery, page]);
 
   useEffect(() => {
     if (!canDeleteEvents || permissionsLoading || !events?.length) {
@@ -169,38 +196,28 @@ export default function ClerkDashboard() {
       try {
         await auctionService.deleteEvent(eventId);
         toast.success("Event deleted successfully.");
-        await dispatch(fetchEvents({ forceRefresh: true })).unwrap();
+        await dispatch(
+          fetchEvents({
+            forceRefresh: true,
+            ...(timeframe ? { timeframe } : {}),
+            search: searchQuery.trim() || undefined,
+            page,
+            page_size: ITEMS_PER_PAGE,
+          })
+        ).unwrap();
       } catch (err) {
         toast.error(err?.message || "Failed to delete event");
       }
     },
-    [canDeleteEvents, dispatch]
+    [canDeleteEvents, dispatch, timeframe, searchQuery, page]
   );
 
-  const getFilteredEvents = () => {
-    if (!events?.length) return [];
-    const now = new Date();
-    if (activeTab === TAB_UPCOMING) {
-      return events.filter((e) => {
-        const end = e.end_time ? new Date(e.end_time) : null;
-        const status = normalizeEventStatusForFilter(e);
-        if (status === "CLOSED" || status === "CLOSING") return false;
-        return !end || end > now;
-      });
-    }
-    return events.filter((e) => {
-      const end = e.end_time ? new Date(e.end_time) : null;
-      const status = normalizeEventStatusForFilter(e);
-      if (status === "CLOSED" || status === "CLOSING") return true;
-      return end && end <= now;
-    });
-  };
-  const filteredEvents = getFilteredEvents();
+  const filteredEvents = events || [];
 
-  const totalPages = Math.max(1, Math.ceil(filteredEvents.length / ITEMS_PER_PAGE));
-  const paginatedEvents = filteredEvents.slice((page - 1) * ITEMS_PER_PAGE, page * ITEMS_PER_PAGE);
+  const totalPages = Math.max(1, Math.ceil((eventsCount || 0) / ITEMS_PER_PAGE));
+  const paginatedEvents = filteredEvents;
 
-  useEffect(() => setPage(1), [activeTab]);
+  useEffect(() => setPage(1), [activeTab, searchQuery]);
 
   const handleEventClick = useCallback(
     (event) => {
@@ -237,15 +254,29 @@ export default function ClerkDashboard() {
           <div className="manager-dashboard-card-header">
             <div className="manager-dashboard-card-title-wrapper">
               <h2 className="manager-dashboard-card-title">Events</h2>
-              <span className="manager-dashboard-event-count">({filteredEvents.length})</span>
+              <span className="manager-dashboard-event-count">({eventsCount || 0})</span>
             </div>
             <div className="buyer-dashboard-tabs">
               <button
                 type="button"
-                className={`buyer-dashboard-tab ${activeTab === TAB_UPCOMING ? "active" : ""}`}
-                onClick={() => setActiveTab(TAB_UPCOMING)}
+                className={`buyer-dashboard-tab ${activeTab === TAB_ALL ? "active" : ""}`}
+                onClick={() => setActiveTab(TAB_ALL)}
               >
-                Upcoming
+                All
+              </button>
+              <button
+                type="button"
+                className={`buyer-dashboard-tab ${activeTab === TAB_UPCOMMING ? "active" : ""}`}
+                onClick={() => setActiveTab(TAB_UPCOMMING)}
+              >
+                Upcomming
+              </button>
+              <button
+                type="button"
+                className={`buyer-dashboard-tab ${activeTab === TAB_CURRENT ? "active" : ""}`}
+                onClick={() => setActiveTab(TAB_CURRENT)}
+              >
+                Current
               </button>
               <button
                 type="button"
@@ -254,6 +285,28 @@ export default function ClerkDashboard() {
               >
                 Past
               </button>
+            </div>
+          </div>
+          <div className="manager-search-container" style={{ marginBottom: "0.75rem" }}>
+            <div className="manager-search-input-wrapper">
+              <input
+                type="search"
+                className="manager-search-input"
+                placeholder="Search events..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                aria-label="Search events"
+              />
+              {searchQuery ? (
+                <button
+                  type="button"
+                  className="manager-clear-search"
+                  onClick={() => setSearchQuery("")}
+                  aria-label="Clear search"
+                >
+                  ✕
+                </button>
+              ) : null}
             </div>
           </div>
 
@@ -316,7 +369,7 @@ export default function ClerkDashboard() {
                   />
                 ))}
               </div>
-              {filteredEvents.length > ITEMS_PER_PAGE && (
+              {totalPages > 1 && (
                 <div className="buyer-dashboard-pagination">
                   <button onClick={() => setPage((p) => Math.max(1, p - 1))} disabled={page <= 1}>
                     Previous
