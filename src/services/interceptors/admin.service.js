@@ -109,6 +109,34 @@ export const adminService = {
     }
   },
 
+  // Admin cash deposit / add funds to a buyer wallet
+  addFunds: async (payload) => {
+    try {
+      const { data } = await apiClient.post(API_ROUTES.ADMIN_ADD_FUNDS, payload);
+      return data;
+    } catch (error) {
+      if (error.isNetworkError) {
+        throw new Error('Unable to connect to server. Please try again later.');
+      }
+      throw error;
+    }
+  },
+
+  // Admin cash deposit history
+  getDepositHistory: async (params = {}) => {
+    try {
+      const { data } = await apiClient.get(API_ROUTES.ADMIN_DEPOSIT_HISTORY, {
+        params,
+      });
+      return data;
+    } catch (error) {
+      if (error.isNetworkError) {
+        throw new Error('Unable to connect to server. Please try again later.');
+      }
+      throw error;
+    }
+  },
+
   // Get Categories List
   getCategories: async () => {
     try {

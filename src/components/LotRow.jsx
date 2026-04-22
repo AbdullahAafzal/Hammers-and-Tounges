@@ -47,7 +47,6 @@ const LotRow = ({
   lot,
   eventStartTime,
   eventEndTime,
-  eventTitle,
   eventStatus,
   onOpenDetail,
   showFavorite = false,
@@ -174,8 +173,9 @@ const LotRow = ({
       </div>
       <div className="lot-row__info">
         <h3 className="lot-row__title">{lot.title || 'Untitled'}</h3>
+        <p className="lot-row__lot-no">Lot #{lot.lot_number || lot.id}</p>
         <p className="lot-row__location">
-          {lot.location || lot.venue || eventTitle || '—'}
+          {lot.location || lot.venue || '—'}
         </p>
         {subCaption ? (
           <p className="lot-row__subcaption">{subCaption}</p>

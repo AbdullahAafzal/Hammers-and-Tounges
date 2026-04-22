@@ -14,7 +14,12 @@ import { fetchEvents } from "../../store/actions/AuctionsActions";
 import { toast } from "react-toastify";
 import { API_CONFIG } from "../../config/api.config";
 import EventListingRow from "../../components/EventListingRow";
-import { normalizeEventStatusForFilter } from "../../utils/eventStatus";
+
+const TAB_UPCOMING = "upcoming";
+const TAB_CURRENT = "current";
+const TAB_PAST = "past";
+const TAB_ALL = "all";
+const ITEMS_PER_PAGE = 15;
 
 // Lazy load images for better performance
 // const Car1 = lazy(() => import('../../assets/admin-assests/1.png'));
@@ -167,8 +172,10 @@ const AdminDashboard = () => {
   const location = useLocation();
   const dispatch = useDispatch();
   const { users, isLoading } = useSelector((state) => state.admin);
-  const { events, eventsLoading, eventsLoaded } = useSelector((state) => state.buyer);
-  const [filterStatus, setFilterStatus] = useState("ALL");
+  const { events, eventsLoading, eventsLoaded, eventsCount } = useSelector((state) => state.buyer);
+  const [activeTab, setActiveTab] = useState(TAB_CURRENT);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [page, setPage] = useState(1);
   const [syncingCreatedEvent, setSyncingCreatedEvent] = useState(false);
   const eventCreated = location.state?.eventCreated === true;
   const createdEventId = location.state?.createdEventId ?? null;
@@ -179,10 +186,30 @@ const AdminDashboard = () => {
     dispatch(fetchUsersList());
   }, [dispatch]);
 
-  // Fetch events on component mount (cached in redux unless stale)
+  const timeframe =
+    activeTab === TAB_ALL
+      ? undefined
+      : activeTab === TAB_UPCOMING
+        ? "upcoming"
+        : activeTab === TAB_CURRENT
+          ? "current"
+          : "past";
+
+  // Fetch events using API-side timeframe/search/pagination
   useEffect(() => {
-    dispatch(fetchEvents({}));
-  }, [dispatch]);
+    dispatch(
+      fetchEvents({
+        ...(timeframe ? { timeframe } : {}),
+        search: searchQuery.trim() || undefined,
+        page,
+        page_size: ITEMS_PER_PAGE,
+      })
+    );
+  }, [dispatch, timeframe, searchQuery, page]);
+
+  useEffect(() => {
+    setPage(1);
+  }, [activeTab, searchQuery]);
 
   useEffect(() => {
     if (!eventCreated) return;
@@ -204,7 +231,15 @@ const AdminDashboard = () => {
 
       for (let attempt = 1; attempt <= maxAttempts; attempt += 1) {
         try {
-          const payload = await dispatch(fetchEvents({ forceRefresh: true })).unwrap();
+          const payload = await dispatch(
+            fetchEvents({
+              forceRefresh: true,
+              ...(timeframe ? { timeframe } : {}),
+              search: searchQuery.trim() || undefined,
+              page,
+              page_size: ITEMS_PER_PAGE,
+            })
+          ).unwrap();
           const list = payload?.results || [];
           if ((!createdEventId && !createdEventCode) || list.some(isCreatedEvent)) {
             break;
@@ -228,14 +263,14 @@ const AdminDashboard = () => {
     return () => {
       cancelled = true;
     };
-  }, [eventCreated, createdEventId, createdEventCode, dispatch, navigate]);
+  }, [eventCreated, createdEventId, createdEventCode, dispatch, navigate, timeframe, searchQuery, page]);
 
   // Calculate stats from users data
   const stats = useMemo(() => {
     if (!users?.results) {
       return {
         totalUsers: 0,
-        totalEvents: events.length,
+        totalEvents: eventsCount || 0,
         totalRevenue: "0"
       };
     }
@@ -245,10 +280,10 @@ const AdminDashboard = () => {
 
     return {
       totalUsers,
-      totalEvents: events.length,
+      totalEvents: eventsCount || 0,
       totalRevenue: "0"
     };
-  }, [users, events.length]);
+  }, [users, eventsCount]);
 
   // Memoized data
   const recentActivities = useMemo(
@@ -272,57 +307,9 @@ const AdminDashboard = () => {
     []
   );
 
-  // Keep this non-memoized so status changes never get stuck.
-  const getFilteredEvents = () => {
-    if (!events || events.length === 0) return [];
-
-    if (filterStatus === "ALL") return events;
-
-    return events.filter((event) => {
-      const status = normalizeEventStatusForFilter(event);
-      return status === filterStatus;
-    });
-  };
-  const filteredEvents = getFilteredEvents();
-
-  useEffect(() => {
-    const rows = (events || []).map((ev) => ({
-      id: ev?.id,
-      title: ev?.title,
-      status: ev?.status,
-      event_status: ev?.event_status,
-      normalized: normalizeEventStatusForFilter(ev),
-      start_time: ev?.start_time,
-      end_time: ev?.end_time,
-    }));
-    console.log('[HT AdminDashboard] events status snapshot', {
-      total: rows.length,
-      filterStatus,
-      rows,
-    });
-  }, [events, filterStatus]);
-
-  useEffect(() => {
-    const normalizedRows = (events || []).map((ev) => ({
-      id: ev?.id,
-      title: ev?.title,
-      status: ev?.status,
-      event_status: ev?.event_status,
-      normalized: normalizeEventStatusForFilter(ev),
-    }));
-    const byStatus = normalizedRows.reduce((acc, row) => {
-      const key = row.normalized || 'UNKNOWN';
-      acc[key] = (acc[key] || 0) + 1;
-      return acc;
-    }, {});
-    console.log('[HT AdminDashboard] all events (no filter)', {
-      total: normalizedRows.length,
-      byStatus,
-      selectedFilter: filterStatus,
-      renderedCount: filteredEvents.length,
-      rows: normalizedRows,
-    });
-  }, [events, filterStatus, filteredEvents.length]);
+  const filteredEvents = events || [];
+  const totalPages = Math.max(1, Math.ceil((eventsCount || 0) / ITEMS_PER_PAGE));
+  const paginatedEvents = filteredEvents;
 
   const handleViewDetails = useCallback(
     (eventId, event) => {
@@ -559,25 +546,65 @@ const AdminDashboard = () => {
             <div className="admin-dashboard-card-header">
               <div className="admin-dashboard-card-title-wrapper">
                 <h2 className="admin-dashboard-card-title">Recent Events</h2>
-              {events.length > 0 && (
+              {(eventsCount || 0) > 0 && (
                   <span className="admin-dashboard-event-count">
-                    ({events.length})
+                    ({eventsCount || 0})
                   </span>
                 )}
               </div>
               <div className="admin-dashboard-card-actions">
-                <select
-                  className="admin-dashboard-filter-select"
-                  aria-label="Filter by status"
-                  value={filterStatus}
-                  onChange={(e) => setFilterStatus(e.target.value)}
-                >
-                  <option value="ALL">All</option>
-                  <option value="SCHEDULED">Scheduled</option>
-                  <option value="LIVE">Live</option>
-                  <option value="CLOSING">Completed</option>
-                  <option value="CLOSED">Closed</option>
-                </select>
+                <div className="buyer-dashboard-tabs">
+                  <button
+                    type="button"
+                    className={`buyer-dashboard-tab ${activeTab === TAB_ALL ? "active" : ""}`}
+                    onClick={() => setActiveTab(TAB_ALL)}
+                  >
+                    All
+                  </button>
+                  <button
+                    type="button"
+                    className={`buyer-dashboard-tab ${activeTab === TAB_UPCOMING ? "active" : ""}`}
+                    onClick={() => setActiveTab(TAB_UPCOMING)}
+                  >
+                    Upcoming
+                  </button>
+                  <button
+                    type="button"
+                    className={`buyer-dashboard-tab ${activeTab === TAB_CURRENT ? "active" : ""}`}
+                    onClick={() => setActiveTab(TAB_CURRENT)}
+                  >
+                    Current
+                  </button>
+                  <button
+                    type="button"
+                    className={`buyer-dashboard-tab ${activeTab === TAB_PAST ? "active" : ""}`}
+                    onClick={() => setActiveTab(TAB_PAST)}
+                  >
+                    Past
+                  </button>
+                </div>
+              </div>
+            </div>
+            <div className="manager-search-container" style={{ marginBottom: "0.75rem" }}>
+              <div className="manager-search-input-wrapper">
+                <input
+                  type="search"
+                  className="manager-search-input"
+                  placeholder="Search events..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  aria-label="Search events"
+                />
+                {searchQuery ? (
+                  <button
+                    type="button"
+                    className="manager-clear-search"
+                    onClick={() => setSearchQuery("")}
+                    aria-label="Clear search"
+                  >
+                    ✕
+                  </button>
+                ) : null}
               </div>
             </div>
 
@@ -593,13 +620,13 @@ const AdminDashboard = () => {
                 <div className="admin-dashboard-events-loading">
                   <EventsSkeleton />
                 </div>
-              ) : filteredEvents.length === 0 ? (
+              ) : paginatedEvents.length === 0 ? (
                 <div className="admin-dashboard-events-empty">
                   No events found
                 </div>
               ) : (
                 <div className="admin-dashboard-events-list">
-                  {filteredEvents.map((event) => (
+                  {paginatedEvents.map((event) => (
                     <EventListingRow
                       key={event.id}
                       event={event}
@@ -621,6 +648,27 @@ const AdminDashboard = () => {
                       )}
                     />
                   ))}
+                </div>
+              )}
+              {totalPages > 1 && !eventsLoading && (
+                <div className="buyer-dashboard-pagination" style={{ marginTop: "1rem" }}>
+                  <button
+                    onClick={() => setPage((p) => Math.max(1, p - 1))}
+                    disabled={page <= 1}
+                    aria-label="Previous page"
+                  >
+                    Previous
+                  </button>
+                  <span className="buyer-dashboard-pagination-info">
+                    Page {page} of {totalPages}
+                  </span>
+                  <button
+                    onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+                    disabled={page >= totalPages}
+                    aria-label="Next page"
+                  >
+                    Next
+                  </button>
                 </div>
               )}
             </div>

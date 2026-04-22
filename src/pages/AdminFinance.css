@@ -80,6 +80,30 @@
 .finance-header-actions {
   display: flex;
   align-items: center;
+  gap: 0.5rem;
+}
+
+.finance-tabs {
+  display: inline-flex;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.finance-tab {
+  border: 1px solid var(--color-input-border);
+  background: var(--color-input-bg);
+  color: var(--color-text-secondary);
+  border-radius: 999px;
+  padding: 0.5rem 1rem;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.finance-tab.is-active {
+  border-color: rgba(140, 198, 63, 0.7);
+  color: #39AE47;
+  background: rgba(140, 198, 63, 0.14);
 }
 
 .finance-primary-btn {
@@ -123,6 +147,18 @@
 .finance-primary-btn--compact svg {
   width: 16px;
   height: 16px;
+}
+
+.finance-primary-btn--cash-deposit {
+  background: rgba(140, 198, 63, 0.18);
+  color: #9ed95b;
+  border: 1px solid rgba(140, 198, 63, 0.45);
+  box-shadow: none;
+}
+
+.finance-primary-btn--cash-deposit:hover {
+  background: rgba(140, 198, 63, 0.28);
+  box-shadow: none;
 }
 
 /* Summary Grid */
@@ -1209,6 +1245,10 @@
   box-shadow: 0 20px 50px rgba(0, 0, 0, 0.35);
 }
 
+.finance-md-modal--cash-deposit {
+  max-width: 560px;
+}
+
 .finance-md-modal--image {
   max-width: min(90vw, 720px);
   padding: 2.5rem 1rem 1rem;
@@ -1424,6 +1464,80 @@ html[data-theme="light"] .finance-md-detail-link {
 
 .finance-md-textarea::placeholder {
   color: var(--color-input-placeholder);
+}
+
+.finance-md-input {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 0.7rem 0.75rem;
+  border-radius: 8px;
+  border: 1px solid var(--color-input-border);
+  background: var(--color-bg-alt);
+  color: var(--color-text);
+  font-size: 0.875rem;
+  margin-bottom: 1rem;
+}
+
+.finance-md-input:focus {
+  outline: none;
+  border-color: #39AE47;
+  box-shadow: 0 0 0 2px rgba(140, 198, 63, 0.12);
+}
+
+.finance-md-input::placeholder {
+  color: var(--color-input-placeholder);
+}
+
+.finance-cash-buyer-list {
+  border: 1px solid var(--color-input-border);
+  border-radius: 8px;
+  max-height: 220px;
+  overflow: auto;
+  margin-bottom: 1rem;
+  background: var(--color-bg);
+}
+
+.finance-cash-buyer-item {
+  width: 100%;
+  border: none;
+  border-bottom: 1px solid var(--color-border);
+  background: transparent;
+  text-align: left;
+  padding: 0.625rem 0.75rem;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.finance-cash-buyer-item:last-child {
+  border-bottom: none;
+}
+
+.finance-cash-buyer-item:hover {
+  background: var(--color-input-bg);
+}
+
+.finance-cash-buyer-item.is-selected {
+  background: rgba(140, 198, 63, 0.14);
+}
+
+.finance-cash-buyer-name {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+.finance-cash-buyer-email {
+  font-size: 0.75rem;
+  color: var(--color-text-muted);
+}
+
+.finance-cash-buyer-empty {
+  margin: 0;
+  padding: 0.8rem 0.75rem;
+  color: var(--color-text-muted);
+  font-size: 0.8125rem;
 }
 
 html[data-theme="light"] .finance-md-textarea {

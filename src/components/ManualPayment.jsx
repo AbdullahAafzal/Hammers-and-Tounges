@@ -163,7 +163,7 @@ export default function ManualPaymentEntry() {
         <div className="manual-dashboard-container">
           <div className="manual-payment-header">
             <div className="header-content">
-              <h1 className="manual-page-title">Cash Deposit Entry</h1>
+              <h1 className="manual-page-title">Bank Transfer Entry</h1>
               <p className="manual-page-subtitle">Record offline payments for invoices and accounts</p>
             </div>
             <div className="header-actions">
