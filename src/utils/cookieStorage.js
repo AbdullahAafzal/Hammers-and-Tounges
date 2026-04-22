@@ -1,63 +1,23 @@
-import Cookies from 'js-cookie';
-
-const COOKIE_OPTIONS = {
-  expires: 7, // 7 days
-  secure: import.meta.env.PROD,
-  sameSite: 'strict',
-  path: '/',
-};
-
 export const cookieStorage = {
-  setItem: (key, value) => {
-    try {
-      const serializedValue = JSON.stringify(value);
-      Cookies.set(key, serializedValue, COOKIE_OPTIONS);
-      return true;
-    } catch (error) {
-      console.error(`Error setting cookie ${key}:`, error);
-      return false;
-    }
+  AUTH_KEYS: {
+    USER: 'user',
+    TOKEN: 'token',
+    REFRESH_TOKEN: 'refresh_token',
   },
-
   getItem: (key) => {
     try {
-      const value = Cookies.get(key);
-      return value ? JSON.parse(value) : null;
-    } catch (error) {
-      console.error(`Error getting cookie ${key}:`, error);
+      return localStorage.getItem(key) ? JSON.parse(localStorage.getItem(key)) : null;
+    } catch {
       return null;
     }
   },
-
+  setItem: (key, value) => {
+    localStorage.setItem(key, JSON.stringify(value));
+  },
   removeItem: (key) => {
-    try {
-      Cookies.remove(key, { path: '/' });
-      return true;
-    } catch (error) {
-      console.error(`Error removing cookie ${key}:`, error);
-      return false;
-    }
+    localStorage.removeItem(key);
   },
-
   clear: () => {
-    try {
-      const allCookies = Cookies.get();
-      Object.keys(allCookies).forEach((key) => {
-        Cookies.remove(key, { path: '/' });
-      });
-      return true;
-    } catch (error) {
-      console.error('Error clearing cookies:', error);
-      return false;
-    }
-  },
-
-  // Specific auth cookie keys
-  AUTH_KEYS: {
-    TOKEN: 'access_token',
-    REFRESH_TOKEN: 'refresh_token',
-    USER: 'user_data',
-    TOKEN_TIMESTAMP: 'token_timestamp',
-    ROLE: 'user_role',
-  },
+    localStorage.clear();
+  }
 };

@@ -7,8 +7,6 @@ import { clearBuyerError } from '../store/slices/buyerSlice';
 import './Auctions.css';
 import { toast } from 'react-toastify';
 
-const AuctionCard = lazy(() => import('../components/AuctionCard'));
-
 const Auctions = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -388,23 +386,14 @@ const Auctions = () => {
                 </div>
               }>
                 {paginatedAuctions.map(auction => (
-                  <AuctionCard
-                    key={auction.id}
-                    auction={{
-                      ...auction,
-                      categoryname: auction.category_name,
-                      initialprice: auction.initial_price,
-                      startdate: auction.start_date,
-                      enddate: auction.end_date,
-                      totalbids: auction.total_bids,
-                      status: auction.status
-                    }}
-                    onClick={() => {
+                  <div key={auction.id} className="auction-card" onClick={() => {
                       token
                         ? navigate(`/auction/${auction.id}`)
                         : handleCheckAuth();
-                    }}
-                  />
+                    }}>
+                    <h3>{auction.title}</h3>
+                    <p>{auction.description}</p>
+                  </div>
                 ))}
               </Suspense>
             </div>

@@ -14,7 +14,6 @@ import Contact from "./pages/Contact";
 import SignIn from "./pages/SignIn";
 import Register from "./pages/Register";
 import OTPVerification from "./pages/OTPVerification";
-import KYCVerification from "./pages/KYCVerification";
 
 import BuyerDashboard from "./pages/BuyerDashboard";
 import BuyerAuctions from "./pages/BuyerAuctions";
@@ -23,7 +22,6 @@ import BuyerBuy from "./pages/BuyerBuy";
 import BuyerAuctionDetails from "./pages/BuyerAuctionDetails";
 import BuyerBids from "./pages/BuyerBids";
 import BuyerWonItems from "./pages/BuyerWonItems";
-import BuyerInvoices from "./pages/BuyerInvoices";
 import BuyerWallet from "./pages/BuyerWallet";
 import BuyerProfile from "./pages/BuyerProfile";
 import BuyerAddBalance from "./pages/BuyerAddBalance";
@@ -34,12 +32,10 @@ import SellerDashboard from "./pages/SellerDashboard";
 import SellerLotDetail from "./pages/SellerLotDetail";
 import SellerAuctionListings from "./pages/SellerAuctionListings";
 import SellerListingDetails from "./pages/SellerAuctionDetails";
-import SellerAuctions from "./pages/SellerAuctions";
-import SellerCreateProduct from "./pages/SellerCreateProduct";
 import SellerAnalytics from "./pages/SellerAnalytics";
+import SellerProductCreate from "./pages/SellerCreateProduct";
 import SellerProfile from "./pages/sellerProfile/SellerProfile";
 import SellerKYCVerification from "./pages/sellerProfile/SellerKYCVerification";
-import SellerKYCDocumentUpload from "./pages/sellerProfile/SellerKYCDocumentUpload";
 
 // Manager
 import ManagerDashboard from "./pages/ManagerDashboard";
@@ -66,7 +62,6 @@ import AdminLotDetail from "./pages/adminDashboard/AdminLotDetail";
 import AdminCreateEvent from "./pages/adminDashboard/AdminCreateEvent";
 import AdminEditEvent from "./pages/adminDashboard/AdminEditEvent";
 import AdminAuctionDetails from "./pages/adminDashboard/AdminAuctionDetails";
-import AdminProfile from "./pages/adminProfile/AdminProfile";
 import AdminSell from "./pages/AdminSell";
 import AdminFinance from './pages/AdminFinance'
 import ManualDepositDetail from './pages/ManualDepositDetail'
@@ -105,8 +100,6 @@ import store from './store/store'
 import { Bounce, ToastContainer } from "react-toastify";
 import ForgotPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
-import ResetVerifyOtp from "./pages/ResetVerifyOTP";
-import SellerSales from "./pages/SellerSales";
 import BuyerBidDetails from "./components/BuyerBidDetails";
 import LotDetailReadOnly from "./components/LotDetailReadOnly";
 import ClerkDashboard from "./pages/ClerkDashboard";
@@ -134,7 +127,6 @@ function App() {
             <Route path="/otp-verification" element={<OTPVerification />} />
             {/* // New // */}
             <Route path="/forgot-password" element={<ForgotPassword />} />
-            <Route path="/verify-reset-otp" element={<ResetVerifyOtp />} />
             <Route path="/reset-password" element={<ResetPassword />} />
 
             {/* Buyer Routes */}
@@ -149,7 +141,6 @@ function App() {
                 <Route path="/buyer/bid/:id" element={<BuyerBidDetails />} />
                 <Route path="/buyer/bids" element={<BuyerBids />} />
                 <Route path="/buyer/won-items" element={<BuyerWonItems />} />
-                <Route path="/buyer/invoices" element={<BuyerInvoices />} />
                 <Route path="/buyer/wallet" element={<BuyerWallet />} />
                 <Route path="/buyer/profile" element={<BuyerProfile />} />
                 <Route path="/buyer/add-balance" element={<BuyerAddBalance />} />
@@ -164,14 +155,10 @@ function App() {
                 <Route path="/seller/lot/:lotId" element={<SellerLotDetail />} />
                 <Route path="/seller/auction-listings" element={<SellerAuctionListings />} />
                 <Route path="/seller/listing/:id" element={<SellerListingDetails />} />
-                <Route path="/seller/auctions" element={<SellerAuctions />} />
-                <Route path="/seller/sales" element={<SellerSales />} />
-                <Route path="/seller/product" element={<SellerCreateProduct />} />
+                <Route path="/seller/product" element={<SellerProductCreate />} />
                 <Route path="/seller/analytics" element={<SellerAnalytics />} />
                 <Route path="/seller/profile" element={<SellerProfile />} />
                 <Route path="/seller/kyc-verification" element={<SellerKYCVerification />} />
-                <Route path="/seller/kyc-verification/upload/:documentType" element={<SellerKYCDocumentUpload />} />
-                <Route path="/kyc-verification" element={<KYCVerification />} />
               </Route>
             </Route>
 
@@ -327,7 +314,6 @@ function App() {
                 <Route path="/admin/event/:id" element={<AdminEventLots />} />
                 <Route path="/admin/event/:eventId/lot/:lotId" element={<AdminLotDetail />} />
                 <Route path="/admin/auction/:id" element={<AdminAuctionDetails />} />
-                <Route path="/admin/profile" element={<AdminProfile />} />
                 <Route path="/admin/unsold-inventory" element={<AdminUnsoldInventory />} />
                 <Route path="/admin/deposit-exemption" element={<AdminDepositExemption />} />
                 <Route path="/admin/goods-received-verification" element={<AdminGoodsReceivedVerification />} />

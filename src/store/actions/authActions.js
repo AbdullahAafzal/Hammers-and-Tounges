@@ -1,140 +1,125 @@
-import {createAsyncThunk} from '@reduxjs/toolkit'
-import { authService } from '../../services/interceptors/auth.service';
+import { createAsyncThunk } from '@reduxjs/toolkit';
+import apiClient from '../../services/api.service';
 import { toast } from 'react-toastify';
 
-
+// Register User
 export const registerUser = createAsyncThunk(
-  'auth/register',
+  'auth/registerUser',
   async (userData, { rejectWithValue }) => {
-    console.log('UserData in Actions: ', userData);
     try {
-      const response = await authService.register(userData);
-      toast.success('Registration successful! Please verify your OTP.');
-      console.log("response: ", response);
-      
-      return response;
+      const response = await apiClient.post('users/register/', userData);
+      toast.success('Registration successful! Please verify your email.');
+      return response.data;
     } catch (error) {
-      console.log('errors in actions: ', error);
-      
-      const message = error.response?.data?.message || 
-                     error.response?.data?.error ||
-                     'Registration failed';
+      const message = error.response?.data?.message || error.response?.data?.error || 'Registration failed';
       toast.error(message);
       return rejectWithValue(error.response?.data || { message });
     }
   }
 );
 
+// Login User
 export const loginUser = createAsyncThunk(
-  'auth/login',
+  'auth/loginUser',
   async (credentials, { rejectWithValue }) => {
     try {
-      const response = await authService.login(credentials);
+      const response = await apiClient.post('users/login/', credentials);
       toast.success('Login successful!');
-      return response;
+      return response.data;
     } catch (error) {
-      console.log(error);
-      
-      const message = error.response?.data?.message || 
-                     error.response?.data?.error ||
-                     'Login failed';
+      const message = error.response?.data?.message || error.response?.data?.error || 'Login failed';
       toast.error(message);
       return rejectWithValue(error.response?.data || { message });
     }
   }
 );
 
+// Verify OTP
 export const verifyOtp = createAsyncThunk(
   'auth/verifyOtp',
   async (otpData, { rejectWithValue }) => {
     try {
-      const response = await authService.verifyOtp(otpData);
+      const response = await apiClient.post('users/verify-otp/', otpData);
       toast.success('OTP verified successfully!');
-      return response;
+      return response.data;
     } catch (error) {
-      const message = error.response?.data?.message || 
-                     error.response?.data?.error ||
-                     'OTP verification failed';
+      const message = error.response?.data?.message || error.response?.data?.error || 'OTP verification failed';
       toast.error(message);
       return rejectWithValue(error.response?.data || { message });
     }
   }
 );
 
+// Resend OTP
 export const resendOtp = createAsyncThunk(
   'auth/resendOtp',
-  async (email, { rejectWithValue }) => {
+  async (data, { rejectWithValue }) => {
     try {
-      const response = await authService.resendOtp(email);
-      toast.success('OTP resent successfully!');
-      return response;
+      const response = await apiClient.post('users/resend-otp/', data);
+      toast.success('OTP sent successfully!');
+      return response.data;
     } catch (error) {
-      const message = error.response?.data?.message || 
-                     error.response?.data?.error ||
-                     'Failed to resend OTP';
+      const message = error.response?.data?.message || error.response?.data?.error || 'Failed to resend OTP';
       toast.error(message);
       return rejectWithValue(error.response?.data || { message });
     }
   }
 );
 
+// Refresh Access Token
 export const refreshAccessToken = createAsyncThunk(
-  'auth/refreshToken',
-  async (refreshToken, { rejectWithValue }) => {
+  'auth/refreshAccessToken',
+  async (_, { rejectWithValue }) => {
     try {
-      const response = await authService.refreshToken(refreshToken);
-      return response;
+      const response = await apiClient.post('users/token/refresh/');
+      return response.data;
     } catch (error) {
       return rejectWithValue(error.response?.data || { message: 'Token refresh failed' });
     }
   }
 );
 
+// Request Password Reset
 export const requestPasswordReset = createAsyncThunk(
   'auth/requestPasswordReset',
   async (email, { rejectWithValue }) => {
     try {
-      const response = await authService.requestPasswordReset(email);
-      toast.success('Password reset OTP sent to your email!');
-      return response;
+      const response = await apiClient.post('users/password-reset-request/', { email });
+      toast.success('Password reset email sent!');
+      return response.data;
     } catch (error) {
-      const message = error.response?.data?.message || 
-                     error.response?.data?.error ||
-                     'Failed to send reset email';
+      const message = error.response?.data?.message || error.response?.data?.error || 'Failed to send reset email';
       toast.error(message);
       return rejectWithValue(error.response?.data || { message });
     }
   }
 );
 
+// Verify Password OTP
 export const verifyPasswordOtp = createAsyncThunk(
   'auth/verifyPasswordOtp',
-  async (otpData, { rejectWithValue }) => {
+  async (data, { rejectWithValue }) => {
     try {
-      const response = await authService.verifyPasswordOtp(otpData);
-      toast.success('OTP verified! You can now reset your password.');
-      return response;
+      const response = await apiClient.post('users/password-OTP-verify/', data);
+      return response.data;
     } catch (error) {
-      const message = error.response?.data?.message || 
-                     error.response?.data?.error ||
-                     'OTP verification failed';
+      const message = error.response?.data?.message || error.response?.data?.error || 'OTP verification failed';
       toast.error(message);
       return rejectWithValue(error.response?.data || { message });
     }
   }
 );
 
+// Confirm Password Reset
 export const confirmPasswordReset = createAsyncThunk(
   'auth/confirmPasswordReset',
-  async (resetData, { rejectWithValue }) => {
+  async (data, { rejectWithValue }) => {
     try {
-      const response = await authService.confirmPasswordReset(resetData);
-      toast.success('Password reset successful! Please login.');
-      return response;
+      const response = await apiClient.post('users/password-reset-confirm/', data);
+      toast.success('Password reset successful!');
+      return response.data;
     } catch (error) {
-      const message = error.response?.data?.message || 
-                     error.response?.data?.error ||
-                     'Password reset failed';
+      const message = error.response?.data?.message || error.response?.data?.error || 'Password reset failed';
       toast.error(message);
       return rejectWithValue(error.response?.data || { message });
     }

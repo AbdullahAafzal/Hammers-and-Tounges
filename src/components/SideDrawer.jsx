@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
 import ThemeToggle from './ThemeToggle'
-import logo from '../assets/logo.png'
 import { fetchCategories } from '../store/actions/AuctionsActions'
 import './SideDrawer.css'
 
@@ -56,7 +55,6 @@ const SideDrawer = ({ isOpen, onClose }) => {
       <aside className={`side-drawer ${isOpen ? 'open' : ''}`} role="dialog" aria-label="Navigation menu">
         <div className="side-drawer__header">
           <Link to="/" className="side-drawer__logo">
-            <img src={logo} alt="Hammer & Tongues" />
             <span>Hammer & Tongues</span>
           </Link>
           <button className="side-drawer__close" onClick={onClose} aria-label="Close menu">

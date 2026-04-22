@@ -56,6 +56,7 @@ export const fetchEvents = createAsyncThunk(
       // Query-driven event pages (timeframe/search/page) should always use one paginated API call.
       const hasExplicitPage =
         params != null && Object.prototype.hasOwnProperty.call(params, 'page');
+      
       const hasServerQuery =
         hasExplicitPage ||
         Boolean(params?.timeframe) ||

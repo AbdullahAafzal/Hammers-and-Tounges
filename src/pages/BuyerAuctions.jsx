@@ -7,8 +7,6 @@ import { clearBuyerError } from '../store/slices/buyerSlice';
 import './BuyerAuctions.css';
 import { toast } from 'react-toastify';
 
-const BuyerAuctionCard = lazy(() => import('../components/BuyerAuctionCard'));
-
 const BuyerAuctions = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -399,20 +397,11 @@ const BuyerAuctions = () => {
                 </div>
               }>
                 {paginatedAuctions.map(auction => (
-                  <BuyerAuctionCard
-                    key={auction.id}
-                    auction={{
-                      ...auction,
-                      categoryname: auction.category_name,
-                      initialprice: auction.initial_price,
-                      startdate: auction.start_date,
-                      enddate: auction.end_date,
-                      totalbids: auction.total_bids,
-                      status: auction.status
-                    }}
-                    onClick={() => navigate(`/buyer/auction/${auction.id}`, { state: { from: 'buyer-auctions', listing: auction } })}
-                    onFavoriteUpdate={handleFavoriteUpdate}
-                  />))}
+                  <div key={auction.id} className="auction-card">
+                    <h3>{auction.title}</h3>
+                    <p>{auction.description}</p>
+                  </div>
+                ))}
               </Suspense>
             </div>
 

@@ -2,7 +2,6 @@ import React, { useState } from 'react'
 import { Outlet, useLocation, Navigate } from 'react-router-dom'
 import { useSelector } from 'react-redux'
 import SideDrawer from '../components/SideDrawer'
-import Footer from '../components/Footer'
 import './GuestLayout.css'
 
 const getDashboardForRole = (user) => {
@@ -22,8 +21,6 @@ const getDashboardForRole = (user) => {
 const GuestLayout = () => {
   const [drawerOpen, setDrawerOpen] = useState(true)
   const { pathname } = useLocation()
-  const hideFooter = pathname === '/signin' || pathname === '/register'
-
   const { isAuthenticated, user } = useSelector((state) => state.auth)
 
   // Redirect authenticated users to their role dashboard (persists across tab close/reopen)
@@ -52,8 +49,6 @@ const GuestLayout = () => {
       <main className="guest-main">
         <Outlet />
       </main>
-
-      {!hideFooter && <Footer />}
 
       <SideDrawer isOpen={drawerOpen} onClose={() => setDrawerOpen(false)} />
     </div>

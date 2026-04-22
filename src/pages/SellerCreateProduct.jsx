@@ -9,7 +9,7 @@ import { toast } from 'react-toastify';
 import { getCurrentLocation } from '../utils/location';
 import { getMediaUrl } from '../config/api.config';
 
-const SellerCreateProduct = () => {
+const SellerProductCreate = () => {
   // const { id } = useParams();
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -1377,4 +1377,4 @@ const SellerCreateProduct = () => {
   );
 };
 
-export default SellerCreateProduct;
+export default SellerProductCreate;
