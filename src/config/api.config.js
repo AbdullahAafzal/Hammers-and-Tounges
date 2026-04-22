@@ -8,10 +8,7 @@
 // };
 
 const getBaseUrl = () => {
-  // Enforce relative paths in production to leverage Netlify/Vercel proxies
-  if (import.meta.env.PROD) return '/api';
-
-  // If someone explicitly configured the env var, prefer it
+  // Use VITE_API_BASE_URL if explicitly set (works in both dev and production)
   const envUrlRaw = import.meta.env.VITE_API_BASE_URL;
   const envUrl = typeof envUrlRaw === 'string' ? envUrlRaw.trim() : '';
 
@@ -19,9 +16,8 @@ const getBaseUrl = () => {
     // If it's already a path (e.g. '/api'), just use it as-is.
     if (envUrl.startsWith('/')) return envUrl;
 
-    // Absolute URL: append '/api' if missing.
-    const base = envUrl;
-    return base.endsWith('/api') ? base : `${base.replace(/\/$/, '')}/api`;
+    // Absolute URL: use as-is (already includes /api suffix from .env.production)
+    return envUrl.replace(/\/$/, '');
   }
 
   // Defaults fallback
@@ -94,6 +90,10 @@ export const getMediaUrl = (mediaPath) => {
   if (path.startsWith('http://207.180.233.44:8001')) {
     // Backwards compatibility for old deployments
     path = path.replace('http://207.180.233.44:8001', '');
+  } else if (path.startsWith('https://207.180.233.44')) {
+    path = path.replace('https://207.180.233.44', '');
+  } else if (path.startsWith('http://207.180.233.44')) {
+    path = path.replace('http://207.180.233.44', '');
   } else if (path.startsWith('https://developer.hashverx.com')) {
     // New API/media host
     path = path.replace('https://developer.hashverx.com', '');
@@ -107,24 +107,18 @@ export const getMediaUrl = (mediaPath) => {
     path = path.slice(1);
   }
 
-  // 4. In production, we want it to be relative to the domain (proxied by Netlify)
-  if (API_CONFIG.IS_PRODUCTION) {
-    // If it already starts with 'media/', just ensure it has a single leading slash
-    if (path.startsWith('media/')) {
-      return `/${path}`;
-    }
-    // Otherwise, prepend '/media/'
-    return `/media/${path}`;
-  }
+  // 4. Use MEDIA_BASE_URL env var (set to full URL in production, relative in dev)
+  const mediaBase = (API_CONFIG.MEDIA_BASE_URL || 'https://developer.hashverx.com/media').replace(/\/$/, '');
 
-  // 5. In development, use MEDIA_BASE_URL
-  // If path already starts with 'media/', we might need to be careful.
-  // Assuming MEDIA_BASE_URL is the origin (http://...:8001)
   if (path.startsWith('media/')) {
-    return `${API_CONFIG.MEDIA_BASE_URL || 'http://207.180.233.44:8001'}/${path}`;
+    // path already has 'media/' prefix — use base origin only
+    const origin = mediaBase.endsWith('/media')
+      ? mediaBase.slice(0, -6)
+      : mediaBase;
+    return `${origin}/${path}`;
   }
 
-  return `${API_CONFIG.MEDIA_BASE_URL || 'http://207.180.233.44:8001'}/media/${path}`;
+  return `${mediaBase}/${path}`;
 };
 
 export const API_ROUTES = {
