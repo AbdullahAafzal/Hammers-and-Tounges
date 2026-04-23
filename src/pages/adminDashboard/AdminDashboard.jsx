@@ -15,7 +15,7 @@ import { toast } from "react-toastify";
 import { API_CONFIG } from "../../config/api.config";
 import EventListingRow from "../../components/EventListingRow";
 
-const TAB_UPCOMMING = "upcomming";
+const TAB_UPCOMMING = "upcoming";
 const TAB_CURRENT = "current";
 const TAB_PAST = "past";
 const TAB_ALL = "all";
@@ -190,7 +190,7 @@ const AdminDashboard = () => {
     activeTab === TAB_ALL
       ? undefined
       : activeTab === TAB_UPCOMMING
-        ? "upcomming"
+        ? "upcoming"
         : activeTab === TAB_CURRENT
           ? "current"
           : "past";
@@ -566,7 +566,7 @@ const AdminDashboard = () => {
                     className={`buyer-dashboard-tab ${activeTab === TAB_UPCOMMING ? "active" : ""}`}
                     onClick={() => setActiveTab(TAB_UPCOMMING)}
                   >
-                    Upcomming
+                    Upcoming
                   </button>
                   <button
                     type="button"
@@ -622,7 +622,9 @@ const AdminDashboard = () => {
                 </div>
               ) : paginatedEvents.length === 0 ? (
                 <div className="admin-dashboard-events-empty">
-                  No events found
+                  {searchQuery.trim()
+                    ? "No data exist for this search"
+                    : "No events found"}
                 </div>
               ) : (
                 <div className="admin-dashboard-events-list">

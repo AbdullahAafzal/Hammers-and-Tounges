@@ -4,6 +4,39 @@ import { auctionService } from '../../services/interceptors/auction.service';
 import { toast } from 'react-toastify';
 
 const EVENTS_CACHE_TTL_MS = 5 * 60 * 1000;
+const NO_RESULTS_PATTERNS = ['not found', 'no result', 'no results', 'no event', 'no events'];
+
+const isNoResultsSearchError = (error, params = {}) => {
+  const status = error?.response?.status;
+  const isSearchRequest = Boolean(params?.search);
+  if (!isSearchRequest) return false;
+  if (status !== 404 && status !== 400) return false;
+
+  const rawMessage =
+    error?.response?.data?.message ||
+    error?.response?.data?.detail ||
+    error?.message ||
+    '';
+  const message = String(rawMessage).toLowerCase();
+
+  return NO_RESULTS_PATTERNS.some((pattern) => message.includes(pattern));
+};
+
+const isSearchCorsOrNetworkError = (error, params = {}) => {
+  const isSearchRequest = Boolean(params?.search);
+  if (!isSearchRequest) return false;
+
+  if (error?.isNetworkError) return true;
+
+  const rawMessage =
+    error?.response?.data?.message ||
+    error?.response?.data?.detail ||
+    error?.message ||
+    '';
+  const message = String(rawMessage).toLowerCase();
+
+  return message.includes('cors');
+};
 
 export const fetchAuctionsList = createAsyncThunk(
   'auctions/fetchAuctionsList',
@@ -74,6 +107,15 @@ export const fetchEvents = createAsyncThunk(
         fetchedAt: Date.now(),
       };
     } catch (error) {
+      if (isNoResultsSearchError(error, params) || isSearchCorsOrNetworkError(error, params)) {
+        return {
+          results: [],
+          count: 0,
+          next: null,
+          previous: null,
+          fetchedAt: Date.now(),
+        };
+      }
       const message =
         error.response?.data?.message ||
         error.response?.data?.detail ||

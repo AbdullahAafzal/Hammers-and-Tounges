@@ -20,7 +20,7 @@ const StatCard = React.memo(({ icon: Icon, value, label, colorClass }) => (
 
 StatCard.displayName = 'StatCard';
 
-const TAB_UPCOMMING = 'upcomming';
+const TAB_UPCOMMING = 'upcoming';
 const TAB_CURRENT = 'current';
 const TAB_PAST = 'past';
 const ITEMS_PER_PAGE = 15;
@@ -62,7 +62,7 @@ const BuyerDashboard = () => {
   const totalPages = Math.max(1, Math.ceil((eventsCount || 0) / ITEMS_PER_PAGE));
   const paginatedEvents = filteredEvents;
   const timeframe =
-    activeTab === TAB_UPCOMMING ? 'upcomming' : activeTab === TAB_CURRENT ? 'current' : 'past';
+    activeTab === TAB_UPCOMMING ? 'upcoming' : activeTab === TAB_CURRENT ? 'current' : 'past';
 
   const handleEventClick = useCallback((event) => {
     navigate(`/buyer/event/${event.id}`, { state: { event } });
@@ -100,7 +100,7 @@ const BuyerDashboard = () => {
         value: filteredEvents.length.toLocaleString(),
         label:
           activeTab === TAB_UPCOMMING
-            ? 'Upcomming Events'
+            ? 'Upcoming Events'
             : activeTab === TAB_CURRENT
               ? 'Current Events'
               : 'Past Events',
@@ -137,7 +137,7 @@ const BuyerDashboard = () => {
                   className={`buyer-dashboard-tab ${activeTab === TAB_UPCOMMING ? 'active' : ''}`}
                   onClick={() => setActiveTab(TAB_UPCOMMING)}
                 >
-                  Upcomming
+                  Upcoming
                 </button>
                 <button
                   type="button"
@@ -161,7 +161,7 @@ const BuyerDashboard = () => {
             <div className="buyer-dashboard-card-header-row">
               <h2 className="buyer-dashboard-card-title">
                 {activeTab === TAB_UPCOMMING
-                  ? 'Upcomming Events'
+                  ? 'Upcoming Events'
                   : activeTab === TAB_CURRENT
                     ? 'Current Events'
                     : 'Past Events'}
@@ -169,28 +169,26 @@ const BuyerDashboard = () => {
               {(eventsCount || 0) > 0 && (
                 <span className="buyer-dashboard-auction-count">({eventsCount || 0})</span>
               )}
-              {(eventsCount || 0) > 0 && (
-                <div className="buyer-dashboard-search-wrap">
-                  <input
-                    type="search"
-                    placeholder="Search events..."
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    className="buyer-dashboard-search"
-                    aria-label="Search events"
-                  />
-                  {searchQuery.trim() && (
-                    <button
-                      type="button"
-                      className="buyer-dashboard-search-clear"
-                      onClick={() => setSearchQuery('')}
-                      aria-label="Clear search"
-                    >
-                      Clear
-                    </button>
-                  )}
-                </div>
-              )}
+              <div className="buyer-dashboard-search-wrap">
+                <input
+                  type="search"
+                  placeholder="Search events..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="buyer-dashboard-search"
+                  aria-label="Search events"
+                />
+                {searchQuery.trim() && (
+                  <button
+                    type="button"
+                    className="buyer-dashboard-search-clear"
+                    onClick={() => setSearchQuery('')}
+                    aria-label="Clear search"
+                  >
+                    Clear
+                  </button>
+                )}
+              </div>
             </div>
           </div>
 
@@ -234,15 +232,19 @@ const BuyerDashboard = () => {
                 <path d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" stroke="#d1d5db" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
               </svg>
               <h2>
-                {activeTab === TAB_UPCOMMING
-                  ? 'No upcomming events'
+                {searchQuery.trim()
+                  ? 'No data exist for this search'
+                  : activeTab === TAB_UPCOMMING
+                  ? 'No upcoming events'
                   : activeTab === TAB_CURRENT
                     ? 'No current events'
                     : 'No past events'}
               </h2>
               <p>
-                {activeTab === TAB_UPCOMMING
-                  ? 'There are no upcomming events at the moment. Check back later.'
+                {searchQuery.trim()
+                  ? 'No data exist for this search'
+                  : activeTab === TAB_UPCOMMING
+                  ? 'There are no upcoming events at the moment. Check back later.'
                   : activeTab === TAB_CURRENT
                     ? 'No current events to display.'
                     : 'No past events to display.'}

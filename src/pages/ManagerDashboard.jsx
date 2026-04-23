@@ -8,7 +8,7 @@ import { fetchEvents } from '../store/actions/AuctionsActions';
 import { normalizeEventStatusForFilter } from '../utils/eventStatus';
 import './ManagerDashboard.css';
 
-const TAB_UPCOMMING = 'upcomming';
+const TAB_UPCOMMING = 'upcoming';
 const TAB_CURRENT = 'current';
 const TAB_PAST = 'past';
 const TAB_ALL = 'all';
@@ -107,7 +107,7 @@ function ManagerDashboard() {
     activeTab === TAB_ALL
       ? undefined
       : activeTab === TAB_UPCOMMING
-        ? 'upcomming'
+        ? 'upcoming'
         : activeTab === TAB_CURRENT
           ? 'current'
           : 'past';
@@ -325,7 +325,7 @@ function ManagerDashboard() {
                   className={`buyer-dashboard-tab ${activeTab === TAB_UPCOMMING ? 'active' : ''}`}
                   onClick={() => setActiveTab(TAB_UPCOMMING)}
                 >
-                  Upcomming
+                  Upcoming
                 </button>
                 <button
                   type="button"
@@ -383,7 +383,9 @@ function ManagerDashboard() {
               <div className="manager-dashboard-empty">Failed to load events</div>
             ) : filteredEvents.length === 0 ? (
               <div className="manager-dashboard-empty">
-                No events found
+                {searchQuery.trim()
+                  ? 'No data exist for this search'
+                  : 'No events found'}
               </div>
             ) : (
               <div className="manager-dashboard-events-list">

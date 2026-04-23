@@ -62,7 +62,11 @@ export const auctionService = {
       return data;
     } catch (error) {
       if (error.isNetworkError) {
-        throw new Error('Unable to connect to server. Please try again later.');
+        const networkError = new Error('Unable to connect to server. Please try again later.');
+        // Preserve network marker so caller-level search handlers can suppress toast noise.
+        networkError.isNetworkError = true;
+        networkError.originalError = error;
+        throw networkError;
       }
       throw error;
     }
