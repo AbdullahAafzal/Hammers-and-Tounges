@@ -102,7 +102,7 @@ const BuyerDashboard = () => {
           activeTab === TAB_UPCOMMING
             ? 'Upcoming Events'
             : activeTab === TAB_CURRENT
-              ? 'Current Events'
+              ? 'Live Events'
               : 'Past Events',
         colorClass: 'buyer-dashboard-icon-auctions',
       },
@@ -144,7 +144,7 @@ const BuyerDashboard = () => {
                   className={`buyer-dashboard-tab ${activeTab === TAB_CURRENT ? 'active' : ''}`}
                   onClick={() => setActiveTab(TAB_CURRENT)}
                 >
-                  Current
+                  Live
                 </button>
                 <button
                   type="button"
@@ -163,7 +163,7 @@ const BuyerDashboard = () => {
                 {activeTab === TAB_UPCOMMING
                   ? 'Upcoming Events'
                   : activeTab === TAB_CURRENT
-                    ? 'Current Events'
+                    ? 'Live Events'
                     : 'Past Events'}
               </h2>
               {(eventsCount || 0) > 0 && (
@@ -237,7 +237,7 @@ const BuyerDashboard = () => {
                   : activeTab === TAB_UPCOMMING
                   ? 'No upcoming events'
                   : activeTab === TAB_CURRENT
-                    ? 'No current events'
+                    ? 'No live events'
                     : 'No past events'}
               </h2>
               <p>
@@ -246,7 +246,7 @@ const BuyerDashboard = () => {
                   : activeTab === TAB_UPCOMMING
                   ? 'There are no upcoming events at the moment. Check back later.'
                   : activeTab === TAB_CURRENT
-                    ? 'No current events to display.'
+                    ? 'No live events to display.'
                     : 'No past events to display.'}
               </p>
             </div>

@@ -91,7 +91,7 @@ const Home = () => {
                 className={`home-events__tab ${activeTab === TAB_CURRENT ? 'active' : ''}`}
                 onClick={() => setActiveTab(TAB_CURRENT)}
               >
-                Current
+                Live
               </button>
               <button
                 className={`home-events__tab ${activeTab === TAB_PAST ? 'active' : ''}`}
@@ -150,7 +150,7 @@ const Home = () => {
                   : activeTab === TAB_UPCOMMING
                   ? 'No upcoming events.'
                   : activeTab === TAB_CURRENT
-                    ? 'No current events.'
+                    ? 'No live events.'
                     : 'No past events.'}
               </p>
             </div>

@@ -332,7 +332,7 @@ function ManagerDashboard() {
                   className={`buyer-dashboard-tab ${activeTab === TAB_CURRENT ? 'active' : ''}`}
                   onClick={() => setActiveTab(TAB_CURRENT)}
                 >
-                  Current
+                  Live
                 </button>
                 <button
                   type="button"
