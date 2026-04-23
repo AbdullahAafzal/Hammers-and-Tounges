@@ -1430,6 +1430,20 @@ body {
   font-family: "Inter", sans-serif;
 }
 
+.manager-search-input[type="search"] {
+  -webkit-appearance: textfield;
+  appearance: textfield;
+}
+
+.manager-search-input[type="search"]::-webkit-search-decoration,
+.manager-search-input[type="search"]::-webkit-search-cancel-button,
+.manager-search-input[type="search"]::-webkit-search-results-button,
+.manager-search-input[type="search"]::-webkit-search-results-decoration {
+  -webkit-appearance: none;
+  appearance: none;
+  display: none;
+}
+
 .manager-search-input::placeholder {
   color: rgba(255, 255, 255, 0.4);
 }
