@@ -63,6 +63,7 @@ const GuestLotDrawer = ({
   isAdmin = false,
   isManager = false,
   isClerk = false,
+  isFinanceReadOnly = false,
   event,
   onLotUpdated,
 }) => {
@@ -566,7 +567,7 @@ const GuestLotDrawer = ({
                 {canEditDelete && (
                   <>
                     {/* Admin is unrestricted; managers/clerk follow manage_events.update */}
-                    {(isAdmin || canUpdateEvents) && (
+                    {(!isFinanceReadOnly && (isAdmin || canUpdateEvents)) && (
                       <button
                         type="button"
                         className="guest-lot-drawer__staff-btn guest-lot-drawer__staff-btn--edit"
@@ -577,7 +578,7 @@ const GuestLotDrawer = ({
                       </button>
                     )}
                     {/* Admin is unrestricted; managers/clerk follow manage_events.delete */}
-                    {(isAdmin || canDeleteEvents) && (
+                    {(!isFinanceReadOnly && (isAdmin || canDeleteEvents)) && (
                       <button
                         type="button"
                         className="guest-lot-drawer__staff-btn guest-lot-drawer__staff-btn--delete"
@@ -591,7 +592,7 @@ const GuestLotDrawer = ({
                   </>
                 )}
                 {/* Activate (draft -> active) should also require update access for managers/clerks */}
-                {isLotDraft && !isEventCompleted && (isAdmin || canUpdateEvents) && (
+                {isLotDraft && !isEventCompleted && !isFinanceReadOnly && (isAdmin || canUpdateEvents) && (
                   <button
                     type="button"
                     className="guest-lot-drawer__staff-btn guest-lot-drawer__staff-btn--active"

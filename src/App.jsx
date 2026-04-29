@@ -25,6 +25,7 @@ import BuyerBids from "./pages/BuyerBids";
 import BuyerWonItems from "./pages/BuyerWonItems";
 import BuyerInvoices from "./pages/BuyerInvoices";
 import BuyerWallet from "./pages/BuyerWallet";
+import BuyerRefunds from "./pages/BuyerRefunds";
 import BuyerProfile from "./pages/BuyerProfile";
 import BuyerAddBalance from "./pages/BuyerAddBalance";
 import BuyerSell from "./pages/BuyerSell";
@@ -84,6 +85,7 @@ import AdminCreateManager from './pages/userManagement/AdminCreateManager'
 import AdminCreateSeller from './pages/userManagement/AdminCreateSeller'
 import AdminEditSeller from './pages/userManagement/AdminEditSeller'
 import AdminCreateClerk from './pages/userManagement/AdminCreateClerk'
+import AdminCreateFinance from './pages/userManagement/AdminCreateFinance'
 import AdminRoleManagement from './pages/userManagement/AdminRoleManagement'
 
 // Route Guards
@@ -92,6 +94,7 @@ import SellerGuard from "./guards/SellerGuard";
 import ManagerGuard from "./guards/ManagerGuard";
 import AdminGuard from "./guards/AdminGuard";
 import ClerkGuard from "./guards/ClerkGuard";
+import AdminWriteGuard from "./guards/AdminWriteGuard";
 
 // All Role's Layouts
 import BuyerLayout from "./layouts/BuyerLayout";
@@ -151,6 +154,7 @@ function App() {
                 <Route path="/buyer/won-items" element={<BuyerWonItems />} />
                 <Route path="/buyer/invoices" element={<BuyerInvoices />} />
                 <Route path="/buyer/wallet" element={<BuyerWallet />} />
+                <Route path="/buyer/wallet/refunds" element={<BuyerRefunds />} />
                 <Route path="/buyer/profile" element={<BuyerProfile />} />
                 <Route path="/buyer/add-balance" element={<BuyerAddBalance />} />
                 <Route path="/buyer/favorite-items" element={<FavoriteAuctions />} />
@@ -318,9 +322,52 @@ function App() {
               <Route element={<AdminLayout />}>
                 <Route path="/admin" element={<Navigate to="/admin/dashboard" replace />} />
                 <Route path="/admin/dashboard" element={<AdminDashboard />} />
-                <Route path="/admin/event/create" element={<AdminCreateEvent />} />
-                <Route path="/admin/event/:eventId/edit" element={<AdminEditEvent />} />
-                <Route path="/admin/publishnew" element={<ManagerPublishNew />} />
+                <Route element={<AdminWriteGuard />}>
+                  <Route path="/admin/event/create" element={<AdminCreateEvent />} />
+                  <Route path="/admin/event/:eventId/edit" element={<AdminEditEvent />} />
+                  <Route path="/admin/publishnew" element={<ManagerPublishNew />} />
+                  <Route path="/admin/finance/manual-payments" element={
+                    <>
+                      <ManualPaymentEntry />
+                    </>
+                  } />
+
+                  <Route path="/admin/finance/manual/payments-authorization" element={
+                    <>
+                      <ManualPaymentAuthorization />
+                    </>
+                  } />
+                  <Route path="/admin/finance/manual/payments-verification" element={
+                    <>
+                      <PaymentVerification />
+                    </>
+                  } />
+                  <Route path="/admin/manager/create" element={
+                    <>
+                      <AdminCreateManager />
+                    </>
+                  } />
+                  <Route path="/admin/clerk/create" element={
+                    <>
+                      <AdminCreateClerk />
+                    </>
+                  } />
+                  <Route path="/admin/finance/create" element={
+                    <>
+                      <AdminCreateFinance />
+                    </>
+                  } />
+                  <Route path="/admin/seller/create" element={
+                    <>
+                      <AdminCreateSeller />
+                    </>
+                  } />
+                  <Route path="/admin/seller/edit/:id" element={
+                    <>
+                      <AdminEditSeller />
+                    </>
+                  } />
+                </Route>
                 <Route path="/admin/buy" element={<AdminBuy />} />
                 <Route path="/admin/sell" element={<AdminSell />} />
                 <Route path="/admin/buy/lot/:lotId" element={<LotDetailReadOnly backPath="/admin/buy" />} />
@@ -334,22 +381,6 @@ function App() {
                 <Route path="/admin/auction-deposit-override" element={<AdminAuctionDepositOverride />} />
                 <Route path="/admin/finance/manual-deposits/:depositId" element={<ManualDepositDetail />} />
                 <Route path="/admin/finance" element={<AdminFinance />} />
-                <Route path="/admin/finance/manual-payments" element={
-                  <>
-                    <ManualPaymentEntry />
-                  </>
-                } />
-
-                <Route path="/admin/finance/manual/payments-authorization" element={
-                  <>
-                    <ManualPaymentAuthorization />
-                  </>
-                } />
-                <Route path="/admin/finance/manual/payments-verification" element={
-                  <>
-                    <PaymentVerification />
-                  </>
-                } />
                 <Route path="/admin/users" element={
                   <>
                     <UserManagement />
@@ -368,26 +399,6 @@ function App() {
                 <Route path="/admin/role-management/:id" element={
                   <>
                     <AdminRoleManagement />
-                  </>
-                } />
-                <Route path="/admin/manager/create" element={
-                  <>
-                    <AdminCreateManager />
-                  </>
-                } />
-                <Route path="/admin/clerk/create" element={
-                  <>
-                    <AdminCreateClerk />
-                  </>
-                } />
-                <Route path="/admin/seller/create" element={
-                  <>
-                    <AdminCreateSeller />
-                  </>
-                } />
-                <Route path="/admin/seller/edit/:id" element={
-                  <>
-                    <AdminEditSeller />
                   </>
                 } />
                 <Route path="/admin/category" element={

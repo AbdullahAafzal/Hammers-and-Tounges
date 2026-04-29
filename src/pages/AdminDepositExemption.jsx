@@ -3,6 +3,7 @@ import { useLocation } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { adminService } from "../services/interceptors/admin.service";
 import { toast } from "react-toastify";
+import { isFinanceAdminFlow } from "../utils/financeAccess";
 import "./AdminDepositExemption.css";
 
 const getUserDisplayName = (user) => {
@@ -16,12 +17,15 @@ const getUserDisplayName = (user) => {
 const AdminDepositExemption = () => {
   const location = useLocation();
   const features = useSelector((state) => state.permissions?.features);
+  const authUser = useSelector((state) => state.auth?.user);
   const [isLoading, setIsLoading] = useState(true);
   const [isSavingMap, setIsSavingMap] = useState({});
   const [buyers, setBuyers] = useState([]);
   const [search, setSearch] = useState("");
   const isManagerFlow = location.pathname.startsWith("/manager");
-  const hasManagerDepositExemptAccess = !isManagerFlow || features?.deposit_exempt?.create === true;
+  const isFinanceReadOnly = isFinanceAdminFlow(location.pathname, authUser);
+  const hasManagerDepositExemptAccess = !isManagerFlow || features?.deposit_exempt?.read === true;
+  const canToggleDepositExempt = !isFinanceReadOnly && (!isManagerFlow || features?.deposit_exempt?.create === true);
 
   const loadBuyers = useCallback(async () => {
     if (!hasManagerDepositExemptAccess) {
@@ -84,6 +88,7 @@ const AdminDepositExemption = () => {
   }, [buyers, search]);
 
   const handleToggle = async (user) => {
+    if (!canToggleDepositExempt) return;
     const userId = user?.id ?? user?.user_id ?? user?.userId;
     if (userId == null) return;
 
@@ -178,7 +183,7 @@ const AdminDepositExemption = () => {
                               <input
                                 type="checkbox"
                                 checked={checked}
-                                disabled={isSaving}
+                                disabled={isSaving || !canToggleDepositExempt}
                                 onChange={() => handleToggle(user)}
                               />
                               <span className="dep-slider" />

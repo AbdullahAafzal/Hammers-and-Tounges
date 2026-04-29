@@ -306,6 +306,28 @@ export const adminService = {
     }
   },
 
+  // Create Finance user (same API as manager/clerk creation; role differs)
+  createFinance: async (financeData) => {
+    try {
+      const formData = new FormData();
+      formData.append('role', 'finance');
+      formData.append('email', financeData.email?.trim() || '');
+      formData.append('password', financeData.password?.trim() || '');
+      formData.append('first_name', financeData.first_name?.trim() || '');
+      formData.append('last_name', financeData.last_name?.trim() || '');
+      formData.append('display_name', financeData.display_name?.trim() || '');
+      formData.append('phone', financeData.phone?.trim() || '');
+
+      const { data } = await apiClient.postForm(API_ROUTES.ADMIN_USER_MANAGEMENT, formData);
+      return data;
+    } catch (error) {
+      if (error.isNetworkError) {
+        throw new Error('Unable to connect to server. Please try again later.');
+      }
+      throw error;
+    }
+  },
+
   // Create Seller (POST form-data to user-management)
   createSeller: async (sellerData) => {
     try {

@@ -3,6 +3,7 @@ import "./BuyerProfile.css";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, useLocation } from "react-router-dom";
 import { fetchProfile, updateProfile } from "../store/actions/profileActions";
+import { profileService } from "../services/interceptors/profile.service";
 
 const BuyerProfile = () => {
   const dispatch = useDispatch();
@@ -32,6 +33,20 @@ const BuyerProfile = () => {
     currentPassword: "",
     newPassword: "",
     confirmPassword: ""
+  });
+  const [bankingProfiles, setBankingProfiles] = useState([]);
+  const [selectedBankingProfileId, setSelectedBankingProfileId] = useState(null);
+  const [isBankingFormOpen, setIsBankingFormOpen] = useState(false);
+  const [bankingLoading, setBankingLoading] = useState(false);
+  const [bankingSaving, setBankingSaving] = useState(false);
+  const [bankingError, setBankingError] = useState("");
+  const [bankingSuccess, setBankingSuccess] = useState("");
+  const [bankingForm, setBankingForm] = useState({
+    account_name: "",
+    bank_name: "",
+    branch_code: "",
+    account_number: "",
+    swift_code: "",
   });
 
   // Fetch profile on component mount
@@ -64,6 +79,55 @@ const BuyerProfile = () => {
     }
   }, [effectiveProfile]);
 
+  const loadBankingDetails = useCallback(async () => {
+    setBankingLoading(true);
+    setBankingError("");
+    setBankingSuccess("");
+    try {
+      const list = await profileService.getBankingProfiles();
+      const profiles = Array.isArray(list) ? list : [];
+      setBankingProfiles(profiles);
+      const selected =
+        profiles.find((p) => String(p?.id) === String(selectedBankingProfileId)) ||
+        null;
+
+      if (!selected) {
+        setSelectedBankingProfileId(null);
+        setBankingForm({
+          account_name: "",
+          bank_name: "",
+          branch_code: "",
+          account_number: "",
+          swift_code: "",
+        });
+        return;
+      }
+      setSelectedBankingProfileId(selected.id ?? null);
+      setBankingForm({
+        account_name: selected.account_name || "",
+        bank_name: selected.bank_name || "",
+        branch_code: selected.branch_code || "",
+        account_number: selected.account_number || "",
+        swift_code: selected.swift_code || "",
+      });
+    } catch (err) {
+      setBankingError(
+        err?.response?.data?.message ||
+          err?.response?.data?.detail ||
+          err?.message ||
+          "Failed to load banking details."
+      );
+    } finally {
+      setBankingLoading(false);
+    }
+  }, [selectedBankingProfileId]);
+
+  useEffect(() => {
+    if (activeTab === "banking") {
+      loadBankingDetails();
+    }
+  }, [activeTab, loadBankingDetails]);
+
   const getDisplayName = useCallback(() => {
     return `${formData.firstName} ${formData.lastName}`.trim() || "Buyer";
   }, [formData.firstName, formData.lastName]);
@@ -88,6 +152,98 @@ const BuyerProfile = () => {
       [field]: value
     }));
   }, []);
+
+  const handleBankingInputChange = useCallback((field, value) => {
+    setBankingForm((prev) => ({
+      ...prev,
+      [field]: value,
+    }));
+  }, []);
+
+  const handleSelectBankingProfile = useCallback((profile) => {
+    setSelectedBankingProfileId(profile?.id ?? null);
+    setBankingForm({
+      account_name: profile?.account_name || "",
+      bank_name: profile?.bank_name || "",
+      branch_code: profile?.branch_code || "",
+      account_number: profile?.account_number || "",
+      swift_code: profile?.swift_code || "",
+    });
+    setBankingError("");
+    setBankingSuccess("");
+    setIsBankingFormOpen(true);
+  }, []);
+
+  const handleAddNewBankingProfile = useCallback(() => {
+    setSelectedBankingProfileId(null);
+    setBankingForm({
+      account_name: "",
+      bank_name: "",
+      branch_code: "",
+      account_number: "",
+      swift_code: "",
+    });
+    setBankingError("");
+    setBankingSuccess("");
+    setIsBankingFormOpen(true);
+  }, []);
+
+  const closeBankingForm = useCallback(() => {
+    setIsBankingFormOpen(false);
+    setBankingError("");
+    setBankingSuccess("");
+  }, []);
+
+  const validateBankingForm = useCallback(() => {
+    return (
+      bankingForm.account_name.trim() &&
+      bankingForm.bank_name.trim() &&
+      bankingForm.branch_code.trim() &&
+      bankingForm.account_number.trim() &&
+      bankingForm.swift_code.trim()
+    );
+  }, [bankingForm]);
+
+  const handleSaveBankingDetails = useCallback(async () => {
+    if (!validateBankingForm()) {
+      setBankingError("All banking fields are required.");
+      setBankingSuccess("");
+      return;
+    }
+
+    const payload = {
+      account_name: bankingForm.account_name.trim(),
+      bank_name: bankingForm.bank_name.trim(),
+      branch_code: bankingForm.branch_code.trim(),
+      account_number: bankingForm.account_number.trim(),
+      swift_code: bankingForm.swift_code.trim(),
+    };
+
+    setBankingSaving(true);
+    setBankingError("");
+    setBankingSuccess("");
+    try {
+      if (selectedBankingProfileId) {
+        await profileService.updateBankingProfile(selectedBankingProfileId, payload);
+        setBankingSuccess("Banking details updated successfully.");
+      } else {
+        const created = await profileService.createBankingProfile(payload);
+        setSelectedBankingProfileId(created?.id ?? null);
+        setBankingSuccess("Banking details added successfully.");
+      }
+      await loadBankingDetails();
+      setIsBankingFormOpen(false);
+    } catch (err) {
+      setBankingError(
+        err?.response?.data?.message ||
+          err?.response?.data?.detail ||
+          err?.message ||
+          "Failed to save banking details."
+      );
+    } finally {
+      setBankingSaving(false);
+    }
+  }, [bankingForm, selectedBankingProfileId, loadBankingDetails, validateBankingForm]);
 
   // Handle save - saves everything in one call
   const handleSave = useCallback(async () => {
@@ -337,6 +493,12 @@ const BuyerProfile = () => {
               onClick={() => setActiveTab("settings")}
             >
               Settings
+            </button>
+            <button
+              className={`tab-btn ${activeTab === "banking" ? "active" : ""}`}
+              onClick={() => setActiveTab("banking")}
+            >
+              Banking Details
             </button>
           </div>
 
@@ -665,10 +827,140 @@ const BuyerProfile = () => {
                 </div>
               </div>
             )}
+
+            {activeTab === "banking" && (
+              <div className="banking-content">
+                <div className="info-section">
+                  <h3 className="section-title">Banking Details</h3>
+                  <p className="banking-subtitle">Add and manage bank accounts used for your payouts.</p>
+                  {bankingSuccess ? <p className="banking-message banking-message-success">{bankingSuccess}</p> : null}
+                  {bankingLoading ? (
+                    <p className="banking-message">Loading banking details...</p>
+                  ) : (
+                    <>
+                      <div className="banking-actions banking-actions-top">
+                        <button
+                          className="b-action-btn b-primary"
+                          type="button"
+                          onClick={handleAddNewBankingProfile}
+                        >
+                          + Add New Account
+                        </button>
+                      </div>
+                      {bankingProfiles.length === 0 ? (
+                        <div className="banking-empty-state">No bank accounts added yet.</div>
+                      ) : (
+                        <div className="banking-cards-grid">
+                          {bankingProfiles.map((profile) => (
+                            <div key={profile.id} className="banking-card">
+                              <div className="banking-card-header">
+                                <h4>{profile.bank_name || "Bank Account"}</h4>
+                                <button
+                                  className="b-action-btn b-outline small"
+                                  type="button"
+                                  onClick={() => handleSelectBankingProfile(profile)}
+                                >
+                                  Edit
+                                </button>
+                              </div>
+                              <p className="banking-card-name">{profile.account_name || "-"}</p>
+                              <div className="banking-card-meta">
+                                <span>Acct: {profile.account_number || "-"}</span>
+                                <span>Branch: {profile.branch_code || "-"}</span>
+                                <span>Swift: {profile.swift_code || "-"}</span>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </>
+                  )}
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </div>
     </div>
+    {activeTab === "banking" && isBankingFormOpen && (
+      <div className="banking-modal-overlay" onClick={closeBankingForm}>
+        <div className="banking-modal" onClick={(e) => e.stopPropagation()}>
+          <div className="banking-modal-header">
+            <h3>{selectedBankingProfileId ? "Edit Bank Account" : "Add Bank Account"}</h3>
+            <button className="b-action-btn b-outline small" type="button" onClick={closeBankingForm}>
+              Close
+            </button>
+          </div>
+          {bankingError ? <p className="banking-message banking-message-error">{bankingError}</p> : null}
+          <div className="info-grid banking-grid">
+            <div className="info-item">
+              <label>Account Name</label>
+              <input
+                type="text"
+                className="edit-input"
+                value={bankingForm.account_name}
+                onChange={(e) => handleBankingInputChange("account_name", e.target.value)}
+                placeholder="e.g. John Doe"
+              />
+            </div>
+            <div className="info-item">
+              <label>Bank Name</label>
+              <input
+                type="text"
+                className="edit-input"
+                value={bankingForm.bank_name}
+                onChange={(e) => handleBankingInputChange("bank_name", e.target.value)}
+                placeholder="e.g. Standard Bank"
+              />
+            </div>
+            <div className="info-item">
+              <label>Branch Code</label>
+              <input
+                type="text"
+                className="edit-input"
+                value={bankingForm.branch_code}
+                onChange={(e) => handleBankingInputChange("branch_code", e.target.value)}
+                placeholder="e.g. 051001"
+              />
+            </div>
+            <div className="info-item">
+              <label>Account Number</label>
+              <input
+                type="text"
+                className="edit-input"
+                value={bankingForm.account_number}
+                onChange={(e) => handleBankingInputChange("account_number", e.target.value)}
+                placeholder="e.g. 10023456789"
+              />
+            </div>
+            <div className="info-item banking-item-wide">
+              <label>SWIFT Code</label>
+              <input
+                type="text"
+                className="edit-input"
+                value={bankingForm.swift_code}
+                onChange={(e) => handleBankingInputChange("swift_code", e.target.value)}
+                placeholder="e.g. SBZA ZA JJ"
+              />
+            </div>
+          </div>
+          <div className="banking-actions">
+            <button
+              className="b-action-btn b-primary"
+              type="button"
+              onClick={handleSaveBankingDetails}
+              disabled={bankingSaving}
+            >
+              {bankingSaving
+                ? "Saving..."
+                : selectedBankingProfileId
+                  ? "Update Banking Details"
+                  : "Add Banking Details"}
+            </button>
+          </div>
+        </div>
+      </div>
+    )}
     </>
   );
 };

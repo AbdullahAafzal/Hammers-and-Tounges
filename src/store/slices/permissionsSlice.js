@@ -18,6 +18,13 @@ const permissionsSlice = createSlice({
       state.isLoading = false;
       state.lastFetchedUserId = null;
     },
+    setPermissionsForUser: (state, action) => {
+      const { userId, features } = action.payload || {};
+      state.features = features || null;
+      state.error = null;
+      state.isLoading = false;
+      state.lastFetchedUserId = userId ?? null;
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -44,6 +51,6 @@ const permissionsSlice = createSlice({
   },
 });
 
-export const { clearPermissions } = permissionsSlice.actions;
+export const { clearPermissions, setPermissionsForUser } = permissionsSlice.actions;
 export default permissionsSlice.reducer;
 

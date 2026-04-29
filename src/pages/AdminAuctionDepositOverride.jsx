@@ -3,6 +3,7 @@ import { useLocation } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { auctionService } from "../services/interceptors/auction.service";
 import { toast } from "react-toastify";
+import { isFinanceAdminFlow } from "../utils/financeAccess";
 import "./AdminAuctionDepositOverride.css";
 
 const EVENT_ALLOWED_STATUSES = new Set(["LIVE", "SCHEDULED"]);
@@ -56,13 +57,15 @@ const AdminAuctionDepositOverride = () => {
   const permissionsLoading = useSelector((state) => state.permissions?.isLoading);
   const lastFetchedUserId = useSelector((state) => state.permissions?.lastFetchedUserId);
   const authUserId = useSelector((state) => state.auth?.user?.id);
+  const authUser = useSelector((state) => state.auth?.user);
   const isManagerFlow = location.pathname.startsWith("/manager");
   const permissionsReady =
     !permissionsLoading &&
     lastFetchedUserId != null &&
     String(lastFetchedUserId) === String(authUserId);
   const canUpdateEvents = features?.manage_events?.update === true;
-  const inputsLocked = isManagerFlow && (!permissionsReady || !canUpdateEvents);
+  const isFinanceReadOnly = isFinanceAdminFlow(location.pathname, authUser);
+  const inputsLocked = isFinanceReadOnly || (isManagerFlow && (!permissionsReady || !canUpdateEvents));
 
   const [loading, setLoading] = useState(true);
   const [rows, setRows] = useState([]);

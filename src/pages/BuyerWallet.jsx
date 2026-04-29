@@ -330,6 +330,9 @@ const BuyerWallet = () => {
                     </div>
                     Add Balance
                   </button>
+                  <button className="refund-button" onClick={() => navigate("/buyer/wallet/refunds")}>
+                    Refund
+                  </button>
                 </div>
 
                 <div className="balance-card reserved-card">

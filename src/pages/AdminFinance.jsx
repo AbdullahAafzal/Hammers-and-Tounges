@@ -1,8 +1,10 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom'
+import { useSelector } from 'react-redux'
 import { toast } from 'react-toastify'
 import { getMediaUrl } from '../config/api.config'
 import { adminService } from '../services/interceptors/admin.service'
+import { isFinanceAdminFlow } from '../utils/financeAccess'
 import './AdminFinance.css'
 
 const STATUS_OPTIONS = [
@@ -52,7 +54,10 @@ function getUserDisplayName(user) {
 const AdminFinance = () => {
   const navigate = useNavigate()
   const routeLocation = useLocation()
+  const authUser = useSelector((state) => state.auth?.user)
   const financeBase = routeLocation.pathname.startsWith('/manager/') ? '/manager/finance' : '/admin/finance'
+  const isFinanceReadOnly = isFinanceAdminFlow(routeLocation.pathname, authUser)
+  const canUseCashDeposit = !routeLocation.pathname.startsWith('/manager/')
 
   const [statusFilter, setStatusFilter] = useState('PENDING')
   const [items, setItems] = useState([])
@@ -155,6 +160,7 @@ const AdminFinance = () => {
   }, [])
 
   const openCashDepositModal = async () => {
+    if (!canUseCashDeposit) return
     setIsCashDepositModalOpen(true)
     setBuyerQuery('')
     setSelectedBuyer(null)
@@ -163,6 +169,7 @@ const AdminFinance = () => {
   }
 
   const handleApprove = async (row) => {
+    if (isFinanceReadOnly) return
     const id = row.id
     if (id == null) return
     setActionId(id)
@@ -184,6 +191,7 @@ const AdminFinance = () => {
   }
 
   const submitReject = async () => {
+    if (isFinanceReadOnly) return
     if (!rejectTarget?.id) return
     const reason = rejectReason.trim()
     if (!reason) {
@@ -228,6 +236,7 @@ const AdminFinance = () => {
   }, [buyerQuery, buyers])
 
   const submitCashDeposit = async () => {
+    if (!canUseCashDeposit) return
     const buyerId = selectedBuyer?.id ?? selectedBuyer?.user_id ?? selectedBuyer?.userId
     if (buyerId == null) {
       toast.error('Please select a buyer.')
@@ -294,7 +303,7 @@ const AdminFinance = () => {
                 type="button"
                 className="finance-primary-btn finance-primary-btn--compact finance-primary-btn--cash-deposit"
                 onClick={openCashDepositModal}
-                disabled={cashDepositSubmitting}
+                disabled={cashDepositSubmitting || !canUseCashDeposit}
               >
                 Cash Deposit
               </button>
@@ -455,7 +464,7 @@ const AdminFinance = () => {
                                 </div>
                               </td>
                               <td onClick={(e) => e.stopPropagation()}>
-                                {isPending ? (
+                                {isPending && !isFinanceReadOnly ? (
                                   <div className="finance-md-actions">
                                     <button
                                       type="button"

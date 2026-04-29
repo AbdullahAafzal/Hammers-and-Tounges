@@ -106,7 +106,12 @@ const authSlice = createSlice({
         const u = action.payload.user;
         const role = (u?.role || '').toLowerCase();
         const isStaff = u?.is_staff === true || u?.is_staff === 1 || String(u?.is_staff).toLowerCase() === 'true';
-        const effectiveRole = (role === 'buyer' || role === 'seller') ? role : (isStaff ? 'admin' : (role || 'buyer'));
+        const effectiveRole =
+          role === 'finance'
+            ? 'finance'
+            : (role === 'buyer' || role === 'seller')
+              ? role
+              : (isStaff ? 'admin' : (role || 'buyer'));
         cookieStorage.setItem(cookieStorage.AUTH_KEYS.ROLE, effectiveRole);
       })
       .addCase(loginUser.rejected, (state, action) => {
@@ -136,7 +141,12 @@ const authSlice = createSlice({
           const u = action.payload.user;
           const role = (u?.role || '').toLowerCase();
           const isStaff = u?.is_staff === true || u?.is_staff === 1 || String(u?.is_staff).toLowerCase() === 'true';
-          const effectiveRole = (role === 'buyer' || role === 'seller') ? role : (isStaff ? 'admin' : (role || 'buyer'));
+          const effectiveRole =
+            role === 'finance'
+              ? 'finance'
+              : (role === 'buyer' || role === 'seller')
+                ? role
+                : (isStaff ? 'admin' : (role || 'buyer'));
           cookieStorage.setItem(cookieStorage.AUTH_KEYS.ROLE, effectiveRole);
         }
       })

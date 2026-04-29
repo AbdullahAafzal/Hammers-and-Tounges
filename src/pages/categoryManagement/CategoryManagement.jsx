@@ -5,21 +5,24 @@ import { fetchCategories, deleteCategory } from '../../store/actions/adminAction
 import { fetchCategories as fetchCategoriesForBuyer } from '../../store/actions/AuctionsActions';
 import { adminService } from '../../services/interceptors/admin.service';
 import { toast } from 'react-toastify';
+import { isFinanceAdminFlow } from '../../utils/financeAccess';
 import './CategoryManagement.css';
 
 export default function CategoryManagement() {
   const dispatch = useDispatch();
   const { categories: categoriesFromStore, isLoading } = useSelector((state) => state.admin);
   const features = useSelector((state) => state.permissions?.features);
+  const authUser = useSelector((state) => state.auth?.user);
   const manageCategoriesPerm = features?.manage_categories || {};
   const location = useLocation();
   const isManagerFlow = location.pathname.startsWith('/manager');
+  const isFinanceReadOnly = isFinanceAdminFlow(location.pathname, authUser);
 
   // Admin should always retain full category access.
   // Permission gating applies only in manager flow.
-  const canCreateCategories = isManagerFlow ? manageCategoriesPerm?.create === true : true;
-  const canUpdateCategories = isManagerFlow ? manageCategoriesPerm?.update === true : true;
-  const canDeleteCategories = isManagerFlow ? manageCategoriesPerm?.delete === true : true;
+  const canCreateCategories = isFinanceReadOnly ? false : (isManagerFlow ? manageCategoriesPerm?.create === true : true);
+  const canUpdateCategories = isFinanceReadOnly ? false : (isManagerFlow ? manageCategoriesPerm?.update === true : true);
+  const canDeleteCategories = isFinanceReadOnly ? false : (isManagerFlow ? manageCategoriesPerm?.delete === true : true);
   const canToggleCategoryStatus = canCreateCategories;
 
   const shouldShowActionsColumn = canUpdateCategories || canDeleteCategories;

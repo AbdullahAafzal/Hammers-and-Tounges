@@ -1,6 +1,7 @@
 import React from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import { useDispatch } from 'react-redux'
+import { useSelector } from 'react-redux'
 import { logout } from '../store/slices/authSlice'
 import { useNavigate } from 'react-router-dom'
 import logo from '../assets/logo.png'
@@ -11,6 +12,8 @@ const AdminSideDrawer = ({ isOpen, onClose }) => {
   const location = useLocation()
   const dispatch = useDispatch()
   const navigate = useNavigate()
+  const authUser = useSelector((state) => state.auth?.user)
+  const roleLabel = String(authUser?.role || '').toLowerCase() === 'finance' ? 'Finance' : 'Admin'
 
   const handleLogout = () => {
     dispatch(logout())
@@ -76,7 +79,7 @@ const AdminSideDrawer = ({ isOpen, onClose }) => {
         </nav>
 
         <div className="admin-side-drawer__actions">
-          <span className="admin-side-drawer__badge">Admin</span>
+          <span className="admin-side-drawer__badge">{roleLabel}</span>
           <button
             type="button"
             className="admin-side-drawer__logout"

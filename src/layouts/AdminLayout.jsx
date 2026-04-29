@@ -1,10 +1,31 @@
 import React, { useState } from 'react'
 import { Outlet } from 'react-router-dom'
+import { useEffect } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
 import AdminSideDrawer from '../components/AdminSideDrawer'
+import { clearPermissions, setPermissionsForUser } from '../store/slices/permissionsSlice'
+import { FINANCE_READ_ONLY_FEATURES, isFinanceUser } from '../utils/financeAccess'
 import './AdminLayout.css'
 
 const AdminLayout = () => {
   const [drawerOpen, setDrawerOpen] = useState(true)
+  const dispatch = useDispatch()
+  const authUser = useSelector((state) => state.auth?.user)
+  const authUserId = authUser?.id
+
+  useEffect(() => {
+    if (!authUserId) return
+    if (isFinanceUser(authUser)) {
+      dispatch(
+        setPermissionsForUser({
+          userId: authUserId,
+          features: FINANCE_READ_ONLY_FEATURES,
+        })
+      )
+      return
+    }
+    dispatch(clearPermissions())
+  }, [dispatch, authUser, authUserId])
 
   return (
     <div className={`admin-layout ${drawerOpen ? 'drawer-open' : ''}`}>

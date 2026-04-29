@@ -34,6 +34,10 @@ const SignIn = () => {
         navigate('/seller/dashboard', { replace: true })
         return
       }
+      if (role === 'finance') {
+        navigate('/admin/dashboard', { replace: true })
+        return
+      }
       // is_staff = admin; otherwise manager goes to manager dashboard
       if (isStaff) {
         navigate('/admin/dashboard', { replace: true })

@@ -1,8 +1,10 @@
 import React, { useEffect, useState } from 'react'
 import { useNavigate, useParams, useLocation } from 'react-router-dom'
+import { useSelector } from 'react-redux'
 import { toast } from 'react-toastify'
 import { getMediaUrl } from '../config/api.config'
 import { adminService } from '../services/interceptors/admin.service'
+import { isFinanceAdminFlow } from '../utils/financeAccess'
 import './AdminFinance.css'
 
 function normalizeManualDepositsList(data) {
@@ -38,7 +40,9 @@ const ManualDepositDetail = () => {
   const { depositId } = useParams()
   const navigate = useNavigate()
   const location = useLocation()
+  const authUser = useSelector((state) => state.auth?.user)
   const idNum = Number(depositId)
+  const isFinanceReadOnly = isFinanceAdminFlow(location.pathname, authUser)
 
   const listPath = location.pathname.startsWith('/manager/') ? '/manager/finance' : '/admin/finance'
 
@@ -116,6 +120,7 @@ const ManualDepositDetail = () => {
   }
 
   const handleApprove = async () => {
+    if (isFinanceReadOnly) return
     if (deposit?.id == null) return
     setActionId(deposit.id)
     try {
@@ -135,6 +140,7 @@ const ManualDepositDetail = () => {
   }
 
   const submitReject = async () => {
+    if (isFinanceReadOnly) return
     if (!rejectTarget?.id) return
     const reason = rejectReason.trim()
     if (!reason) {
@@ -278,7 +284,7 @@ const ManualDepositDetail = () => {
               )}
 
               <footer className="finance-md-detail-actions">
-                {isPending ? (
+                {isPending && !isFinanceReadOnly ? (
                   <>
                     <button
                       type="button"

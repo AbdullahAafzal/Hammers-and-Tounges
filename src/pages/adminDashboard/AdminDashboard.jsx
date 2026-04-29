@@ -14,6 +14,7 @@ import { fetchEvents } from "../../store/actions/AuctionsActions";
 import { toast } from "react-toastify";
 import { API_CONFIG } from "../../config/api.config";
 import EventListingRow from "../../components/EventListingRow";
+import { isFinanceAdminFlow } from "../../utils/financeAccess";
 
 const TAB_UPCOMMING = "upcoming";
 const TAB_CURRENT = "current";
@@ -173,6 +174,8 @@ const AdminDashboard = () => {
   const dispatch = useDispatch();
   const { users, isLoading } = useSelector((state) => state.admin);
   const { events, eventsLoading, eventsLoaded, eventsCount } = useSelector((state) => state.buyer);
+  const authUser = useSelector((state) => state.auth?.user);
+  const isFinanceReadOnly = isFinanceAdminFlow(location.pathname, authUser);
   const [activeTab, setActiveTab] = useState(TAB_CURRENT);
   const [searchQuery, setSearchQuery] = useState("");
   const [page, setPage] = useState(1);
@@ -454,17 +457,19 @@ const AdminDashboard = () => {
           </p>
         </div>
         <div className="admin-dashboard-header-actions">
-          <Link
-            to="/admin/event/create"
-            className="admin-dashboard-create-btn"
-            aria-label="Create event"
-          >
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <line x1="12" y1="5" x2="12" y2="19" strokeLinecap="round" />
-              <line x1="5" y1="12" x2="19" y2="12" strokeLinecap="round" />
-            </svg>
-            Create Event
-          </Link>
+          {!isFinanceReadOnly && (
+            <Link
+              to="/admin/event/create"
+              className="admin-dashboard-create-btn"
+              aria-label="Create event"
+            >
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <line x1="12" y1="5" x2="12" y2="19" strokeLinecap="round" />
+                <line x1="5" y1="12" x2="19" y2="12" strokeLinecap="round" />
+              </svg>
+              Create Event
+            </Link>
+          )}
           {/* <button
             className="admin-dashboard-action-btn admin-dashboard-btn-primary"
             onClick={() => navigate('/admin/profile')}

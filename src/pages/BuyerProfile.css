@@ -1171,6 +1171,163 @@ input:checked + .slider:before {
   border-radius: 12px;
 }
 
+.banking-content {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.banking-content .section-title {
+  margin-bottom: 0.35rem;
+  line-height: 1.3;
+}
+
+.banking-subtitle {
+  margin: 0 0 1rem;
+  line-height: 1.45;
+  color: var(--color-text-muted);
+  font-size: 0.875rem;
+}
+
+.banking-message {
+  margin: 0 0 0.75rem;
+  font-size: 0.8125rem;
+  color: var(--color-text-muted);
+}
+
+.banking-message-error {
+  color: #ef4444;
+}
+
+.banking-message-success {
+  color: #39AE47;
+}
+
+.banking-actions {
+  margin-top: 1rem;
+  display: flex;
+  justify-content: flex-start;
+}
+
+.banking-actions-top {
+  margin-top: 0.25rem;
+}
+
+.banking-grid .banking-item-wide {
+  grid-column: 1 / -1;
+}
+
+.banking-message-warning {
+  color: #f59e0b;
+}
+
+.banking-accounts-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.banking-account-chip {
+  border: 1px solid var(--color-input-border);
+  background: var(--color-input-bg);
+  color: var(--color-text-muted);
+  border-radius: 8px;
+  padding: 0.45rem 0.7rem;
+  font-size: 0.75rem;
+  cursor: pointer;
+}
+
+.banking-account-chip.active {
+  border-color: var(--color-accent);
+  color: var(--color-accent);
+  background: rgba(140, 198, 63, 0.12);
+}
+
+.banking-empty-state {
+  margin-top: 0.5rem;
+  border: 1px dashed var(--color-border-strong);
+  border-radius: 12px;
+  padding: 1rem;
+  color: var(--color-text-muted);
+  text-align: center;
+}
+
+.banking-cards-grid {
+  margin-top: 0.75rem;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 0.75rem;
+}
+
+.banking-card {
+  border: 1px solid var(--color-card-border);
+  background: var(--color-surface-elevated);
+  border-radius: 12px;
+  padding: 0.9rem;
+}
+
+.banking-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.banking-card-header h4 {
+  margin: 0;
+  font-size: 0.9rem;
+  color: var(--color-text);
+}
+
+.banking-card-name {
+  margin: 0 0 0.45rem;
+  color: var(--color-text-secondary);
+  font-size: 0.82rem;
+}
+
+.banking-card-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  color: var(--color-text-muted);
+  font-size: 0.74rem;
+}
+
+.banking-modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 10000;
+  background: rgba(0, 0, 0, 0.65);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+}
+
+.banking-modal {
+  width: min(780px, 100%);
+  background: var(--color-card-bg);
+  border: 1px solid var(--color-card-border);
+  border-radius: 14px;
+  padding: 1rem;
+}
+
+.banking-modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 0.75rem;
+}
+
+.banking-modal-header h3 {
+  margin: 0;
+  font-size: 1rem;
+  color: var(--color-text);
+}
+
 .danger-actions {
   display: flex;
   gap: 1rem;

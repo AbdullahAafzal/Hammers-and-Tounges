@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { auctionService } from '../../services/interceptors/auction.service';
 import { toast } from 'react-toastify';
 import { fetchCategories } from '../../store/actions/AuctionsActions';
@@ -8,6 +8,7 @@ import { getMediaUrl } from '../../config/api.config';
 import BuyerEventLotsFilterBar from '../../components/BuyerEventLotsFilterBar';
 import LotRow from '../../components/LotRow';
 import GuestLotDrawer from '../../components/GuestLotDrawer';
+import { isFinanceAdminFlow } from '../../utils/financeAccess';
 import './AdminEventLots.css';
 import '../../pages/GuestEventLots.css';
 
@@ -56,6 +57,8 @@ const AdminEventLots = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const dispatch = useDispatch();
+  const authUser = useSelector((state) => state.auth?.user);
+  const isFinanceReadOnly = isFinanceAdminFlow(location.pathname, authUser);
   const eventFromState = location.state?.event;
 
   const [lots, setLots] = useState([]);
@@ -201,8 +204,8 @@ const AdminEventLots = () => {
   }, [id, eventTitle, navigate]);
 
   const eventStatusUpper = (eventStatus || '').toUpperCase();
-  const showCreateLot = eventStatusUpper === 'SCHEDULED';
-  const showDeleteEvent = eventStatusUpper === 'SCHEDULED' && canDeleteEvent;
+  const showCreateLot = !isFinanceReadOnly && eventStatusUpper === 'SCHEDULED';
+  const showDeleteEvent = !isFinanceReadOnly && eventStatusUpper === 'SCHEDULED' && canDeleteEvent;
   // const showEditEvent = eventStatusUpper === 'SCHEDULED' && !hasActiveLot;
 
   const handleLotUpdated = useCallback(() => {
@@ -498,6 +501,7 @@ const AdminEventLots = () => {
           onClose={() => setSelectedLot(null)}
           isAdmin
           onLotUpdated={handleLotUpdated}
+          isFinanceReadOnly={isFinanceReadOnly}
         />
       )}
     </div>

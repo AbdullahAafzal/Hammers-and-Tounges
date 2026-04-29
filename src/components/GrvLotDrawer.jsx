@@ -34,12 +34,14 @@ const pickGrvForLot = (list, lotId) => {
 const GrvLotDrawer = ({ lot: initialLot, onClose, onGrvChanged }) => {
   const location = useLocation();
   const features = useSelector((state) => state.permissions?.features);
+  const authUser = useSelector((state) => state.auth?.user);
 
   const isAdminGrvRoute = location.pathname.startsWith('/admin/');
+  const isFinanceReadOnly = isAdminGrvRoute && String(authUser?.role || '').toLowerCase() === 'finance';
   const mg = features?.manage_grv || {};
-  const canGrvCreate = isAdminGrvRoute || mg.create === true;
-  const canGrvUpdate = isAdminGrvRoute || mg.update === true;
-  const canGrvDelete = isAdminGrvRoute || mg.delete === true;
+  const canGrvCreate = !isFinanceReadOnly && (isAdminGrvRoute || mg.create === true);
+  const canGrvUpdate = !isFinanceReadOnly && (isAdminGrvRoute || mg.update === true);
+  const canGrvDelete = !isFinanceReadOnly && (isAdminGrvRoute || mg.delete === true);
 
   const [lot, setLot] = useState(initialLot);
   const [loadingLot, setLoadingLot] = useState(true);
@@ -137,9 +139,12 @@ const GrvLotDrawer = ({ lot: initialLot, onClose, onGrvChanged }) => {
   const hasRecord = grvId != null;
 
   const fieldsEditable =
-    isAdminGrvRoute ||
-    (!hasRecord && canGrvCreate) ||
-    (hasRecord && canGrvUpdate);
+    !isFinanceReadOnly &&
+    (
+      isAdminGrvRoute ||
+      (!hasRecord && canGrvCreate) ||
+      (hasRecord && canGrvUpdate)
+    );
 
   const showSaveOrCreate =
     (!hasRecord && canGrvCreate) || (hasRecord && canGrvUpdate);

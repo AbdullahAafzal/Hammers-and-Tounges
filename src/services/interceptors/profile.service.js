@@ -10,6 +10,24 @@ function listManualDepositsPayload(raw) {
   return [];
 }
 
+function normalizeBankingProfilesPayload(raw) {
+  if (!raw) return [];
+  if (Array.isArray(raw)) return raw;
+  if (Array.isArray(raw.results)) return raw.results;
+  if (Array.isArray(raw.data)) return raw.data;
+  if (raw.id != null) return [raw];
+  return [];
+}
+
+function normalizeRefundsPayload(raw) {
+  if (!raw) return [];
+  if (Array.isArray(raw)) return raw;
+  if (Array.isArray(raw.results)) return raw.results;
+  if (Array.isArray(raw.data)) return raw.data;
+  if (raw.id != null) return [raw];
+  return [];
+}
+
 /**
  * Normalize profile API response - handles different backend response structures.
  * Backend may return: { first_name, ... } | { data: { ... } } | { user: {...}, profile: {...} }
@@ -169,6 +187,39 @@ export const profileService = {
   /** DELETE /payments/manual-deposits/{id}/ — allowed when status is PENDING */
   deleteManualDeposit: async (id) => {
     const { data } = await apiClient.delete(API_ROUTES.MANUAL_DEPOSIT_ITEM(id));
+    return data;
+  },
+
+  /** GET /payments/banking-profiles/ — current user's banking profiles */
+  getBankingProfiles: async () => {
+    const { data } = await apiClient.get(API_ROUTES.BANKING_PROFILES);
+    return normalizeBankingProfilesPayload(data);
+  },
+
+  /** POST /payments/banking-profiles/ — add banking profile */
+  createBankingProfile: async (payload) => {
+    const { data } = await apiClient.post(API_ROUTES.BANKING_PROFILES, payload);
+    return data;
+  },
+
+  /** PATCH /payments/banking-profiles/{id}/ — update banking profile */
+  updateBankingProfile: async (id, payload) => {
+    const { data } = await apiClient.patch(`${API_ROUTES.BANKING_PROFILES}${id}/`, payload);
+    return data;
+  },
+
+  getRefunds: async () => {
+    const { data } = await apiClient.get(API_ROUTES.REFUNDS, { skipDedupe: true });
+    return normalizeRefundsPayload(data);
+  },
+
+  getRefundById: async (id) => {
+    const { data } = await apiClient.get(`${API_ROUTES.REFUNDS}${id}/`, { skipDedupe: true });
+    return data;
+  },
+
+  createRefund: async (payload) => {
+    const { data } = await apiClient.post(API_ROUTES.REFUNDS, payload);
     return data;
   },
 };

@@ -143,7 +143,9 @@ export const API_ROUTES = {
   PROFILE_UPDATE: '/users/profile/',
   WALLET: '/users/wallet/',
   DEPOSIT: '/payments/deposit/',
+  REFUNDS: '/payments/refunds/',
   MANUAL_DEPOSIT: '/payments/manual-deposit/',
+  BANKING_PROFILES: '/payments/banking-profiles/',
   /** DELETE — pending manual requests only; path uses plural `manual-deposits`. */
   MANUAL_DEPOSIT_ITEM: (id) => `/payments/manual-deposits/${id}/`,
   /** GET — Admin/Manager: list manual deposits; optional `?status=PENDING|APPROVED|REJECTED` */
