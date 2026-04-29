@@ -144,6 +144,12 @@ export const API_ROUTES = {
   WALLET: '/users/wallet/',
   DEPOSIT: '/payments/deposit/',
   REFUNDS: '/payments/refunds/',
+  REFUND_VERIFY: (id) => `/payments/refunds/${id}/verify/`,
+  REFUND_REJECT: (id) => `/payments/refunds/${id}/reject/`,
+  REFUND_AUTHORIZE: (id) => `/payments/refunds/${id}/authorize/`,
+  REFUND_DISBURSE: (id) => `/payments/refunds/${id}/disburse/`,
+  TWO_FA_STATUS: '/users/2fa/status/',
+  TWO_FA_SETUP: '/users/2fa/setup/',
   MANUAL_DEPOSIT: '/payments/manual-deposit/',
   BANKING_PROFILES: '/payments/banking-profiles/',
   /** DELETE — pending manual requests only; path uses plural `manual-deposits`. */

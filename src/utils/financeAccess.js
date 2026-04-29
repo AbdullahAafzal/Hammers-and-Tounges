@@ -11,3 +11,16 @@ export const FINANCE_READ_ONLY_FEATURES = {
   manage_grv: { read: true, create: false, update: false, delete: false },
   deposit_exempt: { read: true, create: false, update: false, delete: false },
 };
+
+/** Senior admin or staff — not finance officers. Caller should also limit to `/admin/` routes on web. */
+export function canAuthoriseRefunds(user) {
+  if (!user) return false;
+  if (String(user.role || "").toLowerCase() === "finance") return false;
+  const role = String(user.role || "").toLowerCase();
+  if (role === "admin") return true;
+  return (
+    user.is_staff === true ||
+    user.is_staff === 1 ||
+    String(user.is_staff || "").toLowerCase() === "true"
+  );
+}

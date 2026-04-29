@@ -474,4 +474,110 @@ export const adminService = {
       throw error;
     }
   },
+
+  getRefundRequests: async () => {
+    try {
+      const { data } = await apiClient.get(API_ROUTES.REFUNDS, { skipDedupe: true });
+      return data;
+    } catch (error) {
+      if (error.isNetworkError) {
+        throw new Error('Unable to connect to server. Please try again later.');
+      }
+      throw error;
+    }
+  },
+
+  getRefundRequestById: async (refundId) => {
+    try {
+      const { data } = await apiClient.get(`${API_ROUTES.REFUNDS}${refundId}/`, { skipDedupe: true });
+      return data;
+    } catch (error) {
+      if (error.isNetworkError) {
+        throw new Error('Unable to connect to server. Please try again later.');
+      }
+      throw error;
+    }
+  },
+
+  verifyRefund: async (refundId) => {
+    try {
+      const { data } = await apiClient.post(API_ROUTES.REFUND_VERIFY(refundId));
+      return data;
+    } catch (error) {
+      if (error.isNetworkError) {
+        throw new Error('Unable to connect to server. Please try again later.');
+      }
+      throw error;
+    }
+  },
+
+  rejectRefund: async (refundId, rejection_reason) => {
+    try {
+      const { data } = await apiClient.post(API_ROUTES.REFUND_REJECT(refundId), {
+        rejection_reason,
+      });
+      return data;
+    } catch (error) {
+      if (error.isNetworkError) {
+        throw new Error('Unable to connect to server. Please try again later.');
+      }
+      throw error;
+    }
+  },
+
+  getTwoFaStatus: async () => {
+    try {
+      const { data } = await apiClient.get(API_ROUTES.TWO_FA_STATUS, { skipDedupe: true });
+      return data;
+    } catch (error) {
+      if (error.isNetworkError) {
+        throw new Error('Unable to connect to server. Please try again later.');
+      }
+      throw error;
+    }
+  },
+
+  postTwoFaSetup: async () => {
+    try {
+      const { data } = await apiClient.post(API_ROUTES.TWO_FA_SETUP, {}, { skipDedupe: true });
+      return data;
+    } catch (error) {
+      if (error.isNetworkError) {
+        throw new Error('Unable to connect to server. Please try again later.');
+      }
+      throw error;
+    }
+  },
+
+  authorizeRefund: async (refundId, totp_token) => {
+    try {
+      const { data } = await apiClient.post(
+        API_ROUTES.REFUND_AUTHORIZE(refundId),
+        { totp_token },
+        { skipDedupe: true }
+      );
+      return data;
+    } catch (error) {
+      if (error.isNetworkError) {
+        throw new Error('Unable to connect to server. Please try again later.');
+      }
+      throw error;
+    }
+  },
+
+  disburseRefund: async (refundId, transaction_reference) => {
+    try {
+      const { data } = await apiClient.post(
+        API_ROUTES.REFUND_DISBURSE(refundId),
+        { transaction_reference },
+        { skipDedupe: true }
+      );
+      return data;
+    } catch (error) {
+      if (error.isNetworkError) {
+        throw new Error('Unable to connect to server. Please try again later.');
+      }
+      throw error;
+    }
+  },
 };

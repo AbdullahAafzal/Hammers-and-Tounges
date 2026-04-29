@@ -38,6 +38,13 @@ function refundChannelLabel(channel) {
   return c || "—";
 }
 
+function refundRejectionReason(refund) {
+  if (refund?.rejection_reason) return String(refund.rejection_reason);
+  const logs = Array.isArray(refund?.audit_logs) ? refund.audit_logs : [];
+  const rejectedLog = logs.find((l) => /rejected|failed/i.test(String(l?.to_status || '')));
+  return rejectedLog?.notes ? String(rejectedLog.notes) : '';
+}
+
 const BuyerRefunds = () => {
   const [wallet, setWallet] = useState(null);
   const [refundsLoading, setRefundsLoading] = useState(false);
@@ -228,6 +235,11 @@ const BuyerRefunds = () => {
                         </span>
                         <span className="buyer-wallet-history__when">{formatPaymentWhen(r.created_at)}</span>
                       </div>
+                      {/rejected|failed/i.test(String(r?.status || '')) && refundRejectionReason(r) ? (
+                        <div className="buyer-wallet-history__row-meta">
+                          <span className="buyer-refunds-reason-inline">Reason: {refundRejectionReason(r)}</span>
+                        </div>
+                      ) : null}
                       <div className="buyer-refunds-row-actions">
                         <button
                           type="button"
@@ -260,6 +272,12 @@ const BuyerRefunds = () => {
                       <p><span>Channel</span><strong>{refundChannelLabel(selectedRefund.payment_channel)}</strong></p>
                       <p><span>Date</span><strong>{formatPaymentWhen(selectedRefund.created_at)}</strong></p>
                     </div>
+                    {/rejected|failed/i.test(String(selectedRefund?.status || '')) && refundRejectionReason(selectedRefund) ? (
+                      <div className="buyer-refund-detail__reason">
+                        <span>Rejection reason</span>
+                        <strong>{refundRejectionReason(selectedRefund)}</strong>
+                      </div>
+                    ) : null}
                   </>
                 )}
               </div>
