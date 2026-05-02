@@ -56,7 +56,7 @@ export function useAuctionWebSocket(eventId, lotId, onBidUpdate) {
       return;
     }
 
-    const base = API_CONFIG.WEB_SOCKET_URL || "wss://developer.hashverx.com";
+    const base = API_CONFIG.WEB_SOCKET_URL || "wss://api.codexpace.com";
     const url = `${base}/ws/auction/event/${eventId}/`;
     // eslint-disable-next-line no-console
     console.log("[Auction WS] connecting", { url, eventId, lotId });

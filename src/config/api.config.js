@@ -23,7 +23,7 @@ const getBaseUrl = () => {
 
   // Defaults
   if (import.meta.env.PROD) return '/api';
-  return 'https://developer.hashverx.com/api';
+  return 'https://api.codexpace.com/api';
 };
 
 const getWebSocketBaseUrl = () => {
@@ -33,7 +33,7 @@ const getWebSocketBaseUrl = () => {
   // If it's a relative path like '/api', keep it (assumes websocket is under same prefix).
   if (envUrl && envUrl.startsWith('/')) return envUrl;
 
-  const base = envUrl || 'https://developer.hashverx.com';
+  const base = envUrl || 'https://api.codexpace.com';
   const clean = base.replace(/\/$/, '').replace(/^http/, 'ws');
   return clean;
 };
@@ -93,8 +93,9 @@ export const getMediaUrl = (mediaPath) => {
     // Backwards compatibility for old deployments
     path = path.replace('http://207.180.233.44:8001', '');
   } else if (path.startsWith('https://developer.hashverx.com')) {
-    // New API/media host
     path = path.replace('https://developer.hashverx.com', '');
+  } else if (path.startsWith('https://api.codexpace.com')) {
+    path = path.replace('https://api.codexpace.com', '');
   } else if (path.startsWith('http://') || path.startsWith('https://')) {
     // 2. Handle other full URLs (e.g. unsplash)
     return path;
@@ -119,10 +120,10 @@ export const getMediaUrl = (mediaPath) => {
   // If path already starts with 'media/', we might need to be careful.
   // Assuming MEDIA_BASE_URL is the origin (http://...:8001)
   if (path.startsWith('media/')) {
-    return `${API_CONFIG.MEDIA_BASE_URL || 'http://207.180.233.44:8001'}/${path}`;
+    return `${API_CONFIG.MEDIA_BASE_URL || 'https://api.codexpace.com'}/${path}`;
   }
 
-  return `${API_CONFIG.MEDIA_BASE_URL || 'http://207.180.233.44:8001'}/media/${path}`;
+  return `${API_CONFIG.MEDIA_BASE_URL || 'https://api.codexpace.com'}/media/${path}`;
 };
 
 export const API_ROUTES = {

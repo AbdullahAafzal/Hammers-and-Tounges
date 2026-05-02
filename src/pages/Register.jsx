@@ -138,6 +138,9 @@ const Register = () => {
       acc_id: userId,
     };
 
+    // eslint-disable-next-line no-console
+    console.log("[Register] registration payload", registrationPayload);
+
     await dispatch(registerUser(registrationPayload));
   };
 
