@@ -39,6 +39,7 @@ const BuyerProfile = () => {
   const [isBankingFormOpen, setIsBankingFormOpen] = useState(false);
   const [bankingLoading, setBankingLoading] = useState(false);
   const [bankingSaving, setBankingSaving] = useState(false);
+  const [bankingDeletingId, setBankingDeletingId] = useState(null);
   const [bankingError, setBankingError] = useState("");
   const [bankingSuccess, setBankingSuccess] = useState("");
   const [bankingForm, setBankingForm] = useState({
@@ -79,12 +80,17 @@ const BuyerProfile = () => {
     }
   }, [effectiveProfile]);
 
-  const loadBankingDetails = useCallback(async () => {
-    setBankingLoading(true);
-    setBankingError("");
-    setBankingSuccess("");
+  const loadBankingDetails = useCallback(async (opts = {}) => {
+    const silent = opts.silent === true;
+    if (!silent) {
+      setBankingLoading(true);
+      setBankingError("");
+      setBankingSuccess("");
+    }
     try {
-      const list = await profileService.getBankingProfiles();
+      const list = await profileService.getBankingProfiles(
+        silent ? { skipDedupe: true } : {}
+      );
       const profiles = Array.isArray(list) ? list : [];
       setBankingProfiles(profiles);
       const selected =
@@ -118,7 +124,9 @@ const BuyerProfile = () => {
           "Failed to load banking details."
       );
     } finally {
-      setBankingLoading(false);
+      if (!silent) {
+        setBankingLoading(false);
+      }
     }
   }, [selectedBankingProfileId]);
 
@@ -226,13 +234,25 @@ const BuyerProfile = () => {
       if (selectedBankingProfileId) {
         await profileService.updateBankingProfile(selectedBankingProfileId, payload);
         setBankingSuccess("Banking details updated successfully.");
+        setBankingProfiles((prev) =>
+          prev.map((p) =>
+            String(p?.id) === String(selectedBankingProfileId) ? { ...p, ...payload } : p
+          )
+        );
       } else {
         const created = await profileService.createBankingProfile(payload);
         setSelectedBankingProfileId(created?.id ?? null);
         setBankingSuccess("Banking details added successfully.");
+        if (created?.id != null) {
+          setBankingProfiles((prev) =>
+            prev.some((p) => String(p?.id) === String(created.id))
+              ? prev
+              : [...prev, created]
+          );
+        }
       }
-      await loadBankingDetails();
       setIsBankingFormOpen(false);
+      await loadBankingDetails({ silent: true });
     } catch (err) {
       setBankingError(
         err?.response?.data?.message ||
@@ -244,6 +264,44 @@ const BuyerProfile = () => {
       setBankingSaving(false);
     }
   }, [bankingForm, selectedBankingProfileId, loadBankingDetails, validateBankingForm]);
+
+  const handleDeleteBankingProfile = useCallback(
+    async (profile) => {
+      const id = profile?.id;
+      if (id == null) return;
+      const label = profile?.bank_name || profile?.account_name || "this account";
+      if (
+        !window.confirm(
+          `Remove bank account "${label}"? This cannot be undone.`
+        )
+      ) {
+        return;
+      }
+      setBankingDeletingId(id);
+      setBankingError("");
+      setBankingSuccess("");
+      try {
+        await profileService.deleteBankingProfile(id);
+        setBankingSuccess("Bank account removed.");
+        setBankingProfiles((prev) => prev.filter((p) => String(p?.id) !== String(id)));
+        if (String(selectedBankingProfileId) === String(id)) {
+          setSelectedBankingProfileId(null);
+          setIsBankingFormOpen(false);
+        }
+        await loadBankingDetails({ silent: true });
+      } catch (err) {
+        setBankingError(
+          err?.response?.data?.message ||
+            err?.response?.data?.detail ||
+            err?.message ||
+            "Failed to remove bank account."
+        );
+      } finally {
+        setBankingDeletingId(null);
+      }
+    },
+    [loadBankingDetails, selectedBankingProfileId]
+  );
 
   // Handle save - saves everything in one call
   const handleSave = useCallback(async () => {
@@ -855,13 +913,24 @@ const BuyerProfile = () => {
                             <div key={profile.id} className="banking-card">
                               <div className="banking-card-header">
                                 <h4>{profile.bank_name || "Bank Account"}</h4>
-                                <button
-                                  className="b-action-btn b-outline small"
-                                  type="button"
-                                  onClick={() => handleSelectBankingProfile(profile)}
-                                >
-                                  Edit
-                                </button>
+                                <div className="banking-card-actions">
+                                  <button
+                                    className="b-action-btn b-outline small"
+                                    type="button"
+                                    onClick={() => handleSelectBankingProfile(profile)}
+                                    disabled={bankingDeletingId != null}
+                                  >
+                                    Edit
+                                  </button>
+                                  <button
+                                    className="b-action-btn b-outline small banking-remove-btn"
+                                    type="button"
+                                    onClick={() => handleDeleteBankingProfile(profile)}
+                                    disabled={bankingDeletingId != null}
+                                  >
+                                    {bankingDeletingId === profile.id ? "Removing…" : "Remove"}
+                                  </button>
+                                </div>
                               </div>
                               <p className="banking-card-name">{profile.account_name || "-"}</p>
                               <div className="banking-card-meta">

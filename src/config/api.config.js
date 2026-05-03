@@ -151,6 +151,7 @@ export const API_ROUTES = {
   REFUND_DISBURSE: (id) => `/payments/refunds/${id}/disburse/`,
   TWO_FA_STATUS: '/users/2fa/status/',
   TWO_FA_SETUP: '/users/2fa/setup/',
+  TWO_FA_CONFIRM: '/users/2fa/confirm/',
   MANUAL_DEPOSIT: '/payments/manual-deposit/',
   BANKING_PROFILES: '/payments/banking-profiles/',
   /** DELETE — pending manual requests only; path uses plural `manual-deposits`. */

@@ -549,6 +549,23 @@ export const adminService = {
     }
   },
 
+  /** POST /users/2fa/confirm/ — body `{ totp_token }` completes enrollment after scan/setup. */
+  postTwoFaConfirm: async (totp_token) => {
+    try {
+      const { data } = await apiClient.post(
+        API_ROUTES.TWO_FA_CONFIRM,
+        { totp_token },
+        { skipDedupe: true }
+      );
+      return data;
+    } catch (error) {
+      if (error.isNetworkError) {
+        throw new Error('Unable to connect to server. Please try again later.');
+      }
+      throw error;
+    }
+  },
+
   authorizeRefund: async (refundId, totp_token) => {
     try {
       const { data } = await apiClient.post(

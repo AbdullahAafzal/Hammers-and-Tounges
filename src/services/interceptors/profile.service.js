@@ -191,8 +191,8 @@ export const profileService = {
   },
 
   /** GET /payments/banking-profiles/ — current user's banking profiles */
-  getBankingProfiles: async () => {
-    const { data } = await apiClient.get(API_ROUTES.BANKING_PROFILES);
+  getBankingProfiles: async (requestConfig = {}) => {
+    const { data } = await apiClient.get(API_ROUTES.BANKING_PROFILES, requestConfig);
     return normalizeBankingProfilesPayload(data);
   },
 
@@ -205,6 +205,12 @@ export const profileService = {
   /** PATCH /payments/banking-profiles/{id}/ — update banking profile */
   updateBankingProfile: async (id, payload) => {
     const { data } = await apiClient.patch(`${API_ROUTES.BANKING_PROFILES}${id}/`, payload);
+    return data;
+  },
+
+  /** DELETE /payments/banking-profiles/{id}/ — remove banking profile */
+  deleteBankingProfile: async (id) => {
+    const { data } = await apiClient.delete(`${API_ROUTES.BANKING_PROFILES}${id}/`);
     return data;
   },
 

@@ -1736,6 +1736,10 @@ html[data-theme="light"] .finance-md-modal-close:hover {
   color: var(--color-text);
 }
 
+.finance-2fa-confirm-input {
+  margin-bottom: 0.35rem;
+}
+
 .finance-authorise-2fa-btn {
   margin-top: 0.25rem;
 }

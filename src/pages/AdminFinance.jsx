@@ -66,7 +66,7 @@ function refundStatusBadgeClass(status) {
   if (s === 'VERIFIED') {
     return 'finance-action-badge finance-md-status finance-md-status--verified'
   }
-  if (s === 'AUTHORISED' || s === 'AUTHORIZED') {
+  if (s === 'AUTHORISED' || s === 'AUTHORIZED' || s === 'APPROVED' || s === 'READY_FOR_DISBURSEMENT' || s === 'READY_TO_DISBURSE') {
     return 'finance-action-badge finance-md-status finance-md-status--authorised'
   }
   if (s === 'DISBURSED') {
@@ -215,6 +215,7 @@ const AdminFinance = () => {
   const [twoFaDetailText, setTwoFaDetailText] = useState('')
   const [twoFaQrDataUrl, setTwoFaQrDataUrl] = useState('')
   const [twoFaSetupSubmitting, setTwoFaSetupSubmitting] = useState(false)
+  const [twoFaConfirmInput, setTwoFaConfirmInput] = useState('')
   const [authRefundDetailTarget, setAuthRefundDetailTarget] = useState(null)
   const [authRefundDetailLoading, setAuthRefundDetailLoading] = useState(false)
   const [authTotpRefundId, setAuthTotpRefundId] = useState(null)
@@ -374,6 +375,12 @@ const AdminFinance = () => {
     setTwoFaQrDataUrl(qrUrl)
     return undefined
   }, [authorisePhase, twoFaOtpauthUri])
+
+  useEffect(() => {
+    if (authorisePhase !== 'two_fa_setup') {
+      setTwoFaConfirmInput('')
+    }
+  }, [authorisePhase])
 
   const openReject = (row) => {
     setRejectTarget(row)
@@ -656,21 +663,30 @@ const AdminFinance = () => {
     runAuthoriseGate()
   }, [runAuthoriseGate])
 
-  const handleTwoFaSetupComplete = async () => {
+  const handleTwoFaConfirmComplete = async () => {
     if (twoFaSetupSubmitting) return
+    const code = String(twoFaConfirmInput || '').replace(/\D/g, '')
+    if (code.length !== 6) {
+      toast.error(
+        'Enter the 6-digit code from your authenticator app to finish enabling 2FA.'
+      )
+      return
+    }
     setTwoFaSetupSubmitting(true)
     try {
-      await adminService.postTwoFaSetup()
-      toast.success('2FA setup saved successfully.')
+      await adminService.postTwoFaConfirm(code)
+      toast.success('Two-factor authentication is now enabled.')
+      setTwoFaConfirmInput('')
       await runAuthoriseGate()
     } catch (err) {
       const raw =
         err?.response?.data?.detail ||
         err?.response?.data?.message ||
+        err?.response?.data?.totp_token ||
         err?.response?.data?.non_field_errors ||
         err?.message ||
-        '2FA setup failed'
-      toast.error(typeof raw === 'string' ? raw : '2FA setup failed')
+        'Could not confirm 2FA'
+      toast.error(typeof raw === 'string' ? raw : 'Could not confirm 2FA')
     } finally {
       setTwoFaSetupSubmitting(false)
     }
@@ -941,13 +957,37 @@ const AdminFinance = () => {
                         <code className="finance-2fa-secret">{parseManualSecretFromOtpauth(twoFaOtpauthUri)}</code>
                       </div>
                     ) : null}
+                    <label className="finance-md-label" htmlFor="finance-2fa-confirm-totp">
+                      Confirmation code (6 digits)
+                    </label>
+                    <input
+                      id="finance-2fa-confirm-totp"
+                      type="text"
+                      inputMode="numeric"
+                      autoComplete="one-time-code"
+                      maxLength={6}
+                      className="finance-md-input finance-2fa-confirm-input"
+                      value={twoFaConfirmInput}
+                      onChange={(e) =>
+                        setTwoFaConfirmInput(e.target.value.replace(/\D/g, '').slice(0, 6))
+                      }
+                      placeholder="000000"
+                      disabled={twoFaSetupSubmitting}
+                    />
+                    <p className="finance-md-modal-helper">
+                      After scanning the QR code, enter the current code from your app so we can verify
+                      2FA is enabled.
+                    </p>
                     <button
                       type="button"
                       className="finance-md-btn finance-md-btn--approve finance-authorise-2fa-btn"
-                      onClick={handleTwoFaSetupComplete}
-                      disabled={twoFaSetupSubmitting}
+                      onClick={handleTwoFaConfirmComplete}
+                      disabled={
+                        twoFaSetupSubmitting ||
+                        String(twoFaConfirmInput || '').replace(/\D/g, '').length !== 6
+                      }
                     >
-                      {twoFaSetupSubmitting ? 'Saving…' : 'I have set up 2FA'}
+                      {twoFaSetupSubmitting ? 'Confirming…' : 'Confirm and enable 2FA'}
                     </button>
                   </div>
                 ) : null}
@@ -1731,6 +1771,7 @@ const AdminFinance = () => {
                     const id = authRefundDetailTarget?.id
                     if (id == null || authActionRefundId != null) return
                     setAuthTotpInput('')
+                    closeAuthRefundDetail()
                     setAuthTotpRefundId(id)
                   }}
                   disabled={
@@ -1751,6 +1792,7 @@ const AdminFinance = () => {
                     const id = authRefundDetailTarget?.id
                     if (id == null || authActionRefundId != null) return
                     setAuthDisburseRefInput('')
+                    closeAuthRefundDetail()
                     setAuthDisburseRefundId(id)
                   }}
                   disabled={

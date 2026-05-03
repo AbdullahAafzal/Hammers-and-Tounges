@@ -9,7 +9,13 @@ export function isRefundVerifiedStatus(status) {
 
 export function isRefundAuthorisedStatus(status) {
   const s = normaliseRefundStatus(status);
-  return s === 'AUTHORISED' || s === 'AUTHORIZED';
+  return (
+    s === 'AUTHORISED' ||
+    s === 'AUTHORIZED' ||
+    s === 'APPROVED' ||
+    s === 'READY_FOR_DISBURSEMENT' ||
+    s === 'READY_TO_DISBURSE'
+  );
 }
 
 export function isRefundDisbursedStatus(status) {
@@ -30,7 +36,14 @@ export function filterAuthoriseTabRefunds(list) {
   if (!Array.isArray(list)) return [];
   return list.filter((r) => {
     const s = normaliseRefundStatus(r?.status);
-    return s === 'VERIFIED' || s === 'AUTHORISED' || s === 'AUTHORIZED';
+    return (
+      s === 'VERIFIED' ||
+      s === 'AUTHORISED' ||
+      s === 'AUTHORIZED' ||
+      s === 'APPROVED' ||
+      s === 'READY_FOR_DISBURSEMENT' ||
+      s === 'READY_TO_DISBURSE'
+    );
   });
 }
 
@@ -55,11 +68,12 @@ function parseBooleanLike(value) {
 export function isTwoFaEnabledFromStatus(data) {
   if (!data || typeof data !== 'object') return false;
 
-  const sources = [data, data.user, data.profile, data.result].filter(
+  const sources = [data, data.data, data.user, data.profile, data.result].filter(
     (x) => x && typeof x === 'object'
   );
   const booleanKeys = [
     'enabled',
+    '2fa_enabled',
     'is_2fa_enabled',
     'is_two_fa_enabled',
     'two_fa_enabled',
