@@ -550,6 +550,42 @@ export const adminService = {
   },
 
   /** POST /users/2fa/confirm/ — body `{ totp_token }` completes enrollment after scan/setup. */
+  getEventPopcorn: async (eventId) => {
+    try {
+      const { data } = await apiClient.get(API_ROUTES.ADMIN_EVENT_POPCORN(eventId));
+      return data;
+    } catch (error) {
+      if (error.isNetworkError) {
+        throw new Error('Unable to connect to server. Please try again later.');
+      }
+      throw error;
+    }
+  },
+
+  updateEventPopcorn: async (eventId, body) => {
+    try {
+      const { data } = await apiClient.put(API_ROUTES.ADMIN_EVENT_POPCORN(eventId), body);
+      return data;
+    } catch (error) {
+      if (error.isNetworkError) {
+        throw new Error('Unable to connect to server. Please try again later.');
+      }
+      throw error;
+    }
+  },
+
+  toggleEventPopcorn: async (eventId) => {
+    try {
+      const { data } = await apiClient.post(API_ROUTES.ADMIN_EVENT_POPCORN_TOGGLE(eventId), {});
+      return data;
+    } catch (error) {
+      if (error.isNetworkError) {
+        throw new Error('Unable to connect to server. Please try again later.');
+      }
+      throw error;
+    }
+  },
+
   postTwoFaConfirm: async (totp_token) => {
     try {
       const { data } = await apiClient.post(

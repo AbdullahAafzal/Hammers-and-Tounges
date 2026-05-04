@@ -4,6 +4,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { auctionService } from '../services/interceptors/auction.service';
 import { toast } from 'react-toastify';
 import EventListingRow from '../components/EventListingRow';
+import PopcornBiddingModal from '../components/PopcornBiddingModal';
 import { fetchEvents } from '../store/actions/AuctionsActions';
 import { normalizeEventStatusForFilter } from '../utils/eventStatus';
 import './ManagerDashboard.css';
@@ -94,6 +95,8 @@ function ManagerDashboard() {
   const manageEventsPerm = features?.manage_events || {};
   const canCreateEvents = manageEventsPerm?.create === true;
   const canDeleteEvents = manageEventsPerm?.delete === true;
+  const canManagePopcorn = manageEventsPerm?.update === true;
+  const [popcornModalEvent, setPopcornModalEvent] = useState(null);
   const [activeTab, setActiveTab] = useState(TAB_CURRENT);
   const [searchQuery, setSearchQuery] = useState('');
   const [page, setPage] = useState(1);
@@ -409,6 +412,17 @@ function ManagerDashboard() {
                           </svg>
                           View
                         </button>
+                        {canManagePopcorn ? (
+                          <button
+                            type="button"
+                            className="manager-dashboard-event-action-btn"
+                            onClick={() => setPopcornModalEvent(ev)}
+                            title="Popcorn bidding settings"
+                            aria-label={`Popcorn bidding for ${ev.title}`}
+                          >
+                            Popcorn Bidding
+                          </button>
+                        ) : null}
                         {canDeleteEvents &&
                           normalizeEventStatusForFilter(ev) === 'SCHEDULED' &&
                           deletableEventIds[String(ev.id)] === true && (
@@ -457,6 +471,12 @@ function ManagerDashboard() {
           </div>
         </section>
       </div>
+      <PopcornBiddingModal
+        isOpen={!!popcornModalEvent}
+        onClose={() => setPopcornModalEvent(null)}
+        eventId={popcornModalEvent?.id}
+        eventTitle={popcornModalEvent?.title}
+      />
     </div>
   );
 }

@@ -190,6 +190,10 @@ export const API_ROUTES = {
   INSPECTION_TEMPLATES: '/inspections/templates/',
   INSPECTION_TEMPLATE_DETAIL: '/inspections/templates/', // + template_id
 
+  /** Admin — popcorn bidding rules per event (GET/PUT) and toggle (POST) */
+  ADMIN_EVENT_POPCORN: (eventId) => `/auctions/admin/events/${eventId}/popcorn/`,
+  ADMIN_EVENT_POPCORN_TOGGLE: (eventId) => `/auctions/admin/events/${eventId}/popcorn/toggle/`,
+
   //// Auction Routes (Common for all)
   AUCTIONS_EVENTS: '/auctions/events/',
   AUCTIONS_LOTS: '/auctions/lots/',

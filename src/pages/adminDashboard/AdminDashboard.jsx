@@ -14,6 +14,7 @@ import { fetchEvents } from "../../store/actions/AuctionsActions";
 import { toast } from "react-toastify";
 import { API_CONFIG } from "../../config/api.config";
 import EventListingRow from "../../components/EventListingRow";
+import PopcornBiddingModal from "../../components/PopcornBiddingModal";
 import { isFinanceAdminFlow } from "../../utils/financeAccess";
 
 const TAB_UPCOMMING = "upcoming";
@@ -176,6 +177,8 @@ const AdminDashboard = () => {
   const { events, eventsLoading, eventsLoaded, eventsCount } = useSelector((state) => state.buyer);
   const authUser = useSelector((state) => state.auth?.user);
   const isFinanceReadOnly = isFinanceAdminFlow(location.pathname, authUser);
+  const canManagePopcorn = !isFinanceReadOnly;
+  const [popcornModalEvent, setPopcornModalEvent] = useState(null);
   const [activeTab, setActiveTab] = useState(TAB_CURRENT);
   const [searchQuery, setSearchQuery] = useState("");
   const [page, setPage] = useState(1);
@@ -639,19 +642,32 @@ const AdminDashboard = () => {
                       event={event}
                       onClick={(e) => handleViewDetails(e.id, e)}
                       renderActions={(ev) => (
-                        <button
-                          type="button"
-                          className="admin-dashboard-event-action-btn"
-                          onClick={() => handleViewDetails(ev.id, ev)}
-                          title="View Details"
-                          aria-label={`View details for ${ev.title}`}
-                        >
-                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-                            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" stroke="currentColor" strokeWidth="2" />
-                            <circle cx="12" cy="12" r="3" stroke="currentColor" strokeWidth="2" />
-                          </svg>
-                          View
-                        </button>
+                        <>
+                          <button
+                            type="button"
+                            className="admin-dashboard-event-action-btn"
+                            onClick={() => handleViewDetails(ev.id, ev)}
+                            title="View Details"
+                            aria-label={`View details for ${ev.title}`}
+                          >
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                              <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" stroke="currentColor" strokeWidth="2" />
+                              <circle cx="12" cy="12" r="3" stroke="currentColor" strokeWidth="2" />
+                            </svg>
+                            View
+                          </button>
+                          {canManagePopcorn ? (
+                            <button
+                              type="button"
+                              className="admin-dashboard-event-action-btn"
+                              onClick={() => setPopcornModalEvent(ev)}
+                              title="Popcorn bidding settings"
+                              aria-label={`Popcorn bidding for ${ev.title}`}
+                            >
+                              Popcorn Bidding
+                            </button>
+                          ) : null}
+                        </>
                       )}
                     />
                   ))}
@@ -728,6 +744,12 @@ const AdminDashboard = () => {
         </div>
       </div>
 
+      <PopcornBiddingModal
+        isOpen={!!popcornModalEvent}
+        onClose={() => setPopcornModalEvent(null)}
+        eventId={popcornModalEvent?.id}
+        eventTitle={popcornModalEvent?.title}
+      />
     </div>
   );
 };

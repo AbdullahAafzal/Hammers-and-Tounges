@@ -1,0 +1,201 @@
+.popcorn-modal-root {
+  position: fixed;
+  inset: 0;
+  z-index: 12000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  background: rgba(0, 0, 0, 0.65);
+}
+
+.popcorn-modal-dialog {
+  position: relative;
+  width: 100%;
+  max-width: 420px;
+  border-radius: 12px;
+  border: 1px solid var(--color-border-strong, rgba(255, 255, 255, 0.12));
+  /* Opaque: --color-surface-elevated is translucent rgba in dark theme (see index.css) */
+  background: var(--color-bg-alt);
+  color: var(--color-text, #fff);
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.45);
+  isolation: isolate;
+}
+
+.popcorn-modal-header {
+  padding: 1.1rem 1.25rem 0.75rem;
+  border-bottom: 1px solid var(--color-border-strong, rgba(255, 255, 255, 0.08));
+}
+
+.popcorn-modal-title {
+  margin: 0;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--color-text, #fff);
+}
+
+.popcorn-modal-subtitle {
+  margin: 0.35rem 0 0;
+  font-size: 0.85rem;
+  color: var(--color-text-muted, #9ca3af);
+}
+
+.popcorn-modal-close {
+  position: absolute;
+  top: 0.65rem;
+  right: 0.65rem;
+  width: 2rem;
+  height: 2rem;
+  border: none;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--color-text-muted, #9ca3af);
+  font-size: 1.5rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.popcorn-modal-close:hover {
+  color: var(--color-text, #fff);
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.popcorn-modal-body {
+  padding: 1rem 1.25rem 1.25rem;
+}
+
+.popcorn-modal-loading {
+  padding: 2rem 0;
+  text-align: center;
+  color: var(--color-text-muted, #9ca3af);
+}
+
+.popcorn-modal-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.popcorn-modal-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.popcorn-modal-field-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.popcorn-modal-label {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--color-text-muted, #a1a1aa);
+}
+
+.popcorn-modal-hint {
+  margin: 0;
+  font-size: 0.78rem;
+  color: var(--color-text-muted, #71717a);
+  line-height: 1.35;
+}
+
+.popcorn-modal-input {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 0.55rem 0.75rem;
+  border-radius: 8px;
+  border: 1px solid rgba(140, 198, 63, 0.45);
+  /* Opaque: --color-input-bg is also translucent in dark theme */
+  background: var(--color-bg);
+  color: var(--color-text, #fff);
+  font-size: 0.95rem;
+}
+
+.popcorn-modal-input:focus {
+  outline: 2px solid var(--color-accent, #8cc63f);
+  outline-offset: 1px;
+}
+
+.popcorn-modal-switch {
+  position: relative;
+  width: 48px;
+  height: 28px;
+  flex-shrink: 0;
+  border-radius: 999px;
+  border: 1px solid rgba(140, 198, 63, 0.35);
+  background: rgba(255, 255, 255, 0.08);
+  cursor: pointer;
+  padding: 0;
+  transition: background 0.2s, border-color 0.2s;
+}
+
+.popcorn-modal-switch:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.popcorn-modal-switch--on {
+  background: rgba(140, 198, 63, 0.35);
+  border-color: var(--color-accent, #8cc63f);
+}
+
+.popcorn-modal-switch-knob {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: #fff;
+  transition: transform 0.2s ease;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.35);
+}
+
+.popcorn-modal-switch--on .popcorn-modal-switch-knob {
+  transform: translateX(20px);
+}
+
+.popcorn-modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.6rem;
+  margin-top: 0.25rem;
+}
+
+.popcorn-modal-btn {
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  font-size: 0.88rem;
+  font-weight: 600;
+  cursor: pointer;
+  border: 1px solid transparent;
+}
+
+.popcorn-modal-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.popcorn-modal-btn--ghost {
+  background: transparent;
+  color: var(--color-text-muted, #a1a1aa);
+  border-color: rgba(255, 255, 255, 0.12);
+}
+
+.popcorn-modal-btn--ghost:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--color-text, #fff);
+}
+
+.popcorn-modal-btn--primary {
+  background: var(--color-accent, #8cc63f);
+  color: #0a0a0a;
+  border-color: var(--color-accent, #8cc63f);
+}
+
+.popcorn-modal-btn--primary:hover:not(:disabled) {
+  filter: brightness(1.05);
+}
