@@ -1761,3 +1761,22 @@ html[data-theme="light"] .finance-md-modal-close:hover {
   color: #10b981;
   border: 1px solid rgba(16, 185, 129, 0.4);
 }
+
+/* Full-page refund authorise / disburse (not modal) */
+.finance-refund-action-page {
+  max-width: 520px;
+  margin: 0 auto;
+  padding-top: 0.5rem;
+}
+
+.finance-refund-action-page__toolbar {
+  margin-bottom: 1rem;
+}
+
+.finance-refund-action-page__summary {
+  margin-bottom: 1.25rem;
+}
+
+.finance-refund-action-page__footer {
+  margin-top: 1.25rem;
+}

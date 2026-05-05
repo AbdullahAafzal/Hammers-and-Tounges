@@ -14,6 +14,14 @@ import {
   isRefundVerifiedStatus,
   isRefundAuthorisedStatus,
 } from '../utils/twoFaRefundHelpers'
+import {
+  formatDateTime,
+  getRefundPaymentDetails,
+  getRefundUserDisplay,
+  refundChannelLabel,
+  refundStatusBadgeClass,
+  sortedAuditLogs,
+} from '../utils/financeRefundDisplay'
 import './AdminFinance.css'
 
 const STATUS_OPTIONS = [
@@ -38,18 +46,6 @@ function normalizeRefundsList(data) {
   return []
 }
 
-function formatDateTime(iso) {
-  if (!iso) return '—'
-  try {
-    return new Date(iso).toLocaleString(undefined, {
-      dateStyle: 'medium',
-      timeStyle: 'short',
-    })
-  } catch {
-    return String(iso)
-  }
-}
-
 function statusBadgeClass(status) {
   const s = String(status || '').toUpperCase()
   if (s === 'APPROVED') {
@@ -61,26 +57,6 @@ function statusBadgeClass(status) {
   return 'finance-action-badge finance-md-status finance-md-status--pending'
 }
 
-function refundStatusBadgeClass(status) {
-  const s = String(status || '').toUpperCase()
-  if (s === 'VERIFIED') {
-    return 'finance-action-badge finance-md-status finance-md-status--verified'
-  }
-  if (s === 'AUTHORISED' || s === 'AUTHORIZED' || s === 'APPROVED' || s === 'READY_FOR_DISBURSEMENT' || s === 'READY_TO_DISBURSE') {
-    return 'finance-action-badge finance-md-status finance-md-status--authorised'
-  }
-  if (s === 'DISBURSED') {
-    return 'finance-action-badge finance-md-status finance-md-status--disbursed'
-  }
-  if (s === 'REJECTED') {
-    return 'finance-action-badge finance-md-status finance-md-status--rejected'
-  }
-  if (s === 'PENDING' || s === 'INITIATED') {
-    return 'finance-action-badge finance-md-status finance-md-status--pending'
-  }
-  return 'finance-action-badge finance-md-status finance-md-status--pending'
-}
-
 function getUserDisplayName(user) {
   const full =
     user?.full_name ||
@@ -88,92 +64,9 @@ function getUserDisplayName(user) {
     [user?.first_name, user?.last_name].filter(Boolean).join(' ').trim()
   return full || user?.email || `User #${user?.id ?? user?.user_id ?? user?.userId ?? 'N/A'}`
 }
-function refundChannelLabel(channel) {
-  const c = String(channel || '').toUpperCase()
-  if (c === 'BANK_TRANSFER') return 'Bank Transfer'
-  if (c === 'VISA') return 'Visa / Card Reversal'
-  if (c === 'MOBILE_MONEY') return 'Mobile Money'
-  return c || '—'
-}
 
 function isPendingRefundStatus(status) {
   return /pending|initiated|submitted|processing/i.test(String(status || ''))
-}
-
-function getRefundUserDisplay(row) {
-  const fullFromUser = [row?.user?.first_name, row?.user?.last_name].filter(Boolean).join(' ').trim()
-  const fullFromClient = [row?.client?.first_name, row?.client?.last_name].filter(Boolean).join(' ').trim()
-  return (
-    row?.client_name ||
-    row?.buyer_name ||
-    row?.user_name ||
-    row?.client?.full_name ||
-    row?.client?.display_name ||
-    fullFromClient ||
-    row?.client?.email ||
-    row?.customer_email ||
-    row?.user?.full_name ||
-    row?.user?.display_name ||
-    fullFromUser ||
-    row?.user?.email ||
-    (row?.client_id != null ? `Client #${row.client_id}` : null) ||
-    (row?.user_id != null ? `User #${row.user_id}` : null) ||
-    '—'
-  )
-}
-
-function getRefundPaymentDetails(row) {
-  const details =
-    row?.bank_details ||
-    row?.payment_details ||
-    row?.banking_details ||
-    row?.bank_account ||
-    row?.banking_profile
-  const inline = [
-    row?.bank_name,
-    row?.account_name,
-    row?.account_number,
-    row?.branch_code,
-    row?.swift_code,
-    row?.iban,
-    row?.mobile_money_number,
-    row?.phone_number,
-    row?.card_last4 ? `Card •••• ${row.card_last4}` : null,
-  ].filter(Boolean)
-  if (inline.length > 0) return inline.join(' · ')
-  if (!details) return '—'
-  if (typeof details === 'string') return details
-  if (typeof details === 'object') {
-    return [
-      details.bank_name,
-      details.account_name,
-      details.account_number,
-      details.branch_code,
-      details.swift_code,
-      details.iban,
-      details.mobile_money_number,
-      details.phone_number,
-      details.card_last4 ? `Card •••• ${details.card_last4}` : null,
-    ]
-      .filter(Boolean)
-      .join(' · ') || '—'
-  }
-  if (Array.isArray(row?.audit_logs) && row.audit_logs.length > 0) {
-    const latestNote = row.audit_logs
-      .map((log) => log?.notes)
-      .filter(Boolean)[0]
-    if (latestNote) return latestNote
-  }
-  return '—'
-}
-
-function sortedAuditLogs(row) {
-  const logs = Array.isArray(row?.audit_logs) ? row.audit_logs : []
-  return [...logs].sort((a, b) => {
-    const ta = new Date(a?.timestamp || 0).getTime()
-    const tb = new Date(b?.timestamp || 0).getTime()
-    return tb - ta
-  })
 }
 
 const AdminFinance = () => {
@@ -216,16 +109,6 @@ const AdminFinance = () => {
   const [twoFaQrDataUrl, setTwoFaQrDataUrl] = useState('')
   const [twoFaSetupSubmitting, setTwoFaSetupSubmitting] = useState(false)
   const [twoFaConfirmInput, setTwoFaConfirmInput] = useState('')
-  const [authRefundDetailTarget, setAuthRefundDetailTarget] = useState(null)
-  const [authRefundDetailLoading, setAuthRefundDetailLoading] = useState(false)
-  const [authTotpRefundId, setAuthTotpRefundId] = useState(null)
-  const [authTotpInput, setAuthTotpInput] = useState('')
-  const [authTotpSubmitting, setAuthTotpSubmitting] = useState(false)
-  const [authDisburseRefundId, setAuthDisburseRefundId] = useState(null)
-  const [authDisburseRefInput, setAuthDisburseRefInput] = useState('')
-  const [authDisburseSubmitting, setAuthDisburseSubmitting] = useState(false)
-  const [authActionRefundId, setAuthActionRefundId] = useState(null)
-
   const loadManualDeposits = useCallback(async () => {
     setLoading(true)
     try {
@@ -365,6 +248,16 @@ const AdminFinance = () => {
     runAuthoriseGate()
     return undefined
   }, [activeTab, showAuthoriseRefundTab, runAuthoriseGate])
+
+  useEffect(() => {
+    const st = routeLocation.state
+    if (!st || st.financeActiveTab !== TAB_AUTHORISE_REFUND) return
+    setActiveTab(TAB_AUTHORISE_REFUND)
+    if (st.refreshAuthorise && showAuthoriseRefundTab) {
+      runAuthoriseGate()
+    }
+    navigate(`${routeLocation.pathname}${routeLocation.search || ''}`, { replace: true, state: {} })
+  }, [routeLocation.state, routeLocation.pathname, routeLocation.search, showAuthoriseRefundTab, runAuthoriseGate, navigate])
 
   useEffect(() => {
     if (authorisePhase !== 'two_fa_setup' || !twoFaOtpauthUri) {
@@ -692,93 +585,6 @@ const AdminFinance = () => {
     }
   }
 
-  const closeAuthRefundDetail = () => {
-    setAuthRefundDetailTarget(null)
-    setAuthRefundDetailLoading(false)
-  }
-
-  const openAuthRefundDetail = async (row) => {
-    if (!row) return
-    setAuthRefundDetailTarget(row)
-    if (row?.id == null) return
-    setAuthRefundDetailLoading(true)
-    try {
-      const full = await adminService.getRefundRequestById(row.id)
-      if (full && typeof full === 'object') {
-        setAuthRefundDetailTarget(full)
-      }
-    } catch (err) {
-      const raw =
-        err?.response?.data?.detail ||
-        err?.response?.data?.message ||
-        err?.message ||
-        'Could not load full refund details'
-      toast.error(typeof raw === 'string' ? raw : 'Could not load full refund details')
-    } finally {
-      setAuthRefundDetailLoading(false)
-    }
-  }
-
-  const submitAuthTotp = async () => {
-    if (authTotpRefundId == null || authTotpSubmitting) return
-    const code = String(authTotpInput || '').replace(/\D/g, '')
-    if (code.length !== 6) {
-      toast.error('Enter the 6-digit code from your authenticator app.')
-      return
-    }
-    setAuthTotpSubmitting(true)
-    setAuthActionRefundId(authTotpRefundId)
-    try {
-      await adminService.authorizeRefund(authTotpRefundId, code)
-      toast.success('Refund authorised.')
-      setAuthTotpRefundId(null)
-      setAuthTotpInput('')
-      closeAuthRefundDetail()
-      await loadVerifiedAuthoriseRefunds()
-    } catch (err) {
-      const raw =
-        err?.response?.data?.detail ||
-        err?.response?.data?.message ||
-        err?.response?.data?.totp_token ||
-        err?.message ||
-        'Authorisation failed'
-      toast.error(typeof raw === 'string' ? raw : 'Authorisation failed')
-    } finally {
-      setAuthTotpSubmitting(false)
-      setAuthActionRefundId(null)
-    }
-  }
-
-  const submitAuthDisburse = async () => {
-    if (authDisburseRefundId == null || authDisburseSubmitting) return
-    const refText = String(authDisburseRefInput || '').trim()
-    if (!refText) {
-      toast.error('Transaction reference is required.')
-      return
-    }
-    setAuthDisburseSubmitting(true)
-    setAuthActionRefundId(authDisburseRefundId)
-    try {
-      await adminService.disburseRefund(authDisburseRefundId, refText)
-      toast.success('Refund marked as disbursed.')
-      setAuthDisburseRefundId(null)
-      setAuthDisburseRefInput('')
-      closeAuthRefundDetail()
-      await loadVerifiedAuthoriseRefunds()
-    } catch (err) {
-      const raw =
-        err?.response?.data?.detail ||
-        err?.response?.data?.message ||
-        err?.response?.data?.transaction_reference ||
-        err?.message ||
-        'Disbursement failed'
-      toast.error(typeof raw === 'string' ? raw : 'Disbursement failed')
-    } finally {
-      setAuthDisburseSubmitting(false)
-      setAuthActionRefundId(null)
-    }
-  }
-
   const showAuthClientColumn = useMemo(
     () => authoriseRefundRows.some((r) => getRefundUserDisplay(r) !== '—'),
     [authoriseRefundRows]
@@ -821,9 +627,7 @@ const AdminFinance = () => {
                   (activeTab === TAB_AUTHORISE_REFUND &&
                     (authorisePhase === 'gate_loading' ||
                       authorisePhase === 'list_loading' ||
-                      twoFaSetupSubmitting ||
-                      authTotpSubmitting ||
-                      authDisburseSubmitting))
+                      twoFaSetupSubmitting))
                 }
               >
                 Refresh
@@ -859,7 +663,7 @@ const AdminFinance = () => {
                         className={`finance-md-btn ${activeTab === TAB_AUTHORISE_REFUND ? 'finance-md-btn--approve' : 'finance-md-btn--ghost'}`}
                         onClick={() => setActiveTab(TAB_AUTHORISE_REFUND)}
                       >
-                        Authorise Refund
+                        Authorize Refund
                       </button>
                     ) : null}
                   </div>
@@ -900,13 +704,13 @@ const AdminFinance = () => {
             {activeTab === TAB_AUTHORISE_REFUND ? (
               <>
                 <div className="finance-section-header">
-                  <h2 className="finance-section-title">Authorise refund</h2>
+                  <h2 className="finance-section-title">Authorize refund</h2>
                   <span className="finance-results-info">
                     {authorisePhase === 'list_ready'
                       ? `${authoriseRefundRows.length} refund${authoriseRefundRows.length !== 1 ? 's' : ''} (verified or awaiting disbursement)`
                       : authorisePhase === 'gate_loading' || authorisePhase === 'list_loading'
                         ? 'Loading…'
-                        : 'Senior admin · 2FA required to authorise'}
+                        : 'Senior admin · 2FA required to authorize'}
                   </span>
                 </div>
 
@@ -1011,7 +815,7 @@ const AdminFinance = () => {
                     {authorisePhase === 'list_ready' && authoriseRefundRows.length === 0 ? (
                       <div className="finance-empty-state">
                         <h3>No verified refund requests available</h3>
-                        <p>When finance verifies a refund, it appears here for authorisation and disbursement.</p>
+                        <p>When finance verifies a refund, it appears here for authorization and disbursement.</p>
                       </div>
                     ) : null}
 
@@ -1019,7 +823,7 @@ const AdminFinance = () => {
                       <div
                         className="finance-table-container finance-md-table-scroll"
                         role="region"
-                        aria-label="Verified refunds for authorisation"
+                        aria-label="Verified refunds for authorization"
                         tabIndex={0}
                       >
                         <div className="finance-table-wrapper">
@@ -1050,7 +854,6 @@ const AdminFinance = () => {
                                 </tr>
                               ) : (
                                 authoriseRefundRows.map((row) => {
-                                  const busy = authActionRefundId === row?.id
                                   const st = String(row?.status || '')
                                   const canAuth = isRefundVerifiedStatus(st)
                                   const canDisburse = isRefundAuthorisedStatus(st)
@@ -1058,7 +861,7 @@ const AdminFinance = () => {
                                     <tr
                                       key={String(row?.id ?? '')}
                                       className="finance-table-row finance-md-row-clickable"
-                                      onClick={() => openAuthRefundDetail(row)}
+                                      onClick={() => row?.id != null && navigate(`${financeBase}/refunds/${row.id}`)}
                                     >
                                       <td>#{row?.id ?? '—'}</td>
                                       {showAuthClientColumn ? <td>{getRefundUserDisplay(row)}</td> : null}
@@ -1084,8 +887,7 @@ const AdminFinance = () => {
                                           <button
                                             type="button"
                                             className="finance-md-btn finance-md-btn--ghost"
-                                            onClick={() => openAuthRefundDetail(row)}
-                                            disabled={busy}
+                                            onClick={() => row?.id != null && navigate(`${financeBase}/refunds/${row.id}`)}
                                           >
                                             Details
                                           </button>
@@ -1093,24 +895,16 @@ const AdminFinance = () => {
                                             <button
                                               type="button"
                                               className="finance-md-btn finance-md-btn--approve"
-                                              onClick={() => {
-                                                setAuthTotpInput('')
-                                                setAuthTotpRefundId(row.id)
-                                              }}
-                                              disabled={busy || authTotpSubmitting || authDisburseSubmitting}
+                                              onClick={() => navigate(`${financeBase}/refunds/${row.id}/authorize`)}
                                             >
-                                              Authorise
+                                              Authorize
                                             </button>
                                           ) : null}
                                           {canDisburse ? (
                                             <button
                                               type="button"
                                               className="finance-md-btn finance-md-btn--approve"
-                                              onClick={() => {
-                                                setAuthDisburseRefInput('')
-                                                setAuthDisburseRefundId(row.id)
-                                              }}
-                                              disabled={busy || authTotpSubmitting || authDisburseSubmitting}
+                                              onClick={() => navigate(`${financeBase}/refunds/${row.id}/disburse`)}
                                             >
                                               Disburse
                                             </button>
@@ -1560,252 +1354,6 @@ const AdminFinance = () => {
                 </>
               ) : null}
               <button type="button" className="finance-md-btn finance-md-btn--ghost" onClick={closeRefundDetail}>
-                Close
-              </button>
-            </div>
-          </div>
-        </div>
-      ) : null}
-
-      {authTotpRefundId != null ? (
-        <div
-          className="finance-md-modal-overlay"
-          role="presentation"
-          onClick={() => {
-            if (!authTotpSubmitting) {
-              setAuthTotpRefundId(null)
-              setAuthTotpInput('')
-            }
-          }}
-        >
-          <div className="finance-md-modal" role="dialog" aria-modal="true" onClick={(e) => e.stopPropagation()}>
-            <h2 className="finance-md-modal-title">Authorise refund #{authTotpRefundId}</h2>
-            <p className="finance-md-modal-desc">
-              For security, enter your 2FA code before authorising this refund.
-            </p>
-            <label className="finance-md-label" htmlFor="finance-auth-totp">
-              Authenticator code (6 digits)
-            </label>
-            <input
-              id="finance-auth-totp"
-              type="text"
-              inputMode="numeric"
-              autoComplete="one-time-code"
-              maxLength={6}
-              className="finance-md-input"
-              value={authTotpInput}
-              onChange={(e) => setAuthTotpInput(e.target.value.replace(/\D/g, '').slice(0, 6))}
-              placeholder="000000"
-              disabled={authTotpSubmitting}
-            />
-            <p className="finance-md-modal-helper">This action cannot be undone. Use the current code from your app.</p>
-            <div className="finance-md-modal-footer">
-              <button
-                type="button"
-                className="finance-md-btn finance-md-btn--ghost"
-                onClick={() => {
-                  if (authTotpSubmitting) return
-                  setAuthTotpRefundId(null)
-                  setAuthTotpInput('')
-                }}
-                disabled={authTotpSubmitting}
-              >
-                Cancel
-              </button>
-              <button
-                type="button"
-                className="finance-md-btn finance-md-btn--approve"
-                onClick={submitAuthTotp}
-                disabled={authTotpSubmitting || String(authTotpInput || '').replace(/\D/g, '').length !== 6}
-              >
-                {authTotpSubmitting ? 'Submitting…' : 'Confirm authorise'}
-              </button>
-            </div>
-          </div>
-        </div>
-      ) : null}
-
-      {authDisburseRefundId != null ? (
-        <div
-          className="finance-md-modal-overlay"
-          role="presentation"
-          onClick={() => {
-            if (!authDisburseSubmitting) {
-              setAuthDisburseRefundId(null)
-              setAuthDisburseRefInput('')
-            }
-          }}
-        >
-          <div className="finance-md-modal" role="dialog" aria-modal="true" onClick={(e) => e.stopPropagation()}>
-            <h2 className="finance-md-modal-title">Disburse refund #{authDisburseRefundId}</h2>
-            <p className="finance-md-modal-desc">
-              Enter the bank or payment transaction reference after you have sent the funds.
-            </p>
-            <label className="finance-md-label" htmlFor="finance-auth-disburse-ref">
-              Transaction reference (required)
-            </label>
-            <input
-              id="finance-auth-disburse-ref"
-              type="text"
-              className="finance-md-input"
-              value={authDisburseRefInput}
-              onChange={(e) => setAuthDisburseRefInput(e.target.value)}
-              placeholder="e.g. VISA-ARN-99281"
-              disabled={authDisburseSubmitting}
-            />
-            <div className="finance-md-modal-footer">
-              <button
-                type="button"
-                className="finance-md-btn finance-md-btn--ghost"
-                onClick={() => {
-                  if (authDisburseSubmitting) return
-                  setAuthDisburseRefundId(null)
-                  setAuthDisburseRefInput('')
-                }}
-                disabled={authDisburseSubmitting}
-              >
-                Cancel
-              </button>
-              <button
-                type="button"
-                className="finance-md-btn finance-md-btn--approve"
-                onClick={submitAuthDisburse}
-                disabled={authDisburseSubmitting || !String(authDisburseRefInput || '').trim()}
-              >
-                {authDisburseSubmitting ? 'Submitting…' : 'Confirm disbursement'}
-              </button>
-            </div>
-          </div>
-        </div>
-      ) : null}
-
-      {authRefundDetailTarget ? (
-        <div className="finance-md-modal-overlay" role="presentation" onClick={closeAuthRefundDetail}>
-          <div
-            className="finance-md-modal finance-md-modal--refund-detail"
-            role="dialog"
-            aria-modal="true"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <h2 className="finance-md-modal-title">Refund details #{authRefundDetailTarget?.id ?? '—'}</h2>
-            {authRefundDetailLoading ? (
-              <p className="finance-md-detail-loading">Loading full refund details...</p>
-            ) : (
-              <div className="finance-md-detail-dl">
-                {getRefundUserDisplay(authRefundDetailTarget) !== '—' ? (
-                  <div className="finance-md-detail-row">
-                    <dt>Client</dt>
-                    <dd>{getRefundUserDisplay(authRefundDetailTarget)}</dd>
-                  </div>
-                ) : null}
-                <div className="finance-md-detail-row">
-                  <dt>Amount</dt>
-                  <dd>${parseFloat(authRefundDetailTarget?.amount ?? 0).toFixed(2)}</dd>
-                </div>
-                <div className="finance-md-detail-row">
-                  <dt>Payment channel</dt>
-                  <dd>{refundChannelLabel(authRefundDetailTarget?.payment_channel)}</dd>
-                </div>
-                <div className="finance-md-detail-row">
-                  <dt>Status</dt>
-                  <dd>
-                    <span className={refundStatusBadgeClass(authRefundDetailTarget?.status)}>
-                      {String(authRefundDetailTarget?.status || '—')}
-                    </span>
-                  </dd>
-                </div>
-                {authRefundDetailTarget?.customer_email ? (
-                  <div className="finance-md-detail-row">
-                    <dt>Customer email</dt>
-                    <dd>{authRefundDetailTarget.customer_email}</dd>
-                  </div>
-                ) : null}
-                {authRefundDetailTarget?.rejection_reason ? (
-                  <div className="finance-md-detail-row finance-md-detail-row--block">
-                    <dt>Rejection reason</dt>
-                    <dd>{authRefundDetailTarget.rejection_reason}</dd>
-                  </div>
-                ) : null}
-                <div className="finance-md-detail-row">
-                  <dt>Created</dt>
-                  <dd>{formatDateTime(authRefundDetailTarget?.created_at)}</dd>
-                </div>
-                {getRefundPaymentDetails(authRefundDetailTarget) !== '—' ? (
-                  <div className="finance-md-detail-row finance-md-detail-row--block">
-                    <dt>Bank / Payment details</dt>
-                    <dd>{getRefundPaymentDetails(authRefundDetailTarget)}</dd>
-                  </div>
-                ) : null}
-                {sortedAuditLogs(authRefundDetailTarget).length > 0 ? (
-                  <div className="finance-md-detail-row finance-md-detail-row--block">
-                    <dt>Timeline</dt>
-                    <dd>
-                      <p className="finance-md-modal-helper finance-md-timeline-hint">
-                        Requested → Verified → Authorised → Disbursed
-                      </p>
-                      <div className="finance-md-review-cell finance-md-audit-log-list">
-                        {sortedAuditLogs(authRefundDetailTarget).map((log, idx) => (
-                          <div key={log?.id ?? idx} className="finance-md-audit-log-item">
-                            <strong className="finance-md-audit-log-transition">
-                              {String(log?.from_status || '—')} → {String(log?.to_status || '—')}
-                            </strong>
-                            <div className="finance-md-review-date">{formatDateTime(log?.timestamp)}</div>
-                            {log?.actor_email ? (
-                              <div className="finance-md-review-date">By: {log.actor_email}</div>
-                            ) : null}
-                            {log?.notes ? <div className="finance-md-audit-log-notes">{log.notes}</div> : null}
-                          </div>
-                        ))}
-                      </div>
-                    </dd>
-                  </div>
-                ) : null}
-              </div>
-            )}
-            <div className="finance-md-modal-footer">
-              {isRefundVerifiedStatus(authRefundDetailTarget?.status) ? (
-                <button
-                  type="button"
-                  className="finance-md-btn finance-md-btn--approve"
-                  onClick={() => {
-                    const id = authRefundDetailTarget?.id
-                    if (id == null || authActionRefundId != null) return
-                    setAuthTotpInput('')
-                    closeAuthRefundDetail()
-                    setAuthTotpRefundId(id)
-                  }}
-                  disabled={
-                    authRefundDetailLoading ||
-                    authTotpSubmitting ||
-                    authDisburseSubmitting ||
-                    authActionRefundId != null
-                  }
-                >
-                  Authorise refund
-                </button>
-              ) : null}
-              {isRefundAuthorisedStatus(authRefundDetailTarget?.status) ? (
-                <button
-                  type="button"
-                  className="finance-md-btn finance-md-btn--approve"
-                  onClick={() => {
-                    const id = authRefundDetailTarget?.id
-                    if (id == null || authActionRefundId != null) return
-                    setAuthDisburseRefInput('')
-                    closeAuthRefundDetail()
-                    setAuthDisburseRefundId(id)
-                  }}
-                  disabled={
-                    authRefundDetailLoading ||
-                    authTotpSubmitting ||
-                    authDisburseSubmitting ||
-                    authActionRefundId != null
-                  }
-                >
-                  Disburse refund
-                </button>
-              ) : null}
-              <button type="button" className="finance-md-btn finance-md-btn--ghost" onClick={closeAuthRefundDetail}>
                 Close
               </button>
             </div>

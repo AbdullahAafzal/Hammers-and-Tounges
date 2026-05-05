@@ -6,6 +6,7 @@ import { fetchProfile, updateProfile } from "../store/actions/profileActions";
 import { profileService } from "../services/interceptors/profile.service";
 
 const BuyerProfile = () => {
+  const isMaskedAccountNumber = useCallback((value) => /^\*+\d{2,}$/.test(String(value || "").trim()), []);
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const location = useLocation();
@@ -49,6 +50,7 @@ const BuyerProfile = () => {
     account_number: "",
     swift_code: "",
   });
+  const [originalBankingForm, setOriginalBankingForm] = useState(null);
 
   // Fetch profile on component mount
   useEffect(() => {
@@ -169,14 +171,16 @@ const BuyerProfile = () => {
   }, []);
 
   const handleSelectBankingProfile = useCallback((profile) => {
-    setSelectedBankingProfileId(profile?.id ?? null);
-    setBankingForm({
+    const snapshot = {
       account_name: profile?.account_name || "",
       bank_name: profile?.bank_name || "",
       branch_code: profile?.branch_code || "",
       account_number: profile?.account_number || "",
       swift_code: profile?.swift_code || "",
-    });
+    };
+    setSelectedBankingProfileId(profile?.id ?? null);
+    setBankingForm(snapshot);
+    setOriginalBankingForm(snapshot);
     setBankingError("");
     setBankingSuccess("");
     setIsBankingFormOpen(true);
@@ -191,6 +195,7 @@ const BuyerProfile = () => {
       account_number: "",
       swift_code: "",
     });
+    setOriginalBankingForm(null);
     setBankingError("");
     setBankingSuccess("");
     setIsBankingFormOpen(true);
@@ -203,14 +208,40 @@ const BuyerProfile = () => {
   }, []);
 
   const validateBankingForm = useCallback(() => {
-    return (
+    const hasCoreFields =
       bankingForm.account_name.trim() &&
       bankingForm.bank_name.trim() &&
       bankingForm.branch_code.trim() &&
-      bankingForm.account_number.trim() &&
-      bankingForm.swift_code.trim()
-    );
-  }, [bankingForm]);
+      bankingForm.swift_code.trim();
+    if (!hasCoreFields) return false;
+    if (!selectedBankingProfileId) return bankingForm.account_number.trim();
+    const account = bankingForm.account_number.trim();
+    const originalAccount = String(originalBankingForm?.account_number || "").trim();
+    const accountChanged = account !== originalAccount;
+    if (!accountChanged) return true;
+    // For edits, user may leave masked value unchanged, but if they change account_number it must be a real value.
+    if (!account) return false;
+    return !isMaskedAccountNumber(account);
+  }, [bankingForm, selectedBankingProfileId, originalBankingForm, isMaskedAccountNumber]);
+
+  const buildBankingPatchPayload = useCallback(() => {
+    const original = originalBankingForm || {};
+    const fields = ["account_name", "bank_name", "branch_code", "swift_code"];
+    const patch = {};
+    fields.forEach((key) => {
+      const next = String(bankingForm[key] || "").trim();
+      const prev = String(original[key] || "").trim();
+      if (next !== prev) patch[key] = next;
+    });
+
+    const nextAccount = String(bankingForm.account_number || "").trim();
+    const prevAccount = String(original.account_number || "").trim();
+    const accountChanged = nextAccount !== prevAccount;
+    if (accountChanged && nextAccount && !isMaskedAccountNumber(nextAccount)) {
+      patch.account_number = nextAccount;
+    }
+    return patch;
+  }, [bankingForm, originalBankingForm, isMaskedAccountNumber]);
 
   const handleSaveBankingDetails = useCallback(async () => {
     if (!validateBankingForm()) {
@@ -219,19 +250,17 @@ const BuyerProfile = () => {
       return;
     }
 
-    const payload = {
-      account_name: bankingForm.account_name.trim(),
-      bank_name: bankingForm.bank_name.trim(),
-      branch_code: bankingForm.branch_code.trim(),
-      account_number: bankingForm.account_number.trim(),
-      swift_code: bankingForm.swift_code.trim(),
-    };
-
     setBankingSaving(true);
     setBankingError("");
     setBankingSuccess("");
     try {
       if (selectedBankingProfileId) {
+        const payload = buildBankingPatchPayload();
+        if (Object.keys(payload).length === 0) {
+          setBankingSuccess("No changes to save.");
+          setIsBankingFormOpen(false);
+          return;
+        }
         await profileService.updateBankingProfile(selectedBankingProfileId, payload);
         setBankingSuccess("Banking details updated successfully.");
         setBankingProfiles((prev) =>
@@ -240,6 +269,13 @@ const BuyerProfile = () => {
           )
         );
       } else {
+        const payload = {
+          account_name: bankingForm.account_name.trim(),
+          bank_name: bankingForm.bank_name.trim(),
+          branch_code: bankingForm.branch_code.trim(),
+          account_number: bankingForm.account_number.trim(),
+          swift_code: bankingForm.swift_code.trim(),
+        };
         const created = await profileService.createBankingProfile(payload);
         setSelectedBankingProfileId(created?.id ?? null);
         setBankingSuccess("Banking details added successfully.");
@@ -263,7 +299,7 @@ const BuyerProfile = () => {
     } finally {
       setBankingSaving(false);
     }
-  }, [bankingForm, selectedBankingProfileId, loadBankingDetails, validateBankingForm]);
+  }, [bankingForm, selectedBankingProfileId, loadBankingDetails, validateBankingForm, buildBankingPatchPayload]);
 
   const handleDeleteBankingProfile = useCallback(
     async (profile) => {

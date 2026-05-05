@@ -70,6 +70,9 @@ import AdminAuctionDetails from "./pages/adminDashboard/AdminAuctionDetails";
 import AdminProfile from "./pages/adminProfile/AdminProfile";
 import AdminSell from "./pages/AdminSell";
 import AdminFinance from './pages/AdminFinance'
+import AdminFinanceRefundAuthorize from './pages/AdminFinanceRefundAuthorize'
+import AdminFinanceRefundDisburse from './pages/AdminFinanceRefundDisburse'
+import AdminFinanceRefundDetail from './pages/AdminFinanceRefundDetail'
 import ManualDepositDetail from './pages/ManualDepositDetail'
 import AdminUnsoldInventory from './pages/AdminUnsoldInventory'
 import AdminDepositExemption from './pages/AdminDepositExemption'
@@ -380,6 +383,9 @@ function App() {
                 <Route path="/admin/goods-received-verification" element={<AdminGoodsReceivedVerification />} />
                 <Route path="/admin/auction-deposit-override" element={<AdminAuctionDepositOverride />} />
                 <Route path="/admin/finance/manual-deposits/:depositId" element={<ManualDepositDetail />} />
+                <Route path="/admin/finance/refunds/:refundId/authorize" element={<AdminFinanceRefundAuthorize />} />
+                <Route path="/admin/finance/refunds/:refundId/disburse" element={<AdminFinanceRefundDisburse />} />
+                <Route path="/admin/finance/refunds/:refundId" element={<AdminFinanceRefundDetail />} />
                 <Route path="/admin/finance" element={<AdminFinance />} />
                 <Route path="/admin/users" element={
                   <>

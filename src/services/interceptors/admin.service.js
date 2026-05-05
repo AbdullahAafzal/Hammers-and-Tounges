@@ -499,6 +499,23 @@ export const adminService = {
     }
   },
 
+  /** GET /payments/banking-profiles/ — list profiles (admin token); filter by refund client on the client. */
+  getBankingProfiles: async () => {
+    try {
+      const { data } = await apiClient.get(API_ROUTES.BANKING_PROFILES, { skipDedupe: true });
+      if (!data) return [];
+      if (Array.isArray(data)) return data;
+      if (Array.isArray(data.results)) return data.results;
+      if (Array.isArray(data.data)) return data.data;
+      return [];
+    } catch (error) {
+      if (error.isNetworkError) {
+        throw new Error('Unable to connect to server. Please try again later.');
+      }
+      throw error;
+    }
+  },
+
   verifyRefund: async (refundId) => {
     try {
       const { data } = await apiClient.post(API_ROUTES.REFUND_VERIFY(refundId));
