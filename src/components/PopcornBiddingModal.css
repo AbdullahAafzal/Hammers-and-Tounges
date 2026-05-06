@@ -102,6 +102,17 @@
   line-height: 1.35;
 }
 
+.popcorn-modal-detail-line {
+  margin: 0.1rem 0 0;
+  padding: 0.55rem 0.7rem;
+  border-radius: 8px;
+  border: 1px solid rgba(140, 198, 63, 0.25);
+  background: rgba(140, 198, 63, 0.08);
+  color: var(--color-text-muted, #d4d4d8);
+  font-size: 0.78rem;
+  line-height: 1.35;
+}
+
 .popcorn-modal-input {
   width: 100%;
   box-sizing: border-box;

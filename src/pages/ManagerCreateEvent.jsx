@@ -35,6 +35,8 @@ export default function ManagerCreateEvent() {
     title: '',
     start_time: '',
     end_time: '',
+    phantom_enabled: false,
+    phantom_stall_window_mins: '3',
   }));
 
   const openPicker = useCallback((ref) => {
@@ -119,6 +121,14 @@ export default function ManagerCreateEvent() {
         toast.error(schedule.message);
         return;
       }
+      const parsedPhantomWindow = Number.parseInt(formData.phantom_stall_window_mins, 10);
+      if (
+        formData.phantom_enabled &&
+        (!Number.isInteger(parsedPhantomWindow) || Number.isNaN(parsedPhantomWindow) || parsedPhantomWindow < 1)
+      ) {
+        toast.error('Phantom stall window must be at least 1 minute.');
+        return;
+      }
       setIsSubmitting(true);
       try {
         const payload = new FormData();
@@ -127,6 +137,11 @@ export default function ManagerCreateEvent() {
         payload.append('start_time', new Date(formData.start_time).toISOString());
         payload.append('end_time', new Date(formData.end_time).toISOString());
         payload.append('status', 'SCHEDULED');
+        payload.append('phantom_enabled', String(formData.phantom_enabled));
+        payload.append(
+          'phantom_stall_window_mins',
+          String(formData.phantom_enabled ? parsedPhantomWindow : 0)
+        );
         if (imageFile) payload.append('image', imageFile);
 
         const createdEvent = await auctionService.createEvent(payload);
@@ -216,6 +231,41 @@ export default function ManagerCreateEvent() {
                 disabled={isSubmitting}
                 placeholder="e.g. Mega Auto Auction"
               />
+            </div>
+            <div className="create-event-form-group">
+              <label htmlFor="phantom-enabled">Enable Phantom Bidding</label>
+              <label className="create-event-toggle-row" htmlFor="phantom-enabled">
+                <span className="create-event-toggle-label">
+                  Allow phantom bids when auction activity stalls
+                </span>
+                <input
+                  id="phantom-enabled"
+                  type="checkbox"
+                  name="phantom_enabled"
+                  className="create-event-toggle-input"
+                  checked={formData.phantom_enabled}
+                  onChange={(e) =>
+                    setFormData((prev) => ({ ...prev, phantom_enabled: e.target.checked }))
+                  }
+                  disabled={isSubmitting}
+                />
+              </label>
+            </div>
+            <div className="create-event-form-group">
+              <label>Phantom Stall Window (mins)</label>
+              <input
+                type="number"
+                min="1"
+                step="1"
+                name="phantom_stall_window_mins"
+                value={formData.phantom_stall_window_mins}
+                onChange={handleFormChange}
+                disabled={isSubmitting || !formData.phantom_enabled}
+                placeholder="e.g. 3"
+              />
+              <small className="create-event-input-hint">
+                Minimum 1 minute. Used only when phantom bidding is enabled.
+              </small>
             </div>
 
             <div className="create-event-form-group">

@@ -100,6 +100,44 @@
   color: var(--color-input-placeholder);
 }
 
+.create-event-toggle-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  background: var(--color-input-bg);
+  border: 1px solid var(--color-border-strong);
+  border-radius: 8px;
+  padding: 10px 12px;
+  cursor: pointer;
+}
+
+.create-event-toggle-label {
+  font-size: 0.86rem;
+  line-height: 1.35;
+  color: var(--color-text);
+}
+
+.create-event-form-group input.create-event-toggle-input {
+  width: 18px;
+  height: 18px;
+  margin: 0;
+  padding: 0;
+  accent-color: #39AE47;
+  flex: 0 0 auto;
+  cursor: pointer;
+}
+
+.create-event-form-group input[type="number"] {
+  max-width: 240px;
+}
+
+.create-event-input-hint {
+  margin-top: 6px;
+  font-size: 0.78rem;
+  color: var(--color-text-muted);
+}
+
 /* Date "textbox" that opens native picker */
 .create-event-datebox {
   width: 100%;
@@ -315,6 +353,15 @@ html[data-theme="light"] .create-event-card {
 html[data-theme="light"] .create-event-form-group input {
   background: #ffffff !important;
   border-color: #d1d5db !important;
+  color: #1a1a1a !important;
+}
+
+html[data-theme="light"] .create-event-toggle-row {
+  background: #ffffff !important;
+  border-color: #d1d5db !important;
+}
+
+html[data-theme="light"] .create-event-toggle-label {
   color: #1a1a1a !important;
 }
 

@@ -20,6 +20,10 @@ export default function PopcornBiddingModal({ isOpen, onClose, eventId, eventTit
   const [popcornEnabled, setPopcornEnabled] = useState(false);
   const [thresholdMins, setThresholdMins] = useState('');
   const [extensionMins, setExtensionMins] = useState('');
+  const thresholdPreview = Number.parseInt(String(thresholdMins).trim(), 10);
+  const extensionPreview = Number.parseInt(String(extensionMins).trim(), 10);
+  const safeThreshold = Number.isFinite(thresholdPreview) && thresholdPreview >= 0 ? thresholdPreview : 0;
+  const safeExtension = Number.isFinite(extensionPreview) && extensionPreview >= 0 ? extensionPreview : 0;
 
   const load = useCallback(async () => {
     if (eventId == null) return;
@@ -172,6 +176,9 @@ export default function PopcornBiddingModal({ isOpen, onClose, eventId, eventTit
                   inputMode="numeric"
                 />
               </label>
+              <p className="popcorn-modal-detail-line">
+                Bids placed within the last {safeThreshold} minutes extend the event by {safeExtension} minutes.
+              </p>
 
               <div className="popcorn-modal-actions">
                 <button type="button" className="popcorn-modal-btn popcorn-modal-btn--ghost" onClick={onClose}>
