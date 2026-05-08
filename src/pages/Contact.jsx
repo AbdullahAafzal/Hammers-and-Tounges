@@ -1,38 +1,21 @@
-import React, { useState } from 'react'
+import React from 'react'
 import './Contact.css'
 
 const Contact = () => {
-  const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    subject: '',
-    message: '',
-  })
-
-  const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value })
-  }
-
-  const handleSubmit = (e) => {
-    e.preventDefault()
-    console.log('Form submitted:', formData)
-    setFormData({ name: '', email: '', subject: '', message: '' })
-  }
-
   const contactItems = [
     {
       label: 'Address',
-      value: '123 Auction Street\nBusiness District\nCity, State 12345',
+      value: '18005 Dhlela Way, Graniteside',
       icon: 'M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z',
     },
     {
       label: 'Phone',
-      value: '+1 (555) 123-4567\n+1 (555) 123-4568',
+      value: '+263 (4) 748 118/20',
       icon: 'M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6 19.79 19.79 0 01-3.07-8.67A2 2 0 014.11 2h3a2 2 0 012 1.72 12.84 12.84 0 00.7 2.81 2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45 12.84 12.84 0 002.81.7A2 2 0 0122 16.92z',
     },
     {
       label: 'Email',
-      value: 'info@hammersandtongues.com\nsupport@hammersandtongues.com',
+      value: 'info@hammerandtongues.com',
       icon: 'M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z',
     },
     {
@@ -74,71 +57,19 @@ const Contact = () => {
                   </div>
                   <div className="contact-detail__content">
                     <span className="contact-detail__label">{item.label}</span>
-                    <span className="contact-detail__value">{item.value}</span>
+                    {item.label === 'Email' ? (
+                      <a className="contact-detail__value" href="mailto:info@hammerandtongues.com">{item.value}</a>
+                    ) : item.label === 'Phone' ? (
+                      <a className="contact-detail__value" href="tel:+263474811820">{item.value}</a>
+                    ) : (
+                      <span className="contact-detail__value">{item.value}</span>
+                    )}
                   </div>
                 </div>
               ))}
             </div>
           </section>
 
-          <section className="contact-form-card">
-            <h2 className="contact-card__title">Send a Message</h2>
-            <form className="contact-form" onSubmit={handleSubmit}>
-              <div className="contact-form__row">
-                <div className="contact-form__group">
-                  <label className="contact-form__label">Name</label>
-                  <input
-                    type="text"
-                    name="name"
-                    value={formData.name}
-                    onChange={handleChange}
-                    required
-                    className="contact-form__input"
-                    placeholder="Your name"
-                  />
-                </div>
-                <div className="contact-form__group">
-                  <label className="contact-form__label">Email</label>
-                  <input
-                    type="email"
-                    name="email"
-                    value={formData.email}
-                    onChange={handleChange}
-                    required
-                    className="contact-form__input"
-                    placeholder="you@example.com"
-                  />
-                </div>
-              </div>
-              <div className="contact-form__group">
-                <label className="contact-form__label">Are you looking to buy? Or Sell?</label>
-                <input
-                  type="text"
-                  name="subject"
-                  value={formData.subject}
-                  onChange={handleChange}
-                  required
-                  className="contact-form__input"
-                  placeholder="Buy or Sell"
-                />
-              </div>
-              <div className="contact-form__group">
-                <label className="contact-form__label">Message</label>
-                <textarea
-                  name="message"
-                  value={formData.message}
-                  onChange={handleChange}
-                  required
-                  rows={5}
-                  className="contact-form__textarea"
-                  placeholder="Type your message..."
-                />
-              </div>
-              <button type="submit" className="contact-form__submit">
-                Send Message
-              </button>
-            </form>
-          </section>
         </div>
 
         <section className="contact-faq">

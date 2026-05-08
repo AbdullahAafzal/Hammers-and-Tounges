@@ -1,0 +1,109 @@
+.privacy-page {
+  min-height: 100vh;
+  background: linear-gradient(180deg, var(--color-bg) 0%, var(--color-bg-alt) 50%, var(--color-bg) 100%);
+  color: var(--color-text);
+}
+
+.privacy-hero {
+  padding: 2rem 1rem;
+  border-bottom: 1px solid var(--color-border);
+  text-align: center;
+}
+
+.privacy-hero__title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin: 0 0 0.5rem;
+  color: var(--color-text);
+}
+
+.privacy-hero__subtitle {
+  font-size: 0.8125rem;
+  color: var(--color-text-muted);
+  margin: 0;
+  max-width: 560px;
+  line-height: 1.5;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.privacy-body {
+  max-width: 920px;
+  margin: 0 auto;
+  padding: 2rem 1rem;
+}
+
+.privacy-tabs {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  margin-bottom: 1rem;
+}
+
+.privacy-tabs--glass {
+  padding: 0.4rem;
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+  background: rgba(17, 20, 28, 0.65);
+  backdrop-filter: blur(6px);
+}
+
+.privacy-tab {
+  border: 1px solid var(--color-border);
+  background: rgba(26, 30, 40, 0.85);
+  color: var(--color-text-muted);
+  padding: 0.6rem 0.95rem;
+  border-radius: 10px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.privacy-tab:hover {
+  border-color: rgba(140, 198, 63, 0.35);
+  color: var(--color-text);
+}
+
+.privacy-tab--active {
+  color: #0f1a0f;
+  border-color: rgba(140, 198, 63, 0.6);
+  background: linear-gradient(135deg, #60d56f 0%, #39ae47 100%);
+  box-shadow: 0 8px 20px rgba(57, 174, 71, 0.3);
+}
+
+.privacy-section {
+  padding: 1rem;
+  background: var(--color-surface-elevated);
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+}
+
+.privacy-section--premium {
+  border-radius: 14px;
+  padding: 1.25rem;
+  background: linear-gradient(180deg, rgba(20, 25, 35, 0.96) 0%, rgba(12, 16, 24, 0.96) 100%);
+  border-color: rgba(104, 120, 145, 0.28);
+  box-shadow: 0 16px 38px rgba(0, 0, 0, 0.35);
+}
+
+.privacy-section__content {
+  margin: 0;
+  color: var(--color-text-secondary);
+  font-size: 0.86rem;
+  line-height: 1.78;
+  font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
+  letter-spacing: 0.005em;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+@media (max-width: 768px) {
+  .privacy-hero {
+    padding: 1.5rem 0.75rem;
+  }
+
+  .privacy-body {
+    padding: 1.5rem 0.75rem;
+  }
+}

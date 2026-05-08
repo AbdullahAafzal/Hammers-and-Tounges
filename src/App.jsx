@@ -10,6 +10,7 @@ import GuestLotDetail from "./pages/GuestLotDetail";
 import AuctionDetails from "./pages/AuctionDetails";
 import About from "./pages/About";
 import Contact from "./pages/Contact";
+import PrivacyPolicy from "./pages/PrivacyPolicy";
 
 import SignIn from "./pages/SignIn";
 import Register from "./pages/Register";
@@ -134,6 +135,9 @@ function App() {
               <Route path="/auction/:id" element={<AuctionDetails />} />
               <Route path="/about" element={<About />} />
               <Route path="/contact" element={<Contact />} />
+              <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+              <Route path="/terms-and-conditions" element={<PrivacyPolicy />} />
+              <Route path="/cookie-policy" element={<PrivacyPolicy />} />
               <Route path="/signin" element={<SignIn />} />
               <Route path="/register" element={<Register />} />
             </Route>

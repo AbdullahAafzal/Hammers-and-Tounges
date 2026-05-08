@@ -2,13 +2,6 @@ import React from 'react'
 import './About.css'
 
 const About = () => {
-  const stats = [
-    { value: '10K+', label: 'Active users' },
-    { value: '50K+', label: 'Auctions completed' },
-    { value: '$500M+', label: 'Value traded' },
-    { value: '98%', label: 'Satisfaction rate' },
-  ]
-
   return (
     <div className="about-page">
       <div className="about-hero">
@@ -93,17 +86,6 @@ const About = () => {
           </div>
         </section>
 
-        <section className="about-section about-stats">
-          <h2 className="about-section__title">By The Numbers</h2>
-          <div className="about-stats-grid">
-            {stats.map((stat, i) => (
-              <div key={i} className="about-stat">
-                <span className="about-stat__value">{stat.value}</span>
-                <span className="about-stat__label">{stat.label}</span>
-              </div>
-            ))}
-          </div>
-        </section>
       </div>
     </div>
   )
