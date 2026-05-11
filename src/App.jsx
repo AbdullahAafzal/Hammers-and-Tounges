@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 import GuestLayout from "./layouts/GuestLayout";
 
@@ -106,8 +107,12 @@ import SellerLayout from "./layouts/SellerLayout";
 import ManagerLayout from "./layouts/ManagerLayout";
 import AdminLayout from "./layouts/AdminLayout";
 import ClerkLayout from "./layouts/ClerkLayout";
-import { Provider } from "react-redux";
+import { Provider, useSelector } from "react-redux";
 import store from './store/store'
+import {
+  initializeFirebaseNotifications,
+  subscribeToFirebaseNotifications,
+} from './services/firebaseNotifications';
 
 import { Bounce, ToastContainer } from "react-toastify";
 import ForgotPassword from "./pages/ForgotPassword";
@@ -118,9 +123,40 @@ import BuyerBidDetails from "./components/BuyerBidDetails";
 import LotDetailReadOnly from "./components/LotDetailReadOnly";
 import ClerkDashboard from "./pages/ClerkDashboard";
 import ClerkEventLots from "./pages/ClerkEventLots";
+
+function FirebaseNotifications() {
+  const { isAuthenticated } = useSelector((state) => state.auth);
+
+  useEffect(() => {
+    let isMounted = true;
+    let unsubscribe = () => {};
+
+    if (!isAuthenticated) {
+      return undefined;
+    }
+
+    initializeFirebaseNotifications();
+    subscribeToFirebaseNotifications().then((cleanup) => {
+      if (isMounted) {
+        unsubscribe = cleanup;
+      } else {
+        cleanup();
+      }
+    });
+
+    return () => {
+      isMounted = false;
+      unsubscribe();
+    };
+  }, [isAuthenticated]);
+
+  return null;
+}
+
 function App() {
   return (
     <Provider store={store}>
+      <FirebaseNotifications />
       <Router>
         <div className="app">
           <Routes>
