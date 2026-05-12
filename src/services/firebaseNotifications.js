@@ -1,8 +1,27 @@
 import { initializeApp, getApps } from 'firebase/app';
 import { getMessaging, getToken, isSupported, onMessage } from 'firebase/messaging';
 import { toast } from 'react-toastify';
+import apiClient from './api.service';
+import { API_ROUTES } from '../config/api.config';
+import { cookieStorage } from '../utils/cookieStorage';
 
 const FCM_TOKEN_STORAGE_KEY = 'fcmToken';
+
+const registerFcmTokenWithBackend = async (token) => {
+  if (!token) return;
+  try {
+    const authToken = cookieStorage.getItem(cookieStorage.AUTH_KEYS.TOKEN);
+    if (!authToken) {
+      return;
+    }
+    await apiClient.post(API_ROUTES.FCM_REGISTER, {
+      registration_id: token,
+      device_type: 'web',
+    });
+  } catch (error) {
+    console.log('FCM token registration failed:', error?.response?.data || error?.message);
+  }
+};
 
 const firebaseConfig = {
   apiKey: import.meta.env.VITE_FIREBASE_API_KEY || 'AIzaSyDW-eGF3eVkhUCfUSXbq_L63QcU69uDVTY',
@@ -82,6 +101,7 @@ export const initializeFirebaseNotifications = async () => {
     if (token) {
       localStorage.setItem(FCM_TOKEN_STORAGE_KEY, token);
       console.log('Firebase notification token:', token);
+      await registerFcmTokenWithBackend(token);
     }
 
     return token;

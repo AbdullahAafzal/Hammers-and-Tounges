@@ -133,6 +133,7 @@ export const API_ROUTES = {
   VERIFY_OTP: '/users/verify-otp/',
   RESEND_OTP: '/users/resend-otp/',
   REFRESH_TOKEN: '/users/token/refresh/',
+  FCM_REGISTER: '/users/fcm/register/',
   PASSWORD_RESET_REQUEST: '/users/password-reset-request/',
   PASSWORD_OTP_VERIFY: '/users/password-OTP-verify/',
   PASSWORD_RESET_CONFIRM: '/users/password-reset-confirm/',
