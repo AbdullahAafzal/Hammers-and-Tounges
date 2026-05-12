@@ -94,7 +94,7 @@ const SignIn = () => {
       return
     }
 
-    requestNotificationPermission()
+    const permissionPromise = requestNotificationPermission()
 
     const result = await dispatch(loginUser({
       email: formData.email,
@@ -102,6 +102,7 @@ const SignIn = () => {
     }))
 
     if (loginUser.fulfilled.match(result)) {
+      await permissionPromise
       initializeFirebaseNotifications()
     }
   }
