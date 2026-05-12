@@ -7,6 +7,7 @@ import { cookieStorage } from '../utils/cookieStorage';
 
 const FCM_TOKEN_STORAGE_KEY = 'fcmToken';
 const FCM_REGISTERED_TOKEN_STORAGE_KEY = 'registeredFcmToken';
+const SERVICE_WORKER_PATH = '/firebase-messaging-sw.js';
 
 const registerFcmTokenWithBackend = async (token) => {
   if (!token) return;
@@ -61,10 +62,12 @@ const registerMessagingServiceWorker = async () => {
     return null;
   }
 
-  return navigator.serviceWorker.register(
-    new URL('../firebase-messaging-sw.js', import.meta.url),
-    { type: 'module' },
-  );
+  const existing = await navigator.serviceWorker.getRegistration(SERVICE_WORKER_PATH);
+  if (existing) {
+    return existing;
+  }
+
+  return navigator.serviceWorker.register(SERVICE_WORKER_PATH);
 };
 
 const getNotificationText = (payload) => {
@@ -75,9 +78,33 @@ const getNotificationText = (payload) => {
   return title || body || 'New notification received';
 };
 
+/**
+ * Triggers the browser's notification permission prompt. Safari requires this
+ * to be called from a direct user gesture (e.g. inside a click handler, before
+ * any `await`). Returns the resulting permission string.
+ */
+export const requestNotificationPermission = () => {
+  if (typeof window === 'undefined' || !('Notification' in window)) {
+    return Promise.resolve('denied');
+  }
+  if (Notification.permission !== 'default') {
+    return Promise.resolve(Notification.permission);
+  }
+  try {
+    return Notification.requestPermission();
+  } catch (error) {
+    console.log('Notification permission request failed:', error);
+    return Promise.resolve(Notification.permission);
+  }
+};
+
 export const initializeFirebaseNotifications = async () => {
   try {
-    if (!('Notification' in window)) {
+    if (typeof window === 'undefined' || !('Notification' in window)) {
+      return null;
+    }
+
+    if (Notification.permission !== 'granted') {
       return null;
     }
 
@@ -89,11 +116,6 @@ export const initializeFirebaseNotifications = async () => {
     const app = getFirebaseApp();
     if (!app) {
       console.warn('Firebase notifications are missing web app config.');
-      return null;
-    }
-
-    const permission = await Notification.requestPermission();
-    if (permission !== 'granted') {
       return null;
     }
 

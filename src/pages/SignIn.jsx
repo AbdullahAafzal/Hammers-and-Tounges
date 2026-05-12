@@ -4,7 +4,10 @@ import './SignIn.css'
 import { useDispatch, useSelector } from 'react-redux'
 import { clearError } from '../store/slices/authSlice'
 import { loginUser } from '../store/actions/authActions'
-import { initializeFirebaseNotifications } from '../services/firebaseNotifications'
+import {
+  initializeFirebaseNotifications,
+  requestNotificationPermission,
+} from '../services/firebaseNotifications'
 
 const SignIn = () => {
   const navigate = useNavigate()
@@ -90,6 +93,8 @@ const SignIn = () => {
       navigate('/admin/dashboard', { replace: true })
       return
     }
+
+    requestNotificationPermission()
 
     const result = await dispatch(loginUser({
       email: formData.email,
