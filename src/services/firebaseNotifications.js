@@ -57,17 +57,38 @@ const getFirebaseApp = () => {
   return getApps().length ? getApps()[0] : initializeApp(firebaseConfig);
 };
 
+const waitForServiceWorkerActive = (registration) =>
+  new Promise((resolve) => {
+    if (registration.active) {
+      resolve();
+      return;
+    }
+    const worker = registration.installing || registration.waiting;
+    if (!worker) {
+      resolve();
+      return;
+    }
+    const onStateChange = () => {
+      if (worker.state === 'activated') {
+        worker.removeEventListener('statechange', onStateChange);
+        resolve();
+      }
+    };
+    worker.addEventListener('statechange', onStateChange);
+  });
+
 const registerMessagingServiceWorker = async () => {
   if (!('serviceWorker' in navigator)) {
     return null;
   }
 
-  const existing = await navigator.serviceWorker.getRegistration(SERVICE_WORKER_PATH);
-  if (existing) {
-    return existing;
+  let registration = await navigator.serviceWorker.getRegistration(SERVICE_WORKER_PATH);
+  if (!registration) {
+    registration = await navigator.serviceWorker.register(SERVICE_WORKER_PATH);
   }
 
-  return navigator.serviceWorker.register(SERVICE_WORKER_PATH);
+  await waitForServiceWorkerActive(registration);
+  return registration;
 };
 
 const getNotificationText = (payload) => {
