@@ -6,18 +6,26 @@ import { API_ROUTES } from '../config/api.config';
 import { cookieStorage } from '../utils/cookieStorage';
 
 const FCM_TOKEN_STORAGE_KEY = 'fcmToken';
+const FCM_REGISTERED_TOKEN_STORAGE_KEY = 'registeredFcmToken';
 
 const registerFcmTokenWithBackend = async (token) => {
   if (!token) return;
   try {
+    const registeredToken = localStorage.getItem(FCM_REGISTERED_TOKEN_STORAGE_KEY);
+    if (registeredToken === token) {
+      return;
+    }
+
     const authToken = cookieStorage.getItem(cookieStorage.AUTH_KEYS.TOKEN);
     if (!authToken) {
       return;
     }
+
     await apiClient.post(API_ROUTES.FCM_REGISTER, {
       registration_id: token,
       device_type: 'web',
     });
+    localStorage.setItem(FCM_REGISTERED_TOKEN_STORAGE_KEY, token);
   } catch (error) {
     console.log('FCM token registration failed:', error?.response?.data || error?.message);
   }

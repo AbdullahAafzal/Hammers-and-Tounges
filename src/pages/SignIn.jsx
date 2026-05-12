@@ -4,6 +4,7 @@ import './SignIn.css'
 import { useDispatch, useSelector } from 'react-redux'
 import { clearError } from '../store/slices/authSlice'
 import { loginUser } from '../store/actions/authActions'
+import { initializeFirebaseNotifications } from '../services/firebaseNotifications'
 
 const SignIn = () => {
   const navigate = useNavigate()
@@ -90,10 +91,14 @@ const SignIn = () => {
       return
     }
 
-    await dispatch(loginUser({
+    const result = await dispatch(loginUser({
       email: formData.email,
       password: formData.password,
     }))
+
+    if (loginUser.fulfilled.match(result)) {
+      initializeFirebaseNotifications()
+    }
   }
 
   return (
