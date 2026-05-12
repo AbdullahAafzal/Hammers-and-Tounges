@@ -6,29 +6,29 @@ import { API_ROUTES } from '../config/api.config';
 import { cookieStorage } from '../utils/cookieStorage';
 
 const FCM_TOKEN_STORAGE_KEY = 'fcmToken';
-const FCM_REGISTERED_TOKEN_STORAGE_KEY = 'registeredFcmToken';
 const SERVICE_WORKER_PATH = '/firebase-messaging-sw.js';
 
 const registerFcmTokenWithBackend = async (token) => {
-  if (!token) return;
+  if (!token) {
+    console.log('[FCM] register skipped: no token');
+    return;
+  }
+
+  const authToken = cookieStorage.getItem(cookieStorage.AUTH_KEYS.TOKEN);
+  if (!authToken) {
+    console.log('[FCM] register skipped: user not authenticated');
+    return;
+  }
+
   try {
-    const registeredToken = localStorage.getItem(FCM_REGISTERED_TOKEN_STORAGE_KEY);
-    if (registeredToken === token) {
-      return;
-    }
-
-    const authToken = cookieStorage.getItem(cookieStorage.AUTH_KEYS.TOKEN);
-    if (!authToken) {
-      return;
-    }
-
-    await apiClient.post(API_ROUTES.FCM_REGISTER, {
+    console.log('[FCM] registering token with backend...');
+    const response = await apiClient.post(API_ROUTES.FCM_REGISTER, {
       registration_id: token,
       device_type: 'web',
     });
-    localStorage.setItem(FCM_REGISTERED_TOKEN_STORAGE_KEY, token);
+    console.log('[FCM] register success:', response?.status, response?.data);
   } catch (error) {
-    console.log('FCM token registration failed:', error?.response?.data || error?.message);
+    console.log('[FCM] register failed:', error?.response?.status, error?.response?.data || error?.message);
   }
 };
 
@@ -93,7 +93,7 @@ export const requestNotificationPermission = () => {
   try {
     return Notification.requestPermission();
   } catch (error) {
-    console.log('Notification permission request failed:', error);
+    console.log('[FCM] permission request failed:', error);
     return Promise.resolve(Notification.permission);
   }
 };
@@ -101,21 +101,24 @@ export const requestNotificationPermission = () => {
 export const initializeFirebaseNotifications = async () => {
   try {
     if (typeof window === 'undefined' || !('Notification' in window)) {
+      console.log('[FCM] init skipped: Notification API unavailable');
       return null;
     }
 
     if (Notification.permission !== 'granted') {
+      console.log('[FCM] init skipped: permission is', Notification.permission);
       return null;
     }
 
     const supported = await isSupported();
     if (!supported) {
+      console.log('[FCM] init skipped: messaging not supported in this browser');
       return null;
     }
 
     const app = getFirebaseApp();
     if (!app) {
-      console.warn('Firebase notifications are missing web app config.');
+      console.warn('[FCM] init skipped: missing web app config');
       return null;
     }
 
@@ -130,13 +133,15 @@ export const initializeFirebaseNotifications = async () => {
     const token = await getToken(messaging, tokenOptions);
     if (token) {
       localStorage.setItem(FCM_TOKEN_STORAGE_KEY, token);
-      console.log('Firebase notification token:', token);
+      console.log('[FCM] token generated:', token);
       await registerFcmTokenWithBackend(token);
+    } else {
+      console.log('[FCM] getToken returned empty');
     }
 
     return token;
   } catch (error) {
-    console.log('Firebase notification initialization failed:', error);
+    console.log('[FCM] initialization failed:', error);
     return null;
   }
 };
