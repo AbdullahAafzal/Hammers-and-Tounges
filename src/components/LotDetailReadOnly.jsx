@@ -4,7 +4,7 @@ import { auctionService } from '../services/interceptors/auction.service';
 import { buyerService } from '../services/interceptors/buyer.service';
 import { toast } from 'react-toastify';
 import { formatBidDateTime } from '../utils/formatBidDateTime';
-import { maskBidderName } from '../utils/maskBidderName';
+import { maskBidderName, maskBidderNameForAdmin } from '../utils/maskBidderName';
 import { logLotMediaFromApi } from '../utils/logLotMediaDebug';
 import { getLotImageUrls } from '../utils/lotMedia';
 import './LotDetailReadOnly.css';
@@ -24,6 +24,7 @@ const LotDetailReadOnly = ({ backPath }) => {
   const { lotId } = useParams();
   const navigate = useNavigate();
   const location = useLocation();
+  const isAdminRoute = location.pathname.startsWith('/admin/');
   const lotFromState = location.state?.lot;
 
   const [lot, setLot] = useState(lotFromState);
@@ -199,7 +200,11 @@ const LotDetailReadOnly = ({ backPath }) => {
                     <div className="lot-detail-ro__bid-rank">#{index + 1}</div>
                     <div className="lot-detail-ro__bid-info">
                       <div className="lot-detail-ro__bid-bidder">
-                        {maskBidderName(bid.bidder_name ?? bid.user_name ?? bid.bidder ?? 'Bidder')}
+                        {isAdminRoute
+                          ? maskBidderNameForAdmin(bid)
+                          : maskBidderName(
+                              bid.bidder_name ?? bid.user_name ?? bid.bidder ?? 'Bidder',
+                            )}
                       </div>
                       <div className="lot-detail-ro__bid-time">
                         {formatBidDateTime(bid.created_at)}

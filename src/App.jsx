@@ -80,6 +80,7 @@ import AdminUnsoldInventory from './pages/AdminUnsoldInventory'
 import AdminDepositExemption from './pages/AdminDepositExemption'
 import AdminAuctionDepositOverride from './pages/AdminAuctionDepositOverride'
 import AdminGoodsReceivedVerification from './pages/adminDashboard/AdminGoodsReceivedVerification'
+import AdminPhantomAnalytics from './pages/AdminPhantomAnalytics'
 import ManualPaymentEntry from './components/ManualPayment'
 import ManualPaymentAuthorization from './pages/ManualPaymentAuthorization'
 import PaymentVerification from './pages/paymentVerification/PaymentVerification'
@@ -421,6 +422,7 @@ function App() {
                 <Route path="/admin/unsold-inventory" element={<AdminUnsoldInventory />} />
                 <Route path="/admin/deposit-exemption" element={<AdminDepositExemption />} />
                 <Route path="/admin/goods-received-verification" element={<AdminGoodsReceivedVerification />} />
+                <Route path="/admin/phantom-analytics" element={<AdminPhantomAnalytics />} />
                 <Route path="/admin/auction-deposit-override" element={<AdminAuctionDepositOverride />} />
                 <Route path="/admin/finance/manual-deposits/:depositId" element={<ManualDepositDetail />} />
                 <Route path="/admin/finance/refunds/:refundId/authorize" element={<AdminFinanceRefundAuthorize />} />

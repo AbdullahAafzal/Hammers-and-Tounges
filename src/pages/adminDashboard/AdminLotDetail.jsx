@@ -4,7 +4,7 @@ import { auctionService } from '../../services/interceptors/auction.service';
 import { buyerService } from '../../services/interceptors/buyer.service';
 import { toast } from 'react-toastify';
 import { formatBidDateTime } from '../../utils/formatBidDateTime';
-import { maskBidderName } from '../../utils/maskBidderName';
+import { maskBidderNameForAdmin } from '../../utils/maskBidderName';
 import { logLotMediaFromApi } from '../../utils/logLotMediaDebug';
 import { getLotImageUrls } from '../../utils/lotMedia';
 import './AdminLotDetail.css';
@@ -246,7 +246,7 @@ const AdminLotDetail = () => {
                     <div className="admin-lot-detail__bid-rank">#{index + 1}</div>
                     <div className="admin-lot-detail__bid-info">
                       <span className="admin-lot-detail__bid-bidder">
-                        {maskBidderName(bid.bidder_name ?? bid.user_name ?? bid.bidder ?? 'Bidder')}
+                        {maskBidderNameForAdmin(bid)}
                       </span>
                       <span className="admin-lot-detail__bid-time">
                         {formatBidDateTime(bid.created_at)}

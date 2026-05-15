@@ -3,7 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { adminService } from '../../services/interceptors/admin.service';
 import { API_CONFIG, getMediaUrl } from '../../config/api.config';
 import { formatBidDateTime } from '../../utils/formatBidDateTime';
-import { maskBidderName } from '../../utils/maskBidderName';
+import { maskBidderNameForAdmin } from '../../utils/maskBidderName';
 import './AdminAuctionDetails.css';
 
 const AdminAuctionDetails = () => {
@@ -207,7 +207,7 @@ const AdminAuctionDetails = () => {
                         {auction.currency || 'USD'} {formatPrice(bid.amount)}
                       </div>
                       <div className="admin-auction-details-bid-bidder">
-                        {maskBidderName(bid.bidder_name || bid.bidder_email || 'Unknown Bidder')}
+                        {maskBidderNameForAdmin(bid)}
                       </div>
                       <div className="admin-auction-details-bid-time">
                         {formatBidDateTime(bid.created_at)}
@@ -416,7 +416,7 @@ const AdminAuctionDetails = () => {
                         {auction.currency || 'USD'} {formatPrice(bid.amount)}
                       </div>
                       <div className="admin-auction-details-bid-bidder">
-                        {maskBidderName(bid.bidder_name || bid.bidder_email || 'Unknown Bidder')}
+                        {maskBidderNameForAdmin(bid)}
                       </div>
                       <div className="admin-auction-details-bid-time">
                         {formatBidDateTime(bid.created_at)}

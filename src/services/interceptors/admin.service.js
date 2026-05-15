@@ -40,6 +40,23 @@ export const adminService = {
     }
   },
 
+  /** GET — Phantom bid audit report (`lotId` optional) */
+  getPhantomBidsReport: async (lotId) => {
+    try {
+      const params = {};
+      if (lotId != null && String(lotId).trim() !== '') {
+        params.lot_id = Number(lotId);
+      }
+      const { data } = await apiClient.get(API_ROUTES.ADMIN_PHANTOM_BIDS_REPORT, { params });
+      return data;
+    } catch (error) {
+      if (error.isNetworkError) {
+        throw new Error('Unable to connect to server. Please try again later.');
+      }
+      throw error;
+    }
+  },
+
   // User Actions (Verify Seller, Promote to Manager, etc.)
   performUserAction: async (actionData) => {
     try {

@@ -12,7 +12,7 @@ import { toast } from 'react-toastify';
 import InsufficientBalanceBidModal from './InsufficientBalanceBidModal';
 import { flattenApiDetail, humanizeErrorDetailString } from '../utils/apiErrorMessage';
 import { formatBidDateTime } from '../utils/formatBidDateTime';
-import { maskBidderName } from '../utils/maskBidderName';
+import { maskBidderName, maskBidderNameForAdmin } from '../utils/maskBidderName';
 import { logLotMediaFromApi } from '../utils/logLotMediaDebug';
 import { getLotImageUrls } from '../utils/lotMedia';
 import { getLotBidDisplay, parseLotAmount, resolveLotEventBounds } from '../utils/lotDisplayUtils';
@@ -749,7 +749,13 @@ const GuestLotDrawer = ({
                           {bids.slice(0, 15).map((bid, i) => (
                             <div key={bid.id ?? i} className="guest-lot-drawer__bid-item">
                               <span>#{i + 1}</span>
-                              <span>{maskBidderName(bid.bidder_name ?? bid.user_name ?? 'Bidder')}</span>
+                              <span>
+                                {isAdmin
+                                  ? maskBidderNameForAdmin(bid)
+                                  : maskBidderName(
+                                      bid.bidder_name ?? bid.user_name ?? bid.bidder ?? 'Bidder',
+                                    )}
+                              </span>
                               <span className="guest-lot-drawer__bid-amt">
                                 {currency} {formatPrice(bid.amount)}
                               </span>
