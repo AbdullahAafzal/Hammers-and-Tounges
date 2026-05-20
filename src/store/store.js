@@ -6,6 +6,7 @@ import managerReducer from './slices/managerSlice';
 import sellerReducer from './slices/sellerSlice';
 import buyerReducer from './slices/buyerSlice';
 import permissionsReducer from './slices/permissionsSlice';
+import { fcmLogoutListener } from './fcmLogoutListener';
 
 const store = configureStore({
   reducer: {
@@ -17,6 +18,8 @@ const store = configureStore({
     buyer: buyerReducer,
     permissions: permissionsReducer,
   },
+  middleware: (getDefaultMiddleware) =>
+    getDefaultMiddleware().prepend(fcmLogoutListener.middleware),
   // middleware: (getDefaultMiddleware) =>
   //   getDefaultMiddleware({
   //     serializableCheck: {

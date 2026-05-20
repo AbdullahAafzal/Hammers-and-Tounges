@@ -63,3 +63,12 @@ export const mergeAccountIntoDeviceRegistry = (registry, user, token) => {
 
   return list;
 };
+
+export const removeAccountFromDeviceRegistry = (registry, user) => {
+  const userId = getAuthUserId(user);
+  if (userId == null) {
+    return Array.isArray(registry) ? registry : [];
+  }
+
+  return Array.isArray(registry) ? registry.filter((entry) => entry.userId !== userId) : [];
+};

@@ -1,13 +1,14 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import './SignIn.css'
 import { useDispatch, useSelector } from 'react-redux'
 import { clearError } from '../store/slices/authSlice'
 import { loginUser } from '../store/actions/authActions'
 import {
-  initializeFirebaseNotifications,
+  registerFcmForAuthenticatedUser,
   requestNotificationPermission,
 } from '../services/firebaseNotifications'
+import { getDashboardPathForUser } from '../utils/authNavigation'
 
 const SignIn = () => {
   const navigate = useNavigate()
@@ -23,39 +24,12 @@ const SignIn = () => {
     password: '',
   })
   const [formErrors, setFormErrors] = useState({})
+  const loginInProgressRef = useRef(false)
 
+  // Redirect when already logged in (e.g. opened /signin with valid session cookie)
   useEffect(() => {
-    if (isAuthenticated && user) {
-      const role = (user.role || '').toLowerCase()
-      const isStaff = user.is_staff === true || user.is_staff === 1 || String(user.is_staff).toLowerCase() === 'true'
-
-      // Check role first: buyer and seller always go to their dashboards regardless of is_staff
-      if (role === 'buyer') {
-        navigate('/buyer/dashboard', { replace: true })
-        return
-      }
-      if (role === 'seller') {
-        navigate('/seller/dashboard', { replace: true })
-        return
-      }
-      if (role === 'finance') {
-        navigate('/admin/dashboard', { replace: true })
-        return
-      }
-      // is_staff = admin; otherwise manager goes to manager dashboard
-      if (isStaff) {
-        navigate('/admin/dashboard', { replace: true })
-        return
-      }
-      if (role === 'manager') {
-        navigate('/manager/dashboard', { replace: true })
-        return
-      }
-      if (role === 'clerk') {
-        navigate('/clerk/dashboard', { replace: true })
-        return
-      }
-      navigate('/', { replace: true })
+    if (isAuthenticated && user && !loginInProgressRef.current) {
+      navigate(getDashboardPathForUser(user), { replace: true })
     }
   }, [isAuthenticated, user, navigate])
 
@@ -94,16 +68,25 @@ const SignIn = () => {
       return
     }
 
-    const permissionPromise = requestNotificationPermission()
+    loginInProgressRef.current = true
 
-    const result = await dispatch(loginUser({
-      email: formData.email,
-      password: formData.password,
-    }))
+    try {
+      const permissionPromise = requestNotificationPermission()
 
-    if (loginUser.fulfilled.match(result)) {
-      await permissionPromise
-      await initializeFirebaseNotifications({ requestPermission: false })
+      const result = await dispatch(loginUser({
+        email: formData.email,
+        password: formData.password,
+      }))
+
+      if (loginUser.fulfilled.match(result)) {
+        await permissionPromise
+        await registerFcmForAuthenticatedUser(result.payload.user, {
+          requestPermission: false,
+        })
+        navigate(getDashboardPathForUser(result.payload.user), { replace: true })
+      }
+    } finally {
+      loginInProgressRef.current = false
     }
   }
 

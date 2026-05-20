@@ -111,7 +111,7 @@ import ClerkLayout from "./layouts/ClerkLayout";
 import { Provider, useSelector } from "react-redux";
 import store from './store/store'
 import {
-  initializeFirebaseNotifications,
+  registerFcmForAuthenticatedUser,
   subscribeToFirebaseNotifications,
 } from './services/firebaseNotifications';
 
@@ -126,19 +126,20 @@ import ClerkDashboard from "./pages/ClerkDashboard";
 import ClerkEventLots from "./pages/ClerkEventLots";
 
 function FirebaseNotifications() {
-  const { isAuthenticated } = useSelector((state) => state.auth);
+  const { isAuthenticated, user } = useSelector((state) => state.auth);
   const { pathname } = useLocation();
+  const authUserId = user?.id ?? user?.pk ?? null;
 
   useEffect(() => {
     let isMounted = true;
     let unsubscribe = () => {};
 
-    if (!isAuthenticated || pathname === '/signin') {
+    if (!isAuthenticated || !user || authUserId == null || pathname === '/signin') {
       return undefined;
     }
 
     const setup = async () => {
-      await initializeFirebaseNotifications({ requestPermission: true });
+      await registerFcmForAuthenticatedUser(user, { requestPermission: true });
       if (!isMounted) {
         return;
       }
@@ -156,7 +157,7 @@ function FirebaseNotifications() {
       isMounted = false;
       unsubscribe();
     };
-  }, [isAuthenticated, pathname]);
+  }, [isAuthenticated, authUserId, pathname, user]);
 
   return null;
 }

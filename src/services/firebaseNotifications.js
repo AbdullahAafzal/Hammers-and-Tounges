@@ -7,7 +7,9 @@ import { cookieStorage } from '../utils/cookieStorage';
 import {
   buildFcmRegisterPayload,
   FCM_REGISTERED_ACCOUNTS_KEY,
+  getAuthUserId,
   mergeAccountIntoDeviceRegistry,
+  removeAccountFromDeviceRegistry,
 } from '../utils/fcmRegistrationHelpers';
 
 const FCM_TOKEN_STORAGE_KEY = 'fcmToken';
@@ -27,42 +29,126 @@ const saveDeviceRegistry = (registry) => {
   localStorage.setItem(FCM_REGISTERED_ACCOUNTS_KEY, JSON.stringify(registry));
 };
 
+/** Always POST; uses the explicit user (not a stale cookie). */
 const registerFcmTokenWithBackend = async (token, user) => {
   if (!token) {
     console.log('[FCM] register skipped: no token');
-    return;
+    return false;
+  }
+
+  if (!user) {
+    console.log('[FCM] register skipped: no user');
+    return false;
+  }
+
+  const userId = getAuthUserId(user);
+  if (userId == null) {
+    console.log('[FCM] register skipped: user has no id/pk', user);
+    return false;
   }
 
   const authToken = cookieStorage.getItem(cookieStorage.AUTH_KEYS.TOKEN);
   if (!authToken) {
     console.log('[FCM] register skipped: user not authenticated');
-    return;
-  }
-
-  const activeUser = user || cookieStorage.getItem(cookieStorage.AUTH_KEYS.USER);
-  if (!activeUser) {
-    console.log('[FCM] register skipped: no user profile');
-    return;
+    return false;
   }
 
   const deviceRegistry = getDeviceRegistry();
-  const payload = buildFcmRegisterPayload(token, 'web', activeUser, deviceRegistry);
+  const payload = buildFcmRegisterPayload(token, 'web', user, deviceRegistry);
 
   try {
     console.log('[FCM] registering token with backend...', {
       userId: payload.user_id,
       roles: payload.roles,
+      tokenPreview: `${token.slice(0, 12)}...`,
       sharedAccountsOnDevice: payload.registered_user_ids?.length,
     });
-    const response = await apiClient.post(API_ROUTES.FCM_REGISTER, payload);
+    const response = await apiClient.post(API_ROUTES.FCM_REGISTER, payload, {
+      skipDedupe: true,
+    });
     console.log('[FCM] register success:', response?.status, response?.data);
 
-    const updatedRegistry = mergeAccountIntoDeviceRegistry(deviceRegistry, activeUser, token);
+    const updatedRegistry = mergeAccountIntoDeviceRegistry(deviceRegistry, user, token);
     saveDeviceRegistry(updatedRegistry);
     console.log('[FCM] device registry updated:', updatedRegistry.map((entry) => entry.userId));
+    return true;
   } catch (error) {
     console.log('[FCM] register failed:', error?.response?.status, error?.response?.data || error?.message);
+    return false;
   }
+};
+
+const resolveFcmRegistrationToken = (user) => {
+  let token = localStorage.getItem(FCM_TOKEN_STORAGE_KEY);
+  if (token) {
+    return token;
+  }
+
+  if (!user) {
+    return null;
+  }
+
+  const userId = getAuthUserId(user);
+  if (userId == null) {
+    return null;
+  }
+
+  const deviceRegistry = getDeviceRegistry();
+  const entry = deviceRegistry.find((item) => item.userId === userId);
+  return entry?.token || null;
+};
+
+const unregisterFcmTokenWithBackend = async (token, user, authToken) => {
+  if (!token) {
+    console.log('[FCM] unregister skipped: no token');
+    return false;
+  }
+
+  const bearer = authToken || cookieStorage.getItem(cookieStorage.AUTH_KEYS.TOKEN);
+  if (!bearer) {
+    console.log('[FCM] unregister skipped: user not authenticated');
+    return false;
+  }
+
+  try {
+    console.log('[FCM] unregistering token with backend...', {
+      userId: getAuthUserId(user),
+      tokenPreview: `${token.slice(0, 12)}...`,
+    });
+    const response = await apiClient.delete(API_ROUTES.FCM_UNREGISTER, {
+      data: { registration_id: token },
+      headers: { Authorization: `Bearer ${bearer}` },
+      skipDedupe: true,
+    });
+    console.log('[FCM] unregister success:', response?.status, response?.data);
+
+    if (user) {
+      const deviceRegistry = getDeviceRegistry();
+      const updatedRegistry = removeAccountFromDeviceRegistry(deviceRegistry, user);
+      saveDeviceRegistry(updatedRegistry);
+      console.log('[FCM] device registry updated after logout:', updatedRegistry.map((entry) => entry.userId));
+    }
+
+    return true;
+  } catch (error) {
+    console.log('[FCM] unregister failed:', error?.response?.status, error?.response?.data || error?.message);
+    return false;
+  }
+};
+
+/**
+ * Unregister FCM for the current user. Call on logout while the access token is still valid.
+ */
+export const unregisterFcmForAuthenticatedUser = async (user, { authToken } = {}) => {
+  const activeUser = user || cookieStorage.getItem(cookieStorage.AUTH_KEYS.USER);
+  const token = resolveFcmRegistrationToken(activeUser);
+
+  if (!token) {
+    console.log('[FCM] unregisterForUser skipped: no FCM token available');
+    return false;
+  }
+
+  return unregisterFcmTokenWithBackend(token, activeUser, authToken);
 };
 
 const firebaseConfig = {
@@ -115,13 +201,40 @@ const registerMessagingServiceWorker = async () => {
     return null;
   }
 
-  let registration = await navigator.serviceWorker.getRegistration(SERVICE_WORKER_PATH);
+  let registration =
+    (await navigator.serviceWorker.getRegistration('/')) ||
+    (await navigator.serviceWorker.getRegistration());
+
   if (!registration) {
     registration = await navigator.serviceWorker.register(SERVICE_WORKER_PATH);
   }
 
   await waitForServiceWorkerActive(registration);
   return registration;
+};
+
+const acquireFcmToken = async () => {
+  const supported = await isSupported();
+  if (!supported) {
+    console.log('[FCM] acquire skipped: messaging not supported');
+    return null;
+  }
+
+  const app = getFirebaseApp();
+  if (!app) {
+    console.warn('[FCM] acquire skipped: missing web app config');
+    return null;
+  }
+
+  const serviceWorkerRegistration = await registerMessagingServiceWorker();
+  const messaging = getMessaging(app);
+  const vapidKey = import.meta.env.VITE_FIREBASE_VAPID_KEY;
+  const tokenOptions = {
+    ...(vapidKey ? { vapidKey } : {}),
+    ...(serviceWorkerRegistration ? { serviceWorkerRegistration } : {}),
+  };
+
+  return getToken(messaging, tokenOptions);
 };
 
 const getNotificationText = (payload) => {
@@ -132,11 +245,6 @@ const getNotificationText = (payload) => {
   return title || body || 'New notification received';
 };
 
-/**
- * Triggers the browser's notification permission prompt. Safari requires this
- * to be called from a direct user gesture (e.g. inside a click handler, before
- * any `await`). Returns the resulting permission string.
- */
 export const requestNotificationPermission = () => {
   if (typeof window === 'undefined' || !('Notification' in window)) {
     return Promise.resolve('denied');
@@ -171,67 +279,62 @@ export const ensureNotificationPermission = async () => {
 };
 
 /**
- * @param {{ requestPermission?: boolean }} options
- * requestPermission: when true, prompts if still "default" (session restore). When false, caller already prompted (Sign In).
+ * Register FCM for the given user. Call after every successful login with payload.user.
+ * Reuses cached device token when Firebase getToken fails on repeat logins.
  */
-export const initializeFirebaseNotifications = async ({ requestPermission = true } = {}) => {
-  try {
-    if (typeof window === 'undefined' || !('Notification' in window)) {
-      console.log('[FCM] init skipped: Notification API unavailable');
-      return null;
-    }
-
-    let permission = Notification.permission;
-    if (permission !== 'granted' && requestPermission) {
-      permission = await ensureNotificationPermission();
-    }
-
-    if (permission !== 'granted') {
-      console.log('[FCM] init skipped: permission is', permission);
-      return null;
-    }
-
-    const supported = await isSupported();
-    if (!supported) {
-      console.log('[FCM] init skipped: messaging not supported in this browser');
-      return null;
-    }
-
-    const app = getFirebaseApp();
-    if (!app) {
-      console.warn('[FCM] init skipped: missing web app config');
-      return null;
-    }
-
-    const user = cookieStorage.getItem(cookieStorage.AUTH_KEYS.USER);
-    const serviceWorkerRegistration = await registerMessagingServiceWorker();
-    const messaging = getMessaging(app);
-    const vapidKey = import.meta.env.VITE_FIREBASE_VAPID_KEY;
-    const tokenOptions = {
-      ...(vapidKey ? { vapidKey } : {}),
-      ...(serviceWorkerRegistration ? { serviceWorkerRegistration } : {}),
-    };
-
-    const token = await getToken(messaging, tokenOptions);
-    const effectiveToken = token || localStorage.getItem(FCM_TOKEN_STORAGE_KEY);
-
-    if (effectiveToken) {
-      if (token) {
-        localStorage.setItem(FCM_TOKEN_STORAGE_KEY, token);
-        console.log('[FCM] token generated:', token);
-      } else {
-        console.log('[FCM] reusing stored token');
-      }
-      await registerFcmTokenWithBackend(effectiveToken, user);
-    } else {
-      console.log('[FCM] getToken returned empty');
-    }
-
-    return effectiveToken;
-  } catch (error) {
-    console.log('[FCM] initialization failed:', error);
+export const registerFcmForAuthenticatedUser = async (
+  user,
+  { requestPermission = true } = {},
+) => {
+  if (!user) {
+    console.log('[FCM] registerForUser skipped: no user');
     return null;
   }
+
+  if (typeof window === 'undefined' || !('Notification' in window)) {
+    console.log('[FCM] registerForUser skipped: Notification API unavailable');
+    return null;
+  }
+
+  let permission = Notification.permission;
+  if (permission !== 'granted' && requestPermission) {
+    permission = await ensureNotificationPermission();
+  }
+
+  if (permission !== 'granted') {
+    console.log('[FCM] registerForUser skipped: permission is', permission);
+    return null;
+  }
+
+  let token = localStorage.getItem(FCM_TOKEN_STORAGE_KEY);
+
+  try {
+    const freshToken = await acquireFcmToken();
+    if (freshToken) {
+      token = freshToken;
+      localStorage.setItem(FCM_TOKEN_STORAGE_KEY, token);
+      console.log('[FCM] token acquired:', `${token.slice(0, 12)}...`);
+    } else if (token) {
+      console.log('[FCM] getToken empty; reusing cached token for backend register');
+    } else {
+      console.log('[FCM] registerForUser skipped: no FCM token available');
+      return null;
+    }
+  } catch (error) {
+    console.log('[FCM] acquire token failed:', error);
+    if (!token) {
+      return null;
+    }
+    console.log('[FCM] using cached token after acquire error');
+  }
+
+  await registerFcmTokenWithBackend(token, user);
+  return token;
+};
+
+export const initializeFirebaseNotifications = async ({ requestPermission = true } = {}) => {
+  const user = cookieStorage.getItem(cookieStorage.AUTH_KEYS.USER);
+  return registerFcmForAuthenticatedUser(user, { requestPermission });
 };
 
 export const subscribeToFirebaseNotifications = async () => {
