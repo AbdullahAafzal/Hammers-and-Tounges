@@ -103,7 +103,7 @@ const SignIn = () => {
 
     if (loginUser.fulfilled.match(result)) {
       await permissionPromise
-      initializeFirebaseNotifications()
+      await initializeFirebaseNotifications({ requestPermission: false })
     }
   }
 

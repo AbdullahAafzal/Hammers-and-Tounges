@@ -4,11 +4,30 @@ import { toast } from 'react-toastify';
 import apiClient from './api.service';
 import { API_ROUTES } from '../config/api.config';
 import { cookieStorage } from '../utils/cookieStorage';
+import {
+  buildFcmRegisterPayload,
+  FCM_REGISTERED_ACCOUNTS_KEY,
+  mergeAccountIntoDeviceRegistry,
+} from '../utils/fcmRegistrationHelpers';
 
 const FCM_TOKEN_STORAGE_KEY = 'fcmToken';
 const SERVICE_WORKER_PATH = '/firebase-messaging-sw.js';
 
-const registerFcmTokenWithBackend = async (token) => {
+const getDeviceRegistry = () => {
+  try {
+    const raw = localStorage.getItem(FCM_REGISTERED_ACCOUNTS_KEY);
+    const parsed = raw ? JSON.parse(raw) : [];
+    return Array.isArray(parsed) ? parsed : [];
+  } catch {
+    return [];
+  }
+};
+
+const saveDeviceRegistry = (registry) => {
+  localStorage.setItem(FCM_REGISTERED_ACCOUNTS_KEY, JSON.stringify(registry));
+};
+
+const registerFcmTokenWithBackend = async (token, user) => {
   if (!token) {
     console.log('[FCM] register skipped: no token');
     return;
@@ -20,25 +39,39 @@ const registerFcmTokenWithBackend = async (token) => {
     return;
   }
 
+  const activeUser = user || cookieStorage.getItem(cookieStorage.AUTH_KEYS.USER);
+  if (!activeUser) {
+    console.log('[FCM] register skipped: no user profile');
+    return;
+  }
+
+  const deviceRegistry = getDeviceRegistry();
+  const payload = buildFcmRegisterPayload(token, 'web', activeUser, deviceRegistry);
+
   try {
-    console.log('[FCM] registering token with backend...');
-    const response = await apiClient.post(API_ROUTES.FCM_REGISTER, {
-      registration_id: token,
-      device_type: 'web',
+    console.log('[FCM] registering token with backend...', {
+      userId: payload.user_id,
+      roles: payload.roles,
+      sharedAccountsOnDevice: payload.registered_user_ids?.length,
     });
+    const response = await apiClient.post(API_ROUTES.FCM_REGISTER, payload);
     console.log('[FCM] register success:', response?.status, response?.data);
+
+    const updatedRegistry = mergeAccountIntoDeviceRegistry(deviceRegistry, activeUser, token);
+    saveDeviceRegistry(updatedRegistry);
+    console.log('[FCM] device registry updated:', updatedRegistry.map((entry) => entry.userId));
   } catch (error) {
     console.log('[FCM] register failed:', error?.response?.status, error?.response?.data || error?.message);
   }
 };
 
 const firebaseConfig = {
-  apiKey: import.meta.env.VITE_FIREBASE_API_KEY || 'AIzaSyDW-eGF3eVkhUCfUSXbq_L63QcU69uDVTY',
+  apiKey: import.meta.env.VITE_FIREBASE_API_KEY || 'AIzaSyBhSSd0Tt0GI6y26HblyyuBpWPC3GPqDdI',
   authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN || 'hammerandtongues.firebaseapp.com',
   projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID || 'hammerandtongues',
   storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET || 'hammerandtongues.firebasestorage.app',
   messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID || '134298945759',
-  appId: import.meta.env.VITE_FIREBASE_APP_ID,
+  appId: import.meta.env.VITE_FIREBASE_APP_ID || '1:134298945759:web:aad0c3b221a9935285816a',
 };
 
 const hasRequiredFirebaseConfig = () =>
@@ -119,15 +152,42 @@ export const requestNotificationPermission = () => {
   }
 };
 
-export const initializeFirebaseNotifications = async () => {
+export const ensureNotificationPermission = async () => {
+  if (typeof window === 'undefined' || !('Notification' in window)) {
+    return 'denied';
+  }
+  if (Notification.permission === 'granted') {
+    return 'granted';
+  }
+  if (Notification.permission === 'denied') {
+    return 'denied';
+  }
+  try {
+    return await Notification.requestPermission();
+  } catch (error) {
+    console.log('[FCM] permission request failed:', error);
+    return Notification.permission;
+  }
+};
+
+/**
+ * @param {{ requestPermission?: boolean }} options
+ * requestPermission: when true, prompts if still "default" (session restore). When false, caller already prompted (Sign In).
+ */
+export const initializeFirebaseNotifications = async ({ requestPermission = true } = {}) => {
   try {
     if (typeof window === 'undefined' || !('Notification' in window)) {
       console.log('[FCM] init skipped: Notification API unavailable');
       return null;
     }
 
-    if (Notification.permission !== 'granted') {
-      console.log('[FCM] init skipped: permission is', Notification.permission);
+    let permission = Notification.permission;
+    if (permission !== 'granted' && requestPermission) {
+      permission = await ensureNotificationPermission();
+    }
+
+    if (permission !== 'granted') {
+      console.log('[FCM] init skipped: permission is', permission);
       return null;
     }
 
@@ -143,6 +203,7 @@ export const initializeFirebaseNotifications = async () => {
       return null;
     }
 
+    const user = cookieStorage.getItem(cookieStorage.AUTH_KEYS.USER);
     const serviceWorkerRegistration = await registerMessagingServiceWorker();
     const messaging = getMessaging(app);
     const vapidKey = import.meta.env.VITE_FIREBASE_VAPID_KEY;
@@ -152,15 +213,21 @@ export const initializeFirebaseNotifications = async () => {
     };
 
     const token = await getToken(messaging, tokenOptions);
-    if (token) {
-      localStorage.setItem(FCM_TOKEN_STORAGE_KEY, token);
-      console.log('[FCM] token generated:', token);
-      await registerFcmTokenWithBackend(token);
+    const effectiveToken = token || localStorage.getItem(FCM_TOKEN_STORAGE_KEY);
+
+    if (effectiveToken) {
+      if (token) {
+        localStorage.setItem(FCM_TOKEN_STORAGE_KEY, token);
+        console.log('[FCM] token generated:', token);
+      } else {
+        console.log('[FCM] reusing stored token');
+      }
+      await registerFcmTokenWithBackend(effectiveToken, user);
     } else {
       console.log('[FCM] getToken returned empty');
     }
 
-    return token;
+    return effectiveToken;
   } catch (error) {
     console.log('[FCM] initialization failed:', error);
     return null;

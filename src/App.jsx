@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from "react-router-dom";
 import GuestLayout from "./layouts/GuestLayout";
 
 import Home from "./pages/Home";
@@ -127,29 +127,36 @@ import ClerkEventLots from "./pages/ClerkEventLots";
 
 function FirebaseNotifications() {
   const { isAuthenticated } = useSelector((state) => state.auth);
+  const { pathname } = useLocation();
 
   useEffect(() => {
     let isMounted = true;
     let unsubscribe = () => {};
 
-    if (!isAuthenticated) {
+    if (!isAuthenticated || pathname === '/signin') {
       return undefined;
     }
 
-    initializeFirebaseNotifications();
-    subscribeToFirebaseNotifications().then((cleanup) => {
+    const setup = async () => {
+      await initializeFirebaseNotifications({ requestPermission: true });
+      if (!isMounted) {
+        return;
+      }
+      const cleanup = await subscribeToFirebaseNotifications();
       if (isMounted) {
         unsubscribe = cleanup;
       } else {
         cleanup();
       }
-    });
+    };
+
+    setup();
 
     return () => {
       isMounted = false;
       unsubscribe();
     };
-  }, [isAuthenticated]);
+  }, [isAuthenticated, pathname]);
 
   return null;
 }
@@ -157,8 +164,8 @@ function FirebaseNotifications() {
 function App() {
   return (
     <Provider store={store}>
-      <FirebaseNotifications />
       <Router>
+        <FirebaseNotifications />
         <div className="app">
           <Routes>
             {/* Public Routes - Guest flow with side drawer */}

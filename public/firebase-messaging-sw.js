@@ -3,7 +3,7 @@ importScripts('https://www.gstatic.com/firebasejs/10.13.2/firebase-app-compat.js
 importScripts('https://www.gstatic.com/firebasejs/10.13.2/firebase-messaging-compat.js');
 
 firebase.initializeApp({
-  apiKey: 'AIzaSyDW-eGF3eVkhUCfUSXbq_L63QcU69uDVTY',
+  apiKey: 'AIzaSyBhSSd0Tt0GI6y26HblyyuBpWPC3GPqDdI',
   authDomain: 'hammerandtongues.firebaseapp.com',
   projectId: 'hammerandtongues',
   storageBucket: 'hammerandtongues.firebasestorage.app',
