@@ -112,7 +112,16 @@ const ManagerPublishNew = () => {
         const sellerList = userList.filter((u) => u.role === 'seller');
         setSellers(sellerList);
         const catList = Array.isArray(catsRes) ? catsRes : catsRes?.results || catsRes?.data || [];
-        setCategories(catList);
+        const existingCategoryId = isEdit
+          ? (existingLot?.category ?? existingLot?.category_id)
+          : null;
+        setCategories(
+          catList.filter(
+            (c) =>
+              c.is_active !== false ||
+              (existingCategoryId != null && String(c.id) === String(existingCategoryId))
+          )
+        );
       } catch (err) {
         if (!cancelled) {
           console.error('Error loading sellers/categories:', err);
@@ -123,7 +132,7 @@ const ManagerPublishNew = () => {
       }
     })();
     return () => { cancelled = true; };
-  }, [effectiveEventId]);
+  }, [effectiveEventId, isEdit, existingLot?.category, existingLot?.category_id]);
 
   const handleChange = useCallback((e) => {
     const { name, value, type, checked } = e.target;
