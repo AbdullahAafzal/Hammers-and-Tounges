@@ -6,11 +6,13 @@ import './OTPVerification.css'
 import { useSelector, useDispatch } from 'react-redux'
 import { verifyOtp, resendOtp } from '../store/actions/authActions'
 
+const OTP_TIMER_SECONDS = 300 // 5 minutes — matches backend OTP expiry
+
 const OTPVerification = () => {
   const navigate = useNavigate()
   const location = useLocation()
   const [otp, setOtp] = useState(['', '', '', '', '', ''])
-  const [timer, setTimer] = useState(600) // 10 minutes in seconds
+  const [timer, setTimer] = useState(OTP_TIMER_SECONDS)
   const [canResend, setCanResend] = useState(false)
   const inputRefs = useRef([])
   const dispatch = useDispatch()
@@ -98,7 +100,7 @@ const OTPVerification = () => {
 
   const handleResend = async () => {
     if (canResend) {
-      setTimer(600) // Reset to 10 minutes
+      setTimer(OTP_TIMER_SECONDS)
       setCanResend(false)
       setOtp(['', '', '', '', '', ''])
       if (inputRefs.current[0]) {
@@ -148,7 +150,7 @@ const OTPVerification = () => {
           <h1 className="otp-title">Verify Your Account</h1>
 
           <p className="otp-instructions">
-            We've sent a 6-digit code to <strong>{maskedEmail}</strong>. The code is valid for 10 minutes.
+            We've sent a 6-digit code to <strong>{maskedEmail}</strong>. The code is valid for 5 minutes.
           </p>
 
           <form className="otp-form" onSubmit={handleVerify}>
