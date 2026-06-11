@@ -9,7 +9,6 @@ import { useNavigate, Link, useLocation } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchUsersList } from "../../store/actions/adminActions";
 import { adminService } from "../../services/interceptors/admin.service";
-import { auctionService } from "../../services/interceptors/auction.service";
 import { fetchEvents } from "../../store/actions/AuctionsActions";
 import { toast } from "react-toastify";
 import { API_CONFIG } from "../../config/api.config";
@@ -199,7 +198,9 @@ const AdminDashboard = () => {
         ? "upcoming"
         : activeTab === TAB_CURRENT
           ? "current"
-          : "past";
+          : activeTab === TAB_PAST
+            ? "past"
+            : undefined;
 
   // Fetch events using API-side timeframe/search/pagination
   useEffect(() => {

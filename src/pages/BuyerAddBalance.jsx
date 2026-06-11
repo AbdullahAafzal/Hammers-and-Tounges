@@ -7,8 +7,20 @@ import "./BuyerAddBalance.css";
 
 const TABS = [
   { id: "bank", label: "Online Deposit" },
-  { id: "manual", label: "Bank Transfer" },
+  { id: "manual", label: "Manual deposit" },
 ];
+
+const MANUAL_SUB_TABS = [
+  { id: "bank_transfer", label: "Bank Transfer" },
+  { id: "cash_deposit", label: "Cash Deposit" },
+];
+
+function isCashInHandDeposit(item) {
+  const v = item?.cashinhand ?? item?.cash_in_hand ?? item?.cashInHand;
+  if (v == null) return false;
+  if (typeof v === "boolean") return v;
+  return String(v).toLowerCase() === "true" || v === "1";
+}
 
 function formatManualDate(iso) {
   if (iso == null || iso === "") return "—";
@@ -41,15 +53,15 @@ const BuyerAddBalance = () => {
   const [activeTab, setActiveTab] = useState("bank");
 
   const [amount, setAmount] = useState("");
-  const [cellNumber, setCellNumber] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const quickAmounts = [25, 50, 100, 250];
 
+  const [manualSubTab, setManualSubTab] = useState("bank_transfer");
   const [manualList, setManualList] = useState([]);
   const [manualLoading, setManualLoading] = useState(false);
   const [manualFormMode, setManualFormMode] = useState(null);
   const [manualAmount, setManualAmount] = useState("");
-  const [manualReference, setManualReference] = useState("");
+  const [formCashInHand, setFormCashInHand] = useState(false);
   const [manualFile, setManualFile] = useState(null);
   const [manualProofPreviewUrl, setManualProofPreviewUrl] = useState(null);
   const [manualFileKey, setManualFileKey] = useState(0);
@@ -91,7 +103,7 @@ const BuyerAddBalance = () => {
     setManualFormMode(null);
     setResubmitDepositId(null);
     setManualAmount("");
-    setManualReference("");
+    setFormCashInHand(false);
     setManualFile(null);
     setManualFileKey((k) => k + 1);
   }, []);
@@ -124,7 +136,7 @@ const BuyerAddBalance = () => {
     setManualFormMode("new");
     setResubmitDepositId(null);
     setManualAmount("");
-    setManualReference("");
+    setFormCashInHand(manualSubTab === "cash_deposit");
     setManualFile(null);
     setManualFileKey((k) => k + 1);
   };
@@ -133,7 +145,7 @@ const BuyerAddBalance = () => {
     setManualFormMode("resubmit");
     setResubmitDepositId(item?.id ?? null);
     setManualAmount(item?.amount != null ? String(item.amount) : "");
-    setManualReference(item?.reference_number != null ? String(item.reference_number) : "");
+    setFormCashInHand(isCashInHandDeposit(item));
     setManualFile(null);
     setManualFileKey((k) => k + 1);
   };
@@ -171,16 +183,10 @@ const BuyerAddBalance = () => {
       return;
     }
 
-    if (!cellNumber.trim()) {
-      toast.error("Please enter your cell number");
-      return;
-    }
-
     try {
       setSubmitting(true);
       const response = await profileService.deposit({
         amount: parsedAmount,
-        cell_number: cellNumber.trim(),
       });
       const redirectUrl =
         response?.redirect_url ||
@@ -215,7 +221,7 @@ const BuyerAddBalance = () => {
       toast.error("Please enter a valid amount");
       return;
     }
-    if (!manualFile) {
+    if (!formCashInHand && !manualFile) {
       toast.error("Please attach proof of payment");
       return;
     }
@@ -224,16 +230,16 @@ const BuyerAddBalance = () => {
       setManualSubmitting(true);
       await profileService.submitManualDeposit({
         amount: parsedAmount,
-        proofFile: manualFile,
-        ...(manualFormMode === "resubmit"
-          ? {
-              deposit_id: resubmitDepositId,
-              reference_number: manualReference.trim() || undefined,
-            }
-          : {}),
+        cashinhand: formCashInHand,
+        ...(formCashInHand ? {} : { proofFile: manualFile }),
+        ...(manualFormMode === "resubmit" ? { deposit_id: resubmitDepositId } : {}),
       });
       toast.success(
-        manualFormMode === "resubmit" ? "Resubmitted for review." : "Bank transfer request submitted."
+        manualFormMode === "resubmit"
+          ? "Resubmitted for review."
+          : formCashInHand
+            ? "Cash deposit request submitted."
+            : "Bank transfer request submitted."
       );
       closeManualForm();
       loadManualList();
@@ -250,8 +256,14 @@ const BuyerAddBalance = () => {
 
   const subtitle =
     activeTab === "bank"
-      ? "Initialize your online deposit with amount and cell number."
-      : "Submit your bank transfer proof or track your bank transfer requests.";
+      ? "Initialize your online deposit with the amount you want to add."
+      : "Submit a manual deposit or track your deposit requests.";
+
+  const isCashTab = manualSubTab === "cash_deposit";
+  const filteredManualList = manualList.filter((item) =>
+    isCashTab ? isCashInHandDeposit(item) : !isCashInHandDeposit(item)
+  );
+  const newManualButtonLabel = isCashTab ? "New cash deposit" : "New bank transfer";
 
   return (
     <div className="buyer-add-balance-page">
@@ -317,17 +329,6 @@ const BuyerAddBalance = () => {
                   ))}
                 </div>
 
-                <div className="buyer-add-balance-field">
-                  <label htmlFor="cellNumber">Cell Number</label>
-                  <input
-                    id="cellNumber"
-                    type="text"
-                    placeholder="Enter cell number"
-                    value={cellNumber}
-                    onChange={(e) => setCellNumber(e.target.value)}
-                  />
-                </div>
-
                 <div className="buyer-add-balance-actions">
                   <button
                     type="button"
@@ -345,25 +346,43 @@ const BuyerAddBalance = () => {
             </>
           ) : (
             <>
+              <div className="buyer-manual-subtabs" role="tablist" aria-label="Manual deposit type">
+                {MANUAL_SUB_TABS.map((subTab) => (
+                  <button
+                    key={subTab.id}
+                    type="button"
+                    role="tab"
+                    aria-selected={manualSubTab === subTab.id}
+                    className={`buyer-manual-subtab ${manualSubTab === subTab.id ? "is-active" : ""}`}
+                    onClick={() => setManualSubTab(subTab.id)}
+                  >
+                    {subTab.label}
+                  </button>
+                ))}
+              </div>
               <div className="buyer-manual-toolbar">
-                <h2 className="buyer-add-balance-card-title buyer-manual-toolbar-title">Bank transfers</h2>
+                <h2 className="buyer-add-balance-card-title buyer-manual-toolbar-title">
+                  {isCashTab ? "Cash deposits" : "Bank transfers"}
+                </h2>
                 <button
                   type="button"
                   className="buyer-add-balance-btn primary buyer-manual-new-btn"
                   onClick={openNewManualForm}
                   disabled={manualSubmitting || deletingId != null}
                 >
-                  New bank transfer
+                  {newManualButtonLabel}
                 </button>
               </div>
 
               {manualLoading ? (
                 <p className="buyer-manual-muted">Loading requests…</p>
-              ) : manualList.length === 0 ? (
-                <p className="buyer-manual-muted">No bank transfer requests yet.</p>
+              ) : filteredManualList.length === 0 ? (
+                <p className="buyer-manual-muted">
+                  {isCashTab ? "No cash deposit requests yet." : "No bank transfer requests yet."}
+                </p>
               ) : (
                 <ul className="buyer-manual-list">
-                  {manualList.map((item) => {
+                  {filteredManualList.map((item) => {
                     const proofUrl = item?.proof_of_payment ? getMediaUrl(item.proof_of_payment) : "";
                     const thumbIsImage = proofUrl && isLikelyImageProof(item.proof_of_payment);
                     const status = String(item?.status || "").toUpperCase();
@@ -388,9 +407,7 @@ const BuyerAddBalance = () => {
                             >
                               <span className="buyer-manual-doc-label">PDF / file</span>
                             </button>
-                          ) : (
-                            <div className="buyer-manual-thumb-placeholder" aria-hidden />
-                          )}
+                          ) : null}
                           <div className="buyer-manual-row-text">
                             <div className="buyer-manual-row-top">
                               <span className="buyer-manual-amount">
@@ -447,7 +464,6 @@ const BuyerAddBalance = () => {
             <>
               <h3>Before you continue</h3>
               <ul>
-                <li>Enter the cell number.</li>
                 <li>Use the exact amount you want to deposit.</li>
                 <li>You will be redirected/processed after initialization.</li>
               </ul>
@@ -457,20 +473,31 @@ const BuyerAddBalance = () => {
             </>
           ) : (
             <>
-              <h3>Bank Transfer</h3>
+              <h3>{isCashTab ? "Cash Deposit" : "Bank Transfer"}</h3>
               <ul>
-                <li>
-                  Use <strong>New bank transfer</strong> to open the submission form in a dialog (no need to scroll
-                  past a long list).
-                </li>
-                <li>Make your bank transfer and keep the proof (receipt or screenshot) ready to upload.</li>
+                {isCashTab ? (
+                  <>
+                    <li>
+                      Use <strong>New cash deposit</strong> after paying cash at our premises.
+                    </li>
+                    <li>No proof upload is required for cash deposits.</li>
+                  </>
+                ) : (
+                  <>
+                    <li>
+                      Use <strong>New bank transfer</strong> to open the submission form in a dialog.
+                    </li>
+                    <li>Make your bank transfer and keep the proof (receipt or screenshot) ready to upload.</li>
+                  </>
+                )}
                 <li>Pending requests are reviewed by the team; approved amounts credit your wallet.</li>
-                <li>If a request is rejected, you can resubmit with updated proof.</li>
+                <li>If a request is rejected, you can resubmit.</li>
                 <li>Pending requests can be deleted if you no longer need them.</li>
               </ul>
               <div className="buyer-add-balance-highlight">
-                Only amount and proof are required for a new request. Reference and deposit id are used when
-                resubmitting a rejected request.
+                {isCashTab
+                  ? "Only the deposit amount is required for a cash deposit request."
+                  : "Amount and proof of payment are required for a bank transfer request."}
               </div>
             </>
           )}
@@ -499,7 +526,7 @@ const BuyerAddBalance = () => {
               ×
             </button>
             <h2 id="buyer-manual-modal-title" className="buyer-manual-modal-title">
-              Bank transfer #{detailItem.id}
+              {isCashInHandDeposit(detailItem) ? "Cash deposit" : "Bank transfer"} #{detailItem.id}
             </h2>
             <div className="buyer-manual-modal-body">
               <p className="buyer-manual-modal-line">
@@ -612,12 +639,22 @@ const BuyerAddBalance = () => {
             </button>
             <form className="buyer-manual-form buyer-manual-form--in-modal" onSubmit={handleManualSubmit}>
               <h2 id="buyer-manual-form-modal-title" className="buyer-manual-modal-title">
-                {manualFormMode === "resubmit" ? "Resubmit proof" : "New bank transfer"}
+                {manualFormMode === "resubmit"
+                  ? formCashInHand
+                    ? "Resubmit cash deposit"
+                    : "Resubmit proof"
+                  : formCashInHand
+                    ? "New cash deposit"
+                    : "New bank transfer"}
               </h2>
               <p className="buyer-manual-form-hint">
                 {manualFormMode === "resubmit"
-                  ? "Upload a new proof document. Your previous request was rejected."
-                  : "Upload proof after you complete your bank transfer."}
+                  ? formCashInHand
+                    ? "Update the amount if needed and resubmit your cash deposit request."
+                    : "Upload a new proof document. Your previous request was rejected."
+                  : formCashInHand
+                    ? "Submit a cash deposit request after paying at our premises."
+                    : "Upload proof after you complete your bank transfer."}
               </p>
               <div className="buyer-add-balance-field">
                 <label htmlFor="manualAmount">Amount</label>
@@ -632,45 +669,35 @@ const BuyerAddBalance = () => {
                   required
                 />
               </div>
-              {manualFormMode === "resubmit" ? (
+              {!formCashInHand ? (
                 <div className="buyer-add-balance-field">
-                  <label htmlFor="manualReference">Reference number (optional)</label>
+                  <label htmlFor="manualProof">Proof of payment</label>
                   <input
-                    id="manualReference"
-                    type="text"
-                    placeholder="Bank reference"
-                    value={manualReference}
-                    onChange={(e) => setManualReference(e.target.value)}
+                    key={manualFileKey}
+                    id="manualProof"
+                    type="file"
+                    accept="image/*,.pdf"
+                    onChange={(e) => setManualFile(e.target.files?.[0] ?? null)}
+                    required={!formCashInHand}
                   />
+                  {manualProofPreviewUrl ? (
+                    <div className="buyer-manual-proof-preview">
+                      <img
+                        src={manualProofPreviewUrl}
+                        alt="Selected proof preview"
+                        className="buyer-manual-proof-preview-img"
+                      />
+                      <span className="buyer-manual-proof-preview-caption" title={manualFile?.name}>
+                        {manualFile?.name}
+                      </span>
+                    </div>
+                  ) : manualFile && !isImageFile(manualFile) ? (
+                    <p className="buyer-manual-proof-preview-doc" title={manualFile.name}>
+                      Selected file: {manualFile.name}
+                    </p>
+                  ) : null}
                 </div>
               ) : null}
-              <div className="buyer-add-balance-field">
-                <label htmlFor="manualProof">Proof of payment</label>
-                <input
-                  key={manualFileKey}
-                  id="manualProof"
-                  type="file"
-                  accept="image/*,.pdf"
-                  onChange={(e) => setManualFile(e.target.files?.[0] ?? null)}
-                  required
-                />
-                {manualProofPreviewUrl ? (
-                  <div className="buyer-manual-proof-preview">
-                    <img
-                      src={manualProofPreviewUrl}
-                      alt="Selected proof preview"
-                      className="buyer-manual-proof-preview-img"
-                    />
-                    <span className="buyer-manual-proof-preview-caption" title={manualFile?.name}>
-                      {manualFile?.name}
-                    </span>
-                  </div>
-                ) : manualFile && !isImageFile(manualFile) ? (
-                  <p className="buyer-manual-proof-preview-doc" title={manualFile.name}>
-                    Selected file: {manualFile.name}
-                  </p>
-                ) : null}
-              </div>
               <div className="buyer-add-balance-actions buyer-manual-form-actions">
                 <button
                   type="button"

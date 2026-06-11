@@ -113,7 +113,9 @@ function ManagerDashboard() {
         ? 'upcoming'
         : activeTab === TAB_CURRENT
           ? 'current'
-          : 'past';
+          : activeTab === TAB_PAST
+            ? 'past'
+            : undefined;
 
   useEffect(() => {
     dispatch(

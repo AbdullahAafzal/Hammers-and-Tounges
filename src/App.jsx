@@ -65,6 +65,8 @@ import ManagerProductFields from './pages/managerProductFields/ManagerProductFie
 import AdminDashboard from "./pages/adminDashboard/AdminDashboard";
 import AdminBuy from "./pages/AdminBuy";
 import AdminEventLots from "./pages/adminDashboard/AdminEventLots";
+import SelectReceivedLots from "./pages/SelectReceivedLots";
+import AdminConsignmentEdit from "./pages/AdminConsignmentEdit";
 import AdminLotDetail from "./pages/adminDashboard/AdminLotDetail";
 import AdminCreateEvent from "./pages/adminDashboard/AdminCreateEvent";
 import AdminEditEvent from "./pages/adminDashboard/AdminEditEvent";
@@ -81,6 +83,8 @@ import AdminDepositExemption from './pages/AdminDepositExemption'
 import AdminAuctionDepositOverride from './pages/AdminAuctionDepositOverride'
 import AdminGoodsReceivedVerification from './pages/adminDashboard/AdminGoodsReceivedVerification'
 import AdminPhantomAnalytics from './pages/AdminPhantomAnalytics'
+import AdminConsignment from './pages/AdminConsignment'
+import AdminConsignmentIntake from './pages/AdminConsignmentIntake'
 import ManualPaymentEntry from './components/ManualPayment'
 import ManualPaymentAuthorization from './pages/ManualPaymentAuthorization'
 import PaymentVerification from './pages/paymentVerification/PaymentVerification'
@@ -235,11 +239,15 @@ function App() {
             <Route element={<ManagerGuard />}>
               <Route element={<ManagerLayout />}>
                 <Route path="/manager/dashboard" element={<ManagerDashboard />} />
+                <Route path="/manager/consignment" element={<AdminConsignment isManagerFlow />} />
+                <Route path="/manager/consignment/:lotId/edit" element={<AdminConsignmentEdit isManagerFlow />} />
+                <Route path="/manager/consignment/new" element={<AdminConsignmentIntake isManagerFlow />} />
                 <Route path="/manager/buy" element={<ManagerBuy />} />
                 <Route path="/manager/sell" element={<ManagerSell />} />
                 <Route path="/manager/buy/lot/:lotId" element={<LotDetailReadOnly backPath="/manager/buy" />} />
                 <Route path="/manager/event/create" element={<ManagerCreateEvent />} />
                 <Route path="/manager/event/:eventId/lot/:lotId" element={<ManagerLotDetail />} />
+                <Route path="/manager/event/:id/select-received" element={<SelectReceivedLots isManagerFlow />} />
                 <Route path="/manager/event/:id" element={<ManagerEventLots />} />
                 <Route path="/manager/inspection" element={
                   <>
@@ -374,6 +382,9 @@ function App() {
               <Route element={<AdminLayout />}>
                 <Route path="/admin" element={<Navigate to="/admin/dashboard" replace />} />
                 <Route path="/admin/dashboard" element={<AdminDashboard />} />
+                <Route path="/admin/consignment" element={<AdminConsignment />} />
+                <Route path="/admin/consignment/:lotId/edit" element={<AdminConsignmentEdit />} />
+                <Route path="/admin/consignment/new" element={<AdminConsignmentIntake />} />
                 <Route element={<AdminWriteGuard />}>
                   <Route path="/admin/event/create" element={<AdminCreateEvent />} />
                   <Route path="/admin/event/:eventId/edit" element={<AdminEditEvent />} />
@@ -423,6 +434,7 @@ function App() {
                 <Route path="/admin/buy" element={<AdminBuy />} />
                 <Route path="/admin/sell" element={<AdminSell />} />
                 <Route path="/admin/buy/lot/:lotId" element={<LotDetailReadOnly backPath="/admin/buy" />} />
+                <Route path="/admin/event/:id/select-received" element={<SelectReceivedLots />} />
                 <Route path="/admin/event/:id" element={<AdminEventLots />} />
                 <Route path="/admin/event/:eventId/lot/:lotId" element={<AdminLotDetail />} />
                 <Route path="/admin/auction/:id" element={<AdminAuctionDetails />} />

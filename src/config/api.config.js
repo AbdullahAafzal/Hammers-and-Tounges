@@ -173,7 +173,10 @@ export const API_ROUTES = {
   ADMIN_ASSIGN_AUCTION: '/inspections/admin/assign/',
   ADMIN_USERS_LIST: '/inspections/admin/users/',
   ADMIN_UPDATE_USER: '/users/admin/', // + userId + /update/
+  ADMIN_DEPOSIT_EXEMPT: '/users/admin/', // + userId + /deposit-exempt/
   ADMIN_ADD_FUNDS: '/users/admin/add-funds/',
+  ADMIN_SELLERS_SEARCH: '/users/admin/sellers/search/',
+  ADMIN_SELLERS_QUICK_CREATE: '/users/admin/sellers/create/',
   ADMIN_CREATE_STAFF: '/users/admin/create-staff/',
   ADMIN_USER_MANAGEMENT: '/inspections/admin/user-management/', // POST create seller, PATCH + id + / for edit
   ADMIN_USER_PERMISSIONS: '/inspections/admin/user-permissions/', // GET/PATCH user feature permissions
@@ -200,6 +203,9 @@ export const API_ROUTES = {
 
   //// Auction Routes (Common for all)
   AUCTIONS_EVENTS: '/auctions/events/',
+  INTAKE_SESSIONS: '/auctions/intake-sessions/',
+  INTAKE_SESSION_LOTS: (sessionId) => `/auctions/intake-sessions/${sessionId}/lots/`,
+  INTAKE_SESSION_COMPLETE: (sessionId) => `/auctions/intake-sessions/${sessionId}/complete/`,
   AUCTIONS_LOTS: '/auctions/lots/',
   /** Goods Received Verification reports */
   AUCTIONS_GRV: '/auctions/grv/',

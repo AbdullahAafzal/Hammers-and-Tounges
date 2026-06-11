@@ -1,0 +1,367 @@
+.consignment-intake {
+  padding: 1.5rem 2rem 3rem;
+  max-width: 100%;
+  width: 100%;
+  box-sizing: border-box;
+  color: var(--color-text);
+}
+
+.consignment-intake__header {
+  margin-bottom: 1.5rem;
+}
+
+.consignment-intake__back {
+  background: none;
+  border: none;
+  color: var(--color-primary, #39ae47);
+  font-weight: 600;
+  cursor: pointer;
+  padding: 0;
+  margin-bottom: 0.5rem;
+}
+
+.consignment-intake__title {
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+.consignment-intake__step-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  margin-bottom: 0.75rem;
+}
+
+.consignment-intake__step-title {
+  margin: 0;
+  font-size: 1.1rem;
+  flex: 1 1 auto;
+  min-width: 0;
+  color: var(--color-text);
+}
+
+.consignment-intake__step-header-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  flex-shrink: 0;
+  margin-left: auto;
+}
+
+.consignment-intake__hint {
+  margin: 0 0 1rem;
+  color: var(--color-text-muted);
+  font-size: 0.95rem;
+}
+
+.consignment-intake__input,
+.consignment-intake__textarea,
+.consignment-intake__select {
+  width: 100%;
+  box-sizing: border-box;
+  border: 1px solid var(--color-border-strong);
+  border-radius: 8px;
+  padding: 0.65rem 0.75rem;
+  margin-bottom: 0.75rem;
+  font: inherit;
+  background: var(--color-input-bg);
+  color: var(--color-text);
+}
+
+.consignment-intake__subsection-title {
+  margin: 1.25rem 0 0.75rem;
+  font-size: 0.85rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+}
+
+.consignment-intake__submit-lot {
+  width: 100%;
+  margin-top: 1.25rem;
+}
+
+.consignment-intake__doc-list {
+  list-style: none;
+  margin: 0 0 1rem;
+  padding: 0;
+}
+
+.consignment-intake__doc-list li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  padding: 0.5rem 0.75rem;
+  margin-bottom: 0.5rem;
+  border: 1px solid var(--color-border-strong);
+  border-radius: 8px;
+  background: var(--color-surface-elevated, var(--color-input-bg));
+}
+
+.consignment-intake__doc-list button {
+  background: none;
+  border: none;
+  color: var(--color-text-muted);
+  font-size: 1.25rem;
+  cursor: pointer;
+  line-height: 1;
+}
+
+.consignment-intake__input::placeholder,
+.consignment-intake__textarea::placeholder {
+  color: var(--color-text-muted);
+}
+
+.consignment-intake__field {
+  display: block;
+  margin-bottom: 0.75rem;
+}
+
+.consignment-intake__field > span {
+  display: block;
+  font-weight: 600;
+  font-size: 0.85rem;
+  margin-bottom: 0.35rem;
+  color: var(--color-text-secondary);
+}
+
+.consignment-intake__seller-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.consignment-intake__seller-card {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.15rem;
+  text-align: left;
+  padding: 0.75rem 1rem;
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  background: var(--color-surface-elevated);
+  color: var(--color-text);
+  cursor: pointer;
+  transition: border-color 0.15s ease, background-color 0.15s ease;
+}
+
+.consignment-intake__seller-card:hover {
+  border-color: var(--color-border-strong);
+}
+
+.consignment-intake__seller-card.selected {
+  border-color: var(--color-primary, #39ae47);
+  box-shadow: 0 0 0 1px var(--color-primary, #39ae47);
+  background: rgba(57, 174, 71, 0.08);
+}
+
+.consignment-intake__seller-card strong {
+  color: var(--color-text);
+  font-weight: 600;
+}
+
+.consignment-intake__seller-card span {
+  font-size: 0.85rem;
+  color: var(--color-text-secondary);
+}
+
+.consignment-intake__selected {
+  margin-bottom: 1rem;
+  padding: 0.75rem 1rem;
+  border-radius: 8px;
+  border: 1px solid var(--color-primary, #39ae47);
+  background: rgba(57, 174, 71, 0.08);
+  color: var(--color-text);
+}
+
+.consignment-intake__link-btn {
+  background: none;
+  border: none;
+  color: var(--color-primary, #39ae47);
+  font-weight: 600;
+  cursor: pointer;
+  padding: 0.35rem 0;
+  margin: 0;
+  white-space: nowrap;
+  font-size: 0.875rem;
+}
+
+.consignment-intake__modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1200;
+  background: rgba(0, 0, 0, 0.65);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+}
+
+.consignment-intake__modal {
+  position: relative;
+  width: 100%;
+  max-width: 440px;
+  max-height: min(90vh, 640px);
+  overflow: auto;
+  background: var(--color-bg-alt);
+  border: 1px solid var(--color-card-border);
+  border-radius: 12px;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.35);
+}
+
+.consignment-intake__modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 1rem 1.25rem;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.consignment-intake__modal-title {
+  margin: 0;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+.consignment-intake__modal-close {
+  background: none;
+  border: none;
+  color: var(--color-text-muted);
+  font-size: 1.5rem;
+  line-height: 1;
+  cursor: pointer;
+  padding: 0.15rem 0.35rem;
+}
+
+.consignment-intake__modal-body {
+  padding: 1rem 1.25rem 1.25rem;
+}
+
+.consignment-intake__modal-body .consignment-intake__input {
+  margin-bottom: 0;
+}
+
+.consignment-intake__modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+  margin-top: 1rem;
+}
+
+.consignment-intake__btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.65rem 1.25rem;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  margin: 0;
+}
+
+.consignment-intake__btn--header {
+  padding: 0.5rem 0.85rem;
+  font-size: 0.8125rem;
+  white-space: nowrap;
+}
+
+.consignment-intake__btn.primary {
+  background: var(--color-primary, #39ae47);
+  color: #111;
+}
+
+.consignment-intake__btn.secondary {
+  background: var(--color-surface-elevated);
+  border: 1px solid var(--color-border);
+  color: var(--color-text);
+}
+
+.consignment-intake__btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.consignment-intake__lots-added {
+  margin-bottom: 1.25rem;
+  padding: 1rem;
+  border-radius: 8px;
+  background: var(--color-surface-elevated);
+  border: 1px solid var(--color-border);
+  color: var(--color-text);
+}
+
+.consignment-intake__lots-added h3 {
+  margin: 0 0 0.5rem;
+  color: var(--color-text);
+}
+
+.consignment-intake__lots-added ul {
+  margin: 0.5rem 0 0;
+  padding-left: 1.25rem;
+}
+
+.consignment-intake__lots-added li {
+  margin-bottom: 0.5rem;
+  color: var(--color-text);
+}
+
+.consignment-intake__lots-added li span {
+  display: block;
+  font-size: 0.85rem;
+  color: var(--color-text-secondary);
+}
+
+.consignment-intake__previews {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.consignment-intake__preview {
+  position: relative;
+  width: 72px;
+  height: 72px;
+}
+
+.consignment-intake__preview img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 8px;
+}
+
+.consignment-intake__preview button {
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  border: none;
+  background: #333;
+  color: #fff;
+  cursor: pointer;
+}
+
+.consignment-intake__checkbox {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 1.25rem 0 0.5rem;
+  font-weight: 500;
+  color: var(--color-text);
+}

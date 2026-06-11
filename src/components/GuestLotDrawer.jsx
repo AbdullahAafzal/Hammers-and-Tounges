@@ -64,6 +64,8 @@ const GuestLotDrawer = ({
   isManager = false,
   isClerk = false,
   isFinanceReadOnly = false,
+  isConsignment = false,
+  isManagerFlow = false,
   event,
   onLotUpdated,
 }) => {
@@ -457,6 +459,11 @@ const GuestLotDrawer = ({
 
   const handleEdit = useCallback(() => {
     onClose?.();
+    if (isConsignment) {
+      const base = isManagerFlow ? '/manager/consignment' : '/admin/consignment';
+      navigate(`${base}/${effectiveLot?.id}/edit`, { state: { lot: effectiveLot } });
+      return;
+    }
     const path = isAdmin
       ? '/admin/publishnew'
       : isManager
@@ -473,7 +480,19 @@ const GuestLotDrawer = ({
         fromClerk: isClerk,
       },
     });
-  }, [navigate, eventId, event, eventData, effectiveLot, isAdmin, isManager, isClerk, onClose]);
+  }, [
+    navigate,
+    eventId,
+    event,
+    eventData,
+    effectiveLot,
+    isAdmin,
+    isManager,
+    isClerk,
+    isConsignment,
+    isManagerFlow,
+    onClose,
+  ]);
 
   const handleDelete = useCallback(async () => {
     if (!window.confirm('Are you sure you want to delete this lot?')) return;
@@ -539,9 +558,15 @@ const GuestLotDrawer = ({
   const isStaffView = isAdmin || isManager || isClerk;
   const lotStatus = (effectiveLot?.status ?? effectiveLot?.listing_status ?? '').toUpperCase();
   const isLotActive = lotStatus === 'ACTIVE';
-  const isLotDraft = lotStatus === 'DRAFT';
+  const canSetActiveLot = lotStatus === 'DRAFT';
   const isEventCompleted = ((eventStatus ?? event?.status) || '').toUpperCase() === 'CLOSING' || ((eventStatus ?? event?.status) || '').toUpperCase() === 'CLOSED';
   const canEditDelete = (eventData?.status || '').toUpperCase() === 'SCHEDULED' && !isLotActive;
+  const canConsignmentEdit =
+    isConsignment &&
+    lotStatus === 'RECEIVED' &&
+    !isFinanceReadOnly &&
+    (isAdmin || canUpdateEvents);
+  const hideConsignmentReceivedUi = isConsignment && lotStatus === 'RECEIVED';
 
   return (
     <>
@@ -564,10 +589,10 @@ const GuestLotDrawer = ({
             </h2>
             {(isAdmin || isManager || isClerk) && (
               <div className="guest-lot-drawer__staff-actions">
-                {canEditDelete && (
+                {(canEditDelete || canConsignmentEdit) && (
                   <>
                     {/* Admin is unrestricted; managers/clerk follow manage_events.update */}
-                    {(!isFinanceReadOnly && (isAdmin || canUpdateEvents)) && (
+                    {((canEditDelete || canConsignmentEdit) && !isFinanceReadOnly && (isAdmin || canUpdateEvents)) && (
                       <button
                         type="button"
                         className="guest-lot-drawer__staff-btn guest-lot-drawer__staff-btn--edit"
@@ -578,7 +603,7 @@ const GuestLotDrawer = ({
                       </button>
                     )}
                     {/* Admin is unrestricted; managers/clerk follow manage_events.delete */}
-                    {(!isFinanceReadOnly && (isAdmin || canDeleteEvents)) && (
+                    {canEditDelete && !isFinanceReadOnly && (isAdmin || canDeleteEvents) && (
                       <button
                         type="button"
                         className="guest-lot-drawer__staff-btn guest-lot-drawer__staff-btn--delete"
@@ -592,7 +617,7 @@ const GuestLotDrawer = ({
                   </>
                 )}
                 {/* Activate (draft -> active) should also require update access for managers/clerks */}
-                {isLotDraft && !isEventCompleted && !isFinanceReadOnly && (isAdmin || canUpdateEvents) && (
+                {canSetActiveLot && !isEventCompleted && !isFinanceReadOnly && (isAdmin || canUpdateEvents) && (
                   <button
                     type="button"
                     className="guest-lot-drawer__staff-btn guest-lot-drawer__staff-btn--active"
@@ -740,44 +765,48 @@ const GuestLotDrawer = ({
                       </div>
                     )}
 
-                    <div className="guest-lot-drawer__bid-history">
-                      <h4 className="guest-lot-drawer__section-title">Bid History</h4>
-                      {bidsLoading ? (
-                        <p className="guest-lot-drawer__muted">Loading bid history...</p>
-                      ) : bids?.length > 0 ? (
-                        <div className="guest-lot-drawer__bid-list">
-                          {bids.slice(0, 15).map((bid, i) => (
-                            <div key={bid.id ?? i} className="guest-lot-drawer__bid-item">
-                              <span>#{i + 1}</span>
-                              <span>
-                                {isAdmin
-                                  ? maskBidderNameForAdmin(bid)
-                                  : maskBidderName(
-                                      bid.bidder_name ?? bid.user_name ?? bid.bidder ?? 'Bidder',
-                                    )}
-                              </span>
-                              <span className="guest-lot-drawer__bid-amt">
-                                {currency} {formatPrice(bid.amount)}
-                              </span>
-                              <span>{formatBidDateTime(bid.created_at)}</span>
-                            </div>
-                          ))}
-                        </div>
-                      ) : (
-                        <p className="guest-lot-drawer__muted">No bids yet.</p>
-                      )}
-                    </div>
+                    {!hideConsignmentReceivedUi ? (
+                      <div className="guest-lot-drawer__bid-history">
+                        <h4 className="guest-lot-drawer__section-title">Bid History</h4>
+                        {bidsLoading ? (
+                          <p className="guest-lot-drawer__muted">Loading bid history...</p>
+                        ) : bids?.length > 0 ? (
+                          <div className="guest-lot-drawer__bid-list">
+                            {bids.slice(0, 15).map((bid, i) => (
+                              <div key={bid.id ?? i} className="guest-lot-drawer__bid-item">
+                                <span>#{i + 1}</span>
+                                <span>
+                                  {isAdmin
+                                    ? maskBidderNameForAdmin(bid)
+                                    : maskBidderName(
+                                        bid.bidder_name ?? bid.user_name ?? bid.bidder ?? 'Bidder',
+                                      )}
+                                </span>
+                                <span className="guest-lot-drawer__bid-amt">
+                                  {currency} {formatPrice(bid.amount)}
+                                </span>
+                                <span>{formatBidDateTime(bid.created_at)}</span>
+                              </div>
+                            ))}
+                          </div>
+                        ) : (
+                          <p className="guest-lot-drawer__muted">No bids yet.</p>
+                        )}
+                      </div>
+                    ) : null}
                   </div>
                 </div>
 
                 <aside className="guest-lot-drawer__sidebar">
                   <div className="guest-lot-drawer__bid-card">
-                    <div className="guest-lot-drawer__time">
-                      <span className="guest-lot-drawer__time-label">{timeColumnLabel}</span>
-                      <span className={`guest-lot-drawer__time-value ${isEnded ? 'ended' : ''}`}>
-                        {formatTimeLeft()}
-                      </span>
-                    </div>
+                    {!hideConsignmentReceivedUi ? (
+                      <div className="guest-lot-drawer__time">
+                        <span className="guest-lot-drawer__time-label">{timeColumnLabel}</span>
+                        <span className={`guest-lot-drawer__time-value ${isEnded ? 'ended' : ''}`}>
+                          {formatTimeLeft()}
+                        </span>
+                      </div>
+                    ) : null}
                     <div className="guest-lot-drawer__bid">
                       <div className="guest-lot-drawer__bid-icon">!</div>
                       <div>

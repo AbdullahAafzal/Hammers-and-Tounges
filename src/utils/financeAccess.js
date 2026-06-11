@@ -12,6 +12,24 @@ export const FINANCE_READ_ONLY_FEATURES = {
   deposit_exempt: { read: true, create: false, update: false, delete: false },
 };
 
+/** Consignment dashboard tab — admin and manager only (not finance or clerk). */
+export function canViewConsignmentTab(user, { isManagerFlow = false } = {}) {
+  if (!user) return false;
+  const role = String(user.role || "").toLowerCase();
+  if (role === "finance" || role === "clerk") return false;
+  if (isManagerFlow && role === "manager") return true;
+  if (!isManagerFlow && (role === "admin" || isStaffFlag(user))) return true;
+  return false;
+}
+
+function isStaffFlag(user) {
+  return (
+    user.is_staff === true ||
+    user.is_staff === 1 ||
+    String(user.is_staff || "").toLowerCase() === "true"
+  );
+}
+
 /** Senior admin or staff — not finance officers. Caller should also limit to `/admin/` routes on web. */
 export function canAuthoriseRefunds(user) {
   if (!user) return false;

@@ -1,4 +1,7 @@
 import apiClient from '../api.service';
+import { API_CONFIG } from '../../config/api.config';
+import { cookieStorage } from '../../utils/cookieStorage';
+import { resolveIntakeSessionId } from '../../utils/sellerUtils';
 import { API_ROUTES } from '../../config/api.config';
 
 const EVENTS_CACHE_TTL_MS = 30 * 1000;
@@ -231,6 +234,97 @@ export const auctionService = {
     }
   },
   // Create lot (multipart/form-data)
+  createIntakeSession: async (sellerId) => {
+    try {
+      const seller = Number(sellerId);
+      const base = API_CONFIG.BASE_URL.endsWith('/')
+        ? API_CONFIG.BASE_URL
+        : `${API_CONFIG.BASE_URL}/`;
+      const intakeUrl = `${base}${String(API_ROUTES.INTAKE_SESSIONS).replace(/^\//, '')}`;
+      const token = cookieStorage.getItem(cookieStorage.AUTH_KEYS.TOKEN);
+      const authHeaders = {
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      };
+
+      const attempts = [
+        () => apiClient.post(API_ROUTES.INTAKE_SESSIONS, { seller }),
+        () => apiClient.get(API_ROUTES.INTAKE_SESSIONS, { params: { seller } }),
+        async () => {
+          const res = await fetch(intakeUrl, {
+            method: 'GET',
+            headers: authHeaders,
+            body: JSON.stringify({ seller }),
+          });
+          const raw = await res.text();
+          let parsed = null;
+          try {
+            parsed = raw ? JSON.parse(raw) : null;
+          } catch {
+            parsed = null;
+          }
+          if (!res.ok) {
+            const err = new Error(
+              typeof parsed?.detail === 'string'
+                ? parsed.detail
+                : parsed?.message || raw || `Request failed with status ${res.status}`
+            );
+            err.response = { status: res.status, data: parsed };
+            throw err;
+          }
+          return { data: parsed };
+        },
+      ];
+
+      let lastError;
+      for (const run of attempts) {
+        try {
+          const result = await run();
+          const data = result?.data ?? result;
+          const id = resolveIntakeSessionId(data, seller);
+          if (id != null) return { ...data, id };
+        } catch (e) {
+          lastError = e;
+        }
+      }
+      throw lastError || new Error('Could not start intake session');
+    } catch (error) {
+      if (error.isNetworkError) {
+        throw new Error('Unable to connect to server. Please try again later.');
+      }
+      throw error;
+    }
+  },
+
+  addIntakeLot: async (sessionId, formData) => {
+    try {
+      const { data } = await apiClient.post(API_ROUTES.INTAKE_SESSION_LOTS(sessionId), formData, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+      });
+      return data;
+    } catch (error) {
+      if (error.isNetworkError) {
+        throw new Error('Unable to connect to server. Please try again later.');
+      }
+      throw error;
+    }
+  },
+
+  completeIntakeSession: async (sessionId, sellerApproval = true) => {
+    try {
+      const { data } = await apiClient.post(API_ROUTES.INTAKE_SESSION_COMPLETE(sessionId), {
+        seller_approval: Boolean(sellerApproval),
+      });
+      return data;
+    } catch (error) {
+      if (error.isNetworkError) {
+        throw new Error('Unable to connect to server. Please try again later.');
+      }
+      throw error;
+    }
+  },
+
   createLot: async (formData) => {
     try {
       const { data } = await apiClient.post(API_ROUTES.AUCTIONS_LOTS, formData, {
@@ -267,6 +361,36 @@ export const auctionService = {
         `${API_ROUTES.AUCTIONS_LOTS}${lotId}/update/`,
         payload,
         { headers: { 'Content-Type': 'application/json' } }
+      );
+      return data;
+    } catch (error) {
+      if (error.isNetworkError) {
+        throw new Error('Unable to connect to server. Please try again later.');
+      }
+      throw error;
+    }
+  },
+  patchLot: async (lotId, payload) => {
+    try {
+      const { data } = await apiClient.patch(
+        `${API_ROUTES.AUCTIONS_LOTS}${lotId}/update/`,
+        payload,
+        { headers: { 'Content-Type': 'application/json' } }
+      );
+      return data;
+    } catch (error) {
+      if (error.isNetworkError) {
+        throw new Error('Unable to connect to server. Please try again later.');
+      }
+      throw error;
+    }
+  },
+  patchLotFormData: async (lotId, formData) => {
+    try {
+      const { data } = await apiClient.patch(
+        `${API_ROUTES.AUCTIONS_LOTS}${lotId}/update/`,
+        formData,
+        { headers: { 'Content-Type': 'multipart/form-data' } }
       );
       return data;
     } catch (error) {

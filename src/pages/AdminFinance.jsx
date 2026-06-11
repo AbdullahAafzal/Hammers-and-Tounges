@@ -22,6 +22,11 @@ import {
   refundStatusBadgeClass,
   sortedAuditLogs,
 } from '../utils/financeRefundDisplay'
+import {
+  isCashInHandDeposit,
+  manualDepositTypeBadgeClass,
+  manualDepositTypeLabel,
+} from '../utils/manualDepositAdminDisplay'
 import './AdminFinance.css'
 
 const STATUS_OPTIONS = [
@@ -121,8 +126,8 @@ const AdminFinance = () => {
         err?.response?.data?.message ||
         err?.response?.data?.error ||
         err?.message ||
-        'Failed to load bank transfer requests'
-      const msg = typeof raw === 'string' ? raw : Array.isArray(raw) ? raw.map((e) => e?.message || e).join(' ') : 'Failed to load bank transfer requests'
+        'Failed to load manual deposit requests'
+      const msg = typeof raw === 'string' ? raw : Array.isArray(raw) ? raw.map((e) => e?.message || e).join(' ') : 'Failed to load manual deposit requests'
       toast.error(msg)
       setItems([])
     } finally {
@@ -602,7 +607,7 @@ const AdminFinance = () => {
             <div className="finance-header-content">
               <h1 className="finance-title">Finance</h1>
               <p className="finance-subtitle">
-                Review buyer bank transfer requests. Approve or reject pending proofs of payment.
+                Review buyer manual deposit requests. Approve or reject pending bank transfers and cash deposits.
               </p>
             </div>
             <div className="finance-header-actions">
@@ -646,7 +651,7 @@ const AdminFinance = () => {
                       className={`finance-md-btn ${activeTab === TAB_MANUAL_DEPOSITS ? 'finance-md-btn--approve' : 'finance-md-btn--ghost'}`}
                       onClick={() => setActiveTab(TAB_MANUAL_DEPOSITS)}
                     >
-                      Bank Transfer
+                      Manual Deposits
                     </button>
                     {isFinanceOfficer ? (
                       <button
@@ -926,7 +931,7 @@ const AdminFinance = () => {
             ) : (
               <>
             <div className="finance-section-header">
-              <h2 className="finance-section-title">{activeTab === TAB_REFUND_VERIFICATION ? 'Refund verification' : 'Bank transfer'}</h2>
+              <h2 className="finance-section-title">{activeTab === TAB_REFUND_VERIFICATION ? 'Refund verification' : 'Manual deposits'}</h2>
               <span className="finance-results-info">
                 {loading
                   ? 'Loading…'
@@ -956,7 +961,7 @@ const AdminFinance = () => {
                     strokeLinejoin="round"
                   />
                 </svg>
-                <h3>No bank transfer requests</h3>
+                <h3>No manual deposit requests</h3>
                 <p>Nothing matches this filter.</p>
               </div>
             ) : null}
@@ -972,13 +977,14 @@ const AdminFinance = () => {
               <div
                 className="finance-table-container finance-md-table-scroll"
                 role="region"
-                aria-label="Bank transfer table"
+                aria-label="Manual deposits table"
                 tabIndex={0}
               >
                 <div className="finance-table-wrapper">
                   <table className="finance-table finance-md-table">
                     <thead>
                       <tr>
+                        <th>Type</th>
                         <th>Proof</th>
                         <th>User</th>
                         <th>Email</th>
@@ -993,13 +999,14 @@ const AdminFinance = () => {
                     <tbody>
                       {loading ? (
                         <tr>
-                          <td colSpan={9} className="finance-md-loading-cell">
+                          <td colSpan={10} className="finance-md-loading-cell">
                             Loading…
                           </td>
                         </tr>
                       ) : (
                         items.map((row) => {
                           const proofUrl = getMediaUrl(row.proof_of_payment)
+                          const isCash = isCashInHandDeposit(row)
                           const isPending = String(row.status || '').toUpperCase() === 'PENDING'
                           const busy = actionId === row.id
                           return (
@@ -1012,6 +1019,11 @@ const AdminFinance = () => {
                                 })
                               }
                             >
+                              <td>
+                                <span className={manualDepositTypeBadgeClass(row)}>
+                                  {manualDepositTypeLabel(row)}
+                                </span>
+                              </td>
                               <td>
                                 {proofUrl ? (
                                   <button
@@ -1026,7 +1038,9 @@ const AdminFinance = () => {
                                     <img src={proofUrl} alt="" className="finance-md-proof-thumb" />
                                   </button>
                                 ) : (
-                                  <span className="finance-md-no-proof">—</span>
+                                  <span className="finance-md-no-proof" title={isCash ? 'No proof required for cash deposits' : undefined}>
+                                    {isCash ? 'N/A' : '—'}
+                                  </span>
                                 )}
                               </td>
                               <td>{row.user_name || '—'}</td>

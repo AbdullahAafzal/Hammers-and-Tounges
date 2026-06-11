@@ -116,6 +116,16 @@ const AdminEventLots = () => {
 
   const lotCreated = location.state?.lotCreated;
   const createdLot = location.state?.createdLot;
+  const receivedLotAdded = location.state?.receivedLotAdded;
+
+  useEffect(() => {
+    if (receivedLotAdded && id) {
+      setPage(1);
+      fetchLots(1);
+      navigate(location.pathname, { state: { event: eventFromState }, replace: true });
+    }
+  }, [receivedLotAdded, id, fetchLots, navigate, location.pathname, eventFromState]);
+
   useEffect(() => {
     if (lotCreated && id) {
       // Keep UI in sync immediately after create, even if list API is eventually consistent.
@@ -166,6 +176,11 @@ const AdminEventLots = () => {
   const handleCreateLot = useCallback(() => {
     const eventData = eventFromState || { id, title: eventTitle, status: eventStatus };
     navigate('/admin/publishnew', { state: { eventId: id, event: eventData, fromAdmin: true } });
+  }, [navigate, id, eventFromState, eventTitle, eventStatus]);
+
+  const handleSelectReceivedLots = useCallback(() => {
+    const eventData = eventFromState || { id, title: eventTitle, status: eventStatus };
+    navigate(`/admin/event/${id}/select-received`, { state: { event: eventData } });
   }, [navigate, id, eventFromState, eventTitle, eventStatus]);
 
   const [deletingEvent, setDeletingEvent] = useState(false);
@@ -371,13 +386,24 @@ const AdminEventLots = () => {
           )}
           */}
           {showCreateLot && (
-            <button
-              className="admin-event-lots__create-lot"
-              onClick={handleCreateLot}
-              aria-label="Create lot"
-            >
-              Create Lot
-            </button>
+            <>
+              <button
+                type="button"
+                className="admin-event-lots__select-received"
+                onClick={handleSelectReceivedLots}
+                aria-label="Select received lots"
+              >
+                Select Received lots
+              </button>
+              <button
+                type="button"
+                className="admin-event-lots__create-lot"
+                onClick={handleCreateLot}
+                aria-label="Create lot"
+              >
+                Create Lot
+              </button>
+            </>
           )}
           {showDeleteEvent && (
             <button

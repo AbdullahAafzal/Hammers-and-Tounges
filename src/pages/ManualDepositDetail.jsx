@@ -5,6 +5,11 @@ import { toast } from 'react-toastify'
 import { getMediaUrl } from '../config/api.config'
 import { adminService } from '../services/interceptors/admin.service'
 import { isFinanceAdminFlow } from '../utils/financeAccess'
+import {
+  isCashInHandDeposit,
+  manualDepositTypeBadgeClass,
+  manualDepositTypeLabel,
+} from '../utils/manualDepositAdminDisplay'
 import './AdminFinance.css'
 
 function normalizeManualDepositsList(data) {
@@ -184,6 +189,7 @@ const ManualDepositDetail = () => {
 
   const proofUrl = deposit ? getMediaUrl(deposit.proof_of_payment) : ''
   const isPending = deposit && String(deposit.status || '').toUpperCase() === 'PENDING'
+  const isCash = deposit ? isCashInHandDeposit(deposit) : false
 
   return (
     <div className="finance-dashboard">
@@ -212,11 +218,19 @@ const ManualDepositDetail = () => {
           ) : (
             <article className="finance-md-detail-card">
               <header className="finance-md-detail-card-header">
-                <h1 className="finance-title finance-md-detail-screen-title">Bank transfer</h1>
+                <h1 className="finance-title finance-md-detail-screen-title">
+                  {isCash ? 'Cash deposit' : 'Bank transfer'}
+                </h1>
                 <p className="finance-md-detail-id">Request #{deposit.id}</p>
               </header>
 
               <dl className="finance-md-detail-dl">
+                <div className="finance-md-detail-row">
+                  <dt>Type</dt>
+                  <dd>
+                    <span className={manualDepositTypeBadgeClass(deposit)}>{manualDepositTypeLabel(deposit)}</span>
+                  </dd>
+                </div>
                 <div className="finance-md-detail-row">
                   <dt>User</dt>
                   <dd>{deposit.user_name || '—'}</dd>
@@ -279,6 +293,8 @@ const ManualDepositDetail = () => {
                   </button>
                   <p className="finance-md-detail-proof-hint">Tap image to open full size</p>
                 </div>
+              ) : isCash ? (
+                <p className="finance-md-detail-no-proof">No proof required for cash deposits.</p>
               ) : (
                 <p className="finance-md-detail-no-proof">No proof image uploaded.</p>
               )}

@@ -237,6 +237,15 @@ const ManagerEventLots = () => {
     }
   };
 
+  const handleSelectReceivedLots = () => {
+    if (!canCreateEvents) {
+      toast.error('You do not have permission to add lots to events.');
+      return;
+    }
+    const eventData = eventFromState || { id, title: eventTitle, status: eventStatus };
+    navigate(`/manager/event/${id}/select-received`, { state: { event: eventData } });
+  };
+
   const [deletingEvent, setDeletingEvent] = useState(false);
   const [canDeleteEvent, setCanDeleteEvent] = useState(false);
 
@@ -296,6 +305,16 @@ const ManagerEventLots = () => {
   const showCreateLot = eventStatus === 'SCHEDULED' && authUserRole !== 'clerk' && canCreateEvents;
   const showDeleteEvent =
     eventStatus === 'SCHEDULED' && authUserRole !== 'clerk' && canDeleteEvents && canDeleteEvent;
+
+  const receivedLotAdded = location.state?.receivedLotAdded;
+
+  useEffect(() => {
+    if (receivedLotAdded && id) {
+      setPage(1);
+      fetchLots(1);
+      navigate(location.pathname, { state: { event: eventFromState }, replace: true });
+    }
+  }, [receivedLotAdded, id, fetchLots, navigate, location.pathname, eventFromState]);
 
   const handleLotUpdated = useCallback(() => {
     fetchLots(page);
@@ -378,13 +397,24 @@ const ManagerEventLots = () => {
         </div>
         <div className="manager-event-lots__header-actions">
           {showCreateLot && (
-            <button
-              className="manager-event-lots__create-lot"
-              onClick={handleCreateLot}
-              aria-label="Create lot"
-            >
-              Create Lot
-            </button>
+            <>
+              <button
+                type="button"
+                className="manager-event-lots__select-received"
+                onClick={handleSelectReceivedLots}
+                aria-label="Select received lots"
+              >
+                Select Received lots
+              </button>
+              <button
+                type="button"
+                className="manager-event-lots__create-lot"
+                onClick={handleCreateLot}
+                aria-label="Create lot"
+              >
+                Create Lot
+              </button>
+            </>
           )}
           {showDeleteEvent && (
             <button

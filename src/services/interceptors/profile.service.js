@@ -149,10 +149,9 @@ export const profileService = {
     return normalizeWalletPayload(data) ?? data;
   },
 
-  deposit: async ({ amount, cell_number }) => {
+  deposit: async ({ amount }) => {
     const payload = {
       amount: String(amount),
-      cell_number: String(cell_number),
     };
     const { data } = await apiClient.post(API_ROUTES.DEPOSIT, payload);
     return data;
@@ -166,19 +165,20 @@ export const profileService = {
 
   /**
    * POST /payments/manual-deposit/ — multipart.
-   * New request: amount + proof_of_payment only.
-   * Resubmit: also send deposit_id (prior manual deposit id) and optionally reference_number.
+   * Bank transfer: amount + proof_of_payment + cashinhand=false.
+   * Cash deposit: amount + cashinhand=true (no proof).
+   * Resubmit: also send deposit_id.
    */
-  submitManualDeposit: async ({ amount, proofFile, reference_number, deposit_id }) => {
+  submitManualDeposit: async ({ amount, proofFile, deposit_id, cashinhand = false }) => {
     const formData = new FormData();
     formData.append("amount", String(amount));
-    formData.append("proof_of_payment", proofFile);
+    formData.append("cashinhand", cashinhand ? "true" : "false");
+    if (!cashinhand && proofFile) {
+      formData.append("proof_of_payment", proofFile);
+    }
     const isResubmit = deposit_id != null && String(deposit_id).trim() !== "";
     if (isResubmit) {
       formData.append("deposit_id", String(deposit_id).trim());
-      if (reference_number != null && String(reference_number).trim() !== "") {
-        formData.append("reference_number", String(reference_number).trim());
-      }
     }
     const { data } = await apiClient.post(API_ROUTES.MANUAL_DEPOSIT, formData);
     return data;

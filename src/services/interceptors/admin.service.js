@@ -259,6 +259,44 @@ export const adminService = {
     }
   },
 
+  /** POST /users/admin/{userId}/deposit-exempt/ — set buyer bidding limit exemption */
+  setUserDepositExempt: async (userId, amount) => {
+    try {
+      const { data } = await apiClient.post(
+        `${API_ROUTES.ADMIN_DEPOSIT_EXEMPT}${userId}/deposit-exempt/`,
+        { amount: String(amount) }
+      );
+      return data;
+    } catch (error) {
+      if (error.isNetworkError) {
+        throw new Error('Unable to connect to server. Please try again later.');
+      }
+      throw error;
+    }
+  },
+
+  /** GET /users/admin/{userId}/deposit-exempt/ — read current exemption amount */
+  getUserDepositExempt: async (userId) => {
+    const url = `${API_ROUTES.ADMIN_DEPOSIT_EXEMPT}${userId}/deposit-exempt/`;
+    try {
+      const { data } = await apiClient.get(url);
+      console.log("[getUserDepositExempt] response", { userId, url, data });
+      return data;
+    } catch (error) {
+      console.log("[getUserDepositExempt] error", {
+        userId,
+        url,
+        status: error?.response?.status,
+        data: error?.response?.data,
+        message: error?.message,
+      });
+      if (error.isNetworkError) {
+        throw new Error('Unable to connect to server. Please try again later.');
+      }
+      throw error;
+    }
+  },
+
   // Create Manager/Staff (FormData for consistency with updateUser - backend may expect multipart)
   createStaff: async (staffData) => {
     try {
@@ -346,6 +384,37 @@ export const adminService = {
   },
 
   // Create Seller (POST form-data to user-management)
+  searchSellers: async (q) => {
+    try {
+      const { data } = await apiClient.get(API_ROUTES.ADMIN_SELLERS_SEARCH, {
+        params: { q: String(q || '').trim() },
+      });
+      return data;
+    } catch (error) {
+      if (error.isNetworkError) {
+        throw new Error('Unable to connect to server. Please try again later.');
+      }
+      throw error;
+    }
+  },
+
+  quickCreateSeller: async (payload) => {
+    try {
+      const { data } = await apiClient.post(API_ROUTES.ADMIN_SELLERS_QUICK_CREATE, {
+        first_name: payload.first_name?.trim() || '',
+        last_name: payload.last_name?.trim() || '',
+        email: payload.email?.trim() || '',
+        phone: payload.phone?.trim() || '',
+      });
+      return data;
+    } catch (error) {
+      if (error.isNetworkError) {
+        throw new Error('Unable to connect to server. Please try again later.');
+      }
+      throw error;
+    }
+  },
+
   createSeller: async (sellerData) => {
     try {
       const formData = new FormData();
