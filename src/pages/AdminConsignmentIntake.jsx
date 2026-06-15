@@ -20,7 +20,6 @@ import './AdminConsignmentIntake.css';
 
 const STEPS = { SELLER: 1, LOTS: 2 };
 const MAX_IMAGES = 8;
-const MAX_FILES = 4;
 
 const formatFieldLabel = (fieldName) =>
   fieldName
@@ -69,7 +68,6 @@ const AdminConsignmentIntake = ({ isManagerFlow = false }) => {
   const [stcEligible, setStcEligible] = useState(false);
   const [specificData, setSpecificData] = useState({});
   const [images, setImages] = useState([]);
-  const [documents, setDocuments] = useState([]);
   const [sellerApproval, setSellerApproval] = useState(false);
 
   const sessionId = session?.id ?? resolveIntakeSessionId(session);
@@ -199,7 +197,6 @@ const AdminConsignmentIntake = ({ isManagerFlow = false }) => {
       if (img.preview) URL.revokeObjectURL(img.preview);
     });
     setImages([]);
-    setDocuments([]);
   };
 
   const renderSpecificField = (fieldName, fieldConfig) => {
@@ -317,18 +314,6 @@ const AdminConsignmentIntake = ({ isManagerFlow = false }) => {
     e.target.value = '';
   };
 
-  const onDocumentChange = (e) => {
-    const files = Array.from(e.target.files || []);
-    if (!files.length) return;
-    const next = files.slice(0, MAX_FILES - documents.length).map((file, idx) => ({
-      id: `${Date.now()}-doc-${idx}`,
-      file,
-      label: file.name || `Document ${documents.length + idx + 1}`,
-    }));
-    setDocuments((prev) => [...prev, ...next].slice(0, MAX_FILES));
-    e.target.value = '';
-  };
-
   const buildLotFormData = () => {
     const fd = new FormData();
     fd.append('seller', String(selectedSellerId));
@@ -346,12 +331,6 @@ const AdminConsignmentIntake = ({ isManagerFlow = false }) => {
       if (img.file instanceof File) {
         fd.append(`image_${idx + 1}`, img.file);
         fd.append('media_labels', img.label || `Image ${idx + 1}`);
-      }
-    });
-    documents.forEach((doc, idx) => {
-      if (doc.file instanceof File) {
-        fd.append(`file_${idx + 1}`, doc.file);
-        fd.append('media_labels', doc.label || `Document ${idx + 1}`);
       }
     });
     return fd;
@@ -579,27 +558,6 @@ const AdminConsignmentIntake = ({ isManagerFlow = false }) => {
                   </div>
                 ))}
               </div>
-            ) : null}
-
-            <label className="consignment-intake__field">
-              <span>Documents ({documents.length}/{MAX_FILES})</span>
-              <input type="file" multiple onChange={onDocumentChange} />
-            </label>
-            {documents.length > 0 ? (
-              <ul className="consignment-intake__doc-list">
-                {documents.map((doc) => (
-                  <li key={doc.id}>
-                    <span>{doc.label}</span>
-                    <button
-                      type="button"
-                      aria-label="Remove document"
-                      onClick={() => setDocuments((prev) => prev.filter((x) => x.id !== doc.id))}
-                    >
-                      ×
-                    </button>
-                  </li>
-                ))}
-              </ul>
             ) : null}
 
             <label className="consignment-intake__checkbox">
