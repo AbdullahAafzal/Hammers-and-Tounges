@@ -22,7 +22,12 @@ export const cookieStorage = {
   getItem: (key) => {
     try {
       const value = Cookies.get(key);
-      return value ? JSON.parse(value) : null;
+      if (!value) return null;
+      try {
+        return JSON.parse(value);
+      } catch {
+        return value;
+      }
     } catch (error) {
       console.error(`Error getting cookie ${key}:`, error);
       return null;

@@ -80,6 +80,161 @@
   margin-top: 1.25rem;
 }
 
+.grv-status-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.65rem;
+  margin-bottom: 1.25rem;
+}
+
+.grv-status-card {
+  padding: 0.75rem;
+  border-radius: 8px;
+  border: 1px solid var(--color-border-strong);
+  background: var(--color-surface);
+  text-align: center;
+}
+
+.grv-status-card.done {
+  border-color: rgba(57, 174, 71, 0.45);
+  background: rgba(57, 174, 71, 0.08);
+}
+
+.grv-status-card.pending {
+  border-color: rgba(245, 158, 11, 0.4);
+  background: rgba(245, 158, 11, 0.06);
+}
+
+.grv-status-card__label {
+  display: block;
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--color-text-muted);
+  margin-bottom: 0.25rem;
+}
+
+.grv-status-card strong {
+  font-size: 0.85rem;
+  color: var(--color-text);
+}
+
+.grv-panel__warning {
+  padding: 0.65rem 0.85rem;
+  border-radius: 8px;
+  background: rgba(245, 158, 11, 0.1);
+  border: 1px solid rgba(245, 158, 11, 0.35);
+  color: var(--color-text-secondary);
+  font-size: 0.85rem;
+  margin-bottom: 1rem;
+}
+
+.grv-checklist-form h5,
+.grv-grv-section h5,
+.grv-approval-section h5 {
+  margin: 0 0 0.75rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.grv-checklist-section {
+  margin-bottom: 1rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid var(--color-border-strong);
+}
+
+.grv-checklist-section h6 {
+  margin: 0 0 0.5rem;
+  font-size: 0.8rem;
+  text-transform: capitalize;
+  color: var(--color-text-muted);
+}
+
+.grv-checklist-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-bottom: 0.5rem;
+  font-size: 0.85rem;
+}
+
+.grv-checklist-item select {
+  min-width: 100px;
+  padding: 0.35rem 0.5rem;
+  border-radius: 6px;
+  border: 1px solid var(--color-border-strong);
+  background: var(--color-input-bg);
+  color: var(--color-text);
+}
+
+.grv-grv-section {
+  margin-top: 1.25rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--color-border-strong);
+}
+
+.grv-approval-section {
+  margin-top: 1.5rem;
+  padding-top: 1.25rem;
+  border-top: 2px solid rgba(57, 174, 71, 0.25);
+}
+
+.grv-panel__hint {
+  font-size: 0.8rem;
+  color: var(--color-text-muted);
+  margin: 0 0 0.75rem;
+}
+
+.grv-blockers {
+  margin: 0 0 1rem;
+  padding-left: 1.25rem;
+  font-size: 0.8rem;
+  color: #f59e0b;
+}
+
+.grv-approval-fields {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.grv-approval-fields label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--color-text-muted);
+}
+
+.grv-approval-fields__full {
+  grid-column: 1 / -1;
+}
+
+.grv-approval-fields input,
+.grv-approval-fields textarea {
+  padding: 0.5rem 0.65rem;
+  border-radius: 6px;
+  border: 1px solid var(--color-border-strong);
+  background: var(--color-input-bg);
+  color: var(--color-text);
+  font-weight: 400;
+}
+
+.grv-file-count {
+  font-size: 0.75rem;
+  color: var(--color-text-muted);
+  margin-top: 0.25rem;
+}
+
+.grv-panel__btn--secondary {
+  background: transparent;
+  border: 1px solid var(--color-border-strong);
+  color: var(--color-text);
+}
+
 .grv-panel__btn {
   padding: 0.55rem 1.1rem;
   border-radius: 8px;

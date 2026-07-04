@@ -3,6 +3,42 @@ import { cookieStorage } from '../../utils/cookieStorage';
 import { registerUser, loginUser, verifyOtp, resendOtp, refreshAccessToken, requestPasswordReset, verifyPasswordOtp, confirmPasswordReset } from '../actions/authActions';
 import { toast } from 'react-toastify';
 
+const pickAccessToken = (payload) =>
+  payload?.access || payload?.access_token || payload?.token || null;
+
+const pickRefreshToken = (payload) =>
+  payload?.refresh || payload?.refresh_token || null;
+
+const persistSession = (payload) => {
+  const access = pickAccessToken(payload);
+  const refresh = pickRefreshToken(payload);
+  if (payload?.user) {
+    cookieStorage.setItem(cookieStorage.AUTH_KEYS.USER, payload.user);
+  }
+  if (access) {
+    cookieStorage.setItem(cookieStorage.AUTH_KEYS.TOKEN, access);
+    cookieStorage.setItem(cookieStorage.AUTH_KEYS.TOKEN_TIMESTAMP, Date.now());
+  }
+  if (refresh) {
+    cookieStorage.setItem(cookieStorage.AUTH_KEYS.REFRESH_TOKEN, refresh);
+  }
+  if (payload?.user) {
+    const u = payload.user;
+    const role = (u?.role || '').toLowerCase();
+    const isStaff = u?.is_staff === true || u?.is_staff === 1 || String(u?.is_staff).toLowerCase() === 'true';
+    const effectiveRole =
+      role === 'finance'
+        ? 'finance'
+        : role === 'buyer' || role === 'seller'
+          ? role
+          : isStaff
+            ? 'admin'
+            : role || 'buyer';
+    cookieStorage.setItem(cookieStorage.AUTH_KEYS.ROLE, effectiveRole);
+  }
+  return { access, refresh };
+};
+
 const initialState = {
   user: cookieStorage.getItem(cookieStorage.AUTH_KEYS.USER) || null,
   token: cookieStorage.getItem(cookieStorage.AUTH_KEYS.TOKEN) || null,
@@ -93,26 +129,10 @@ const authSlice = createSlice({
       .addCase(loginUser.fulfilled, (state, action) => {
         state.isLoading = false;
         state.user = action.payload.user;
-        state.token = action.payload.access;
-        state.refreshToken = action.payload.refresh;
-        state.isAuthenticated = true;
-
-        // Save to cookies
-        cookieStorage.setItem(cookieStorage.AUTH_KEYS.USER, action.payload.user);
-        cookieStorage.setItem(cookieStorage.AUTH_KEYS.TOKEN, action.payload.access);
-        cookieStorage.setItem(cookieStorage.AUTH_KEYS.REFRESH_TOKEN, action.payload.refresh);
-        cookieStorage.setItem(cookieStorage.AUTH_KEYS.TOKEN_TIMESTAMP, Date.now());
-        // Store role: buyer/seller use their role; only manager+is_staff → admin
-        const u = action.payload.user;
-        const role = (u?.role || '').toLowerCase();
-        const isStaff = u?.is_staff === true || u?.is_staff === 1 || String(u?.is_staff).toLowerCase() === 'true';
-        const effectiveRole =
-          role === 'finance'
-            ? 'finance'
-            : (role === 'buyer' || role === 'seller')
-              ? role
-              : (isStaff ? 'admin' : (role || 'buyer'));
-        cookieStorage.setItem(cookieStorage.AUTH_KEYS.ROLE, effectiveRole);
+        const { access, refresh } = persistSession(action.payload);
+        state.token = access;
+        state.refreshToken = refresh;
+        state.isAuthenticated = !!access;
       })
       .addCase(loginUser.rejected, (state, action) => {
         state.isLoading = false;
@@ -127,27 +147,14 @@ const authSlice = createSlice({
       })
       .addCase(verifyOtp.fulfilled, (state, action) => {
         state.isVerifyingOtp = false;
-        if (action.payload.access && action.payload.refresh) {
+        const access = pickAccessToken(action.payload);
+        const refresh = pickRefreshToken(action.payload);
+        if (access && refresh) {
           state.user = action.payload.user;
-          state.token = action.payload.access;
-          state.refreshToken = action.payload.refresh;
+          persistSession(action.payload);
+          state.token = access;
+          state.refreshToken = refresh;
           state.isAuthenticated = true;
-
-          cookieStorage.setItem(cookieStorage.AUTH_KEYS.USER, action.payload.user);
-          cookieStorage.setItem(cookieStorage.AUTH_KEYS.TOKEN, action.payload.access);
-          cookieStorage.setItem(cookieStorage.AUTH_KEYS.REFRESH_TOKEN, action.payload.refresh);
-          cookieStorage.setItem(cookieStorage.AUTH_KEYS.TOKEN_TIMESTAMP, Date.now());
-          // Store role: buyer/seller use their role; only manager+is_staff → admin
-          const u = action.payload.user;
-          const role = (u?.role || '').toLowerCase();
-          const isStaff = u?.is_staff === true || u?.is_staff === 1 || String(u?.is_staff).toLowerCase() === 'true';
-          const effectiveRole =
-            role === 'finance'
-              ? 'finance'
-              : (role === 'buyer' || role === 'seller')
-                ? role
-                : (isStaff ? 'admin' : (role || 'buyer'));
-          cookieStorage.setItem(cookieStorage.AUTH_KEYS.ROLE, effectiveRole);
         }
       })
       .addCase(verifyOtp.rejected, (state, action) => {
@@ -170,9 +177,12 @@ const authSlice = createSlice({
     // Refresh Token
     builder
       .addCase(refreshAccessToken.fulfilled, (state, action) => {
-        state.token = action.payload.access;
-        cookieStorage.setItem(cookieStorage.AUTH_KEYS.TOKEN, action.payload.access);
-        cookieStorage.setItem(cookieStorage.AUTH_KEYS.TOKEN_TIMESTAMP, Date.now());
+        const access = pickAccessToken(action.payload);
+        state.token = access;
+        if (access) {
+          cookieStorage.setItem(cookieStorage.AUTH_KEYS.TOKEN, access);
+          cookieStorage.setItem(cookieStorage.AUTH_KEYS.TOKEN_TIMESTAMP, Date.now());
+        }
       })
       .addCase(refreshAccessToken.rejected, (state) => {
         state.user = null;

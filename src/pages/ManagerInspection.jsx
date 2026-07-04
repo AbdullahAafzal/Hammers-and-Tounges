@@ -1,8 +1,13 @@
 import React, { useState, useEffect, useMemo } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { toast } from 'react-toastify';
-import { managerService } from '../services/interceptors/manager.service';
-import { API_CONFIG, getMediaUrl } from '../config/api.config';
+import { checklistTemplateService } from '../services/interceptors/checklistTemplate.service';
+import { inspectionService } from '../services/interceptors/inspection.service';
+import { getMediaUrl } from '../config/api.config';
+import {
+  templateDataToSections,
+  buildChecklistData,
+} from '../utils/checklistUtils';
 import "./ManagerInspection.css";
 
 const ManagerInspection = () => {
@@ -33,8 +38,6 @@ const ManagerInspection = () => {
   const [overallRatingRejection, setOverallRatingRejection] = useState("");
   const [overallRating, setOverallRating] = useState("");
   const [initialPrice, setInitialPrice] = useState("");
-  const [startDate, setStartDate] = useState("");
-  const [endDate, setEndDate] = useState("");
 
 
   // Get images from auctionData media - only use real images from API, no static fallbacks
@@ -76,45 +79,21 @@ const ManagerInspection = () => {
   // Get item description
   const itemDescription = auctionData?.description || '';
 
-  // Get item ID
-  const itemId = auctionData?.id ? `INSP-${auctionData.id}` : 'N/A';
+  // Get lot ID (manager inspect uses lot_id)
+  const lotId = auctionData?.lot_id ?? auctionData?.lot ?? auctionData?.id;
+  const itemId = lotId ? `INSP-${lotId}` : 'N/A';
+  const categoryId = auctionData?.category ?? auctionData?.category_id;
 
-  // Fetch checklist on component mount
+  // Fetch checklist template for lot category
   useEffect(() => {
     const fetchChecklist = async () => {
-      if (!isStart || !categoryName) return;
+      if (!isStart || !categoryId) return;
 
       try {
         setLoadingChecklist(true);
-        const checklists = await managerService.getChecklists();
-
-        if (Array.isArray(checklists) && checklists.length > 0) {
-          // Match category name with checklist title
-          // e.g., "Vehicles" -> "Vehicles Inspection"
-          const normalizedCategoryName = categoryName.toLowerCase().trim();
-
-          const matchingChecklist = checklists.find(cl => {
-            if (!cl.title) return false;
-            const checklistTitle = cl.title.trim().toLowerCase();
-            return checklistTitle === `${normalizedCategoryName} inspection` ||
-              checklistTitle === normalizedCategoryName ||
-              checklistTitle.startsWith(normalizedCategoryName);
-          });
-
-          if (matchingChecklist && matchingChecklist.template_data && typeof matchingChecklist.template_data === 'object') {
-            // Convert template_data to checklist categories format
-            const categories = Object.entries(matchingChecklist.template_data).map(([name, items], index) => ({
-              id: `category-${index}`,
-              name,
-              items: Array.isArray(items) ? items.map((item, itemIndex) => ({
-                id: `item-${index}-${itemIndex}`,
-                name: typeof item === 'string' ? item : item.name || String(item)
-              })) : []
-            }));
-            setChecklistCategories(categories);
-          } else {
-            setChecklistCategories([]);
-          }
+        const template = await checklistTemplateService.getForCategory(categoryId);
+        if (template?.template_data) {
+          setChecklistCategories(templateDataToSections(template.template_data));
         } else {
           setChecklistCategories([]);
         }
@@ -127,7 +106,7 @@ const ManagerInspection = () => {
     };
 
     fetchChecklist();
-  }, [isStart, categoryName]);
+  }, [isStart, categoryId]);
 
   const toggle = (index) => setOpen(open === index ? null : index);
 
@@ -159,48 +138,36 @@ const ManagerInspection = () => {
   const handleApprove = async () => {
     if (isSubmitting) return; // Prevent multiple submissions
 
-    if (!auctionData?.id) {
-      toast.error("Auction ID is missing. Cannot submit inspection.");
+    if (!lotId) {
+      toast.error("Lot ID is missing. Cannot submit inspection.");
       return;
     }
 
-    // Validate required fields
-    if (!overallRating || !initialPrice || !startDate || !endDate) {
-      toast.error("Please fill in all required fields: Overall Rating, Initial Price, Start Date, and End Date.");
+    if (!overallRating || !initialPrice) {
+      toast.error("Please fill in Overall Rating and Initial Price.");
       return;
     }
 
     setIsSubmitting(true);
     try {
-      // Prepare checklist data in the format expected by API
-      const checklistData = {};
+      const checklistValues = {};
       checklistCategories.forEach((category) => {
-        const categoryData = {};
         category.items.forEach((item) => {
-          const key = `${category.name}-${item.id}`;
-          categoryData[item.name] = checkedItems[key] || false;
+          const key = `${category.name}::${item.name}`;
+          const checkboxKey = `${category.name}-${item.id}`;
+          checklistValues[key] = checkedItems[checkboxKey] ? 'Pass' : 'Fail';
         });
-        if (Object.keys(categoryData).length > 0) {
-          checklistData[category.name] = categoryData;
-        }
       });
+      const checklistData = buildChecklistData(checklistCategories, checklistValues);
 
-      // Prepare inspection data
-      const inspectionData = {
+      await inspectionService.performManagerInspection(lotId, {
         decision: "APPROVED",
-        overall_rating: parseFloat(overallRating),
+        overall_rating: overallRating.trim(),
         admin_feedback: finalNotes || "",
         checklist_data: checklistData,
-        initial_price: parseFloat(initialPrice),
-        start_date: new Date(startDate).toISOString(),
-        end_date: new Date(endDate).toISOString(),
-        buy_now_price: null,
-        is_buy_now_enabled: "False",
-        inspection_images: files
-      };
-
-      // Submit inspection
-      const response = await managerService.performInspection(auctionData.id, inspectionData);
+        initial_price: initialPrice.trim(),
+        inspection_images: files,
+      });
       toast.success("Inspection approved successfully!");
 
       // Navigate after a short delay to allow toast to be visible
@@ -222,39 +189,30 @@ const ManagerInspection = () => {
   const handleReject = async () => {
     if (isSubmitting) return; // Prevent multiple submissions
 
-    if (!auctionData?.id || !overallRatingRejection) {
+    if (!lotId || !overallRatingRejection) {
       toast.error("All checklist fields and overall Rating are required.");
       return;
     }
 
     setIsSubmitting(true);
-    // For rejection, we can use a simpler payload
-    // But we still need to send the decision and basic data
     try {
-      // Prepare checklist data in the format expected by API
-      const checklistData = {};
+      const checklistValues = {};
       checklistCategories.forEach((category) => {
-        const categoryData = {};
         category.items.forEach((item) => {
-          const key = `${category.name}-${item.id}`;
-          categoryData[item.name] = checkedItems[key] || false;
+          const key = `${category.name}::${item.name}`;
+          const checkboxKey = `${category.name}-${item.id}`;
+          checklistValues[key] = checkedItems[checkboxKey] ? 'Pass' : 'Fail';
         });
-        if (Object.keys(categoryData).length > 0) {
-          checklistData[category.name] = categoryData;
-        }
       });
+      const checklistData = buildChecklistData(checklistCategories, checklistValues);
 
-      // Prepare inspection data for rejection
-      const inspectionData = {
+      await inspectionService.performManagerInspection(lotId, {
         decision: "REJECTED",
         admin_feedback: finalNotes || "Inspection rejected by manager.",
         checklist_data: checklistData,
         inspection_images: files,
-        overall_rating: parseFloat(overallRatingRejection),
-      };
-
-      // Submit inspection rejection
-      const response = await managerService.performInspection(auctionData?.id, inspectionData);
+        overall_rating: overallRatingRejection.trim(),
+      });
       toast.success("Inspection rejected successfully!");
 
       // Navigate after a short delay to allow toast to be visible
@@ -676,37 +634,11 @@ const ManagerInspection = () => {
                       <input
                         type="number"
                         className="approval-form-input"
-                        placeholder="e.g., 5000.00"
+                        placeholder="e.g., 12500.00"
                         min="0"
                         step="0.01"
                         value={initialPrice}
                         onChange={(e) => setInitialPrice(e.target.value)}
-                        required
-                      />
-                    </div>
-
-                    <div className="approval-form-group">
-                      <label className="approval-form-label">
-                        Start Date <span className="required">*</span>
-                      </label>
-                      <input
-                        type="datetime-local"
-                        className="approval-form-input"
-                        value={startDate}
-                        onChange={(e) => setStartDate(e.target.value)}
-                        required
-                      />
-                    </div>
-
-                    <div className="approval-form-group">
-                      <label className="approval-form-label">
-                        End Date <span className="required">*</span>
-                      </label>
-                      <input
-                        type="datetime-local"
-                        className="approval-form-input"
-                        value={endDate}
-                        onChange={(e) => setEndDate(e.target.value)}
                         required
                       />
                     </div>

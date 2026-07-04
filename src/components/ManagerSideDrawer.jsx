@@ -95,7 +95,7 @@ const ManagerSideDrawer = ({ isOpen, onClose }) => {
     { path: '/manager/auction-deposit-override', label: 'Auction Control: Deposit Multiplier Override', icon: 'M3 3h18v18H3V3zm4 13h3v-3H7v3zm7 0h3V8h-3v8zm-3 0h2V5h-2v11z' },
     {
       path: '/manager/goods-received-verification',
-      label: 'Goods Received Verification',
+      label: 'Checklist & Goods Receive Verification',
       icon: 'M9 12l2 2 4-4m5 2a9 9 0 11-18 0 9 9 0 0118 0z',
       show: 'manageGrv',
     },

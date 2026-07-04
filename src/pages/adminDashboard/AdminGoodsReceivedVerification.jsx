@@ -78,7 +78,7 @@ const AdminGoodsReceivedVerification = () => {
     }
     if (!canAccessManagerGrv) {
       setLoading(false);
-      toast.error('You do not have access to Goods Received Verification.');
+      toast.error('You do not have access to Checklist & Goods Receive Verification.');
       navigate('/manager/dashboard', { replace: true });
       return;
     }
@@ -117,13 +117,13 @@ const AdminGoodsReceivedVerification = () => {
         </button>
         <div className="admin-event-lots__header-content">
           <div className="admin-event-lots__header-title-row">
-            <h1 className="admin-event-lots__title">Goods Received Verification</h1>
+            <h1 className="admin-event-lots__title">Checklist &amp; Goods Receive Verification</h1>
             <span className="admin-event-lots__header-status admin-event-lots__header-status--draft">
               Draft lots
             </span>
           </div>
           <p className="admin-event-lots__subtitle">
-            {draftCount} draft lot{draftCount !== 1 ? 's' : ''} · open a lot to manage GRV checklist
+            {draftCount} draft lot{draftCount !== 1 ? 's' : ''} · open a lot to manage checklist &amp; GRV
           </p>
         </div>
       </header>

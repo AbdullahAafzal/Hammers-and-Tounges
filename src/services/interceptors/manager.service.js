@@ -1,6 +1,7 @@
 
 import apiClient from '../api.service';
 import { API_ROUTES } from '../../config/api.config';
+import { withAuthConfig } from '../../utils/authHeaders';
 
 export const managerService = {
   // Get Manager's Assigned Tasks/Auctions
@@ -16,8 +17,8 @@ export const managerService = {
     }
   },
 
-  // Perform Inspection on an Auction
-  performInspection: async (auctionId, inspectionData) => {
+  // Perform Inspection on a Lot (manager sign-off)
+  performInspection: async (lotId, inspectionData) => {
     try {
       const formData = new FormData();
       
@@ -39,7 +40,7 @@ export const managerService = {
       });
 
       const { data } = await apiClient.post(
-        `${API_ROUTES.MANAGER_INSPECT}${auctionId}/`,
+        `${API_ROUTES.MANAGER_INSPECT}${lotId}/`,
         formData,
         {
           headers: { 'Content-Type': 'multipart/form-data' },
@@ -84,12 +85,13 @@ export const managerService = {
     }
   },
 
-  // Checklist/Template Management
+  // Checklist Template Management (category-linked)
   createChecklist: async (checklistData) => {
     try {
       const { data } = await apiClient.post(
-        API_ROUTES.INSPECTION_TEMPLATES,
-        checklistData
+        API_ROUTES.CHECKLIST_TEMPLATES,
+        checklistData,
+        withAuthConfig()
       );
       return data;
     } catch (error) {
@@ -100,9 +102,14 @@ export const managerService = {
     }
   },
 
-  getChecklists: async () => {
+  getChecklists: async (params = {}) => {
     try {
-      const { data } = await apiClient.get(API_ROUTES.INSPECTION_TEMPLATES);
+      const { data } = await apiClient.get(
+        API_ROUTES.CHECKLIST_TEMPLATES,
+        withAuthConfig({ params })
+      );
+      if (Array.isArray(data)) return data;
+      if (Array.isArray(data?.results)) return data.results;
       return data;
     } catch (error) {
       if (error.isNetworkError) {
@@ -115,8 +122,25 @@ export const managerService = {
   updateChecklist: async (templateId, checklistData) => {
     try {
       const { data } = await apiClient.put(
-        `${API_ROUTES.INSPECTION_TEMPLATE_DETAIL}${templateId}/`,
-        checklistData
+        API_ROUTES.CHECKLIST_TEMPLATE_DETAIL(templateId),
+        checklistData,
+        withAuthConfig()
+      );
+      return data;
+    } catch (error) {
+      if (error.isNetworkError) {
+        throw new Error('Unable to connect to server. Please try again later.');
+      }
+      throw error;
+    }
+  },
+
+  patchChecklist: async (templateId, checklistData) => {
+    try {
+      const { data } = await apiClient.patch(
+        API_ROUTES.CHECKLIST_TEMPLATE_DETAIL(templateId),
+        checklistData,
+        withAuthConfig()
       );
       return data;
     } catch (error) {
@@ -130,7 +154,8 @@ export const managerService = {
   deleteChecklist: async (templateId) => {
     try {
       const { data } = await apiClient.delete(
-        `${API_ROUTES.INSPECTION_TEMPLATE_DETAIL}${templateId}/`
+        API_ROUTES.CHECKLIST_TEMPLATE_DETAIL(templateId),
+        withAuthConfig()
       );
       return data;
     } catch (error) {

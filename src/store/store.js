@@ -7,6 +7,7 @@ import sellerReducer from './slices/sellerSlice';
 import buyerReducer from './slices/buyerSlice';
 import permissionsReducer from './slices/permissionsSlice';
 import { fcmLogoutListener } from './fcmLogoutListener';
+import { setAuthStore } from '../utils/authHeaders';
 
 const store = configureStore({
   reducer: {
@@ -36,6 +37,8 @@ const store = configureStore({
   //   }),
   // devTools: import.meta.env.DEV,
 });
+
+setAuthStore(store);
 
 export { store };
 export default store;

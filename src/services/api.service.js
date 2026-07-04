@@ -1,6 +1,6 @@
 import axios from 'axios';
 import { API_CONFIG } from '../config/api.config';
-import { cookieStorage } from '../utils/cookieStorage';
+import { getAccessToken, setAuthorizationHeader } from '../utils/authHeaders';
 
 const baseURL = API_CONFIG.BASE_URL.endsWith('/')
   ? API_CONFIG.BASE_URL
@@ -65,8 +65,15 @@ const getRequestKey = (config) => {
   const url = config.url || '';
   const params = stableStringify(config.params || {});
   const data = stableStringify(config.data || {});
+  const auth =
+    config.headers?.Authorization ||
+    config.headers?.authorization ||
+    (typeof config.headers?.get === 'function'
+      ? config.headers.get('Authorization') || config.headers.get('authorization')
+      : '') ||
+    '';
 
-  return `${method}|${url}|${params}|${data}`;
+  return `${method}|${url}|${params}|${data}|${auth}`;
 };
 
 apiClient.interceptors.request.use((config) => {
@@ -96,9 +103,10 @@ apiClient.interceptors.request.use((config) => {
   }
   // Add auth token only for protected routes (skip for public/guest endpoints)
   if (!isPublicPath(config.url)) {
-    const token = cookieStorage.getItem(cookieStorage.AUTH_KEYS.TOKEN);
-    if (token && typeof token === 'string') {
-      config.headers.Authorization = `Bearer ${token}`;
+    const token = getAccessToken();
+    if (token) {
+      config.headers = config.headers || {};
+      setAuthorizationHeader(config.headers, token);
     }
   }
   return config;

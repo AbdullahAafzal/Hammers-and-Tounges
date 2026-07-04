@@ -189,13 +189,16 @@ export const API_ROUTES = {
 
   // Manager Routes
   MANAGER_TASKS: '/inspections/manager/tasks/',
-  MANAGER_INSPECT: '/inspections/manager/inspect/', // + auction_id
+  /** POST multipart — lot sign-off / manager inspection */
+  MANAGER_INSPECT: '/auctions/manager/inspect/', // + lot_id
   INSPECTION_REPORTS: '/inspections/reports/',
   INSPECTION_REPORT_DETAIL: '/inspections/reports/', // + report_id
+  /** GET unified checklist + GRV inspection report for a lot */
+  LOT_INSPECTION_REPORT: (lotId) => `/auctions/lots/${lotId}/inspection-report/`,
 
-  // Checklist/Template Routes
-  INSPECTION_TEMPLATES: '/inspections/templates/',
-  INSPECTION_TEMPLATE_DETAIL: '/inspections/templates/', // + template_id
+  // Checklist template routes (category-linked)
+  CHECKLIST_TEMPLATES: '/auctions/checklist-templates/',
+  CHECKLIST_TEMPLATE_DETAIL: (templateId) => `/auctions/checklist-templates/${templateId}/`,
 
   /** Admin — popcorn bidding rules per event (GET/PUT) and toggle (POST) */
   ADMIN_EVENT_POPCORN: (eventId) => `/auctions/admin/events/${eventId}/popcorn/`,

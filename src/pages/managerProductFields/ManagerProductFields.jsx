@@ -4,6 +4,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { createCategory, updateCategory, fetchCategories } from '../../store/actions/adminActions';
 import { fetchCategories as fetchCategoriesForBuyer } from '../../store/actions/AuctionsActions';
 import { toast } from 'react-toastify';
+import CategoryChecklistTemplate from '../../components/CategoryChecklistTemplate';
 import './ManagerProductFields.css';
 
 const ManagerProductFields = () => {
@@ -17,6 +18,9 @@ const ManagerProductFields = () => {
   // Check if we're in edit mode
   const editingCategoryId = localStorage.getItem('editingCategoryId');
   const isEditMode = !!editingCategoryId;
+  const [resolvedCategoryId, setResolvedCategoryId] = useState(
+    isEditMode ? parseInt(editingCategoryId, 10) : null
+  );
 
   const [categoryName, setCategoryName] = useState('');
 
@@ -376,36 +380,34 @@ const ManagerProductFields = () => {
     };
 
     try {
-      let createdCategoryId = null;
-
       if (isEditMode && editingCategoryId) {
-        // Update existing category
         await dispatch(updateCategory({ 
           categoryId: parseInt(editingCategoryId), 
           categoryData 
         })).unwrap();
+        setResolvedCategoryId(parseInt(editingCategoryId, 10));
         toast.success('Category updated successfully!');
       } else {
-        // Create new category
-        await dispatch(createCategory(categoryData)).unwrap();
-        toast.success('Category created successfully!');
+        const created = await dispatch(createCategory(categoryData)).unwrap();
+        const newId = created?.id ?? created?.data?.id;
+        if (newId) {
+          setResolvedCategoryId(Number(newId));
+          localStorage.setItem('editingCategoryId', String(newId));
+        }
+        toast.success('Category saved. Create a checklist template below to complete setup.');
       }
 
-      // Clear localStorage
-      localStorage.removeItem('pendingCategoryName');
-      if (isEditMode) {
-        localStorage.removeItem('editingCategoryId');
-      }
-      
-      // Refresh categories in both admin and buyer stores (Buy tab uses state.buyer.categories)
       dispatch(fetchCategories());
       dispatch(fetchCategoriesForBuyer());
-      
-      // Navigate back to category list
-      navigate(`${basePath}/category`);
     } catch (error) {
       console.error(`Failed to ${isEditMode ? 'update' : 'create'} category:`, error);
     }
+  };
+
+  const handleFinishCategorySetup = () => {
+    localStorage.removeItem('pendingCategoryName');
+    localStorage.removeItem('editingCategoryId');
+    navigate(`${basePath}/category`);
   };
 
   const getFieldTypeIcon = (type) => {
@@ -424,22 +426,15 @@ const ManagerProductFields = () => {
         <div className="dashboard-container">
           <div className="manage-fields-header">
             <div className="category-details">
-              <h1 className="manage-field-page-title">Manage Product Fields</h1>
+              <h1 className="manage-field-page-title">Category Details</h1>
               <p className="manage-field-page-subtitle">
-                Configure custom fields for products in <strong>{categoryName || 'New Category'}</strong> category
+                Configure product fields and checklist template for <strong>{categoryName || 'New Category'}</strong>
               </p>
             </div>
             <div className="header-actions">
               <button
                 className="field-secondary-btn"
-                onClick={() => {
-                  // Clear edit mode data when canceling
-                  if (isEditMode) {
-                    localStorage.removeItem('editingCategoryId');
-                    localStorage.removeItem('pendingCategoryName');
-                  }
-                  navigate(`${basePath}/category`);
-                }}
+                onClick={handleFinishCategorySetup}
               >
                 Back to Categories
               </button>
@@ -783,6 +778,12 @@ const ManagerProductFields = () => {
               </div>
             </div>
           </div>
+
+          <CategoryChecklistTemplate
+            categoryId={resolvedCategoryId}
+            categoryName={categoryName}
+            canEdit
+          />
         </div>
       </main>
     </div>
