@@ -4,6 +4,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { fetchCategories, deleteCategory } from '../../store/actions/adminActions';
 import { fetchCategories as fetchCategoriesForBuyer } from '../../store/actions/AuctionsActions';
 import { adminService } from '../../services/interceptors/admin.service';
+import { auctionService } from '../../services/interceptors/auction.service';
 import { toast } from 'react-toastify';
 import { isFinanceAdminFlow } from '../../utils/financeAccess';
 import './CategoryManagement.css';
@@ -84,8 +85,14 @@ export default function CategoryManagement() {
     }
   };
 
-  const handleEdit = (id) => {
+  const handleEdit = async (id) => {
     if (!canUpdateCategories) return;
+    try {
+      const categoryDetail = await auctionService.getCategoryDetail(id);
+      console.log('Get category detail API response (edit category):', categoryDetail);
+    } catch (error) {
+      console.log('Get category detail API error (edit category):', error?.response?.data ?? error);
+    }
     // Store category ID in localStorage to pass to edit flow
     localStorage.setItem('editingCategoryId', id.toString());
     // Find the category to get its name

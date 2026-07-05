@@ -31,9 +31,16 @@ const templateDataToSections = (templateData) => {
 
 /**
  * Checklist template CRUD for a category (Category Details / Product Fields screen).
+ * Initial template data comes from category detail API (`checklist_template`), not a separate list call.
  */
-export default function CategoryChecklistTemplate({ categoryId, categoryName, canEdit = true }) {
-  const [loading, setLoading] = useState(true);
+export default function CategoryChecklistTemplate({
+  categoryId,
+  categoryName,
+  canEdit = true,
+  checklistTemplate = null,
+  loading: checklistLoading = false,
+  onRefresh,
+}) {
   const [saving, setSaving] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [template, setTemplate] = useState(null);
@@ -42,15 +49,8 @@ export default function CategoryChecklistTemplate({ categoryId, categoryName, ca
   const [description, setDescription] = useState('');
   const [sections, setSections] = useState([emptySection()]);
 
-  const loadTemplate = useCallback(async () => {
-    if (!categoryId) {
-      setLoading(false);
-      setTemplate(null);
-      return;
-    }
-    setLoading(true);
-    try {
-      const found = await checklistTemplateService.getForCategory(categoryId);
+  const applyTemplate = useCallback(
+    (found) => {
       setTemplate(found);
       if (found) {
         setTitle(found.title || `${categoryName || 'Category'} Inspection`);
@@ -61,25 +61,17 @@ export default function CategoryChecklistTemplate({ categoryId, categoryName, ca
         setDescription('');
         setSections([emptySection()]);
       }
-    } catch (err) {
-      const status = err?.response?.status;
-      const detail = err?.response?.data?.detail;
-      if (status === 404) {
-        setTemplate(null);
-      } else {
-        toast.error(
-          typeof detail === 'string' ? detail : err?.message || 'Failed to load checklist template'
-        );
-        setTemplate(null);
-      }
-    } finally {
-      setLoading(false);
-    }
-  }, [categoryId, categoryName]);
+    },
+    [categoryName]
+  );
 
   useEffect(() => {
-    loadTemplate();
-  }, [loadTemplate]);
+    if (!categoryId) {
+      setTemplate(null);
+      return;
+    }
+    applyTemplate(checklistTemplate ?? null);
+  }, [categoryId, checklistTemplate, applyTemplate]);
 
   const startCreate = () => {
     setIsEditing(true);
@@ -138,7 +130,7 @@ export default function CategoryChecklistTemplate({ categoryId, categoryName, ca
         toast.success('Checklist template created.');
       }
       setIsEditing(false);
-      await loadTemplate();
+      await onRefresh?.();
     } catch (err) {
       const status = err?.response?.status;
       const detail = err?.response?.data?.detail;
@@ -159,7 +151,7 @@ export default function CategoryChecklistTemplate({ categoryId, categoryName, ca
     try {
       await checklistTemplateService.patch(template.id, { is_active: !template.is_active });
       toast.success(template.is_active ? 'Template deactivated.' : 'Template activated.');
-      await loadTemplate();
+      await onRefresh?.();
     } catch (err) {
       toast.error(err?.response?.data?.detail || err?.message || 'Failed to update template status');
     } finally {
@@ -177,6 +169,7 @@ export default function CategoryChecklistTemplate({ categoryId, categoryName, ca
       setTemplate(null);
       setIsEditing(false);
       setSections([emptySection()]);
+      await onRefresh?.();
     } catch (err) {
       toast.error(err?.response?.data?.detail || err?.message || 'Failed to delete template');
     } finally {
@@ -248,7 +241,7 @@ export default function CategoryChecklistTemplate({ categoryId, categoryName, ca
         )}
       </div>
 
-      {loading ? (
+      {checklistLoading ? (
         <p className="category-checklist__loading">Loading checklist template…</p>
       ) : !template && !isEditing ? (
         <div className="category-checklist__empty">

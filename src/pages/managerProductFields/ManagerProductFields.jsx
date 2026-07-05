@@ -1,8 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useLocation, useParams, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { createCategory, updateCategory, fetchCategories } from '../../store/actions/adminActions';
 import { fetchCategories as fetchCategoriesForBuyer } from '../../store/actions/AuctionsActions';
+import { auctionService } from '../../services/interceptors/auction.service';
 import { toast } from 'react-toastify';
 import CategoryChecklistTemplate from '../../components/CategoryChecklistTemplate';
 import './ManagerProductFields.css';
@@ -23,6 +24,33 @@ const ManagerProductFields = () => {
   );
 
   const [categoryName, setCategoryName] = useState('');
+  const [checklistTemplate, setChecklistTemplate] = useState(null);
+  const [checklistLoading, setChecklistLoading] = useState(false);
+
+  const loadCategoryDetail = useCallback(async (id) => {
+    if (!id) {
+      setChecklistTemplate(null);
+      return;
+    }
+    setChecklistLoading(true);
+    try {
+      const detail = await auctionService.getCategoryDetail(id);
+      setChecklistTemplate(detail?.checklist_template ?? null);
+    } catch (error) {
+      console.error('Failed to load category detail:', error);
+      setChecklistTemplate(null);
+    } finally {
+      setChecklistLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (resolvedCategoryId) {
+      loadCategoryDetail(resolvedCategoryId);
+    } else {
+      setChecklistTemplate(null);
+    }
+  }, [resolvedCategoryId, loadCategoryDetail]);
 
   // Convert validation_schema to fields format
   const convertValidationSchemaToFields = (validationSchema) => {
@@ -783,6 +811,9 @@ const ManagerProductFields = () => {
             categoryId={resolvedCategoryId}
             categoryName={categoryName}
             canEdit
+            checklistTemplate={checklistTemplate}
+            loading={checklistLoading}
+            onRefresh={() => loadCategoryDetail(resolvedCategoryId)}
           />
         </div>
       </main>
