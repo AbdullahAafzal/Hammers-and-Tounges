@@ -1,12 +1,14 @@
 import React, { useState, useEffect, useMemo } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { toast } from 'react-toastify';
-import { checklistTemplateService } from '../services/interceptors/checklistTemplate.service';
+import { auctionService } from '../services/interceptors/auction.service';
 import { inspectionService } from '../services/interceptors/inspection.service';
 import { getMediaUrl } from '../config/api.config';
 import {
   templateDataToSections,
   buildChecklistData,
+  resolveLotCategoryId,
+  checklistTemplateFromCategoryDetail,
 } from '../utils/checklistUtils';
 import "./ManagerInspection.css";
 
@@ -82,16 +84,17 @@ const ManagerInspection = () => {
   // Get lot ID (manager inspect uses lot_id)
   const lotId = auctionData?.lot_id ?? auctionData?.lot ?? auctionData?.id;
   const itemId = lotId ? `INSP-${lotId}` : 'N/A';
-  const categoryId = auctionData?.category ?? auctionData?.category_id;
+  const categoryId = resolveLotCategoryId(auctionData);
 
-  // Fetch checklist template for lot category
+  // Fetch checklist template from category detail API
   useEffect(() => {
     const fetchChecklist = async () => {
       if (!isStart || !categoryId) return;
 
       try {
         setLoadingChecklist(true);
-        const template = await checklistTemplateService.getForCategory(categoryId);
+        const detail = await auctionService.getCategoryDetail(categoryId);
+        const template = checklistTemplateFromCategoryDetail(detail);
         if (template?.template_data) {
           setChecklistCategories(templateDataToSections(template.template_data));
         } else {
@@ -190,7 +193,12 @@ const ManagerInspection = () => {
     if (isSubmitting) return; // Prevent multiple submissions
 
     if (!lotId || !overallRatingRejection) {
-      toast.error("All checklist fields and overall Rating are required.");
+      toast.error("Overall rating is required for rejection.");
+      return;
+    }
+
+    if (!finalNotes.trim()) {
+      toast.error("Please provide a rejection reason in Final Inspection Summary.");
       return;
     }
 
@@ -205,10 +213,12 @@ const ManagerInspection = () => {
         });
       });
       const checklistData = buildChecklistData(checklistCategories, checklistValues);
+      const rejectionReason = finalNotes.trim();
 
       await inspectionService.performManagerInspection(lotId, {
         decision: "REJECTED",
-        admin_feedback: finalNotes || "Inspection rejected by manager.",
+        admin_feedback: rejectionReason,
+        rejection_reason: rejectionReason,
         checklist_data: checklistData,
         inspection_images: files,
         overall_rating: overallRatingRejection.trim(),
@@ -583,7 +593,7 @@ const ManagerInspection = () => {
                         <div className="rejection-section">
                           <h4 className="rejection-title">Reason for Rejection</h4>
                           <p className="rejection-text">
-                            {auctionData?.rejection_reason || 'The item did not meet the minimum inspection requirements set by the management.'}
+                            {auctionData?.admin_feedback || auctionData?.rejection_reason || 'The item did not meet the minimum inspection requirements set by the management.'}
                           </p>
                         </div>
 

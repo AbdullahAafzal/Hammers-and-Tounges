@@ -5,12 +5,13 @@ import { getLotImageUrls } from '../utils/lotMedia';
 import { auctionService } from '../services/interceptors/auction.service';
 import { grvService } from '../services/interceptors/grv.service';
 import { inspectionService } from '../services/interceptors/inspection.service';
-import { checklistTemplateService } from '../services/interceptors/checklistTemplate.service';
 import {
   templateDataToSections,
   buildChecklistData,
   flattenChecklistData,
   isChecklistFilled,
+  resolveLotCategoryId,
+  checklistTemplateFromCategoryDetail,
 } from '../utils/checklistUtils';
 import { toast } from 'react-toastify';
 import './GuestLotDrawer.css';
@@ -60,6 +61,7 @@ const GrvLotDrawer = ({ lot: initialLot, onClose, onGrvChanged }) => {
   const [templateLoading, setTemplateLoading] = useState(true);
   const [savingGrv, setSavingGrv] = useState(false);
   const [approving, setApproving] = useState(false);
+  const [rejecting, setRejecting] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [selectedImage, setSelectedImage] = useState(0);
 
@@ -78,7 +80,7 @@ const GrvLotDrawer = ({ lot: initialLot, onClose, onGrvChanged }) => {
 
   const effectiveLot = lot || initialLot;
   const eventTitle = effectiveLot?.event_title || '—';
-  const categoryId = effectiveLot?.category ?? effectiveLot?.category_id;
+  const categoryId = resolveLotCategoryId(effectiveLot);
   const imageUrls = getLotImageUrls(effectiveLot);
   const displayImage = imageUrls[selectedImage] || imageUrls[0];
 
@@ -99,7 +101,9 @@ const GrvLotDrawer = ({ lot: initialLot, onClose, onGrvChanged }) => {
 
   const reportChecklistDone = !!inspectionReport?.checklist_completed;
   const reportConditionDone = !!inspectionReport?.condition_confirmed;
-  const reportApproved = String(inspectionReport?.status || grvRecord?.status || '').toUpperCase() === 'APPROVED';
+  const inspectionStatus = String(inspectionReport?.status || grvRecord?.status || '').toUpperCase();
+  const reportApproved = inspectionStatus === 'APPROVED';
+  const reportRejected = inspectionStatus === 'REJECTED';
   const localChecklistFilled = isChecklistFilled(checklistSections, checklistValues);
 
   const loadInspectionReport = useCallback(async (lotId) => {
@@ -157,7 +161,8 @@ const GrvLotDrawer = ({ lot: initialLot, onClose, onGrvChanged }) => {
     }
     setTemplateLoading(true);
     try {
-      const template = await checklistTemplateService.getForCategory(catId);
+      const detail = await auctionService.getCategoryDetail(catId);
+      const template = checklistTemplateFromCategoryDetail(detail);
       setChecklistSections(templateDataToSections(template?.template_data));
     } catch {
       setChecklistSections([]);
@@ -211,6 +216,9 @@ const GrvLotDrawer = ({ lot: initialLot, onClose, onGrvChanged }) => {
     if (reportApproved) {
       blockers.push('This lot is already approved.');
     }
+    if (reportRejected) {
+      blockers.push('This lot has been rejected.');
+    }
     return blockers;
   }, [
     localChecklistFilled,
@@ -219,11 +227,13 @@ const GrvLotDrawer = ({ lot: initialLot, onClose, onGrvChanged }) => {
     reportConditionDone,
     checklistSections.length,
     reportApproved,
+    reportRejected,
   ]);
 
   const canSubmitApproval =
     canApprove &&
     !reportApproved &&
+    !reportRejected &&
     checklistSections.length > 0 &&
     (localChecklistFilled || reportChecklistDone) &&
     (conditionConfirmed || reportConditionDone) &&
@@ -303,6 +313,48 @@ const GrvLotDrawer = ({ lot: initialLot, onClose, onGrvChanged }) => {
       toast.error(typeof msg === 'string' ? msg : 'Failed to approve lot');
     } finally {
       setApproving(false);
+    }
+  };
+
+  const handleRejectLot = async () => {
+    const lotId = effectiveLot?.id;
+    if (!lotId || !canApprove || reportApproved || reportRejected) return;
+
+    const rejectionReason = adminFeedback.trim();
+    if (!rejectionReason) {
+      toast.error('Enter a rejection reason in Admin feedback before rejecting.');
+      return;
+    }
+
+    if (!window.confirm('Reject this lot? The seller will need to address the issues before resubmitting.')) {
+      return;
+    }
+
+    setRejecting(true);
+    try {
+      const checklistData = buildChecklistData(checklistSections, checklistValues);
+      await inspectionService.performManagerInspection(lotId, {
+        decision: 'REJECTED',
+        checklist_data: checklistData,
+        admin_feedback: rejectionReason,
+        rejection_reason: rejectionReason,
+        overall_rating: overallRating.trim() || '0',
+        inspection_images: inspectionFiles,
+      });
+      toast.success('Lot rejected.');
+      await loadInspectionReport(lotId);
+      await loadGrv(lotId);
+      onGrvChanged?.();
+    } catch (err) {
+      const d = err?.response?.data;
+      const msg =
+        (typeof d?.detail === 'string' && d.detail) ||
+        (Array.isArray(d?.detail) && d.detail.map((x) => (typeof x === 'string' ? x : x?.msg)).filter(Boolean).join(', ')) ||
+        d?.message ||
+        err?.message;
+      toast.error(typeof msg === 'string' ? msg : 'Failed to reject lot');
+    } finally {
+      setRejecting(false);
     }
   };
 
@@ -443,11 +495,22 @@ const GrvLotDrawer = ({ lot: initialLot, onClose, onGrvChanged }) => {
                         <span className="grv-status-card__label">GRV / Condition</span>
                         <strong>{reportConditionDone || conditionConfirmed ? 'Confirmed' : 'Pending'}</strong>
                       </div>
-                      <div className={`grv-status-card ${reportApproved ? 'done' : 'pending'}`}>
+                      <div className={`grv-status-card ${reportApproved ? 'done' : reportRejected ? 'rejected' : 'pending'}`}>
                         <span className="grv-status-card__label">Approval</span>
-                        <strong>{reportApproved ? 'Approved' : String(inspectionReport?.status || grvRecord?.status || 'Draft')}</strong>
+                        <strong>
+                          {reportApproved ? 'Approved' : reportRejected ? 'Rejected' : inspectionStatus || 'Draft'}
+                        </strong>
                       </div>
                     </div>
+
+                    {reportRejected && (
+                      <p className="grv-panel__rejected">
+                        Rejected
+                        {inspectionReport?.admin_feedback || inspectionReport?.rejection_reason
+                          ? `: ${inspectionReport.admin_feedback || inspectionReport.rejection_reason}`
+                          : ''}
+                      </p>
+                    )}
 
                     {!checklistSections.length && (
                       <p className="grv-panel__warning">
@@ -456,7 +519,7 @@ const GrvLotDrawer = ({ lot: initialLot, onClose, onGrvChanged }) => {
                       </p>
                     )}
 
-                    {checklistSections.length > 0 && !reportApproved && (
+                    {checklistSections.length > 0 && !reportApproved && !reportRejected && (
                       <div className="grv-checklist-form">
                         <h5>Inspection checklist</h5>
                         {checklistSections.map((section) => (
@@ -472,7 +535,7 @@ const GrvLotDrawer = ({ lot: initialLot, onClose, onGrvChanged }) => {
                                     onChange={(e) =>
                                       setChecklistValues((prev) => ({ ...prev, [key]: e.target.value }))
                                     }
-                                    disabled={!fieldsEditable || reportApproved}
+                                    disabled={!fieldsEditable || reportApproved || reportRejected}
                                   >
                                     <option value="">Select…</option>
                                     {PASS_FAIL_OPTIONS.map((opt) => (
@@ -494,7 +557,7 @@ const GrvLotDrawer = ({ lot: initialLot, onClose, onGrvChanged }) => {
                           type="checkbox"
                           checked={conditionConfirmed}
                           onChange={(e) => setConditionConfirmed(e.target.checked)}
-                          disabled={!fieldsEditable || reportApproved}
+                          disabled={!fieldsEditable || reportApproved || reportRejected}
                         />
                         <span>Condition confirmed</span>
                       </label>
@@ -508,11 +571,11 @@ const GrvLotDrawer = ({ lot: initialLot, onClose, onGrvChanged }) => {
                         value={notes}
                         onChange={(e) => setNotes(e.target.value)}
                         placeholder="Optional GRV notes…"
-                        readOnly={!fieldsEditable || reportApproved}
+                        readOnly={!fieldsEditable || reportApproved || reportRejected}
                       />
                     </div>
 
-                    {!reportApproved && fieldsEditable && (
+                    {!reportApproved && !reportRejected && fieldsEditable && (
                       <div className="grv-panel__actions">
                         <button
                           type="button"
@@ -535,11 +598,11 @@ const GrvLotDrawer = ({ lot: initialLot, onClose, onGrvChanged }) => {
                       </div>
                     )}
 
-                    {!reportApproved && canApprove && (
+                    {!reportApproved && !reportRejected && canApprove && (
                       <div className="grv-approval-section">
                         <h5>Final lot approval</h5>
                         <p className="grv-panel__hint">
-                          Both checklist and GRV condition must be complete before approval.
+                          Both checklist and GRV condition must be complete before approval. Use Admin feedback as the rejection reason if rejecting.
                         </p>
 
                         {approvalBlockers.length > 0 && (
@@ -592,15 +655,25 @@ const GrvLotDrawer = ({ lot: initialLot, onClose, onGrvChanged }) => {
                           </label>
                         </div>
 
-                        <button
-                          type="button"
-                          className="grv-panel__btn grv-panel__btn--primary"
-                          onClick={handleFinalApproval}
-                          disabled={!canSubmitApproval || approving}
-                          title={!canSubmitApproval ? approvalBlockers.join(' ') : undefined}
-                        >
-                          {approving ? 'Approving…' : 'Approve lot'}
-                        </button>
+                        <div className="grv-approval-actions">
+                          <button
+                            type="button"
+                            className="grv-panel__btn grv-panel__btn--danger"
+                            onClick={handleRejectLot}
+                            disabled={rejecting || approving}
+                          >
+                            {rejecting ? 'Rejecting…' : 'Reject lot'}
+                          </button>
+                          <button
+                            type="button"
+                            className="grv-panel__btn grv-panel__btn--primary"
+                            onClick={handleFinalApproval}
+                            disabled={!canSubmitApproval || approving}
+                            title={!canSubmitApproval ? approvalBlockers.join(' ') : undefined}
+                          >
+                            {approving ? 'Approving…' : 'Approve lot'}
+                          </button>
+                        </div>
                       </div>
                     )}
 

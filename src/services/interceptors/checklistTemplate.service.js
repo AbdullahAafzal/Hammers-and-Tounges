@@ -56,8 +56,10 @@ export const checklistTemplateService = {
 
   /** Active template for a category, if any */
   getForCategory: async (categoryId) => {
+    const id = Number(categoryId);
     const list = await checklistTemplateService.list({ category: categoryId });
-    const active = list.find((t) => t.is_active !== false);
-    return active || list[0] || null;
+    const forCategory = list.filter((t) => Number(t.category) === id);
+    const active = forCategory.find((t) => t.is_active !== false);
+    return active || forCategory[0] || null;
   },
 };

@@ -74,3 +74,22 @@ export const isChecklistFilled = (sections, values) => {
 };
 
 export const GRV_TAB_LABEL = 'Checklist & Goods Receive Verification';
+
+/** Normalize lot.category / category_id (number or nested object) for API calls. */
+export const resolveLotCategoryId = (lot) => {
+  const raw = lot?.category_id ?? lot?.category;
+  if (raw == null || raw === '') return null;
+  if (typeof raw === 'object') {
+    const id = raw.id ?? raw.pk;
+    return id != null ? Number(id) : null;
+  }
+  const n = Number(raw);
+  return Number.isFinite(n) ? n : null;
+};
+
+/** Active checklist template from category detail API (`checklist_template` may be null). */
+export const checklistTemplateFromCategoryDetail = (detail) => {
+  const template = detail?.checklist_template;
+  if (!template || template.is_active === false) return null;
+  return template;
+};
